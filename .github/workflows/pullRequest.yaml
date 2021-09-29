@@ -1,10 +1,14 @@
 name: Run Tests and Lighthouse Performace Score
 
-on: pull_request
+on: 
+  workflow_dispatch:
+  pull_request:
 
 jobs:
-    build-gh-pages:
+    run-test:
             runs-on: ubuntu-latest
+
+            name: Run Tests
 
             steps:
                 - uses: actions/checkout@v2
@@ -20,6 +24,7 @@ jobs:
 
 
     lighthouse-check:
+        name: Check Lighthouse Performance Score
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@master
