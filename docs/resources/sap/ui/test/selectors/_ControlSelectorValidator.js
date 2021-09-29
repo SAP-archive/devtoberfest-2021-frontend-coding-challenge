@@ -1,0 +1,6 @@
+/*!
+ * OpenUI5
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
+ */
+sap.ui.define(["sap/ui/base/ManagedObject","sap/ui/test/_OpaLogger","sap/ui/test/_ControlFinder","sap/ui/thirdparty/jquery"],function(t,e,r,i){"use strict";var o=t.extend("sap.ui.test.selectors._ControlSelectorValidator",{constructor:function(t,r){this.оValidationRoot=t;this.bMultiple=r;this._oLogger=e.getLogger("sap.ui.test.selectors._ControlSelectorValidator")},_validate:function(t){if(t){var e=r._findControls(i.extend(true,{},t));if(this.оValidationRoot&&e.length>1){e=e.filter(function(t){return this._hasAncestor(t,this.оValidationRoot)}.bind(this))}if(e.length){if(e.length===1){this._oLogger.debug("Selector matched a single control: "+JSON.stringify(t));return true}else if(this.bMultiple){this._oLogger.debug("Selector matched multiple controls: "+JSON.stringify(t));return true}else{this._oLogger.debug("Selector matched multiple controls: "+JSON.stringify(t));return false}}else{this._oLogger.debug("Selector did not match any controls: "+JSON.stringify(t));return false}}},_hasAncestor:function(t,e){var r=t.getParent();return!!r&&(r===e||this._hasAncestor(r,e))}});return o});

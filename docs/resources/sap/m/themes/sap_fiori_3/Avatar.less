@@ -1,0 +1,56 @@
+/* ============================= */
+/* CSS for control sap.m/Avatar  */
+/* Fiori 3 theme                 */
+/* ============================= */
+
+.sapFAvatarBorder {
+	&.sapFAvatarIcon,
+	&.sapFAvatarInitials,
+	.sapFAvatarImageHolder {
+		box-shadow: 0 0 0 0.0625rem fade(@sapUiContentShadowColor, 10) inset;
+	}
+}
+
+.sapFAvatarInitialsHolder {
+	color: @sapUiContentContrastTextColor;
+}
+
+.sapFAvatarIcon {
+	color: @sapUiContentContrastIconColor;
+}
+
+.sapFAvatarSquare {
+	border-radius: @sapUiElementBorderCornerRadius;
+
+	.sapFAvatarImageHolder {
+		border-radius: @sapUiElementBorderCornerRadius;
+	}
+}
+
+.sapFAvatarXL .sapFAvatarInitialsHolder {
+	font-size: 3rem;
+}
+
+.sapFAvatarL {
+	font-size: 2.25rem;
+
+	.sapFAvatarInitialsHolder {
+		font-size: 2.25rem;
+	}
+}
+
+.sapFAvatarM {
+	font-size: 1.5rem;
+
+	.sapFAvatarInitialsHolder {
+		font-size: 1.5rem;
+	}
+}
+
+.sapFAvatarS {
+	font-size: 1.125rem;
+}
+
+.sapFAvatarXS .sapFAvatarInitialsHolder {
+	font-size: 1rem;
+}

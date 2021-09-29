@@ -1,0 +1,6 @@
+/*!
+ * OpenUI5
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
+ */
+sap.ui.define(["sap/ui/integration/thirdparty/adaptivecards"],function(t){"use strict";return function(e){if(e===0){e="ac-pushButton"}var i=this.parent.hostConfig;var n=document.createElement("ui5-button");this.addCssClasses(n);n.setAttribute("aria-label",this.title);n.type="button";n.style.display="flex";n.style.alignItems="center";n.style.justifyContent="center";var s=!t.isNullOrEmpty(this.title);var l=document.createElement("div");l.style.overflow="hidden";l.style.textOverflow="ellipsis";if(!(i.actions.iconPlacement===t.ActionIconPlacement.AboveTitle||i.actions.allowTitleToWrap)){l.style.whiteSpace="nowrap"}if(s){l.innerText=this.title}if(t.isNullOrEmpty(this.iconUrl)){n.classList.add("noIcon");n.appendChild(l)}else{var a=document.createElement("img");a.src=this.iconUrl;a.style.width=i.actions.iconSize+"px";a.style.height=i.actions.iconSize+"px";a.style.flex="0 0 auto";if(i.actions.iconPlacement===t.ActionIconPlacement.AboveTitle){n.classList.add("iconAbove");n.style.flexDirection="column";if(s){a.style.marginBottom="4px"}}else{n.classList.add("iconLeft");if(s){a.style.marginRight="4px"}}n.appendChild(a);n.appendChild(l)}this._renderedElement=n}});
