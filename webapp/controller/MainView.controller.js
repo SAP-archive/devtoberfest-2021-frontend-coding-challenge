@@ -54,15 +54,14 @@ sap.ui.define(
                     );
                 },
 
-
-            onToggleTheme: function (oEvent) {
-                const lightTheme = oEvent.getParameter("state");
-                sap.ui
-                    .getCore()
-                    .applyTheme(
-                        lightTheme ? "sap_fiori_3" : "sap_fiori_3_dark"
-                    );
-            },
+                onToggleTheme: function (oEvent) {
+                    const lightTheme = oEvent.getParameter("state");
+                    sap.ui
+                        .getCore()
+                        .applyTheme(
+                            lightTheme ? "sap_fiori_3" : "sap_fiori_3_dark"
+                        );
+                },
             }
         );
     }
