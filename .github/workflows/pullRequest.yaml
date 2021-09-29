@@ -1,0 +1,45 @@
+name: Run Tests and Lighthouse Performace Score
+
+on: pull_request
+
+jobs:
+    build-gh-pages:
+            runs-on: ubuntu-latest
+
+            steps:
+                - uses: actions/checkout@v2
+
+                - uses: actions/setup-node@v2
+                  with:
+                      node-version: 14
+                      cache: yarn
+
+                - run: yarn install
+
+                - run: yarn test
+
+
+    lighthouse-check:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@master
+            - run: mkdir /tmp/artifacts
+            - name: Run Lighthouse
+              uses: foo-software/lighthouse-check-action@master
+              with:
+                  accessToken: ${{ secrets.LIGHTHOUSE_CHECK_GITHUB_ACCESS_TOKEN }}
+                  author: ${{ github.actor }}
+                  branch: ${{ github.ref }}
+                  outputDirectory: /tmp/artifacts
+                  urls: "https://miniature-pancake-13a71efb.pages.github.io/" ## todo, remove hard coded URL build based on pattern https://[owner].github.io/[repo]/
+            - name: Upload artifacts
+              uses: actions/upload-artifact@master
+              with:
+                  name: Lighthouse reports
+                  path: /tmp/artifacts
+
+            - name: Handle Lighthouse Check results
+              uses: foo-software/lighthouse-check-status-action@master
+              with:
+                lighthouseCheckResults: ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}
+                minPerformanceScore: "75"
