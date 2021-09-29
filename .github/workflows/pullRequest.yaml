@@ -36,7 +36,7 @@ jobs:
                   accessToken: ${{ secrets.LIGHTHOUSE_CHECK_GITHUB_ACCESS_TOKEN }}
                   author: ${{ github.actor }}
                   branch: ${{ github.ref }}
-                  urls: "https://miniature-pancake-13a71efb.pages.github.io/" ## todo, remove hard coded URL build based on pattern https://[owner].github.io/[repo]/
+                  urls: "https://sap-samples.github.io/devtoberfest-2021-frontend-coding-challenge/" ## todo, remove hard coded URL build based on pattern https://[owner].github.io/[repo]/
 
             - name: Handle Lighthouse Check results
               uses: foo-software/lighthouse-check-status-action@master
