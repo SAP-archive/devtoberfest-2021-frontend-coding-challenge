@@ -27,24 +27,19 @@ jobs:
         name: Check Lighthouse Performance Score
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@master
-            - run: mkdir /tmp/artifacts
+            - uses: actions/checkout@v2
+            
             - name: Run Lighthouse
+              id: lighthouseCheck
               uses: foo-software/lighthouse-check-action@master
               with:
                   accessToken: ${{ secrets.LIGHTHOUSE_CHECK_GITHUB_ACCESS_TOKEN }}
                   author: ${{ github.actor }}
                   branch: ${{ github.ref }}
-                  outputDirectory: /tmp/artifacts
                   urls: "https://miniature-pancake-13a71efb.pages.github.io/" ## todo, remove hard coded URL build based on pattern https://[owner].github.io/[repo]/
-            - name: Upload artifacts
-              uses: actions/upload-artifact@master
-              with:
-                  name: Lighthouse reports
-                  path: /tmp/artifacts
 
             - name: Handle Lighthouse Check results
               uses: foo-software/lighthouse-check-status-action@master
               with:
-                lighthouseCheckResults: ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}
+                lighthouseCheckResults: ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }} ## Todo also check for successful run of test -> then assing label
                 minPerformanceScore: "75"
