@@ -42,7 +42,7 @@ sap.ui.define(
                         value1: value,
                     });
                     const stateFilter = new sap.ui.model.Filter({
-                        path: "state",
+                        path: "category",
                         operator: sap.ui.model.FilterOperator.Contains,
                         value1: value,
                     });
