@@ -17,7 +17,8 @@
         </Text>
         <ToolbarSpacer />
         <Image src="resources/img/github.png" height="50%" press="goToRepo" />
-        <Link text="{i18n>forkMe}" target="_blank" href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge"
+        <Link text="{i18n>forkMe}" target="_blank"
+          href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge"
           visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }" class="sapUiMediumMarginEnd" />
         <core:Icon id="barDarkIcon" visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }"
           src="sap-icon://energy-saving-lightbulb" color="{= !${settings>/lightTheme} ? '#f9d001' : ''}"
@@ -36,23 +37,21 @@
         <MessageStrip text="{i18n>performanceNote}" type="Warning" showIcon="true" showCloseButton="true"
           class="sapUiSmallMarginTopBottom">
           <link>
-          <Link text="{i18n>performanceNoteLink}" target="_blank" href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge" />
+          <Link text="{i18n>performanceNoteLink}" target="_blank"
+            href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge" />
           </link>
         </MessageStrip>
         <List id="all-list" items="{sample>/}">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
-              <Title id="all-bar-info" text="{i18n>Some Items}" level="H4" />
+              <Title id="all-bar-info" text="{i18n>SAP BTP Services}" level="H4" />
               <ToolbarSpacer id="all-bar-spacer" />
               <SearchField id="all-bar-search" width="60%" placeholder="{i18n>Search for the name or description}"
                 liveChange=".liveSearch" />
             </OverflowToolbar>
           </headerToolbar>
-          <StandardListItem title="{sample>name}" description="{sample>description}" infoState="{= ${sample>state} }"
-            info="{
-          parts: ['sample>state'],
-          formatter: '.formatter.translateState'
-        }" />
+          <StandardListItem title="{sample>name}" description="{sample>description}" infoState="Information"
+            icon="{sample>icon}" info="{sample>category}" />
         </List>
       </ScrollContainer>
     </tnt:mainContents>
