@@ -7,9 +7,7 @@ on:
 jobs:
   run-test:
     runs-on: ubuntu-latest
-
     name: Run Tests
-
     steps:
       - uses: actions/checkout@v2
 
@@ -26,8 +24,6 @@ jobs:
     name: Check Lighthouse Performance Score
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
       - name: Run Lighthouse
         id: lighthouseCheck
         uses: foo-software/lighthouse-check-action@master
@@ -38,11 +34,13 @@ jobs:
           urls: "https://sap-samples.github.io/devtoberfest-2021-frontend-coding-challenge/" ## todo, remove hard coded URL build based on pattern https://[owner].github.io/[repo]/
 
       - name: Comment PR
-        uses: thollander/actions-comment-pull-request@v1
         # if: steps.lighthouseCheck.outputs.lighthouseCheckResults.performance > 75
+        uses: actions/github-script@0.3.0
         with:
-          message: "Example of message !"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
+            github.issues.createComment({ issue_number, owner, repo, body: 'Congrats, your web app achieved a performace score of  👋' });
 
       - name: Handle Lighthouse Check results
         uses: foo-software/lighthouse-check-status-action@master
@@ -53,11 +51,9 @@ jobs:
   assign-label:
     runs-on: ubuntu-latest
     name: Assign passing label
-
     needs:
       - run-test
       - lighthouse-check
-
     steps:
       - uses: actions-ecosystem/action-add-labels@v1
         with:
