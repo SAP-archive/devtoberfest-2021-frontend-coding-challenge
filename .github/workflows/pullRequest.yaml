@@ -1,45 +1,64 @@
 name: Run Tests and Lighthouse Performace Score
 
-on: 
+on:
   workflow_dispatch:
   pull_request:
 
 jobs:
-    run-test:
-            runs-on: ubuntu-latest
+  run-test:
+    runs-on: ubuntu-latest
 
-            name: Run Tests
+    name: Run Tests
 
-            steps:
-                - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-                - uses: actions/setup-node@v2
-                  with:
-                      node-version: 14
-                      cache: yarn
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+          cache: yarn
 
-                - run: yarn install
+      - run: yarn install
 
-                - run: yarn test
+      - run: yarn test
 
+  lighthouse-check:
+    name: Check Lighthouse Performance Score
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-    lighthouse-check:
-        name: Check Lighthouse Performance Score
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            
-            - name: Run Lighthouse
-              id: lighthouseCheck
-              uses: foo-software/lighthouse-check-action@master
-              with:
-                  accessToken: ${{ secrets.LIGHTHOUSE_CHECK_GITHUB_ACCESS_TOKEN }}
-                  author: ${{ github.actor }}
-                  branch: ${{ github.ref }}
-                  urls: "https://sap-samples.github.io/devtoberfest-2021-frontend-coding-challenge/" ## todo, remove hard coded URL build based on pattern https://[owner].github.io/[repo]/
+      - name: Run Lighthouse
+        id: lighthouseCheck
+        uses: foo-software/lighthouse-check-action@master
+        with:
+          accessToken: ${{ secrets.LIGHTHOUSE_CHECK_GITHUB_ACCESS_TOKEN }}
+          author: ${{ github.actor }}
+          branch: ${{ github.ref }}
+          urls: "https://sap-samples.github.io/devtoberfest-2021-frontend-coding-challenge/" ## todo, remove hard coded URL build based on pattern https://[owner].github.io/[repo]/
 
-            - name: Handle Lighthouse Check results
-              uses: foo-software/lighthouse-check-status-action@master
-              with:
-                lighthouseCheckResults: ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }} ## Todo also check for successful run of test -> then assing label
-                minPerformanceScore: "75"
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v1
+        # if: steps.lighthouseCheck.outputs.lighthouseCheckResults.performance > 75
+        with:
+          message: "Example of message !"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Handle Lighthouse Check results
+        uses: foo-software/lighthouse-check-status-action@master
+        with:
+          lighthouseCheckResults: ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}
+          minPerformanceScore: "2"
+
+  assign-label:
+    runs-on: ubuntu-latest
+    name: Assign passing label
+
+    needs:
+      - run-test
+      - lighthouse-check
+
+    steps:
+      - uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: passed
