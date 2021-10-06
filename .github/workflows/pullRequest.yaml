@@ -46,7 +46,7 @@ jobs:
       - name: Echo ## todo, remove
         id: convertOutput
         run: |
-          performance=$( echo ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }} | jq '.data[0].scores.performance' )
+          performance=$( echo '${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}' | jq '.data[0].scores.performance' )
           echo "::set-output performance=$performance"
           echo "$performance"
         shell: bash
