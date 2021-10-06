@@ -1,0 +1,22 @@
+name: Validate SAP Community ID
+on:
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  ask-for-id:
+    if: github.event.label.name == 'passed'
+    runs-on: ubuntu-latest
+    steps:
+
+
+      - name: Echo
+        run: |
+          echo "${{ github.event }}"
+        shell: bash
+
+      # - name: Add comment
+      #   uses: thollander/actions-comment-pull-request@v1
+      #   with:
+      #     message: "Congrats 🥳, your web app achieved a performace score of ${{ steps.convertOutput.outputs.performance }}. Great job 💪!"
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
