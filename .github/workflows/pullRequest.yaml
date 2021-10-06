@@ -33,14 +33,22 @@ jobs:
           branch: ${{ github.ref }}
           urls: "https://sap-samples.github.io/devtoberfest-2021-frontend-coding-challenge/" ## todo, remove hard coded URL build based on pattern https://[owner].github.io/[repo]/
 
+      - name: Echo
+        run: echo "${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}"
+        shell: bash 
+
       - name: Comment PR
-        # if: steps.lighthouseCheck.outputs.lighthouseCheckResults.performance > 75
-        uses: actions/github-script@0.3.0
+        uses: thollander/actions-comment-pull-request@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
-            github.issues.createComment({ issue_number, owner, repo, body: 'Congrats, your web app achieved a performace score of  👋' });
+          message: 'Congrats, your web app achieved a performace score of  👋'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # if: steps.lighthouseCheck.outputs.lighthouseCheckResults.performance > 75
+        # uses: actions/github-script@0.3.0
+        # with:
+        #   github-token: ${{ secrets.GITHUB_TOKEN }}
+        #   script: |
+        #     const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
+        #     github.issues.createComment({ issue_number, owner, repo, body: 'Congrats, your web app achieved a performace score of  👋' });
 
       - name: Handle Lighthouse Check results
         uses: foo-software/lighthouse-check-status-action@master
