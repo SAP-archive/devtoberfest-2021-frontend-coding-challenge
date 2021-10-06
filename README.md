@@ -2,6 +2,7 @@
 
 
 [![Build Status][test-image]][test-url]
+[![Open in Visual Studio Code][vscode-image]][vscode-url]
 [![License Status][license-image]][license-url]
 [![REUSE status][reuse-image]][reuse-url]
 
@@ -99,3 +100,5 @@ Copyright (c) 2021 SAP SE or an SAP affiliate company. All rights reserved. This
 [license-url]: https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/blob/master/LICENSE
 [reuse-image]: https://api.reuse.software/badge/github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/
 [reuse-url]: https://api.reuse.software/info/github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/
+[vscode-image]: https://open.vscode.dev/badges/open-in-vscode.svg
+[vscode-url]: https://open.vscode.dev/SAP-samples/devtoberfest-2021-frontend-coding-challenge/
