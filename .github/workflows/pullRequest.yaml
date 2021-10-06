@@ -14,6 +14,11 @@ jobs:
         with:
           fail_on_error: false
           labels: passed
+          
+      - name: Show GitHub context   
+        env: 
+          GITHUB_CONTEXT: ${{ toJson(github) }}   
+        run: echo "$GITHUB_CONTEXT" ```
 
   run-test:
     runs-on: ubuntu-latest
