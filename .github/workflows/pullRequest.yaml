@@ -48,7 +48,7 @@ jobs:
         id: convertOutput
         run: |
           performance=$( echo '${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}' | jq '.data[0].scores.performance' )
-          echo "::set-output performance=$performance"
+          echo "::set-output name=performance::$performance"
         shell: bash
 
 
