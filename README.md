@@ -94,11 +94,11 @@ Copyright (c) 2021 SAP SE or an SAP affiliate company. All rights reserved. This
 
 
 
-[test-image]: https://github.com/SAP/generator-easy-ui5/actions/workflows/main.yml/badge.svg
-[test-url]: https://github.com/SAP/generator-easy-ui5/actions/workflows/main.yml
+[test-image]: https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/actions/workflows/push.yml/badge.svg
+[test-url]: https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/actions/workflows/push.yml
 [daviddm-image]: https://img.shields.io/david/SAP/generator-easy-ui5.svg
 [daviddm-url]: https://david-dm.org/SAP/generator-easy-ui5
-[license-image]: https://img.shields.io/npm/l/generator-easy-ui5.svg
-[license-url]: https://github.com/SAP/generator-easy-ui5/blob/master/LICENSE
-[reuse-image]: https://api.reuse.software/badge/github.com/SAP/generator-easy-ui5/
-[reuse-url]: https://api.reuse.software/info/github.com/SAP/generator-easy-ui5/
+[license-image]: https://img.shields.io/github/license/SAP-samples/devtoberfest-2021-frontend-coding-challenge
+[license-url]: https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/blob/master/LICENSE
+[reuse-image]: https://api.reuse.software/badge/github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/
+[reuse-url]: https://api.reuse.software/info/github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/
