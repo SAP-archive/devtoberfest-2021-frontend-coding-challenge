@@ -44,7 +44,7 @@ jobs:
           urls: "https://sap-samples.github.io/devtoberfest-2021-frontend-coding-challenge/" ## todo, remove hard coded URL build based on pattern https://[owner].github.io/[repo]/
 
       - name: Echo ## todo, remove
-        run: echo "${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}"
+        run: echo "${{ steps.lighthouseCheck.outputs.lighthouseCheckResults.performance }}"
         shell: bash 
 
       - name: Comment PR
