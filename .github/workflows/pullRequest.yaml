@@ -50,6 +50,14 @@ jobs:
           echo "::set-output performance=$performance"
         shell: bash
 
+
+      - name: Echo output
+        id: echoOutput
+        run: |
+          echo "${{ steps.convertOutput.outputs.performance }}"
+        shell: bash
+
+
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v1
         if: steps.convertOutput.outputs.performance >= 70
