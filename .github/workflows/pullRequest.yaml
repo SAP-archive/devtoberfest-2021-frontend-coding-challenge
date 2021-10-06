@@ -42,7 +42,7 @@ jobs:
           accessToken: ${{ secrets.LIGHTHOUSE_CHECK_GITHUB_ACCESS_TOKEN }}
           author: ${{ github.actor }}
           branch: ${{ github.ref }}
-          urls: "https://sap-samples.github.io/devtoberfest-2021-frontend-coding-challenge/" ## todo, remove hard coded URL build based on pattern https://[owner].github.io/[repo]/
+          urls: "https://${{ github.actor }}.github.io/${{ github.name }}/" 
 
       - name: Convert Output
         id: convertOutput
