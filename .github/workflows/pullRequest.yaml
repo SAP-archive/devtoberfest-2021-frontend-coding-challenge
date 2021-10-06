@@ -69,7 +69,7 @@ jobs:
         uses: foo-software/lighthouse-check-status-action@master
         with:
           lighthouseCheckResults: ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}
-          minPerformanceScore: 7
+          minPerformanceScore: 1
 
       - name: Echo
         run: |
