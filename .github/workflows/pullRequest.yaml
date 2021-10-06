@@ -5,19 +5,19 @@ on:
   pull_request:
 
 jobs:
-
   remove-label:
     runs-on: ubuntu-latest
-    name: Remove all labels
+    name: Remove "passed" label
     steps:
       - uses: actions-ecosystem/action-remove-labels@v1
         with:
+          fail_on_error: false
           labels: passed
-
 
   run-test:
     runs-on: ubuntu-latest
     name: Run Tests
+    needs: remove-label
     steps:
       - uses: actions/checkout@v2
 
@@ -44,29 +44,32 @@ jobs:
           urls: "https://sap-samples.github.io/devtoberfest-2021-frontend-coding-challenge/" ## todo, remove hard coded URL build based on pattern https://[owner].github.io/[repo]/
 
       - name: Echo ## todo, remove
-        run: echo "${{ steps.lighthouseCheck.outputs.lighthouseCheckResults.performance }}"
-        shell: bash 
+        id: convertOutput
+        run: |
+          performance=$( ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }} | jq '.performance' )
+          echo "::set-output performance=$performance"
+          echo "$performance"
+        shell: bash
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v1
-        if: steps.lighthouseCheck.outputs.lighthouseCheckResults.performance >= 70
+        if: steps.convertOutput.outputs.performance >= 70
         with:
-          message: 'Congrats 🥳, your web app achieved a performace score of ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults.performance }}. Great job 💪!'
+          message: "Congrats 🥳, your web app achieved a performace score of ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults.performance }}. Great job 💪!"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v1
-        if: steps.lighthouseCheck.outputs.lighthouseCheckResults.performance < 70
+        if: steps.convertOutput.outputs.performance < 70
         with:
-          message: 'Thanks for creating this pull request. It seems that the performance of the SAPUI5 still has some room for improvements (currently ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults.performance }}). Feel free to push new commits to the repo to run this check again.'
+          message: "Thanks for creating this pull request. It seems that the performance of the SAPUI5 still has some room for improvements (currently ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults.performance }}). Feel free to push new commits to the repo to run this check again."
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Handle Lighthouse Check results
         uses: foo-software/lighthouse-check-status-action@master
         with:
           lighthouseCheckResults: ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}
-          minPerformanceScore: "70" 
+          minPerformanceScore: "70"
 
   assign-label:
     runs-on: ubuntu-latest
