@@ -53,14 +53,14 @@ jobs:
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v1
-        if: steps.convertOutput.outputs.performance >= 70
+        if: steps.convertOutput.outputs.performance >= 7
         with:
           message: "Congrats 🥳, your web app achieved a performace score of ${{ steps.convertOutput.outputs.performance }}. Great job 💪! \n\n So that we can [recognize your solution for the coding challenge](https://github.com/SAP-samples/devtoberfest-2021/blob/main/topics/Week6_Frontend/README.md#coding-challenge), please tell us your SAP Community profile URL in a reply to this comment; don't include any other text, just the URL on its own, like this:\n\nhttps://people.sap.com/your-user-name\n\nThanks!"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v1
-        if: steps.convertOutput.outputs.performance < 70
+        if: steps.convertOutput.outputs.performance < 7
         with:
           message: "Thanks for creating this pull request. It seems that the performance of the SAPUI5 still has some room for improvements (currently ${{ steps.convertOutput.outputs.performance }}). Feel free to push new commits to the repo to run this check again."
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -69,7 +69,7 @@ jobs:
         uses: foo-software/lighthouse-check-status-action@master
         with:
           lighthouseCheckResults: ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}
-          minPerformanceScore: "70"
+          minPerformanceScore: 7
 
       - name: Echo
         run: |
