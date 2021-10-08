@@ -1,84 +1,84 @@
 name: Run Tests and Lighthouse Performace Score
 
 on:
-  workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize, reopened]
+    workflow_dispatch:
+    pull_request:
+        types: [opened, synchronize, reopened]
 
 jobs:
-  remove-label:
-    runs-on: ubuntu-latest
-    name: Remove "passed" label
-    steps:
-      - uses: actions-ecosystem/action-remove-labels@v1
-        with:
-          fail_on_error: false
-          labels: passed
+    remove-label:
+        runs-on: ubuntu-latest
+        name: Remove "passed" label
+        steps:
+            - uses: actions-ecosystem/action-remove-labels@v1
+              with:
+                  fail_on_error: false
+                  labels: passed
 
-  run-test:
-    runs-on: ubuntu-latest
-    name: Run Tests
-    needs: remove-label
-    steps:
-      - uses: actions/checkout@v2
+    run-test:
+        runs-on: ubuntu-latest
+        name: Run Tests
+        needs: remove-label
+        steps:
+            - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 14
-          cache: yarn
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: 14
+                  cache: yarn
 
-      - run: yarn install
+            - run: yarn install
 
-      - run: yarn test
+            - run: yarn test
 
-  lighthouse-check:
-    name: Check Lighthouse Performance Score
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run Lighthouse
-        id: lighthouseCheck
-        uses: foo-software/lighthouse-check-action@master
-        with:
-          accessToken: ${{ secrets.LIGHTHOUSE_CHECK_GITHUB_ACCESS_TOKEN }}
-          author: ${{ github.actor }}
-          branch: ${{ github.ref }}
-          emulatedFormFactor: desktop
-          urls: "https://${{ github.actor }}.github.io/${{ github.event.repository.name  }}/"
+    lighthouse-check:
+        name: Check Lighthouse Performance Score
+        runs-on: ubuntu-latest
+        steps:
+            - name: Run Lighthouse
+              id: lighthouseCheck
+              uses: foo-software/lighthouse-check-action@master
+              with:
+                  accessToken: ${{ secrets.LIGHTHOUSE_CHECK_GITHUB_ACCESS_TOKEN }}
+                  author: ${{ github.actor }}
+                  branch: ${{ github.ref }}
+                  emulatedFormFactor: desktop
+                  urls: "https://${{ github.actor }}.github.io/${{ github.event.repository.name  }}/"
 
-      - name: Convert Output
-        id: convertOutput
-        run: |
-          performance=$( echo '${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}' | jq '.data[0].scores.performance' )
-          echo "::set-output name=performance::$performance"
-        shell: bash
+            - name: Convert Output
+              id: convertOutput
+              run: |
+                  performance=$( echo '${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}' | jq '.data[0].scores.performance' )
+                  echo "::set-output name=performance::$performance"
+              shell: bash
 
-      - name: Comment PR
-        uses: thollander/actions-comment-pull-request@v1
-        if: steps.convertOutput.outputs.performance >= 70
-        with:
-          message: "Congrats 🥳, your web app achieved a performace score of ${{ steps.convertOutput.outputs.performance }}. Great job 💪! \n\n So that we can [recognize your solution for the coding challenge](https://github.com/SAP-samples/devtoberfest-2021/blob/main/topics/Week6_Frontend/README.md#coding-challenge), please tell us your SAP Community profile URL in a reply to this comment; don't include any other text, just the URL on its own, like this:\n\nhttps://people.sap.com/your-user-name\n\nThanks!"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Comment PR
+              uses: thollander/actions-comment-pull-request@v1
+              if: steps.convertOutput.outputs.performance >= 70
+              with:
+                  message: "Congrats 🥳, your web app achieved a performace score of ${{ steps.convertOutput.outputs.performance }}. Great job 💪! \n\n So that we can [recognize your solution for the coding challenge](https://github.com/SAP-samples/devtoberfest-2021/blob/main/topics/Week6_Frontend/README.md#coding-challenge), please tell us your SAP Community profile URL in a reply to this comment; don't include any other text, just the URL on its own, like this:\n\nhttps://people.sap.com/your-user-name\n\nThanks!"
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Comment PR
-        uses: thollander/actions-comment-pull-request@v1
-        if: steps.convertOutput.outputs.performance < 70
-        with:
-          message: "Thanks for creating this pull request. It seems that the performance of the SAPUI5 still has some room for improvements (currently ${{ steps.convertOutput.outputs.performance }}). Feel free to push new commits to the repo to run this check again."
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Comment PR
+              uses: thollander/actions-comment-pull-request@v1
+              if: steps.convertOutput.outputs.performance < 70
+              with:
+                  message: "Thanks for creating this pull request. It seems that the performance of the SAPUI5 still has some room for improvements (currently ${{ steps.convertOutput.outputs.performance }}). Feel free to push new commits to the repo to run this check again."
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Handle Lighthouse Check results
-        uses: foo-software/lighthouse-check-status-action@master
-        with:
-          lighthouseCheckResults: ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}
-          minPerformanceScore: 70
+            - name: Handle Lighthouse Check results
+              uses: foo-software/lighthouse-check-status-action@master
+              with:
+                  lighthouseCheckResults: ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}
+                  minPerformanceScore: 70
 
-  assign-label:
-    runs-on: ubuntu-latest
-    name: Assign passing label
-    needs:
-      - run-test
-      - lighthouse-check
-    steps:
-      - uses: actions-ecosystem/action-add-labels@v1
-        with:
-          labels: passed
+    assign-label:
+        runs-on: ubuntu-latest
+        name: Assign passing label
+        needs:
+            - run-test
+            - lighthouse-check
+        steps:
+            - uses: actions-ecosystem/action-add-labels@v1
+              with:
+                  labels: passed

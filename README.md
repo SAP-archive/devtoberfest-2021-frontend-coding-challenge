@@ -1,6 +1,5 @@
 # Devtoberfest 2021 Frontend Week Coding Challenge
 
-
 [![Build Status][test-image]][test-url]
 [![Open in Visual Studio Code][vscode-image]][vscode-url]
 [![License Status][license-image]][license-url]
@@ -8,7 +7,7 @@
 
 ## Description
 
-This is the [Devtoberfest 2021 Coding Challenge of week 6](https://github.com/SAP-samples/devtoberfest-2021/blob/main/topics/Week6_Frontend/README.md#coding-challenge). The repo contains a web application that displays all current services available on the SAP Business Technology Platform. 
+This is the [Devtoberfest 2021 Coding Challenge of week 6](https://github.com/SAP-samples/devtoberfest-2021/blob/main/topics/Week6_Frontend/README.md#coding-challenge). The repo contains a web application that displays all current services available on the SAP Business Technology Platform.
 
 ![Running app in light mode](./running.png)
 
@@ -41,9 +40,7 @@ Node.js LTS version 14 is installed: https://nodejs.org/en/download
 ### Testing
 
 Start the [Karma Test Runner](https://karma-runner.github.io/latest/index.html) with the [UI5 Plugin](https://github.com/SAP/karma-ui5) and execute the tests
-    ```sh
-    npm test
-    ```
+`sh npm test `
 
 ## How to obtain support
 
@@ -52,7 +49,6 @@ This content is provided "as-is" with no other support.
 ## Known Issues
 
 This project got a really bad [Lighthouse performance score](https://web.dev/performance-scoring/). As part of this coding challenge, it's up to you to improve this web app.
-
 
 ## Contributing / Submitting your Proposal
 
@@ -67,15 +63,17 @@ You can submit your solution as follows:
     ```
 
 1. Start a local server and run the application (http://localhost:8080/index.html)
+
     ```sh
     npm start
-    ``` 
+    ```
 
 1. Trigger the [Lighthouse Performance Scoring](https://web.dev/performance-scoring/) (e.g. with [Google Chrome](https://developers.google.com/web/tools/lighthouse))
 
 1. Optimize the app until the performance score is above 70.
 
 1. Commit and push your edits
+
     ```sh
     git commit -am "Fix performance issues"
     git push
@@ -85,14 +83,11 @@ You can submit your solution as follows:
 
     TODO add screenshot here
 
-
 > Please note that we won't merge any pull request. It is sufficient if your PR earns the green "passed" label and you entered your SAP Community ID in the pull request **after** the label was assigned. If everthing goes well, your pull request will be closed then.
-
 
 ## License
 
 Copyright (c) 2021 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the Apache Software License, version 2.0 except as noted otherwise in the [LICENSE](LICENSES/Apache-2.0.txt) file.
-
 
 [test-image]: https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/actions/workflows/push.yaml/badge.svg
 [test-url]: https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/actions/workflows/push.yaml
