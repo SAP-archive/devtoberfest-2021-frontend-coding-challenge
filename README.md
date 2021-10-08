@@ -56,6 +56,8 @@ You can submit your solution as follows:
 
 1. Fork and clone this repository
 
+    > It's optional but recommended to turn on Actions on this repository. This will allow you to make use of the included workflows, e.g. to build the web app on every push.
+
 1. Install all dependencies
 
     ```sh
@@ -79,7 +81,7 @@ You can submit your solution as follows:
     git push
     ```
 
-1. Create a pull request and make sure your web app is exposed as with [GitHub Pages](https://pages.github.com/) and available under `https://${{ github.actor }}.github.io/${{ github.name }}/`. Our CI/CD actions will take it from here and let you know if your app passed the test.
+1. Create a pull request and make sure your web app is exposed as with [GitHub Pages](https://pages.github.com/) and available under `https://${{ Your GitHub User }}.github.io/devtoberfest-2021-frontend-coding-challenge/`. Our CI/CD actions will take it from here and let you know if your app passed the test.
 
     TODO add screenshot here
 
