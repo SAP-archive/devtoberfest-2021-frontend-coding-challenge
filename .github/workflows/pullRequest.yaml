@@ -1,8 +1,8 @@
 name: Run Tests and Lighthouse Performace Score
 
 on:
-    workflow_dispatch:
-    pull_request:
+    workflow_dispatch: # The workflow will fail when triggered manually because it's not associated to PR. But that's fine as it will trigger the lighthouse score anyway
+    pull_request_target:
         types: [opened, synchronize, reopened]
 
 jobs:
