@@ -8,7 +8,7 @@ sap.ui.define(["sap/ui/test/Opa5"], function (Opa5) {
                 this.iStartMyUIComponent({
                     componentConfig: {
                         name: "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
-                        async: true,
+                        async: false,
                         manifest: true,
                     },
                 });
