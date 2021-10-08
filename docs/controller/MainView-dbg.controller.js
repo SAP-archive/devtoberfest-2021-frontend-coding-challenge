@@ -12,21 +12,6 @@ sap.ui.define(
             {
                 formatter,
 
-                onInit: function () {
-                    const useDarkTheme =
-                        window.matchMedia &&
-                        window.matchMedia("(prefers-color-scheme: dark)")
-                            .matches;
-                    if (useDarkTheme) {
-                        sap.ui.getCore().applyTheme("sap_fiori_3_dark");
-                    }
-                    const settingsModel = new JSONModel({
-                        search: "",
-                        lightTheme: !useDarkTheme,
-                    });
-                    this.getView().setModel(settingsModel, "settings");
-                },
-
                 liveSearch: function (oEvent) {
                     const value = oEvent.getParameter("newValue");
                     const list = this.getView().byId("all-list");
