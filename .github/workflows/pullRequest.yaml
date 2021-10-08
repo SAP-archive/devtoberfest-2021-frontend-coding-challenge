@@ -42,7 +42,7 @@ jobs:
           accessToken: ${{ secrets.LIGHTHOUSE_CHECK_GITHUB_ACCESS_TOKEN }}
           author: ${{ github.actor }}
           branch: ${{ github.ref }}
-          urls: "https://${{ github.actor }}.github.io/${{ github.event.repository.name  }}/" 
+          urls: "https://${{ github.actor }}.github.io/${{ github.event.repository.name }}/" 
 
       - name: Convert Output
         id: convertOutput
