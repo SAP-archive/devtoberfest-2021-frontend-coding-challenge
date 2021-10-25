@@ -4,6 +4,7 @@
   <!-- xmlns:aow="aow.artifact.control" -->
   <tnt:ToolPage id="toolPage">
     <tnt:header>
+      
       <tnt:ToolHeader>
         <Image src="resources/img/favicon.ico">
           <layoutData>
