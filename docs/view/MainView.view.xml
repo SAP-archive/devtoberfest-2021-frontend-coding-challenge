@@ -4,6 +4,7 @@
   <!-- xmlns:aow="aow.artifact.control" -->
   <tnt:ToolPage id="toolPage">
     <tnt:header>
+      
       <tnt:ToolHeader>
         <Image src="resources/img/favicon.ico">
           <layoutData>
@@ -33,14 +34,6 @@
     </tnt:header>
     <tnt:mainContents>
       <ScrollContainer id="all-page" horizontal="false" vertical="true" height="100%">
-
-        <MessageStrip text="{i18n>performanceNote}" type="Warning" showIcon="true" showCloseButton="true"
-          class="sapUiSmallMarginTopBottom">
-          <link>
-          <Link text="{i18n>performanceNoteLink}" target="_blank"
-            href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge" />
-          </link>
-        </MessageStrip>
         <List id="all-list" items="{sample>/}">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
@@ -56,5 +49,4 @@
       </ScrollContainer>
     </tnt:mainContents>
   </tnt:ToolPage>
-
 </mvc:View>
