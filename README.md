@@ -7,7 +7,7 @@
 
 ## Description
 
-This is the [Devtoberfest 2021 Coding Challenge of week 6](https://github.com/SAP-samples/devtoberfest-2021/blob/main/topics/Week6_Frontend/README.md#coding-challenge). The repo contains a web application that displays all current services available on the SAP Business Technology Platform.
+This is the [Devtoberfest 2021 Coding Challenge of week 6](https://github.com/SAP-samples/devtoberfest-2021/blob/main/topics/Week6_Frontend/README.md#coding-challenge). The repository contains a web application that displays all current services available on the SAP Business Technology Platform:
 
 ![Running app in light mode](./running.png)
 
@@ -21,44 +21,13 @@ Possible areas where you can achieve performance boosts are:
 
 
 For more details, watch [this video](https://www.youtube.com/watch?v=CBF_8eOjuc8):
-<iframe width="560" height="315" src="https://www.youtube.com/embed/CBF_8eOjuc8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+[![Video Preview](https://img.youtube.com/vi/CBF_8eOjuc8/0.jpg)](https://www.youtube.com/watch?v=CBF_8eOjuc8)
 
 ## Requirements
 
 Node.js LTS version 14 is installed: https://nodejs.org/en/download
-
-## Download and Installation
-
-### Getting started
-
-1. Clone this repository and navigate into it
-    ```sh
-    git clone https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge
-    cd devtoberfest-2021-frontend-coding-challenge
-    ```
-1. Install all dependencies
-
-    ```sh
-    npm install
-    ```
-
-1. Start a local server and run the application (http://localhost:8080/index.html)
-    ```sh
-    npm start
-    ```
-
-### Testing
-
-Start the [Karma Test Runner](https://karma-runner.github.io/latest/index.html) with the [UI5 Plugin](https://github.com/SAP/karma-ui5) and execute the tests
-`sh npm test `
-
-## How to obtain support
-
-This content is provided "as-is" with no other support.
-
-## Known Issues
-
-This project got a terrible [Lighthouse performance score](https://web.dev/performance-scoring/). As part of this coding challenge, it's up to you to improve this web app.
 
 ## Contributing / Submitting your Proposal
 
@@ -109,6 +78,39 @@ For this challenge, please abide by these rules:
 1. Please ensure you specify your SAP Community user name in your pull request (either in the title or when prompted for it after the GitHub Actions passed).
 1. You only need to send modifications to the content in the `/docs` and `/webapp` folders and possibly the `package.json`. You should not need to modify any other files in this repository (especially not the `.github` folder).
 1. We will not merge your pull request as the base repository remains the starting template for everyone. Instead, we will just judge your submissions based upon what is contained within the Pull Request.
+
+## Download and Installation
+
+### Getting started
+
+1. Clone this repository and navigate into it
+    ```sh
+    git clone https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge
+    cd devtoberfest-2021-frontend-coding-challenge
+    ```
+1. Install all dependencies
+
+    ```sh
+    npm install
+    ```
+
+1. Start a local server and run the application (http://localhost:8080/index.html)
+    ```sh
+    npm start
+    ```
+
+### Testing
+
+Start the [Karma Test Runner](https://karma-runner.github.io/latest/index.html) with the [UI5 Plugin](https://github.com/SAP/karma-ui5) and execute the tests
+`sh npm test `
+
+## How to obtain support
+
+This content is provided "as-is" with no other support.
+
+## Known Issues
+
+This project got a terrible [Lighthouse performance score](https://web.dev/performance-scoring/). As part of this coding challenge, it's up to you to improve this web app.
 
 ## License
 
