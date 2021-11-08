@@ -25,7 +25,6 @@ sap.ui.define(
                     });
                     this.getView().setModel(settingsModel, "settings");
                 },
-                //test
                 liveSearch: function (oEvent) {
                     const value = oEvent.getParameter("newValue");
                     const list = this.getView().byId("all-list");
