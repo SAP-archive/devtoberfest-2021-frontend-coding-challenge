@@ -1,28 +1,16 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="resources/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+<!DOCTYPE html><html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="resources/img/favicon.ico" rel="shortcut icon" type="image/x-icon">
 
     <!-- css required for the loading screen css anumation -->
-    <link id="animation" rel="stylesheet" type="text/css" href="css/progress-animation.css" />
+    <link id="animation" rel="stylesheet" type="text/css" href="css/progress-animation.css">
 
     <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
 
-    <script
-            id="sap-ui-bootstrap"
-            src="https://ui5.sap.com/1.95.0/resources/sap-ui-core.js"
-            data-sap-ui-theme="sap_fiori_3"
-            data-sap-ui-resourceroots='{
-        "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./"
-      }'
-            data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
-            data-sap-ui-compatVersion="edge"
-            data-sap-ui-frameOptions="trusted"
-            data-sap-ui-async="true"
-        ></script>
+    <script id="sap-ui-bootstrap" src="resources/sap-ui-custom.js" data-sap-ui-theme="sap_fiori_3" data-sap-ui-resourceroots="{
+        &quot;com.devtoberfest.devtoberfest2021FrontendCodingChallenge&quot;: &quot;./&quot;
+      }" data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatversion="edge" data-sap-ui-frameoptions="trusted" data-sap-ui-async="true"></script>
 
     <!-- <script>
         sap.ui.getCore().attachInit(function () {
@@ -44,14 +32,14 @@
 </head>
 
 <body class="sapUiBody" role="application">
-    <div data-sap-ui-component data-id="content" data-name="com.devtoberfest.devtoberfest2021FrontendCodingChallenge" data-handle-validation="true">
+    <div data-sap-ui-component="" data-id="content" data-name="com.devtoberfest.devtoberfest2021FrontendCodingChallenge" data-handle-validation="true">
         <!-- Loading splash screen -->
         <div id="busyIndicator" style="text-align: center; font-family: Sans, Arial">
             <!-- static header text -->
             <h3>App is loading</h3>
 
             <!-- static image of the ui5logo  -->
-            <img src="resources/img/sapui5-logo.png" height="227px" width="551px" class="logo" />
+            <img src="resources/img/sapui5-logo.png" height="227px" width="551px" class="logo">
 
             <!-- 
                     loader animation 
@@ -72,6 +60,6 @@
             </center>
         </div>
     </div>
-</body>
 
-</html>
+
+</body></html>
