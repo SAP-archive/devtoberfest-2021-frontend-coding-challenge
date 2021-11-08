@@ -9,3 +9,4 @@ Makefile*
 mta-*
 approuter/*/webapp/
 .gitignore
+docs/resources/

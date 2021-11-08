@@ -25,7 +25,7 @@
         </Text>
         <ToolbarSpacer id="toolbarSpacer0" />
         <Image id="image1"
-          src="images/github.png"
+          src="resources/img/github.png"
           height="50%"/>
         <Link id="link0"
           text="{i18n>forkMe}"
