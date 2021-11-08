@@ -35,7 +35,7 @@
             <Link text="{i18n>performanceNoteLink}" target="_blank" href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge" />
           </link>
         </MessageStrip>
-        <List id="all-list" items="{sample>/}" growingThreshold="10" growing="true" growingScrollToLoad="true">
+        <List id="all-list" items="{sample>/}">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
               <Title id="all-bar-info" text="{i18n>toolBarTitle}" level="H4" />
