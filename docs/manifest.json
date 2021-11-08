@@ -45,7 +45,9 @@
             "libs": {
                 "sap.ui.core": {},
                 "sap.m": {},
-                "sap.ui.layout": {}
+                "sap.ui.layout": {
+                    "lazy":true
+                }
             }
         },
         "contentDensities": {
@@ -56,7 +58,9 @@
             "i18n": {
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": {
-                    "bundleName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.i18n.i18n"
+                    "bundleName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.i18n.i18n",
+                    "supportedLocales": ["en", "de"],
+				    "fallbackLocale": "en"
                 }
             },
             "sample": {
