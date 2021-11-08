@@ -33,6 +33,7 @@
         }
     },
     "sap.ui5": {
+        "async": true,
         "flexEnabled": true,
         "rootView": {
             "viewName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view.MainView",
@@ -72,6 +73,7 @@
         },
         "routing": {
             "config": {
+                "async": true,
                 "routerClass": "sap.m.routing.Router",
                 "viewType": "XML",
                 "viewPath": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view",
