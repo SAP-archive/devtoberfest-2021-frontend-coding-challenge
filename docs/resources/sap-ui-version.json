@@ -1,43 +1,43 @@
 {
 	"name": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
 	"version": "0.1.0",
-	"buildTimestamp": "202111081339",
+	"buildTimestamp": "202111081420",
 	"scmRevision": "",
 	"libraries": [
 		{
 			"name": "sap.f",
 			"version": "1.96.0",
-			"buildTimestamp": "202111081339",
+			"buildTimestamp": "202111081420",
 			"scmRevision": ""
 		},
 		{
 			"name": "sap.m",
 			"version": "1.96.0",
-			"buildTimestamp": "202111081339",
+			"buildTimestamp": "202111081420",
 			"scmRevision": ""
 		},
 		{
 			"name": "sap.tnt",
 			"version": "1.96.0",
-			"buildTimestamp": "202111081339",
+			"buildTimestamp": "202111081420",
 			"scmRevision": ""
 		},
 		{
 			"name": "sap.ui.core",
 			"version": "1.96.0",
-			"buildTimestamp": "202111081339",
+			"buildTimestamp": "202111081420",
 			"scmRevision": ""
 		},
 		{
 			"name": "sap.ui.layout",
 			"version": "1.96.0",
-			"buildTimestamp": "202111081339",
+			"buildTimestamp": "202111081420",
 			"scmRevision": ""
 		},
 		{
 			"name": "sap.ui.unified",
 			"version": "1.96.0",
-			"buildTimestamp": "202111081339",
+			"buildTimestamp": "202111081420",
 			"scmRevision": ""
 		}
 	]
