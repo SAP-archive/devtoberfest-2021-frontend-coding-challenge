@@ -1,4 +1,4 @@
-# Devtoberfest 2021 Frontend Week Coding Challenge
+# Devtoberfest 2021 Frontend Week Coding Challenge 
 
 [![Build Status][test-image]][test-url]
 [![Open in Visual Studio Code][vscode-image]][vscode-url]
