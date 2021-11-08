@@ -3,11 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link
-            href="resources/img/favicon.ico"
-            rel="shortcut icon"
-            type="image/x-icon"
-        />
+        <link href="resources/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
         <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
 
@@ -21,20 +17,18 @@
             data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
             data-sap-ui-compatVersion="edge"
             data-sap-ui-frameOptions="trusted"
+            data-sap-ui-async="true"
         ></script>
 
         <script>
             sap.ui.getCore().attachInit(function () {
-                sap.ui.require(
-                    ["sap/ui/core/ComponentContainer"],
-                    function (ComponentContainer) {
-                        new ComponentContainer({
-                            name: "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
-                            manifest: true,
-                            height: "100%",
-                        }).placeAt("content");
-                    }
-                );
+                sap.ui.require(["sap/ui/core/ComponentContainer"], function (ComponentContainer) {
+                    new ComponentContainer({
+                        name: "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
+                        manifest: true,
+                        height: "100%",
+                    }).placeAt("content");
+                });
             });
         </script>
     </head>
