@@ -13,7 +13,7 @@
 
         <script
             id="sap-ui-bootstrap"
-            src="resources/sap-ui-core.js"
+            src="https://ui5.sap.com/1.95.0/resources/sap-ui-core.js"
             data-sap-ui-theme="sap_fiori_3"
             data-sap-ui-resourceroots='{
         "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./"
@@ -23,7 +23,7 @@
             data-sap-ui-frameOptions="trusted"
         ></script>
 
-        <script>
+        <!--<script>
             sap.ui.getCore().attachInit(function () {
                 sap.ui.require(
                     ["sap/ui/core/ComponentContainer"],
@@ -36,10 +36,11 @@
                     }
                 );
             });
-        </script>
+        </script>-->
     </head>
 
     <body class="sapUiBody" role="application">
-        <div id="content"></div>
+        <!--<div id="content"></div>-->
+        <div data-sap-ui-component data-id="content" data-name="com.devtoberfest.devtoberfest2021FrontendCodingChallenge" data-handle-validation="true"></div>
     </body>
 </html>
