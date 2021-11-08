@@ -57,9 +57,9 @@
       transform: translate(24px, 0);
     }
   }
-  
+
   .logo {
     max-height: 227px; 
     display: block; 
     margin: auto;        
-  }
+  } 
