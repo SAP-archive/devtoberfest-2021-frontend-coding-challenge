@@ -11,13 +11,20 @@
 
     <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
 
-    <script id="sap-ui-bootstrap" src="https://sapui5.hana.ondemand.com/1.95.0/resources/sap-ui-core.js"
-        data-sap-ui-async="true" data-sap-ui-theme="sap_fiori_3" data-sap-ui-resourceroots='{
+    <script
+            id="sap-ui-bootstrap"
+            src="https://ui5.sap.com/1.95.0/resources/sap-ui-core.js"
+            data-sap-ui-theme="sap_fiori_3"
+            data-sap-ui-resourceroots='{
         "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./"
-      }' data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatVersion="edge"
-        data-sap-ui-preload="async" data-sap-ui-frameOptions="trusted"></script>
+      }'
+            data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
+            data-sap-ui-compatVersion="edge"
+            data-sap-ui-frameOptions="trusted"
+            data-sap-ui-async="true"
+        ></script>
 
-    <script>
+    <!-- <script>
         sap.ui.getCore().attachInit(function () {
             sap.ui.require(
                 ["sap/ui/core/ComponentContainer"],
@@ -33,7 +40,7 @@
                 }
             );
         });
-    </script>
+    </script> -->
 </head>
 
 <body class="sapUiBody" role="application">
