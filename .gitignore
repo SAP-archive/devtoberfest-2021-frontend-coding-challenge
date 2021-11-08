@@ -10,3 +10,4 @@ mta-*
 approuter/*/webapp/
 
 .DS_Store
+docs
