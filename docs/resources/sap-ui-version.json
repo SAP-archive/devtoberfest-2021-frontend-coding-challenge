@@ -1,43 +1,71 @@
 {
 	"name": "devtoberfest2021FrontendCodingChallenge",
 	"version": "0.1.0",
+<<<<<<< HEAD
 	"buildTimestamp": "202111081455",
+=======
+	"buildTimestamp": "202111081335",
+>>>>>>> fb1fac450b33b99df908e9fc2a7f8da2ccea2cd4
 	"scmRevision": "",
 	"libraries": [
 		{
 			"name": "sap.f",
 			"version": "1.95.0",
+<<<<<<< HEAD
 			"buildTimestamp": "202111081455",
+=======
+			"buildTimestamp": "202111081335",
+>>>>>>> fb1fac450b33b99df908e9fc2a7f8da2ccea2cd4
 			"scmRevision": ""
 		},
 		{
 			"name": "sap.m",
 			"version": "1.95.0",
+<<<<<<< HEAD
 			"buildTimestamp": "202111081455",
+=======
+			"buildTimestamp": "202111081335",
+>>>>>>> fb1fac450b33b99df908e9fc2a7f8da2ccea2cd4
 			"scmRevision": ""
 		},
 		{
 			"name": "sap.tnt",
 			"version": "1.95.0",
+<<<<<<< HEAD
 			"buildTimestamp": "202111081455",
+=======
+			"buildTimestamp": "202111081335",
+>>>>>>> fb1fac450b33b99df908e9fc2a7f8da2ccea2cd4
 			"scmRevision": ""
 		},
 		{
 			"name": "sap.ui.core",
 			"version": "1.95.0",
+<<<<<<< HEAD
 			"buildTimestamp": "202111081455",
+=======
+			"buildTimestamp": "202111081335",
+>>>>>>> fb1fac450b33b99df908e9fc2a7f8da2ccea2cd4
 			"scmRevision": ""
 		},
 		{
 			"name": "sap.ui.layout",
 			"version": "1.95.0",
+<<<<<<< HEAD
 			"buildTimestamp": "202111081455",
+=======
+			"buildTimestamp": "202111081335",
+>>>>>>> fb1fac450b33b99df908e9fc2a7f8da2ccea2cd4
 			"scmRevision": ""
 		},
 		{
 			"name": "sap.ui.unified",
 			"version": "1.95.0",
+<<<<<<< HEAD
 			"buildTimestamp": "202111081455",
+=======
+			"buildTimestamp": "202111081335",
+>>>>>>> fb1fac450b33b99df908e9fc2a7f8da2ccea2cd4
 			"scmRevision": ""
 		}
 	]
