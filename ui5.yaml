@@ -22,6 +22,7 @@ builder:
                   - mode: raw
                     filters:
                         - sap/ui/thirdparty/baseuri.js
+                        - sap/ui/core/date/_Calendars.js
                         # - sap/ui/thirdparty/es6-promise.js
                         # - sap/ui/thirdparty/es6-shim-nopromise.js
                         - ui5loader.js
