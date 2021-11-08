@@ -1,6 +1,6 @@
 {
     "name": "devtoberfest2021-frontend-coding-challenge",
-    "description": "The sample in this repository has \"built-in\" performance flaws for you to discover and fix during the Frontend Week Coding Challenge as part of Devtoberfest.",
+    "description": "The samplein this repository has \"built-in\" performance flaws for you to discover and fix during the Frontend Week Coding Challenge as part of Devtoberfest.",
     "version": "0.1.0",
     "author": "SAP SE",
     "license": "Apache-2.0",
