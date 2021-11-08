@@ -1,36 +1,31 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
+	"./BaseHeader",
 	"sap/m/library",
 	"sap/f/library",
-	"sap/ui/core/Control",
 	"sap/m/Text",
-	"sap/f/Avatar",
-	"sap/ui/Device",
-	'sap/ui/model/json/JSONModel',
+	"sap/m/Avatar",
 	"sap/f/cards/HeaderRenderer",
-	"sap/f/cards/IconFormatter",
 	"sap/ui/core/Core",
-	"sap/f/cards/loading/LoadingProvider"
+	"sap/ui/core/InvisibleText"
 ], function (
+	BaseHeader,
 	mLibrary,
 	library,
-	Control,
 	Text,
 	Avatar,
-	Device,
-	JSONModel,
 	HeaderRenderer,
-	IconFormatter,
 	Core,
-	LoadingProvider
+	InvisibleText
 ) {
 	"use strict";
 
 	var AvatarShape = mLibrary.AvatarShape;
+	var AvatarColor = mLibrary.AvatarColor;
 
 	/**
 	 * Constructor for a new <code>Header</code>.
@@ -49,11 +44,11 @@ sap.ui.define([
 	 * <li>To show a KPI or any numeric information, use {@link sap.f.cards.NumericHeader} instead.</li>
 	 * <ul>
 	 *
-	 * @extends sap.ui.core.Control
+	 * @extends sap.f.cards.BaseHeader
 	 * @implements sap.f.cards.IHeader
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public
@@ -61,7 +56,7 @@ sap.ui.define([
 	 * @alias sap.f.cards.Header
 	 * @ui5-metamodel This control/element also will be described in the UI5 (legacy) designtime metamodel
 	 */
-	var Header = Control.extend("sap.f.cards.Header", {
+	var Header = BaseHeader.extend("sap.f.cards.Header", {
 		metadata: {
 			library: "sap.f",
 			interfaces: ["sap.f.cards.IHeader"],
@@ -95,16 +90,23 @@ sap.ui.define([
 				/**
 				 * Defines the initials of the icon.
 				 */
-				iconInitials: { type: "string", defaultValue: "" }
-			},
-			aggregations: {
+				iconInitials: { type: "string", defaultValue: "" },
 
 				/**
-				 * Defines the toolbar.
-				 * @experimental Since 1.75
-				 * @since 1.75
+				 * Defines an alt text for the avatar or icon.
+				 *
+				 * @experimental Since 1.81 this feature is experimental and the API may change.
 				 */
-				toolbar: { type: "sap.ui.core.Control", multiple: false },
+				iconAlt: { type: "string", defaultValue: "" },
+
+				/**
+				 * Defines a background color for the avatar or icon.
+				 *
+				 * @experimental Since 1.83 this feature is experimental and the API may change.
+				 */
+				iconBackgroundColor: { type: "sap.m.AvatarColor", defaultValue: AvatarColor.Transparent }
+			},
+			aggregations: {
 
 				/**
 				 * Defines the inner title control.
@@ -119,7 +121,7 @@ sap.ui.define([
 				/**
 				 * Defines the inner avatar control.
 				 */
-				_avatar: { type: "sap.f.Avatar", multiple: false, visibility: "hidden" }
+				_avatar: { type: "sap.m.Avatar", multiple: false, visibility: "hidden" }
 			},
 			events: {
 
@@ -128,7 +130,8 @@ sap.ui.define([
 				 */
 				press: {}
 			}
-		}
+		},
+		renderer: HeaderRenderer
 	});
 
 	/**
@@ -136,63 +139,24 @@ sap.ui.define([
 	 * @private
 	 */
 	Header.prototype.init = function () {
+		BaseHeader.prototype.init.apply(this, arguments);
+
 		this._oRb = Core.getLibraryResourceBundle("sap.f");
-		this._aReadyPromises = [];
-		this._bReady = false;
+		this.data("sap-ui-fastnavgroup", "true", true); // Define group for F6 handling
 
-		// So far the ready event will be fired when the data is ready. But this can change in the future.
-		this._awaitEvent("_dataReady");
-		this._awaitEvent("_actionHeaderReady");
+		this._oAriaAvatarText = new InvisibleText({id: this.getId() + "-ariaAvatarText"});
+		this._oAriaAvatarText.setText(this._oRb.getText("ARIA_HEADER_AVATAR_TEXT"));
 
-		Promise.all(this._aReadyPromises).then(function () {
-			this._bReady = true;
-			this.fireEvent("_ready");
-		}.bind(this));
-
-		this._oLoadingProvider = new LoadingProvider();
 	};
 
 	Header.prototype.exit = function () {
-		this._oServiceManager = null;
-		this._oDataProviderFactory = null;
+		BaseHeader.prototype.exit.apply(this, arguments);
+
+		if (this._oAriaAvatarText) {
+			this._oAriaAvatarText.destroy();
+			this._oAriaAvatarText = null;
+		}
 		this._oRb = null;
-
-		if (this._oDataProvider) {
-			this._oDataProvider.destroy();
-			this._oDataProvider = null;
-		}
-
-		if (this._oActions) {
-			this._oActions.destroy();
-			this._oActions = null;
-		}
-
-		if (this._oLoadingProvider) {
-			this._oLoadingProvider.destroy();
-			this._oLoadingProvider = null;
-		}
-	};
-
-	/**
-	 * Await for an event which controls the overall "ready" state of the header.
-	 *
-	 * @private
-	 * @param {string} sEvent The name of the event
-	 */
-	Header.prototype._awaitEvent = function (sEvent) {
-		this._aReadyPromises.push(new Promise(function (resolve) {
-			this.attachEventOnce(sEvent, function () {
-				resolve();
-			});
-		}.bind(this)));
-	};
-
-	/**
-	 * @public
-	 * @returns {boolean} If the header is ready or not.
-	 */
-	Header.prototype.isReady = function () {
-		return this._bReady;
 	};
 
 	/**
@@ -230,7 +194,7 @@ sap.ui.define([
 	/**
 	 * Lazily creates an avatar control and returns it.
 	 * @private
-	 * @returns {sap.f.Avatar} The inner avatar aggregation
+	 * @returns {sap.m.Avatar} The inner avatar aggregation
 	 */
 	Header.prototype._getAvatar = function () {
 		var oAvatar = this.getAggregation("_avatar");
@@ -246,11 +210,18 @@ sap.ui.define([
 	 * @private
 	 */
 	Header.prototype.onBeforeRendering = function () {
+		BaseHeader.prototype.onBeforeRendering.apply(this, arguments);
+
+		var oAvatar = this._getAvatar();
+
 		this._getTitle().setText(this.getTitle());
 		this._getSubtitle().setText(this.getSubtitle());
-		this._getAvatar().setDisplayShape(this.getIconDisplayShape());
-		this._getAvatar().setSrc(this.getIconSrc());
-		this._getAvatar().setInitials(this.getIconInitials());
+
+		oAvatar.setDisplayShape(this.getIconDisplayShape());
+		oAvatar.setSrc(this.getIconSrc());
+		oAvatar.setInitials(this.getIconInitials());
+		oAvatar.setTooltip(this.getIconAlt());
+		oAvatar.setBackgroundColor(this.getIconBackgroundColor());
 	};
 
 	/**
@@ -259,28 +230,39 @@ sap.ui.define([
 	 * @private
 	 * @returns {string} IDs of controls
 	 */
-	Header.prototype._getHeaderAccessibility = function () {
-		var sTitleId = this._getTitle() ? this._getTitle().getId() : "",
-			sSubtitleId = this._getSubtitle() ? this._getSubtitle().getId() : "",
-			sStatusTextId = this.getStatusText() ? this.getId() + "-status" : "",
-			sAvatarId = this._getAvatar() ? this._getAvatar().getId() : "";
+	Header.prototype._getAriaLabelledBy = function () {
+		var sCardTypeId = "",
+			sTitleId = "",
+			sSubtitleId = "",
+			sStatusTextId = "",
+			sAvatarId = "",
+			sIds;
 
-		return sTitleId + " " + sSubtitleId + " " + sStatusTextId + " " + sAvatarId;
-	};
-
-	/**
-	 * Called after the control is rendered.
-	 */
-	Header.prototype.onAfterRendering = function() {
-		//TODO performance will be affected, but text should clamp on IE also - TBD
-		if (Device.browser.msie) {
-			if (this.getTitle()) {
-				this._getTitle().clampText();
-			}
-			if (this.getSubtitle()) {
-				this._getSubtitle().clampText();
-			}
+		if (this.getParent() && this.getParent()._ariaText) {
+			sCardTypeId = this.getParent()._ariaText.getId();
 		}
+
+		if (this.getTitle()) {
+			sTitleId = this._getTitle().getId();
+		}
+
+		if (this.getSubtitle()) {
+			sSubtitleId = this._getSubtitle().getId();
+		}
+
+		if (this.getStatusText()) {
+			sStatusTextId = this.getId() + "-status";
+		}
+
+		if (this.getIconSrc() || this.getIconInitials()) {
+			sAvatarId = this.getId() + "-ariaAvatarText";
+		}
+
+		sIds = sCardTypeId + " " + sTitleId + " " + sSubtitleId + " " + sStatusTextId + " " + sAvatarId;
+
+		// remove whitespace from both sides
+		// and merge consecutive spaces into one
+		return sIds.replace(/ {2,}/g, ' ').trim();
 	};
 
 	/**
@@ -288,7 +270,7 @@ sap.ui.define([
 	 */
 	Header.prototype.ontap = function (oEvent) {
 		var srcControl = oEvent.srcControl;
-		if (srcControl && srcControl.getId().indexOf('overflowButton') > -1) { // better way?
+		if (srcControl && srcControl.getId().indexOf("overflowButton") > -1) { // better way?
 			return;
 		}
 
@@ -302,92 +284,49 @@ sap.ui.define([
 		this.firePress();
 	};
 
-	Header.prototype.setServiceManager = function (oServiceManager) {
-		this._oServiceManager = oServiceManager;
-		return this;
-	};
-
-	Header.prototype.setDataProviderFactory = function (oDataProviderFactory) {
-		this._oDataProviderFactory = oDataProviderFactory;
-		return this;
-	};
-
-	/**
-	 * Sets a data provider to the header.
-	 *
-	 * @private
-	 * @param {object} oDataSettings The data settings
-	 */
-	Header.prototype._setData = function (oDataSettings) {
-		var sPath = "/";
-		if (oDataSettings && oDataSettings.path) {
-			sPath = oDataSettings.path;
-		}
-		this.bindObject(sPath);
-
-		if (this._oDataProvider) {
-			this._oDataProvider.destroy();
-		}
-
-		this._oDataProvider = this._oDataProviderFactory.create(oDataSettings, this._oServiceManager);
-
-		this._oLoadingProvider.createLoadingState(this._oDataProvider);
-
-		if (this._oDataProvider) {
-			// If a data provider is created use an own model. Otherwise bind to the one propagated from the card.
-			this.setModel(new JSONModel());
-
-			//TODO Designers to decide if we have to keep loading status when an error occured during loading
-			this._oDataProvider.attachDataChanged(function (oEvent) {
-				this._updateModel(oEvent.getParameter("data"));
-			}.bind(this));
-
-			this._oDataProvider.attachError(function (oEvent) {
-				this._handleError(oEvent.getParameter("message"));
-			}.bind(this));
-
-			this._oDataProvider.triggerDataUpdate().then(function () {
-				this.fireEvent("_dataReady");
-				this._oLoadingProvider.setLoading(false);
-				this._oLoadingProvider.removeHeaderPlaceholder(this);
-			}.bind(this));
-		} else {
-			this.fireEvent("_dataReady");
-		}
-	};
-
-	/**
-	 * Sets accessibility to the header to the header.
-	 *
-	 * @private
-	 * @param {object} mConfiguration A map containing the header configuration options, which are already parsed.
-	 */
-	Header.prototype._setAccessibilityAttributes = function (mConfiguration) {
-		if (!mConfiguration.actions) {
-			this._sAriaRole = 'heading';
-			this._sAriaHeadingLevel = '3';
-			this._sAriaRoleDescritoion = this._oRb.getText("ARIA_ROLEDESCRIPTION_CARD_HEADER");
-		} else {
-			this._sAriaRole = 'button';
-			this._sAriaHeadingLevel = undefined;
-			this._sAriaRoleDescritoion = this._oRb.getText("ARIA_ROLEDESCRIPTION_INTERACTIVE_CARD_HEADER");
-		}
-	};
-
-	Header.prototype._updateModel = function (oData) {
-		this.getModel().setData(oData);
-	};
-
-	Header.prototype._handleError = function (sLogMessage) {
-		this.fireEvent("_error", { logMessage: sLogMessage });
-	};
-
 	Header.prototype.isLoading = function () {
-		var oLoadingProvider = this._oLoadingProvider,
-            oCard = this.getParent(),
-			cardLoading = oCard.getMetadata()._sClassName === 'sap.ui.integration.widgets.Card' ? oCard.isLoading() : false;
+		return false;
+	};
 
-		return !oLoadingProvider.getDataProviderJSON() && (oLoadingProvider.getLoadingState() || cardLoading);
+	Header.prototype.attachPress = function () {
+		var aMyArgs = Array.prototype.slice.apply(arguments);
+		aMyArgs.unshift("press");
+
+		BaseHeader.prototype.attachEvent.apply(this, aMyArgs);
+
+		this.invalidate();
+
+		return this;
+	};
+
+	Header.prototype.detachPress = function() {
+		var aMyArgs = Array.prototype.slice.apply(arguments);
+		aMyArgs.unshift("press");
+
+		BaseHeader.prototype.detachEvent.apply(this, aMyArgs);
+
+		this.invalidate();
+
+		return this;
+	};
+
+	/**
+	 * Returns if the control is inside a sap.f.GridContainer
+	 *
+	 * @private
+	 */
+	Header.prototype._isInsideGridContainer = function() {
+		var oParent = this.getParent();
+		if (!oParent) {
+			return false;
+		}
+
+		oParent = oParent.getParent();
+		if (!oParent) {
+			return false;
+		}
+
+		return oParent.isA("sap.f.GridContainer");
 	};
 
 	return Header;
