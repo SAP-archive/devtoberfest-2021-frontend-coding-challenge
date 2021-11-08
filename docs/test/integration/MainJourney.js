@@ -1,0 +1,1 @@
+sap.ui.define(["sap/ui/test/opaQunit","./pages/Main"],function(e){"use strict";e("Should see the product list",function(e,i,t){e.iStartMyApp();t.onTheMainPage.iShouldSeeTheTitle();t.onTheMainPage.iShouldSeeSomeListItems();t.iTeardownMyApp()})});
