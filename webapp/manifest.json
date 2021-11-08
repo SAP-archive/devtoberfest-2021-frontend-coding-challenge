@@ -83,7 +83,8 @@
                 "viewType": "XML",
                 "viewPath": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view",
                 "controlId": "idAppControl",
-                "controlAggregation": "pages"
+                "controlAggregation": "pages",
+                "async": true
             },
             "routes": [
                 {
