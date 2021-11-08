@@ -1,3 +1,5 @@
 {
-    "actions": []
+    "actions": [],
+    "ui5-tools.server.resourcesProxy": "CDN SAPUI5",
+    "ui5-tools.ui5Version": "1.96.0"
 }
