@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-sap.ui.define([],function(){"use strict";var e={};e.render=function(e,t){var r,i,n=t.getVisibleItems(),l=n.length,s=t._iconTabHeader,a=true;if(s){s._checkTextOnly(n);a=s._bTextOnly;t._bIconOnly=t.checkIconOnly(n)}e.write("<ul");e.writeAttribute("role","listbox");e.writeControlData(t);e.addClass("sapMITBSelectList");if(a){e.addClass("sapMITBSelectListTextOnly")}e.writeClasses();e.write(">");for(r=0;r<l;r++){i=n[r];i.renderInSelectList(e,t,r,l)}e.write("</ul>")};return e},true);
+sap.ui.define(["sap/ui/core/library"],function(e){"use strict";var t=e.IconColor;var i={apiVersion:2};i.render=function(e,i){var r=i._getParams(),n=i.getVisibleItems(),a=i._oIconTabHeader,s=a._checkTextOnly(),l=a.getVisibleTabFilters().length,o=r.fNestedItemPaddingLeft,c=false;var f=n.filter(function(e){return e.isA("sap.m.IconTabFilter")}).some(function(e){return e.getIconColor()!==t.Default});i.checkIconOnly();var u=r.fAdditionalPadding;if(f&&u){o+=u;c=true}this.renderList(e,n,i,a,s,o,c,l)};i.renderList=function(e,t,i,r,n,a,s,l){if(!t.length){return}e.openStart("ul",i).attr("role","menu").class("sapMITBSelectList");if(n){e.class("sapMITBSelectListTextOnly")}e.openEnd();for(var o=0;o<t.length;o++){var c=t[o],f;if(r&&c.isA("sap.m.IconTabFilter")){f=r.getVisibleTabFilters().indexOf(c._getRealTab())}if(c.isA("sap.m.IconTabFilter")&&c._getRootTab()._getSelectList()===i){f=o;l=t.length}var u=c._getNestedLevel()-2;if(s){u++}if(i._bIsOverflow){u++}c.renderInSelectList(e,i,f,l,a*u)}e.close("ul")};return i},true);

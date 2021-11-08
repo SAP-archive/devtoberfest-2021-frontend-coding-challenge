@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -124,9 +124,9 @@ sap.ui.define([
 					//using href instead of hash to avoid the escape problem in firefox
 					sHash = (window.location.href.split("#")[1] || "");
 
-				jWindowDom.bind('hashchange', detectHashChange);
+				jWindowDom.on('hashchange', detectHashChange);
 
-				if (jQuery.isArray(mSettings.routes)) {
+				if (Array.isArray(mSettings.routes)) {
 					var i, route;
 					for (i = 0 ; i < mSettings.routes.length ; i++) {
 						route = mSettings.routes[i];
@@ -136,7 +136,7 @@ sap.ui.define([
 					}
 				}
 
-				if (jQuery.isFunction(mSettings.defaultHandler)) {
+				if (typeof mSettings.defaultHandler === "function") {
 					defaultHandler = mSettings.defaultHandler;
 				}
 
@@ -271,7 +271,7 @@ sap.ui.define([
 
 			//back is called directly after restoring the bookmark. Since there's no history stored, call the default handler.
 			if (hashHistory.length === 1) {
-				if (jQuery.isFunction(defaultHandler)) {
+				if (typeof defaultHandler === "function") {
 					defaultHandler();
 				}
 			} else {
@@ -301,7 +301,7 @@ sap.ui.define([
 
 			//back is called directly after restoring the bookmark. Since there's no history stored, call the default handler.
 			if (hashHistory.length === 1) {
-				if (jQuery.isFunction(defaultHandler)) {
+				if (typeof defaultHandler === "function") {
 					defaultHandler();
 				}
 			} else {
@@ -328,7 +328,7 @@ sap.ui.define([
 
 			//back is called directly after restoring the bookmark. Since there's no history stored, call the default handler.
 			if (hashHistory.length === 1) {
-				if (jQuery.isFunction(defaultHandler)) {
+				if (typeof defaultHandler === "function") {
 					defaultHandler(jQuery.sap.history.NavType.Back);
 				}
 			} else {
@@ -385,7 +385,7 @@ sap.ui.define([
 		 * @private
 		 */
 		function calculateStepsToHash(sCurrentHash, sToHash, bPrefix){
-			var iCurrentIndex = jQuery.inArray(sCurrentHash, hashHistory),
+			var iCurrentIndex = hashHistory.indexOf(sCurrentHash),
 				iToIndex,
 				i,
 				tempHash;
@@ -398,7 +398,7 @@ sap.ui.define([
 						}
 					}
 				} else {
-					iToIndex = jQuery.inArray(sToHash, hashHistory);
+					iToIndex = hashHistory.indexOf(sToHash);
 
 					//When back to home is needed, and application is started with nonempty hash but it's nonbookmarkable
 					if ((iToIndex === -1) && sToHash.length === 0) {
@@ -494,8 +494,8 @@ sap.ui.define([
 		 * @private
 		 */
 		function preGenHash(sIdf, oStateData){
-			var sEncodedIdf = window.encodeURIComponent(sIdf);
-			var sEncodedData = window.encodeURIComponent(window.JSON.stringify(oStateData));
+			var sEncodedIdf = encodeURIComponent(sIdf);
+			var sEncodedData = encodeURIComponent(JSON.stringify(oStateData));
 			return sEncodedIdf + sIdSeperator + sEncodedData;
 		}
 
@@ -506,7 +506,7 @@ sap.ui.define([
 		 * @private
 		 */
 		function getAppendId(sHash){
-			var iIndex = jQuery.inArray(currentHash, hashHistory),
+			var iIndex = hashHistory.indexOf(currentHash),
 				i, sHistory;
 			if (iIndex > -1) {
 				for (i = 0 ; i < iIndex + 1 ; i++) {
@@ -526,7 +526,7 @@ sap.ui.define([
 		 * @private
 		 */
 		function reorganizeHistoryArray(sHash){
-			var iIndex = jQuery.inArray(currentHash, hashHistory);
+			var iIndex = hashHistory.indexOf(currentHash);
 
 			if ( !(iIndex === -1 || iIndex === hashHistory.length - 1) ) {
 				hashHistory.splice(iIndex + 1, hashHistory.length - 1 - iIndex);
@@ -549,7 +549,7 @@ sap.ui.define([
 		 * @private
 		 */
 		function calcStepsToRealHistory(sCurrentHash, bForward){
-			var iIndex = jQuery.inArray(sCurrentHash, hashHistory),
+			var iIndex = hashHistory.indexOf(sCurrentHash),
 				i;
 
 			if (iIndex !== -1) {
@@ -585,7 +585,7 @@ sap.ui.define([
 				oParsedHash = parseHashToObject(sHash);
 
 				if (!oParsedHash || !oParsedHash.bBookmarkable) {
-					if (jQuery.isFunction(defaultHandler)) {
+					if (typeof defaultHandler === "function") {
 						defaultHandler(jQuery.sap.history.NavType.Bookmark);
 					}
 					return;
@@ -593,7 +593,7 @@ sap.ui.define([
 			}
 
 			if (sHash.length === 0) {
-				if (jQuery.isFunction(defaultHandler)) {
+				if (typeof defaultHandler === "function") {
 					defaultHandler(jQuery.sap.history.NavType.Back);
 				}
 			} else {
@@ -603,7 +603,7 @@ sap.ui.define([
 				if (iNewHashIndex === 0) {
 					oParsedHash = parseHashToObject(sHash);
 					if (!oParsedHash || !oParsedHash.bBookmarkable) {
-						if (jQuery.isFunction(defaultHandler)) {
+						if (typeof defaultHandler === "function") {
 							defaultHandler(jQuery.sap.history.NavType.Back);
 						}
 						return;
@@ -704,7 +704,7 @@ sap.ui.define([
 			var aParts = sHash.split(sIdSeperator), oReturn = {};
 			if (aParts.length === 4 || aParts.length === 3) {
 				oReturn.sIdentifier = window.decodeURIComponent(aParts[0]);
-				oReturn.oStateData = window.JSON.parse(window.decodeURIComponent(aParts[1]));
+				oReturn.oStateData = JSON.parse(window.decodeURIComponent(aParts[1]));
 				if (aParts.length === 4) {
 					oReturn.uid = aParts[2];
 				}
