@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -28,7 +28,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.96.0
 	 * @since 1.34
 	 *
 	 * @public
@@ -45,7 +45,7 @@ sap.ui.define([
 				 * Updates the size of the chart. If not set then the default size is applied based on the device tile.
 				 * @deprecated Since version 1.38.0. The FeedContent control has now a fixed size, depending on the used media (desktop, tablet or phone).
 				 */
-				"size" : {type : "sap.m.Size", group : "Misc", defaultValue : Size.Auto},
+				"size" : {type : "sap.m.Size", group : "Misc", defaultValue : Size.Auto, deprecated: true},
 
 				/**
 				 * The content text.
@@ -100,13 +100,13 @@ sap.ui.define([
 	};
 
 	FeedContent.prototype.onBeforeRendering = function() {
-		this.$().unbind("mouseenter");
-		this.$().unbind("mouseleave");
+		this.$().off("mouseenter");
+		this.$().off("mouseleave");
 	};
 
 	FeedContent.prototype.onAfterRendering = function() {
-		this.$().bind("mouseenter", this._addTooltip.bind(this));
-		this.$().bind("mouseleave", this._removeTooltip.bind(this));
+		this.$().on("mouseenter", this._addTooltip.bind(this));
+		this.$().on("mouseleave", this._removeTooltip.bind(this));
 	};
 
 	FeedContent.prototype.exit = function() {
@@ -187,7 +187,7 @@ sap.ui.define([
 	 */
 	FeedContent.prototype.ontap = function(oEvent) {
 		if (Device.browser.msie) {
-			this.$().focus();
+			this.$().trigger("focus");
 		}
 		this.firePress();
 	};

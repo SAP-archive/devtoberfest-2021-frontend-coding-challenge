@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -13,11 +13,11 @@
  * @name sap.ui.test
  * @public
  */
-
+// The module ID argument is given because QUnitUtils.js often was included as a script Element in the past.
+// It is now recommended to use it via a module dependency (sap.ui.define).
 sap.ui.define('sap/ui/qunit/QUnitUtils', [
 	'jquery.sap.global',
 	'sap/base/util/ObjectPath',
-	'sap/ui/Device',
 	'sap/ui/base/DataType',
 	'sap/ui/events/KeyCodes',
 	"sap/base/strings/camelize",
@@ -29,7 +29,6 @@ sap.ui.define('sap/ui/qunit/QUnitUtils', [
 	function(
 		jQuery,
 		ObjectPath,
-		Device,
 		DataType,
 		KeyCodes,
 		camelize,
@@ -80,7 +79,7 @@ sap.ui.define('sap/ui/qunit/QUnitUtils', [
 					var QUnit = window.QUnit;
 					window.QUnit = undefined;
 					// load the blanket instance
-					sap.ui.requireSync("sap/ui/thirdparty/blanket");
+					sap.ui.requireSync("sap/ui/thirdparty/blanket"); // legacy-relevant
 					// restore the QUnit object
 					window.QUnit = QUnit;
 					// trigger blanket to display the coverage report
@@ -99,92 +98,6 @@ sap.ui.define('sap/ui/qunit/QUnitUtils', [
 	jQuery.now = function() {
 		return Date.now();
 	};
-
-	// PhantomJS fixes
-	if (Device.browser.phantomJS) {
-
-		// 1.) PhantomJS patch for Focus detection via jQuery:
-		// ==> https://code.google.com/p/phantomjs/issues/detail?id=427
-		//     ==> https://github.com/ariya/phantomjs/issues/10427
-		var $is = jQuery.fn.is;
-		jQuery.fn.is = function(sSelector) {
-			if (sSelector === ":focus") {
-				return this.get(0) === document.activeElement;
-			}
-			return $is.apply(this, arguments);
-		};
-
-		// 2.) PhantomJS fix for invalid date handling:
-		// ==> https://github.com/ariya/phantomjs/issues/11151
-
-		/*eslint-disable */
-		var NativeDate = Date,
-			NativeDate_parse = NativeDate.parse;
-
-		// override the constructor of the Date object
-		Date = function(sDateString) {
-			if ( arguments.length === 1 && typeof sDateString === 'string' ) {
-				return new NativeDate(Date.parse(sDateString));
-			}
-
-			// signature variant with 2..6 individual date components
-			var args = Array.prototype.slice.call(arguments);
-			args.unshift(window);
-			if (this instanceof NativeDate) {
-				// usage of new Date(...):
-				// simulate a new call with Function.prototype.bind.apply(fnClass, args)
-				return new (Function.prototype.bind.apply(NativeDate, args));
-			} else {
-				// usage of Date(...):
-				return NativeDate.apply(window, args);
-			}
-		};
-
-		// patch the parse function of the Date
-		var parse = function (sDateString) {
-			var iMillis = NativeDate_parse.apply(Date, arguments);
-			if (sDateString && typeof sDateString === "string") {
-				// if the year is gt/eq 2034 we need to increment the
-				// date by one additional day since this is broken in
-				// PhantomJS => this is a workaround for the upper BUG!
-				var m = /^(\d{4})(?:-(\d+)?-(\d+))(?:[T ](\d+):(\d+)(?::(\d+)(?:\.(\d+))?)?)?(?:Z(-?\d*))?$/.exec(sDateString);
-				if (m && parseInt(m[1]) >= 2034) {
-					iMillis += 24 * 60 * 60 * 1000;
-				}
-			}
-			return iMillis;
-		};
-
-		// Add the static functions to Date with 'enumerable=false',
-		// otherwise, Sinon will copy them over his own modified versions
-		// of e.g. Date.now, thereby breaking the fakeTimer feature.
-		Object.defineProperties(Date, {
-			"parse": {
-				value: parse,
-				enumerable: false
-			},
-			"toString": {
-				value: function() {
-					return NativeDate.toString.call(this);
-				},
-				enumerable: false
-			},
-			"now": {
-				value: NativeDate.now,
-				enumerable: false
-			},
-			"UTC": {
-				value: NativeDate.UTC,
-				enumerable: false
-			},
-			"prototype": {
-				value: NativeDate.prototype,
-				enumerable :false
-			}
-		});
-		/*eslint-enable */
-
-	}
 
 	/**
 	 * Contains helper functionality for QUnit tests.
@@ -448,10 +361,10 @@ sap.ui.define('sap/ui/qunit/QUnitUtils', [
 		oParams.location = mapKeyCodeToLocation(sKey);
 
 		oParams.which = oParams.keyCode;
-		oParams.shiftKey = bShiftKey;
-		oParams.altKey = bAltKey;
-		oParams.metaKey = bCtrlKey;
-		oParams.ctrlKey = bCtrlKey;
+		oParams.shiftKey = !!bShiftKey;
+		oParams.altKey = !!bAltKey;
+		oParams.metaKey = !!bCtrlKey;
+		oParams.ctrlKey = !!bCtrlKey;
 		QUtils.triggerEvent(sEventType, oTarget, oParams);
 	};
 
@@ -581,6 +494,71 @@ sap.ui.define('sap/ui/qunit/QUnitUtils', [
 		oParams.pageY = iPageY;
 		oParams.button = iButton;
 		QUtils.triggerEvent(sEventType, oTarget, oParams);
+	};
+
+	/**
+	 * Removes any kind of whitespaces from the given <code>sText</code>
+	 *
+	 * @param {string} sText The text
+	 * @returns {string} The text without any kind of whitespaces
+	 * @private
+	 */
+	QUtils._removeAllWhitespaces = function(sText){
+		return sText.replace(/\s/g, "");
+	};
+
+	/**
+	 * Performs a "SelectAll" also known as CTRL + A on the whole browser window
+	 *
+	 * @protected
+	 */
+	QUtils.triggerSelectAll = function(){
+		document.getSelection().selectAllChildren(document.body);
+	};
+
+	/**
+	 * Checks if the given <code>sText</code> is equal with the selected text. If no <code>sText</code> is given, its checked if the there is any text selected
+	 *
+	 * @param {string} [sText] The given text
+	 * @returns {boolean} If the selected text is equal with the given <code>sText</code>
+	 * @protected
+	 */
+	QUtils.isSelectedTextEqual = function(sText){
+		var sSelectedText = QUtils.getSelectedText();
+		return sText ? sText === sSelectedText : !!sSelectedText;
+	};
+
+	/**
+	 * Checks if the given <code>sText</code> is included in the selected text. If no <code>sText</code> is given, its checked if the there is any text selected
+	 *
+	 * @param {string | string[]} [vText] The given text or an array of string
+	 * @returns {boolean} If the selected text contains the given <code>sText</code>
+	 * @protected
+	 */
+	QUtils.includesSelectedText = function(vText){
+		var sSelectedText = QUtils.getSelectedText();
+		if (!vText){
+			return !!sSelectedText;
+		}
+		if (!Array.isArray(vText)){
+			vText = [vText];
+		}
+		return vText.every(function(sText){
+			return sSelectedText.indexOf(sText) > -1;
+		});
+	};
+
+	/**
+	 * Determines the selected text, if no text is selected an empty string is returned
+	 *
+	 * Any kind of whitespaces are removed, because depending on OS and/or browser type different
+	 *  types and amount of whitespaces are determined by the Selection-API
+	 *
+	 * @returns {string} The selected text
+	 * @protected
+	 */
+	QUtils.getSelectedText = function(){
+		return QUtils._removeAllWhitespaces(document.getSelection().toString());
 	};
 
 	// --------------------------------------------------------------------------------------------------
@@ -1009,7 +987,7 @@ sap.ui.define('sap/ui/qunit/QUnitUtils', [
 						} else if ( c > a ) {
 							var j = offset(a,c,va,0),
 								end = j + params[c].n;
-							for (count = occurs[j]; count > 0 && i < end; j++ ) {
+							for (count = occurs[j]; count > 0 && j < end; j++ ) {
 								if ( occurs[j] < count ) {
 									count = occurs[j];
 								}

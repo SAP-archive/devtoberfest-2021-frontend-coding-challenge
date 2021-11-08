@@ -1,28 +1,22 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
-	'sap/ui/core/Control',
-	'sap/m/NumericContent',
-	'sap/m/Text',
-	'sap/ui/model/json/JSONModel',
-	"sap/f/cards/NumericSideIndicator",
+	"./BaseHeader",
+	"sap/m/NumericContent",
+	"sap/m/Text",
 	"sap/f/cards/NumericHeaderRenderer",
-	"sap/ui/core/Core",
-	"sap/f/cards/loading/LoadingProvider"
+	"sap/ui/core/Core"
 ], function (
-		Control,
-		NumericContent,
-		Text,
-		JSONModel,
-		NumericSideIndicator,
-		NumericHeaderRenderer,
-		Core,
-		LoadingProvider
-	) {
-		"use strict";
+	BaseHeader,
+	NumericContent,
+	Text,
+	NumericHeaderRenderer,
+	Core
+) {
+	"use strict";
 
 	/**
 	 * Constructor for a new <code>NumericHeader</code>.
@@ -32,9 +26,9 @@ sap.ui.define([
 	 *
 	 * @class
 	 * Displays general information in the header of the {@link sap.f.Card} and allows the
-	 * configuration of a numeric value visualization..
+	 * configuration of a numeric value visualization.
 	 *
-	 * You can configure the title, subtitle, status text and icon, using the provided properties.
+	 * You can configure the title, subtitle, and status text, using the provided properties.
 	 * To add more side number indicators, use the <code>sideIndicators</code> aggregation.
 	 *
 	 * <b>Notes:</b>
@@ -44,10 +38,10 @@ sap.ui.define([
 	 * <li>To show only basic information, use {@link sap.f.cards.Header Header} instead.</li>
 	 * </ul>
 	 *
-	 * @extends sap.ui.core.Control
+	 * @extends sap.f.cards.BaseHeader
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public
@@ -55,7 +49,7 @@ sap.ui.define([
 	 * @alias sap.f.cards.NumericHeader
 	 * @ui5-metamodel This control/element also will be described in the UI5 (legacy) designtime metamodel
 	 */
-	var NumericHeader = Control.extend("sap.f.cards.NumericHeader", {
+	var NumericHeader = BaseHeader.extend("sap.f.cards.NumericHeader", {
 		metadata: {
 			library: "sap.f",
 			interfaces: ["sap.f.cards.IHeader"],
@@ -109,16 +103,14 @@ sap.ui.define([
 				/**
 				 * Additional text which adds more details to what is shown in the numeric header.
 				 */
-				details: { "type": "string", group: "Appearance" }
-			},
-			aggregations: {
+				details: { "type": "string", group: "Appearance" },
 
 				/**
-				 * Defines the toolbar.
-				 * @experimental Since 1.75
-				 * @since 1.75
+				 * The alignment of the side indicators.
 				 */
-				toolbar: { type: "sap.ui.core.Control", multiple: false },
+				 sideIndicatorsAlignment: { "type": "sap.f.cards.NumericHeaderSideIndicatorsAlignment", group: "Appearance", defaultValue : "Begin" }
+			},
+			aggregations: {
 
 				/**
 				 * Additional side number indicators. For example "Deviation" and "Target". Not more than two side indicators should be used.
@@ -157,7 +149,8 @@ sap.ui.define([
 				 */
 				press: {}
 			}
-		}
+		},
+		renderer: NumericHeaderRenderer
 	});
 
 	/**
@@ -165,62 +158,17 @@ sap.ui.define([
 	 * @private
 	 */
 	NumericHeader.prototype.init = function () {
+		BaseHeader.prototype.init.apply(this, arguments);
+
 		this._oRb = Core.getLibraryResourceBundle("sap.f");
-		this._aReadyPromises = [];
-		this._bReady = false;
 
-		// So far the ready event will be fired when the data is ready. But this can change in the future.
-		this._awaitEvent("_dataReady");
-
-		Promise.all(this._aReadyPromises).then(function () {
-			this._bReady = true;
-			this.fireEvent("_ready");
-		}.bind(this));
-
-		this._oLoadingProvider = new LoadingProvider();
+		this.data("sap-ui-fastnavgroup", "true", true); // Define group for F6 handling
 	};
 
 	NumericHeader.prototype.exit = function () {
-		this._oServiceManager = null;
-		this._oDataProviderFactory = null;
+		BaseHeader.prototype.exit.apply(this, arguments);
+
 		this._oRb = null;
-
-		if (this._oDataProvider) {
-			this._oDataProvider.destroy();
-			this._oDataProvider = null;
-		}
-
-		if (this._oActions) {
-			this._oActions.destroy();
-			this._oActions = null;
-		}
-
-		if (this._oLoadingProvider) {
-			this._oLoadingProvider.destroy();
-			this._oLoadingProvider = null;
-		}
-	};
-
-	/**
-	 * Await for an event which controls the overall "ready" state of the header.
-	 *
-	 * @private
-	 * @param {string} sEvent The name of the event
-	 */
-	NumericHeader.prototype._awaitEvent = function (sEvent) {
-		this._aReadyPromises.push(new Promise(function (resolve) {
-			this.attachEventOnce(sEvent, function () {
-				resolve();
-			});
-		}.bind(this)));
-	};
-
-	/**
-	 * @public
-	 * @returns {boolean} If the header is ready or not.
-	 */
-	NumericHeader.prototype.isReady = function () {
-		return this._bReady;
 	};
 
 	/**
@@ -228,7 +176,7 @@ sap.ui.define([
 	 *
 	 * @public
 	 * @param {string} sValue The text of the title
-	 * @return {sap.f.cards.NumericHeader} <code>this</code> pointer for chaining
+	 * @return {this} <code>this</code> pointer for chaining
 	 */
 	NumericHeader.prototype.setTitle = function(sValue) {
 		this.setProperty("title", sValue, true);
@@ -241,7 +189,7 @@ sap.ui.define([
 	 *
 	 * @public
 	 * @param {string} sValue The text of the subtitle
-	 * @return {sap.f.cards.NumericHeader} <code>this</code> pointer for chaining
+	 * @return {this} <code>this</code> pointer for chaining
 	 */
 	NumericHeader.prototype.setSubtitle = function(sValue) {
 		this.setProperty("subtitle", sValue, true);
@@ -254,7 +202,7 @@ sap.ui.define([
 	 *
 	 * @public
 	 * @param {string} sValue The value of the unit of measurement
-	 * @return {sap.f.cards.NumericHeader} <code>this</code> pointer for chaining
+	 * @return {this} <code>this</code> pointer for chaining
 	 */
 	NumericHeader.prototype.setUnitOfMeasurement = function(sValue) {
 		this.setProperty("unitOfMeasurement", sValue, true);
@@ -267,7 +215,7 @@ sap.ui.define([
 	 *
 	 * @public
 	 * @param {string} sValue The text of the details
-	 * @return {sap.f.cards.NumericHeader} <code>this</code> pointer for chaining
+	 * @return {this} <code>this</code> pointer for chaining
 	 */
 	NumericHeader.prototype.setDetails = function(sValue) {
 		this.setProperty("details", sValue, true);
@@ -280,7 +228,7 @@ sap.ui.define([
 	 *
 	 * @public
 	 * @param {string} sValue A string representation of the number
-	 * @return {sap.f.cards.NumericHeader} <code>this</code> pointer for chaining
+	 * @return {this} <code>this</code> pointer for chaining
 	 */
 	NumericHeader.prototype.setNumber = function(sValue) {
 		this.setProperty("number", sValue, true);
@@ -293,7 +241,7 @@ sap.ui.define([
 	 *
 	 * @public
 	 * @param {string} sValue The text of the title
-	 * @return {sap.f.cards.NumericHeader} <code>this</code> pointer for chaining
+	 * @return {this} <code>this</code> pointer for chaining
 	 */
 	NumericHeader.prototype.setScale = function(sValue) {
 		this.setProperty("scale", sValue, true);
@@ -306,7 +254,7 @@ sap.ui.define([
 	 *
 	 * @public
 	 * @param {sap.m.DeviationIndicator} sValue The direction of the trend arrow
-	 * @return {sap.f.cards.NumericHeader} <code>this</code> pointer for chaining
+	 * @return {this} <code>this</code> pointer for chaining
 	 */
 	NumericHeader.prototype.setTrend = function(sValue) {
 		this.setProperty("trend", sValue, true);
@@ -319,7 +267,7 @@ sap.ui.define([
 	 *
 	 * @public
 	 * @param {sap.m.ValueColor} sValue The semantic color which represents the state
-	 * @return {sap.f.cards.NumericHeader} <code>this</code> pointer for chaining
+	 * @return {this} <code>this</code> pointer for chaining
 	 */
 	NumericHeader.prototype.setState = function(sValue) {
 		this.setProperty("state", sValue, true);
@@ -437,7 +385,7 @@ sap.ui.define([
 	 */
 	NumericHeader.prototype.ontap = function (oEvent) {
 		var srcControl = oEvent.srcControl;
-		if (srcControl && srcControl.getId().indexOf('overflowButton') > -1) { // better way?
+		if (srcControl && srcControl.getId().indexOf("overflowButton") > -1) { // better way?
 			return;
 		}
 
@@ -451,101 +399,52 @@ sap.ui.define([
 		this.firePress();
 	};
 
-	NumericHeader.prototype.setServiceManager = function (oServiceManager) {
-		this._oServiceManager = oServiceManager;
-		return this;
-	};
-
-	NumericHeader.prototype.setDataProviderFactory = function (oDataProviderFactory) {
-		this._oDataProviderFactory = oDataProviderFactory;
-		return this;
-	};
-
-	/**
-	 * Sets a data provider to the header.
-	 *
-	 * @private
-	 * @param {object} oDataSettings The data settings
-	 */
-	NumericHeader.prototype._setData = function (oDataSettings) {
-		var sPath = "/";
-		if (oDataSettings && oDataSettings.path) {
-			sPath = oDataSettings.path;
-
-		}
-		this.bindObject(sPath);
-
-		if (this._oDataProvider) {
-			this._oDataProvider.destroy();
-		}
-
-
-		this._oDataProvider = this._oDataProviderFactory.create(oDataSettings, this._oServiceManager);
-
-		this._oLoadingProvider.createLoadingState(this._oDataProvider);
-		if (this._oDataProvider) {
-			// If a data provider is created use an own model. Otherwise bind to the one propagated from the card.
-			this.setModel(new JSONModel());
-
-			this._oDataProvider.attachDataChanged(function (oEvent) {
-				this._updateModel(oEvent.getParameter("data"));
-			}.bind(this));
-
-			this._oDataProvider.attachError(function (oEvent) {
-				this._handleError(oEvent.getParameter("message"));
-			}.bind(this));
-			this._oDataProvider.triggerDataUpdate().then(function () {
-				this.fireEvent("_dataReady");
-				this._oLoadingProvider.setLoading(false);
-				this._oLoadingProvider.removeHeaderPlaceholder(this);
-			}.bind(this));
-		} else {
-			this.fireEvent("_dataReady");
-		}
-	};
-
-	NumericHeader.prototype._updateModel = function (oData) {
-		this.getModel().setData(oData);
-	};
-
-	NumericHeader.prototype._handleError = function (sLogMessage) {
-		this.fireEvent("_error", { logMessage: sLogMessage });
-	};
-
 	/**
 	 * Helper function used to create aria-labelledby attribute.
 	 *
 	 * @private
 	 * @returns {string} IDs of controls
 	 */
-	NumericHeader.prototype._getHeaderAccessibility = function () {
-		var sTitleId = this._getTitle() ? this._getTitle().getId() : "",
-			sSubtitleId = this._getSubtitle() ? this._getSubtitle().getId() : "",
-			sStatusTextId = this.getStatusText() ? this.getId() + "-status" : "",
-			sUnitOfMeasureId = this._getUnitOfMeasurement() ? this._getUnitOfMeasurement().getId() : "",
-			sSideIndicatorsId = this.getSideIndicators() ? this._getSideIndicatorIds() : "",
-			sDetailsId = this._getDetails() ? this._getDetails().getId() : "",
-			sMainIndicatorId = this._getMainIndicator() ? this._getMainIndicator().getId() : "";
+	NumericHeader.prototype._getAriaLabelledBy = function () {
+		var sCardTypeId = "",
+			sTitleId = "",
+			sSubtitleId = "",
+			sStatusTextId = "",
+			sUnitOfMeasureId = this._getUnitOfMeasurement().getId(),
+			sMainIndicatorId = "",
+			sSideIndicatorsIds = this._getSideIndicatorIds(),
+			sDetailsId = "",
+			sIds;
 
-			return sTitleId + " " + sSubtitleId + " " + sStatusTextId + " " + sUnitOfMeasureId + " " + sMainIndicatorId + sSideIndicatorsId + " " + sDetailsId;
-	};
-
-	/**
-	 * Sets accessibility to the header to the header.
-	 *
-	 * @private
-	 * @param {object} mConfiguration A map containing the header configuration options, which are already parsed.
-	 */
-	NumericHeader.prototype._setAccessibilityAttributes = function (mConfiguration) {
-		if (!mConfiguration.actions) {
-			this._sAriaRole = 'heading';
-			this._sAriaHeadingLevel = '3';
-			this._sAriaRoleDescritoion = this._oRb.getText("ARIA_ROLEDESCRIPTION_CARD_HEADER");
-		} else {
-			this._sAriaRole = 'button';
-			this._sAriaHeadingLevel = undefined;
-			this._sAriaRoleDescritoion = this._oRb.getText("ARIA_ROLEDESCRIPTION_INTERACTIVE_CARD_HEADER");
+		if (this.getParent() && this.getParent()._ariaText) {
+			sCardTypeId = this.getParent()._ariaText.getId();
 		}
+
+		if (this.getTitle()) {
+			sTitleId = this._getTitle().getId();
+		}
+
+		if (this.getSubtitle()) {
+			sSubtitleId = this._getSubtitle().getId();
+		}
+
+		if (this.getStatusText()) {
+			sStatusTextId = this.getId() + "-status";
+		}
+
+		if (this.getDetails()) {
+			sDetailsId = this._getDetails().getId();
+		}
+
+		if (this.getNumber() || this.getScale()) {
+			sMainIndicatorId = this._getMainIndicator().getId();
+		}
+
+		sIds = sCardTypeId + " " + sTitleId + " " + sSubtitleId + " " + sStatusTextId + " " + sUnitOfMeasureId + " " + sMainIndicatorId + " " + sSideIndicatorsIds + " " + sDetailsId;
+
+		// remove whitespace from both sides
+		// and merge the consecutive spaces into one
+		return sIds.replace(/ {2,}/g, ' ').trim();
 	};
 
 	/**
@@ -555,20 +454,54 @@ sap.ui.define([
 	 * @returns {string} IDs of controls
 	 */
 	NumericHeader.prototype._getSideIndicatorIds = function () {
-		var sSideIndicatorIds = "";
-		this.getSideIndicators().forEach(function(oSideIndicator) {
-			sSideIndicatorIds += " " + oSideIndicator.getId();
-		});
-
-		return sSideIndicatorIds;
+		return this.getSideIndicators()
+			.map(function(oSideIndicator) { return oSideIndicator.getId(); })
+			.join(" ");
 	};
 
 	NumericHeader.prototype.isLoading = function () {
-		var oLoadingProvider = this._oLoadingProvider,
-            oCard = this.getParent(),
-		    cardLoading = oCard.getMetadata()._sClassName === 'sap.ui.integration.widgets.Card' ? oCard.isLoading() : false;
+		return false;
+	};
 
-		return !oLoadingProvider.getDataProviderJSON() && (oLoadingProvider.getLoadingState() || cardLoading);
+	NumericHeader.prototype.attachPress = function () {
+		var aMyArgs = Array.prototype.slice.apply(arguments);
+		aMyArgs.unshift("press");
+
+		BaseHeader.prototype.attachEvent.apply(this, aMyArgs);
+
+		this.invalidate();
+
+		return this;
+	};
+
+	NumericHeader.prototype.detachPress = function() {
+		var aMyArgs = Array.prototype.slice.apply(arguments);
+		aMyArgs.unshift("press");
+
+		BaseHeader.prototype.detachEvent.apply(this, aMyArgs);
+
+		this.invalidate();
+
+		return this;
+	};
+
+	/**
+	 * Returns if the control is inside a sap.f.GridContainer
+	 *
+	 * @private
+	 */
+	NumericHeader.prototype._isInsideGridContainer = function() {
+		var oParent = this.getParent();
+		if (!oParent) {
+			return false;
+		}
+
+		oParent = oParent.getParent();
+		if (!oParent) {
+			return false;
+		}
+
+		return oParent.isA("sap.f.GridContainer");
 	};
 
 	return NumericHeader;
