@@ -57,7 +57,7 @@
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": {
                     "bundleName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.i18n.i18n",
-                    "supportedLocals": ["en"],
+                    "supportedLocales": ["en"],
                     "fallbackLocale": "en"
                 }
             },
