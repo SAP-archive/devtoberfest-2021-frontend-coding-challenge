@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="resources/img/favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+        <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
+
+        <script id="sap-ui-bootstrap" src="resources/sap-ui-custom.js" data-sap-ui-theme="sap_fiori_3" data-sap-ui-resourceroots="{
+        &quot;com.devtoberfest.devtoberfest2021FrontendCodingChallenge&quot;: &quot;./&quot;
+      }" data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatversion="edge" data-sap-ui-frameoptions="trusted"></script>
+
+        <script>
+            sap.ui.getCore().attachInit(function () {
+                sap.ui.require(
+                    ["sap/ui/core/ComponentContainer"],
+                    function (ComponentContainer) {
+                        new ComponentContainer({
+                            name: "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
+                            manifest: true,
+                            height: "100%",
+                        }).placeAt("content");
+                    }
+                );
+            });
+        </script>
+    </head>
+
+    <body class="sapUiBody" role="application">
+        <div id="content"></div>
+    
+
+</body></html>
