@@ -1,11 +1,7 @@
 specVersion: "2.5"
 metadata:
-    name: devtoberfest2021FrontendCodingChallenge
+    name: com.devtoberfest.devtoberfest2021FrontendCodingChallenge
 type: application
-resources:
-    configuration:
-        paths:
-            webapp: webapp
 framework:
     name: SAPUI5
     version: 1.96.0
@@ -16,10 +12,56 @@ framework:
         - name: sap.tnt
         - name: sap.ui.layout
         - name: themelib_sap_fiori_3
-server:
-    customMiddleware:
-        - name: ui5-middleware-livereload
-          afterMiddleware: compression
-          configuration:
-              port: 35729
-              path: webapp
+builder:
+    bundles:
+        - bundleDefinition:
+              name: custom-boot.js
+              defaultFileTypes:
+                  - ".js"
+              sections:
+                  - mode: raw
+                    filters:
+                        - sap/ui/thirdparty/baseuri.js
+                        # - sap/ui/thirdparty/es6-promise.js
+                        # - sap/ui/thirdparty/es6-shim-nopromise.js
+                        - ui5loader.js
+                        - ui5loader-autoconfig.js
+                    resolve: false
+                    sort: true
+                  - mode: preload
+                    filters:
+                        - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/Boot.js
+                    resolve: true
+                    sort: true
+                  - mode: require
+                    filters:
+                        - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/Boot.js
+          bundleOptions:
+              optimize: true
+              usePredefineCalls: true
+        - bundleDefinition:
+              name: com/devtoberfest/devtoberfest2021FrontendCodingChallenge/Component-bundle.js
+              defaultFileTypes:
+                  - ".js"
+                  - ".json"
+                  - ".css"
+                  - ".xml"
+                  - ".properties"
+              sections:
+                  - mode: provided
+                    filters:
+                        - ui5loader-autoconfig.js
+                        - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/Boot.js
+                    resolve: true
+                  - mode: preload
+                    filters:
+                        - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/Component.js
+                        - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/manifest.json
+                        - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/controller/**
+                        - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/i18n/**
+                        - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/view/**
+                    resolve: true
+                    sort: true
+          bundleOptions:
+              optimize: true
+              usePredefineCalls: true
