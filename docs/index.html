@@ -2,8 +2,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="resources/img/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link rel="preload" as="image" href="resources/img/github.webp">
 
     <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
+
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            display: inline-block;
+            background-image: url("resources/img/github.webp");
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
 
     <script id="sap-ui-bootstrap" src="resources/sap-ui-custom.js" data-sap-ui-async="true" data-sap-ui-theme="sap_fiori_3" data-sap-ui-resourceroots="{
         &quot;com.devtoberfest.devtoberfest2021FrontendCodingChallenge&quot;: &quot;./&quot;
@@ -26,7 +40,8 @@
 </head>
 
 <body class="sapUiBody" role="application">
-    <div id="content"></div>
+    <div id="content">
+    </div>
 
 
 </body></html>
