@@ -1,46 +1,64 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link
-            href="resources/img/favicon.ico"
-            rel="shortcut icon"
-            type="image/x-icon"
-        />
 
-        <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="resources/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
-        <script
-            async
-            id="sap-ui-bootstrap"
-            src="resources/sap-ui-core.js"
-            data-sap-ui-theme="sap_fiori_3"
-            data-sap-ui-resourceroots='{
+    <!-- css required for the loading screen css anumation -->
+    <link id="animation" rel="stylesheet" type="text/css" href="css/progress-animation.css" />
+
+
+    <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
+
+    <script async id="sap-ui-bootstrap" src="resources/sap-ui-core.js" data-sap-ui-theme="sap_fiori_3"
+        data-sap-ui-resourceroots='{
         "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./"
-      }'
-            data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
-            data-sap-ui-compatVersion="edge"
-            data-sap-ui-frameOptions="trusted"
-        ></script>
+      }' data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatVersion="edge"
+        data-sap-ui-frameOptions="trusted"></script>
 
-        <script>
-            sap.ui.getCore().attachInit(function () {
-                sap.ui.require(
-                    ["sap/ui/core/ComponentContainer"],
-                    function (ComponentContainer) {
-                        new ComponentContainer({
-                            name: "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
-                            manifest: true,
-                            height: "100%",
-                        }).placeAt("content");
-                    }
-                );
-            });
-        </script>
-    </head>
+    <script>
+        sap.ui.getCore().attachInit(function () {
+            sap.ui.require(
+                ["sap/ui/core/ComponentContainer"],
+                function (ComponentContainer) {
+                    new ComponentContainer({
+                        name: "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
+                        manifest: true,
+                        height: "100%",
+                    }).placeAt("content");
+                }
+            );
+        });
+    </script>
+</head>
 
-    <body class="sapUiBody" role="application">
-        <div id="content"></div>
-    </body>
+<body class="sapUiBody" role="application">
+    <div id="content"></div>
+
+    <!-- Loading splash screen -->
+    <div id="busyIndicator" style="text-align: center; font-family: Sans, Arial">
+        <!-- static header text -->
+        <h3>App is loading</h3>
+
+        <!-- static image of the ui5logo  -->
+        <img src="images/openui5-logo.png" class="logo" />
+
+        <!-- loader animation CC0 licensed code used with permission from https://loading.io/css/ -->
+        <div class="lds-ellipsis">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <!-- end of loader animation -->
+
+        <!-- static footer text  -->
+        <center>
+            <h5>This may take a few moments...</h5>
+        </center>
+    </div>
+</body>
+
 </html>
