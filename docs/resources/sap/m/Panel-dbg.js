@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -66,7 +66,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.95.0
 	 *
 	 * @constructor
 	 * @public
@@ -194,19 +194,6 @@ sap.ui.define([
 		this.data("sap-ui-fastnavgroup", "true", true); // Define group for F6 handling
 	};
 
-	/**
-	 * Sets the width of the panel.
-	 * @param {sap.ui.core.CSSSize} sWidth The width of the Panel as CSS size.
-	 * @returns {sap.m.Panel} Pointer to the control instance to allow method chaining.
-	 * @public
-	 */
-
-	/**
-	 * Sets the height of the panel.
-	 * @param {sap.ui.core.CSSSize} sHeight The height of the panel as CSS size.
-	 * @returns {sap.m.Panel} Pointer to the control instance to allow method chaining.
-	 * @public
-	 */
 	Panel.prototype.onThemeChanged = function () {
 		this._setContentHeight();
 	};
@@ -214,10 +201,11 @@ sap.ui.define([
 	/**
 	 * Sets the expanded property of the control.
 	 * @param {boolean} bExpanded Defines whether control is expanded or not.
-	 * @returns {sap.m.Panel} Pointer to the control instance to allow method chaining.
+	 * @returns {this} Pointer to the control instance to allow method chaining.
 	 * @public
 	 */
 	Panel.prototype.setExpanded = function (bExpanded) {
+		var that = this;
 
 		if (bExpanded === this.getExpanded()) {
 			return this;
@@ -229,7 +217,11 @@ sap.ui.define([
 			return this;
 		}
 
-		this._toggleExpandCollapse();
+		this._toggleExpandCollapse(function () {
+			// invalidate once the animation is over so rerendering could be smoоth
+			that.invalidate();
+		});
+
 		this._toggleButtonIcon(bExpanded);
 		this.fireExpand({ expand: bExpanded, triggeredByInteraction: this._bInteractiveExpand });
 		this._bInteractiveExpand = false;
@@ -238,22 +230,13 @@ sap.ui.define([
 	};
 
 	/**
-	 * Sets the accessibleRole property of the control.
-	 * @param {sap.m.PanelAccessibleRole} sRole Defines the aria role of the control.
-	 * @returns {sap.m.Panel} Pointer to the control instance to allow method chaining.
-	 * @public
+	 * Called before the control is rendered.
+	 *
+	 * @private
 	 */
 	Panel.prototype.onBeforeRendering = function () {
-		if (this.getExpandable() && !this.oButtonCollapsed) {
-			this.oButtonCollapsed = this._createButton();
-		}
-
-		if (this.oButtonCollapsed) {
-			this._getButton().$().attr("aria-expanded", this.getExpanded());
-		}
-
-		if (Device.browser.msie || Device.browser.edge) {
-			this._updateButtonAriaLabelledBy();
+		if (this.getExpandable() && !this._oExpandButton) {
+			this._oExpandButton = this._createExpandButton();
 		}
 
 		if (sap.ui.getCore().getConfiguration().getAccessibility()) {
@@ -261,14 +244,15 @@ sap.ui.define([
 		}
 	};
 	Panel.prototype.onAfterRendering = function () {
-		var $this = this.$(), $button,
-			oPanelContent = this.getDomRef("content");
-		var oDomRef = this.getDomRef();
+		var $this = this.$(),
+			oPanelContent = this.getDomRef("content"),
+			sHeight,
+			oDomRef = this.getDomRef();
 
 		if (oDomRef) {
 			oDomRef.style.width = this.getWidth();
 
-			var sHeight = this.getHeight();
+			sHeight = this.getHeight();
 			oDomRef.style.height = sHeight;
 			if (parseFloat(sHeight) != 0) {
 				oDomRef.querySelector(".sapMPanelContent").style.height = sHeight;
@@ -277,56 +261,105 @@ sap.ui.define([
 		this._setContentHeight();
 
 		if (this.getExpandable()) {
-			$button = this.oButtonCollapsed.$();
-			oPanelContent && $button.attr("aria-controls", oPanelContent.id);
+			this.getHeaderToolbar() && oPanelContent && this._oExpandButton.$().attr("aria-controls", oPanelContent.id);
 
-			if (this.getExpanded()) {
-				$button.attr("aria-expanded", "true");
-			} else {
+			if (!this.getExpanded()) {
 				// hide those parts which are collapsible (w/o animation, otherwise initial loading doesn't look good ...)
 				$this.children(".sapMPanelExpandablePart").css("display", "none");
-				$button.attr("aria-expanded", "false");
 			}
 		}
 	};
 
-	Panel.prototype.exit = function () {
-		if (this.oButtonCollapsed) {
-			this.oButtonCollapsed.destroy();
-			this.oButtonCollapsed = null;
+	/**
+	 * Called when the <code>Panel</code> is clicked/tapped.
+	 *
+	 * @param {jQuery.Event} oEvent - the keyboard event.
+	 * @private
+	 */
+	Panel.prototype.ontap = function (oEvent) {
+		var oDomRef = this.getDomRef(),
+			oWrapperDomRef = oDomRef && oDomRef.querySelector(".sapMPanelWrappingDiv");
+
+		if (!this.getExpandable() || this.getHeaderToolbar() || !oWrapperDomRef) {
+			return;
+		}
+
+		if (oWrapperDomRef.contains(oEvent.target)) {
+			this._bInteractiveExpand = true;
+			this.setExpanded(!this.getExpanded());
 		}
 	};
 
-	Panel.prototype._createButton = function () {
+	/**
+	 * Event handler called when the SPACE key is pressed.
+	 *
+	 * @param {jQuery.Event} oEvent The event object.
+	 * @private
+	 */
+	Panel.prototype.onsapspace = function(oEvent) {
+		this.ontap(oEvent);
+	};
+
+	/**
+	 * Event handler called when the ENTER key is pressed.
+	 *
+	 * @param {jQuery.Event} oEvent The ENTER keyboard key event object
+	 */
+	Panel.prototype.onsapenter = function(oEvent) {
+		this.ontap(oEvent);
+	};
+
+	Panel.prototype.exit = function () {
+		if (this._oExpandButton) {
+			this._oExpandButton.destroy();
+			this._oExpandButton = null;
+		}
+	};
+
+	Panel.prototype._createExpandButton = function () {
 		var that = this,
-			sCollapsedIconURI = IconPool.getIconURI("slim-arrow-right"),
+			sIconURI = this.getExpanded() ? IconPool.getIconURI("slim-arrow-down") : IconPool.getIconURI("slim-arrow-right"),
 			sTooltipBundleText = sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("PANEL_ICON"),
 			oButton;
 
-		oButton = new Button(that.getId() + "-CollapsedImg", {
-			icon: sCollapsedIconURI,
+		if (!this.getHeaderToolbar()) {
+			return IconPool.createControlByURI({
+				src: sIconURI,
+				tooltip: sTooltipBundleText
+			});
+		}
+
+		oButton = new Button(this.getId() + "-expandButton", {
+			icon: sIconURI,
 			tooltip: sTooltipBundleText,
 			type: ButtonType.Transparent,
 			press: function () {
 				that._bInteractiveExpand = true;
 				that.setExpanded(!that.getExpanded());
 			}
-		});
+		}).addEventDelegate({
+			onAfterRendering: function() {
+				oButton.$().attr("aria-expanded", this.getExpanded());
+			}.bind(this)
+		}, this);
 
 		this.addDependent(oButton);
 
 		return oButton;
 	};
 
-	Panel.prototype._getButton = function () {
-		return this.oButtonCollapsed;
-	};
-
 	Panel.prototype._toggleButtonIcon = function (bIsExpanded) {
-		var oButton = this._getButton(),
-			sIconURI = bIsExpanded ? IconPool.getIconURI("slim-arrow-down") : IconPool.getIconURI("slim-arrow-right");
+		var sIconURI = bIsExpanded ? IconPool.getIconURI("slim-arrow-down") : IconPool.getIconURI("slim-arrow-right");
 
-		oButton && oButton.setIcon(sIconURI);
+		if (!this._oExpandButton) {
+			return;
+		}
+
+		if (this.getHeaderToolbar()) {
+			this._oExpandButton.setIcon(sIconURI);
+		} else {
+			this._oExpandButton.setSrc(sIconURI);
+		}
 	};
 
 	Panel.prototype._setContentHeight = function () {
@@ -340,38 +373,20 @@ sap.ui.define([
 
 		// 'offsetTop' measures the vertical space occupied by siblings before this one
 		// Earlier each previous sibling's height was calculated separately and then all height values were summed up
-		sAdjustedContentHeight =  'calc(' + this.getHeight() + ' - ' + oPanelContent.offsetTop + 'px)';
+		sAdjustedContentHeight =  'calc(' + "100%" + ' - ' + oPanelContent.offsetTop + 'px)';
 		oPanelContent.style.height = sAdjustedContentHeight;
 	};
 
-	Panel.prototype._toggleExpandCollapse = function () {
-		var oOptions = {};
+	Panel.prototype._toggleExpandCollapse = function (fnAnimationComplete) {
+		var oOptions = {
+			complete: fnAnimationComplete
+		};
+
 		if (!this.getExpandAnimation()) {
 			oOptions.duration = 0;
 		}
 
 		this.$().children(".sapMPanelExpandablePart").slideToggle(oOptions);
-	};
-
-	Panel.prototype._updateButtonAriaLabelledBy = function () {
-		var sLabelId, aAriaLabels, bFormRole;
-
-		if (!this.oButtonCollapsed) {
-			return;
-		}
-
-		if (this.getAccessibleRole() === PanelAccessibleRole.Form) {
-			bFormRole = true;
-		}
-
-		sLabelId = this._getLabellingElementId();
-		aAriaLabels = this.oButtonCollapsed.getAriaLabelledBy();
-
-		// If the old label is different we should reinitialize the association, because we can have only one label
-		if (sLabelId && aAriaLabels.indexOf(sLabelId) === -1) {
-			this.oButtonCollapsed.removeAllAssociation("ariaLabelledBy");
-			!bFormRole && this.oButtonCollapsed.addAriaLabelledBy(sLabelId);
-		}
 	};
 
 	Panel.prototype._getLabellingElementId = function () {

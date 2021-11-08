@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -62,8 +62,15 @@ sap.ui.define(["sap/ui/layout/library", "sap/ui/Device"],
 		DynamicSideContentRenderer._renderMainContent = function(oRm, oSideControl, iSideContentId, bShouldSetHeight) {
 			oRm.openStart("div", iSideContentId + "-MCGridCell");
 
-			if (oSideControl._iMcSpan) {
-				oRm.class("sapUiDSCSpan" + oSideControl._iMcSpan);
+			oRm.class("sapUiDSCM");
+
+			if (oSideControl.getProperty("mcSpan")) {
+				if (oSideControl.getShowSideContent() && oSideControl._SCVisible) {
+					oRm.class("sapUiDSCSpan" + oSideControl.getProperty("mcSpan"));
+				} else {
+					oRm.class("sapUiDSCSpan12");
+					bShouldSetHeight = true;
+				}
 			}
 			if (bShouldSetHeight) {
 				oRm.style("height", "100%");
@@ -80,6 +87,8 @@ sap.ui.define(["sap/ui/layout/library", "sap/ui/Device"],
 
 			oRm.openStart(sSideContentTag, iSideContentId + "-SCGridCell");
 
+			oRm.class("sapUiDSCS");
+
 			var oMessageBundle = sap.ui.getCore().getLibraryResourceBundle("sap.ui.layout");
 			oRm.attr("aria-label", oMessageBundle.getText(SIDE_CONTENT_LABEL));
 
@@ -87,8 +96,13 @@ sap.ui.define(["sap/ui/layout/library", "sap/ui/Device"],
 				role: "complementary"
 			});
 
-			if (oSideControl._iScSpan) {
-				oRm.class("sapUiDSCSpan" + oSideControl._iScSpan);
+			if (oSideControl.getProperty("scSpan")) {
+				if (oSideControl.getShowMainContent() && oSideControl._MCVisible) {
+					oRm.class("sapUiDSCSpan" + oSideControl.getProperty("scSpan"));
+				} else {
+					oRm.class("sapUiDSCSpan12");
+					bShouldSetHeight = true;
+				}
 			}
 			if (bShouldSetHeight) {
 				oRm.style("height", "100%");

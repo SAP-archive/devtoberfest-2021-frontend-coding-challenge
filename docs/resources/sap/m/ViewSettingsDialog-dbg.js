@@ -1,13 +1,12 @@
 /*!
 * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
 */
 
 // Provides control sap.m.ViewSettingsDialog.
 sap.ui.define([
 	'./library',
-	'./TitleAlignmentMixin',
 	'sap/ui/core/Control',
 	'sap/ui/core/IconPool',
 	'./Toolbar',
@@ -19,13 +18,13 @@ sap.ui.define([
 	'./Button',
 	'./ToggleButton',
 	'./Title',
-	'./Label',
 	'./NavContainer',
 	'./Bar',
 	'./SegmentedButton',
 	'./Page',
 	'./ViewSettingsItem',
 	'sap/ui/base/ManagedObject',
+	'sap/ui/base/ManagedObjectObserver',
 	'sap/ui/base/EventProvider',
 	'sap/ui/Device',
 	'sap/ui/core/InvisibleText',
@@ -38,7 +37,6 @@ sap.ui.define([
 ],
 function(
 	library,
-	TitleAlignmentMixin,
 	Control,
 	IconPool,
 	Toolbar,
@@ -50,13 +48,13 @@ function(
 	Button,
 	ToggleButton,
 	Title,
-	Label,
 	NavContainer,
 	Bar,
 	SegmentedButton,
 	Page,
 	ViewSettingsItem,
 	ManagedObject,
+	ManagedObjectObserver,
 	EventProvider,
 	Device,
 	InvisibleText,
@@ -110,13 +108,14 @@ function(
 	 * the footer toolbar if they refer to a table. Place group, sort, and filter buttons
 	 * in the footer toolbar if they refer to a master list.
 	 *
-	 * <b>Note:</b> Reset button, when used in <code>ViewSettingsDialog</code> without custom tabs,
-	 * is enabled when there are some Filters or presetFilters selected as well as there are changes
-	 * in Sort by, Sort order, Group By or Group order values compared to initial state of the dialog,
-	 * and disabled, if there are no changes or filters set. If the <code>ViewSettingsDialog</code>
-	 * have one or more custom tabs, the Reset button is always enabled, because there is no way
-	 * to determine the initial state of the custom tabs content and compare to their current state
-	 * in order to determine enable/disable state of the Reset button.
+	 * <b>Note:</b> If <code>ViewSettingsDialog</code> is used without custom tabs or custom items
+	 * in any of its aggregations, then Reset button is enabled if the user selects any Filters or
+	 * presetFilters or changes any of the Sort by, Sort order, Group by, or Group order values.
+	 * When <code>ViewSettingsDialog</code> is used with custom tabs or custom items
+	 * in any of its aggregations (sortItems, groupItems, filterItems or presetFilterItems),
+	 * the Reset button is always enabled, because there is no way to determine
+	 * the initial state of the custom tabs and compare it to their current state in order to
+	 * determine the enable/disable state of the Reset button.
 	 *
 	 * <h3>Usage</h3>
 	 *
@@ -143,7 +142,7 @@ function(
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.95.0
 	 *
 	 * @constructor
 	 * @public
@@ -182,6 +181,7 @@ function(
 
 			/**
 			 * Specifies the Title alignment (theme specific).
+			 * If set to <code>TitleAlignment.None</code>, the automatic title alignment depending on the theme settings will be disabled.
 			 * If set to <code>TitleAlignment.Auto</code>, the Title will be aligned as it is set in the theme (if not set, the default value is <code>center</code>);
 			 * Other possible values are <code>TitleAlignment.Start</code> (left or right depending on LTR/RTL), and <code>TitleAlignment.Center</code> (centered)
 			 * @since 1.72
@@ -354,6 +354,7 @@ function(
 		this._sTitleLabelId                 = sId + "-title";
 		this._sFilterDetailTitleLabelId     = sId + "-detailtitle";
 		this._oFiltersSelectedOnly			= {};
+		this._oKeylessFilters				= {};
 
 		/* setup a name map between the sortItems
 		 aggregation and an sap.m.List with items
@@ -408,6 +409,7 @@ function(
 		this._filterContent                 = null;
 		this._sCustomTabsButtonsIdPrefix    = null;
 		this._fnFilterSearchCallback        = null;
+		this._oKeylessFilters               = null;
 
 		// sap.ui.core.Popup removes its content on close()/destroy() automatically from the static UIArea,
 		// but only if it added it there itself. As we did that, we have to remove it also on our own
@@ -526,6 +528,9 @@ function(
 		if (this._oStringFilter) {
 			this._oStringFilter = null;
 		}
+		if (this._oSelectedFilterKeys) {
+			this._oSelectedFilterKeys = null;
+		}
 	};
 
 	ViewSettingsDialog.prototype._aggregationToListItems = function(sAggregationName, oItemPropertyMap, oItemAggregationMap, oListItemInitials, oListOptions) {
@@ -624,7 +629,7 @@ function(
 	 * @overwrite
 	 * @public
 	 * @param {object} oCustomTab The custom tab to be added
-	 * @returns {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @returns {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.addCustomTab = function (oCustomTab) {
 		var sId = oCustomTab.getId();
@@ -652,7 +657,8 @@ function(
 	 * Forward method to the inner dialog method: addStyleClass.
 	 * @public
 	 * @override
-	 * @returns {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @param {string} sStyleClass CSS class name to add
+	 * @returns {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.addStyleClass = function () {
 		var oDialog = this._getDialog();
@@ -665,7 +671,8 @@ function(
 	 * Forward method to the inner dialog method: removeStyleClass.
 	 * @public
 	 * @override
-	 * @returns {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @param {string} sStyleClass CSS class name to remove
+	 * @returns {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.removeStyleClass = function () {
 		var oDialog = this._getDialog();
@@ -678,7 +685,9 @@ function(
 	 * Forward method to the inner dialog method: toggleStyleClass.
 	 * @public
 	 * @override
-	 * @returns {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @param {string} sStyleClass CSS class name to add or remove
+	 * @param {boolean} [bAdd] Whether style class should be added (or removed); when this parameter is not given, the given style class will be toggled (removed, if present, and added if not present)
+	 * @returns {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.toggleStyleClass = function () {
 		var oDialog = this._getDialog();
@@ -720,14 +729,24 @@ function(
 	 * @overwrite
 	 * @public
 	 * @param {string} sTitle The title text for the dialog
-	 * @return {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @return {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.setTitle = function(sTitle) {
-		this._getDialogTitleControl().setText(sTitle);
+		this._getTitleLabel().setText(sTitle);
 		this.setProperty("title", sTitle);
 		return this;
 	};
 
+	ViewSettingsDialog.prototype.setTitleAlignment = function (sAlignment) {
+		this.setProperty("titleAlignment", sAlignment);
+		if (this._page1) {
+			this._page1.setTitleAlignment(sAlignment);
+		}
+		if (this._page2) {
+			this._page2.setTitleAlignment(sAlignment);
+		}
+		return this;
+	};
 
 	/**
 	 * Override the method in order to attach some event handlers
@@ -754,6 +773,10 @@ function(
 			this._attachItemPropertyChange(sType, oObject);
 		} else {
 			this._attachItemEventHandlers(sAggregationName, oObject);
+		}
+
+		if (sAggregationName === "filterItems") {
+			this._observeItem(oObject);
 		}
 
 		return this;
@@ -790,6 +813,10 @@ function(
 			this._attachItemEventHandlers(sAggregationName, oObject);
 		}
 
+		if (sAggregationName === "filterItems") {
+			this._observeItem(oObject);
+		}
+
 		return this;
 	};
 
@@ -805,6 +832,13 @@ function(
 			var oRemovedListItem = oList.removeItem(oListItem);
 			oRemovedListItem.destroy();
 			this._detachItemPropertyChange(vRemovedObject);
+		}
+
+		if (sAggregationName === "filterItems") {
+			this._unobserveItem(vRemovedObject);
+			if (!this.getFilterItems().length) {
+				this._disconnectAndDestroyFilterItemsObserver();
+			}
 		}
 
 		return vRemovedObject;
@@ -831,6 +865,10 @@ function(
 			}, this);
 		}
 
+		if (sAggregationName === "filterItems") {
+			this._disconnectAndDestroyFilterItemsObserver();
+		}
+
 		return vRemovedObjects;
 	};
 
@@ -845,6 +883,10 @@ function(
 			if (oList) {
 				oList.destroyItems();
 			}
+		}
+
+		if (sAggregationName === "filterItems") {
+			this._disconnectAndDestroyFilterItemsObserver();
 		}
 
 		return this;
@@ -877,6 +919,60 @@ function(
 
 			oListItem.getMetadata().getAllProperties()[sListProp].set(oListItem, vListPropVal);
 		}, this);
+	};
+
+	/**
+	 * Returns the ManagedObjectObserver for the filterItems
+	 *
+	 * @return {sap.ui.base.ManagedObjectObserver} the filterItems observer object
+	 * @private
+	 */
+	ViewSettingsDialog.prototype._getFilterItemsObserver = function () {
+		if (!this._oFilterItemsObserver) {
+			this._oFilterItemsObserver = new ManagedObjectObserver(function() {
+				if (this._oSelectedFilterKeys) {
+					this.setSelectedFilterCompoundKeys(this._oSelectedFilterKeys);
+				}
+			}.bind(this));
+		}
+		return this._oFilterItemsObserver;
+	};
+
+	/**
+	 * Observes the items aggregation of the passed filterItem
+	 *
+	 * @param {sap.m.ViewSettingsDialogFilterItem} oFilterItem the filterItem, which aggregation will be observed
+	 * @private
+	 */
+	ViewSettingsDialog.prototype._observeItem = function (oFilterItem) {
+		this._getFilterItemsObserver().observe(oFilterItem, {
+			aggregations: ["items"]
+		});
+	};
+
+	/**
+	 * Unobserves the items aggregation of the passed filterItem
+	 *
+	 * @param {sap.m.ViewSettingsDialogFilterItem} oFilterItem the filterItem, which aggregation will be unobserved
+	 * @private
+	 */
+	ViewSettingsDialog.prototype._unobserveItem = function (oFilterItem) {
+		this._getFilterItemsObserver().unobserve(oFilterItem, {
+			aggregations: ["items"]
+		});
+	};
+
+	/**
+	 * Disconnects and destroys the ManagedObjectObserver observing the used filterItem
+	 *
+	 * @private
+	 */
+	ViewSettingsDialog.prototype._disconnectAndDestroyFilterItemsObserver = function () {
+		if (this._oFilterItemsObserver) {
+			this._oFilterItemsObserver.disconnect();
+			this._oFilterItemsObserver.destroy();
+			this._oFilterItemsObserver = null;
+		}
 	};
 
 	/**
@@ -931,6 +1027,9 @@ function(
 					this['_init' + sType + 'Content']();
 				}
 				if (typeof this['_init' + sType + 'Items'] === 'function') {
+					if (oEvent.getParameter("propertyKey") === "selected" && oEvent.getParameter("propertyValue") === true) {
+						this.setAssociation("selectedGroupItem", oEvent.getParameter("changedItem"), true);
+					}
 					this['_init' + sType + 'Items']();
 				}
 			}
@@ -964,7 +1063,7 @@ function(
 	 * Adds a reference to a specific title in the dialog's <code>aria-labelledby</code> attribute.
 	 *
 	 * @param {string} sNewTitleId Title's ID
-	 * @returns {sap.m.ViewSettingsDialog} this For method chaining
+	 * @returns {this} this For method chaining
 	 * @private
 	 */
 	ViewSettingsDialog.prototype._toggleDialogTitle = function (sNewTitleId) {
@@ -1024,7 +1123,7 @@ function(
 	 * @overwrite
 	 * @public
 	 * @param {sap.m.ViewSettingsItem} oItem The item to be added to the aggregation
-	 * @return {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @return {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.addSortItem = function(oItem) {
 		this.addAggregation("sortItems", oItem);
@@ -1041,7 +1140,7 @@ function(
 	 * @overwrite
 	 * @public
 	 * @param {sap.m.ViewSettingsItem} oItem The item to be added to the group items
-	 * @return {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @return {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.addGroupItem = function(oItem) {
 		this.addAggregation("groupItems", oItem);
@@ -1058,7 +1157,7 @@ function(
 	 * @overwrite
 	 * @public
 	 * @param {sap.m.ViewSettingsItem} oItem The selected item or a string with the key
-	 * @return {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @return {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.addPresetFilterItem = function(oItem) {
 		this.addAggregation("presetFilterItems", oItem);
@@ -1075,7 +1174,7 @@ function(
 	 * @overwrite
 	 * @public
 	 * @param {sap.m.ViewSettingsItem|string} vItemOrKey The selected item or the item's key string
-	 * @return {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @return {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.setSelectedSortItem = function(vItemOrKey) {
 		var aItems = this.getSortItems(),
@@ -1086,16 +1185,16 @@ function(
 				"Could not set selected sort item. Item is not found: '" + vItemOrKey + "'"
 			);
 
-		//change selected item only if it is found among the sort items
-		if (validateViewSettingsItem(oItem)) {
+		//change selected item only if it is found among the sort items or if there is no selected item
+		if (!oItem || validateViewSettingsItem(oItem)) {
 			// set selected = true for this item & selected = false for all others items
 			for (i = 0; i < aItems.length; i++) {
-				if (aItems[i].getId() !== oItem.getId()) {
+				if (!oItem || aItems[i].getId() !== oItem.getId()) {
 					aItems[i].setProperty('selected', false, true);
 				}
 			}
 
-			if (oItem.getProperty('selected') !== true) {
+			if (oItem && oItem.getProperty('selected') !== true) {
 				oItem.setProperty('selected', true, true);
 			}
 
@@ -1115,7 +1214,7 @@ function(
 	 * @overwrite
 	 * @public
 	 * @param {sap.m.ViewSettingsItem|string} vItemOrKey The selected item or the item's key string
-	 * @return {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @return {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.setSelectedGroupItem = function(vItemOrKey) {
 		var aItems = this.getGroupItems(),
@@ -1156,7 +1255,7 @@ function(
 	 * @overwrite
 	 * @public
 	 * @param {sap.m.ViewSettingsItem|string|null} vItemOrKey The selected item or the item's key string
-	 * @return {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @return {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.setSelectedPresetFilterItem = function(vItemOrKey) {
 		var aItems = this.getPresetFilterItems(),
@@ -1193,7 +1292,7 @@ function(
 	 * @param {string} [sPageId] The ID of the initial page to be opened in the dialog.
 	 *	The available values are "sort", "group", "filter" or IDs of custom tabs.
 	 *
-	 * @return {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @return {this} this pointer for chaining
 	 * @ui5-metamodel This method also will be described in the UI5 (legacy) designtime metamodel
 	 */
 	ViewSettingsDialog.prototype.open = function(sPageId) {
@@ -1411,12 +1510,13 @@ function(
 			sParentKey,
 			oFilterItem;
 
+		this._oKeylessFilters = {};
+
 		for (i = 0; i < aSelectedFilterItems.length; i++) {
 			oFilterItem = aSelectedFilterItems[i];
 			if (oFilterItem instanceof sap.m.ViewSettingsCustomItem) {
 				sKey = oFilterItem.getKey();
 				oSelectedFilterKeys[sKey] = oFilterItem.getSelected();
-
 			} else {
 				sKey = oFilterItem.getKey();
 				sParentKey = oFilterItem.getParent().getKey();
@@ -1424,6 +1524,13 @@ function(
 					oSelectedFilterKeys[sParentKey] = {};
 				}
 				oSelectedFilterKeys[sParentKey][sKey] = oFilterItem.getSelected();
+				if (sKey === "") {
+					// store additional data for keyless items in order to ease restore
+					if (!this._oKeylessFilters[sParentKey]) {
+						this._oKeylessFilters[sParentKey] = {};
+					}
+					this._oKeylessFilters[sParentKey][oFilterItem.getText()] = true;
+				}
 			}
 		}
 
@@ -1439,7 +1546,7 @@ function(
 	 *         A configuration object with filter item and sub item keys in the format: { key: boolean }.
 	 *         Setting boolean to true will set the filter to true, false or omitting an entry will set the filter to false.
 	 *         It can be used to set the dialog state based on presets.
-	 * @return {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @return {this} this pointer for chaining
 	 * @ui5-metamodel This method also will be described in the UI5 (legacy) designtime metamodel
 	 * @deprecated as of version 1.42, replaced by <code>setSelectedFilterCompoundKeys</code> method
 	 */
@@ -1514,62 +1621,69 @@ function(
 	 *         A configuration object with filter item and sub item keys in the format: { parent_key: { key: boolean, key2: boolean, ...}, ... }.
 	 *         Setting boolean to true will set the filter to true, false or omitting an entry will set the filter to false.
 	 *         It can be used to set the dialog state based on presets.
-	 * @return {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @return {this} this pointer for chaining
 	 * @ui5-metamodel This method also will be described in the UI5 (legacy) designtime metamodel
 	 * @since 1.42
 	 */
 	ViewSettingsDialog.prototype.setSelectedFilterCompoundKeys = function(oSelectedFilterKeys) {
-		var aFilterItems = this.getFilterItems();
-		var fnGetSelectedItemFromFilterKey = function (aFilterItems, oFilterKeys, sKey) {
-			if (!oFilterKeys.hasOwnProperty(sKey)) {
-				return;
-			}
+		var aFilterItems = this.getFilterItems(),
+			sParentKey,
+			sKey,
+			sText,
+			oParentItem,
+			oSelectedSubFilterKeys,
+			aSubFilterItems,
+			bMultiSelect,
+			bSelected,
+			bOneSelected,
+			iIndex;
 
-			var oItem = getViewSettingsItemByKey(aFilterItems, sKey);
+		this._oSelectedFilterKeys = oSelectedFilterKeys;
 
-			return oItem;
-		};
-
-		// clear preset filters (only one mode is allowed, preset filters or filters)
 		if (Object.keys(oSelectedFilterKeys).length) {
+
+			// clear preset filters (only one mode is allowed, preset filters or filters)
 			this._clearPresetFilter();
-		}
 
-		// loop through the provided object array {key -> subKey -> boolean}
-		for (var sParentKey in oSelectedFilterKeys) { // filter key
-			var oParentItem = fnGetSelectedItemFromFilterKey(aFilterItems, oSelectedFilterKeys, sParentKey);
-
-			if (!oParentItem) {
-				Log.warning('No filter with key "' + sParentKey);
-				continue;
-			}
-
-			if (oParentItem instanceof sap.m.ViewSettingsCustomItem) {
-				oParentItem.setProperty('selected', oSelectedFilterKeys[sParentKey], true);
-			} else if (oParentItem instanceof sap.m.ViewSettingsFilterItem) {
-				var oSelectedSubFilterKeys = oSelectedFilterKeys[sParentKey];
-				var aSubFilterItems = oParentItem.getItems();
-				var bMultiSelect = oParentItem.getMultiSelect();
-
-				for (var sKey in oSelectedSubFilterKeys) {
-					var oItem = fnGetSelectedItemFromFilterKey(aSubFilterItems, oSelectedSubFilterKeys, sKey);
-
-					if (!oItem) {
-						Log.warning('No filter with key "' + sKey);
-						continue;
+			// loop through the provided object array {key -> subKey -> boolean}
+			for (sParentKey in oSelectedFilterKeys) { // filter key
+				oParentItem = null;
+				for (iIndex = 0; iIndex < aFilterItems.length; iIndex++) {
+					sKey = aFilterItems[iIndex].getKey();
+					if ( sKey === sParentKey) {
+						oParentItem = aFilterItems[iIndex];
+						break;
 					}
-
-					if (!bMultiSelect) {
-						aSubFilterItems.forEach(function(item) {
-							item.setProperty('selected', false, true);
-						});
+				}
+				if (oParentItem instanceof sap.m.ViewSettingsCustomItem) {
+					oParentItem.setProperty('selected', oSelectedFilterKeys[sParentKey], true);
+				} else if (oParentItem instanceof sap.m.ViewSettingsFilterItem) {
+					oSelectedSubFilterKeys = oSelectedFilterKeys[sParentKey];
+					aSubFilterItems = oParentItem.getItems();
+					bMultiSelect = oParentItem.getMultiSelect();
+					bOneSelected = false;
+					// loop through the sub-items
+					for (iIndex = 0; iIndex < aSubFilterItems.length; iIndex++) {
+						sKey = aSubFilterItems[iIndex].getKey();
+						sText = aSubFilterItems[iIndex].getText();
+						if ((sKey !== "" && oSelectedSubFilterKeys[sKey]) ||
+							(sKey === "" && this._oKeylessFilters[sParentKey]
+										 && this._oKeylessFilters[sParentKey][sText])) {
+							// get passed value; respect multi-select
+							bSelected = bOneSelected ? false : oSelectedSubFilterKeys[sKey];
+						} else {
+							// clear omitted sub-items
+							bSelected = false;
+						}
+						aSubFilterItems[iIndex].setProperty("selected", bSelected, true);
+						if (bSelected && !bMultiSelect) {
+							// if not multi-select, only one TRUE value can be set
+							bOneSelected = true;
+						}
 					}
-
-					oItem.setProperty('selected', oSelectedSubFilterKeys[sKey], true);
 				}
 			}
 		}
-
 		return this;
 	};
 
@@ -1582,6 +1696,36 @@ function(
 	/* =========================================================== */
 
 	/**
+	 * Checks if there is a custom item in the given aggregation, one of sortItems, groupItems, filterItems or presetFilterItems.
+	 * @private
+	 */
+	ViewSettingsDialog.prototype._checkForInnerCustomItems = function(aItems) {
+		for (var i = 0; i < aItems.length; i++) {
+			if (aItems[i].isA("sap.m.ViewSettingsCustomItem")) {
+				return true;
+			}
+		}
+		return false;
+	};
+
+	/**
+	 * Checks if there is a custom tab or a custom item in the aggregations sortItems, groupItems, filterItems and presetFilterItems.
+	 * @private
+	 */
+	ViewSettingsDialog.prototype._checkForCustomItems = function() {
+		var aSortItems = this.getSortItems(),
+			aGroupItems = this.getGroupItems(),
+			aFilterItems = this.getFilterItems(),
+			aPresetFilterItems = this.getPresetFilterItems();
+
+		return this.getAggregation("customTabs").length ||
+			aSortItems.length && this._checkForInnerCustomItems(aSortItems) ||
+			aGroupItems.length && this._checkForInnerCustomItems(aGroupItems) ||
+			aFilterItems.length && this._checkForInnerCustomItems(aFilterItems) ||
+			aPresetFilterItems.length && this._checkForInnerCustomItems(aPresetFilterItems);
+	};
+
+	/**
 	 * Checks if there are changes made since the initial VSD open and enables/disables reset buttons accordingly
 	 * @private
 	 */
@@ -1589,7 +1733,7 @@ function(
 		var bChanges = false,
 			oFilterKeys = this.getSelectedFilterItems();
 
-		if (this.getAggregation("customTabs").length > 0) {
+		if (this._checkForCustomItems()) {
 			// there are custom tabs defined, enable Reset button in any case
 			bChanges = true;
 		} else {
@@ -1602,7 +1746,7 @@ function(
 				}
 
 				// check if the sortItem or sortDescending are different than initial
-				if ((this._oInitialState.sortItem && this._oInitialState.sortItem !== this.getSelectedSortItem()) || this._oInitialState.sortDescending !== this.getSortDescending()) {
+				if (this._oInitialState.sortItem !== this.getSelectedSortItem() || this._oInitialState.sortDescending !== this.getSortDescending()) {
 					bChanges = true;
 				}
 
@@ -1637,7 +1781,7 @@ function(
 		this.clearFilters();
 
 		// clear sortItem/sortDescending
-		this._oInitialState.sortItem !== undefined && this.setSelectedSortItem(sap.ui.getCore().byId(this._oInitialState.sortItem));
+		this.setSelectedSortItem(sap.ui.getCore().byId(this._oInitialState.sortItem));
 		this.setSortDescending(this._oInitialState.sortDescending);
 		this._updateListSelection(this._sortOrderList, this._oInitialState.sortDescending);
 
@@ -1725,15 +1869,14 @@ function(
 	};
 
 	/**
-	 * Lazy initialization of the internal sap.m.Title control.
-	 * @returns {sap.m.Title} The created control
+	 * Lazy initialization of the internal title label.
+	 * @returns {sap.m.Title} The created title label
 	 * @private
 	 */
-	ViewSettingsDialog.prototype._getDialogTitleControl = function() {
+	ViewSettingsDialog.prototype._getTitleLabel = function() {
 		if (this._titleLabel === undefined) {
 			this._titleLabel = new Title(this._sTitleLabelId, {
-				text : this._rb.getText("VIEWSETTINGS_TITLE"),
-				level: "H5"
+				text : this._rb.getText("VIEWSETTINGS_TITLE")
 			}).addStyleClass("sapMVSDTitle");
 		}
 		return this._titleLabel;
@@ -1777,12 +1920,12 @@ function(
 
 	/**
 	 * Lazy initialization of the internal detail title label.
-	 * @returns {sap.m.Label} The created detail title label
+	 * @returns {sap.m.Title} The created detail title label
 	 * @private
 	 */
 	ViewSettingsDialog.prototype._getDetailTitleLabel = function() {
 		if (this._detailTitleLabel === undefined) {
-			this._detailTitleLabel = new Label(this.getId() + "-detailtitle",
+			this._detailTitleLabel = new Title(this.getId() + "-detailtitle",
 				{
 					text : this._rb.getText("VIEWSETTINGS_TITLE_FILTERBY")
 				}).addStyleClass("sapMVSDTitle");
@@ -1798,12 +1941,10 @@ function(
 	ViewSettingsDialog.prototype._getHeader = function() {
 		if (this._header === undefined) {
 			this._header = new Bar({
-				contentMiddle : [ this._getDialogTitleControl() ]
+				titleAlignment : this.getTitleAlignment(),
+				contentMiddle : [ this._getTitleLabel() ]
 			}).addStyleClass("sapMVSDBar");
 		}
-
-		// call the method that registers this Bar for alignment
-		this._setupBarTitleAlignment(this._header, this.getId() + '_header');
 
 		return this._header;
 	};
@@ -1919,8 +2060,9 @@ function(
 	ViewSettingsDialog.prototype._getPage1 = function(bSuppressCreation) {
 		if (this._page1 === undefined && !bSuppressCreation) {
 			this._page1 = new Page(this.getId() + '-page1', {
-				title           : this._rb.getText("VIEWSETTINGS_TITLE"),
-				customHeader    : this._getHeader()
+				title : this._rb.getText("VIEWSETTINGS_TITLE"),
+				titleAlignment : this.getTitleAlignment(),
+				customHeader : this._getHeader()
 			});
 			this._getNavContainer().addPage(this._page1); // sort, group, filter
 		}
@@ -1934,7 +2076,10 @@ function(
 	 * @private
 	 */
 	ViewSettingsDialog.prototype._getPage2 = function() {
-		var oDetailHeader, oBackButton, oDetailResetButton;
+		var oDetailHeader,
+			oBackButton,
+			oDetailResetButton,
+			sTitleAlignment = this.getTitleAlignment();
 
 		if (this._page2 === undefined) {
 			// init internal page content
@@ -1944,17 +2089,16 @@ function(
 			});
 			oDetailResetButton = this._getDetailResetButton();
 			oDetailHeader = new Bar({
+				titleAlignment	: sTitleAlignment,
 				contentLeft     : [ oBackButton ],
 				contentMiddle   : [ this._getDetailTitleLabel() ],
 				contentRight    : [ oDetailResetButton ]
 			}).addStyleClass("sapMVSDBar");
 
-			// call the method that registers this Bar for alignment
-			this._setupBarTitleAlignment(oDetailHeader, this.getId() + "_page2_header");
-
 			this._page2 = new Page(this.getId() + '-page2', {
-				title           : this._rb.getText("VIEWSETTINGS_TITLE_FILTERBY"),
-				customHeader    : oDetailHeader
+				title : this._rb.getText("VIEWSETTINGS_TITLE_FILTERBY"),
+				titleAlignment : sTitleAlignment,
+				customHeader : oDetailHeader
 			});
 			this._getNavContainer().addPage(this._page2); // filter details
 		}
@@ -2128,7 +2272,7 @@ function(
 			sTitleGroupObject = this._rb.getText("VIEWSETTINGS_GROUP_OBJECT");
 
 		this._groupList.destroyItems();
-		if (!!aGroupItems.length) {
+		if (aGroupItems.length) {
 			this._groupList.addItem(new GroupHeaderListItem({title: sTitleGroupObject}));
 			aGroupItems.forEach(function (oItem) {
 				oListItem = new StandardListItem({
@@ -2257,7 +2401,7 @@ function(
 		if (aPresetFilterItems.length) {
 			oListItem = new StandardListItem({
 				id: this._presetFilterList.getId() + "-none" + LIST_ITEM_SUFFIX,
-				title : this._rb.getText("VIEWSETTINGS_NONE_ITEM"),
+				title : this._rb.getText("VIEWSETTINGS_NONE_ITEM_FILTER"),
 				selected : !!this.getSelectedPresetFilterItem()
 			});
 			this._presetFilterList.addItem(oListItem);
@@ -2643,14 +2787,14 @@ function(
 	 *
 	 * @param {sap.ui.model.Model} oModel The model whose setter will be overwritten
 	 * @param {string} sName The name of the model
-	 * @returns {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @returns {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.setModel = function (oModel, sName) {
 		// BCP 1570030370
 		if (this._vContentPage === 3 && this._oContentItem) {
 			resetFilterPage.call(this);
 		}
-		return ManagedObject.prototype.setModel.call(this, oModel, sName);
+		return Control.prototype.setModel.call(this, oModel, sName);
 	};
 
 	/**
@@ -2659,7 +2803,7 @@ function(
 	 * @overwrite
 	 * @public
 	 * @param { int| sap.m.ViewSettingsFilterItem | string } vFilterItem The filter item's index, or the item itself, or its id
-	 * @returns {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @returns {sap.m.ViewSettingsFilterItem|null} The removed item or null
 	 */
 	ViewSettingsDialog.prototype.removeFilterItem = function (vFilterItem) {
 		var sFilterItemId = "";
@@ -2686,7 +2830,7 @@ function(
 	 *
 	 * @overwrite
 	 * @public
-	 * @returns {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @returns {sap.m.ViewSettingsFilterItem[]} the removed items
 	 */
 	ViewSettingsDialog.prototype.removeAllFilterItems = function () {
 		if (this._vContentPage === 3 && this._oContentItem) {
@@ -2699,7 +2843,7 @@ function(
 	 * Sets a callback that will check the ViewSettingsItem's text against the search query.
 	 * If a callback is set, <code>filterSearchOperator</code> property will be ignored, as it serves the same purpose.
 	 * @param {function} fnTest A function that accepts two parameters fnTest({string} query, {string} value) and returns boolean if the value satisfies the query.
-	 * @returns {sap.m.ViewSettingsDialog} this instance for chaining
+	 * @returns {this} this instance for chaining
 	 * @public
 	 * @since 1.42
 	 */
@@ -2717,7 +2861,7 @@ function(
 	 */
 	ViewSettingsDialog.prototype._switchToPage = function(vWhich, oItem) {
 		var i               = 0,
-			oTitleLabel     = this._getDialogTitleControl(),
+			oTitleLabel     = this._getTitleLabel(),
 			oHeader         = this._getHeader(),
 			oSubHeader      = this._getSubHeader();
 
@@ -3332,7 +3476,7 @@ function(
 	 * Clears the selected filters and navigates to the filter overview page
 	 *
 	 * @public
-	 * @return {sap.m.ViewSettingsDialog} this pointer for chaining
+	 * @return {this} this pointer for chaining
 	 */
 	ViewSettingsDialog.prototype.clearFilters = function() {
 		// clear data and update selections
@@ -3389,7 +3533,7 @@ function(
 	 * @private
 	 */
 	ViewSettingsDialog.prototype._applyContextualSettings = function () {
-		ManagedObject.prototype._applyContextualSettings.call(this, ManagedObject._defaultContextualSettings);
+		Control.prototype._applyContextualSettings.call(this);
 	};
 
 	/**
@@ -3456,7 +3600,7 @@ function(
 	 * Needed because of the not-bullet proof implementation of setBusy in sap.ui.core.Control
 	 * @public
 	 * @param {boolean} bBusy The busy state flag
-	 * @return {sap.m.ViewSettingsDialog} this Instance for chaining
+	 * @return {this} this Instance for chaining
 	 */
 	ViewSettingsDialog.prototype.setBusy = function (bBusy) {
 		this._getDialog().setBusy(bBusy);
@@ -3531,10 +3675,6 @@ function(
 		var rAnyWordStartsWith = new RegExp(".*\\b" + sQuery + ".*");
 		return rAnyWordStartsWith.test(sValue);
 	}
-
-
-	// enrich the control functionality with TitleAlignmentMixin
-	TitleAlignmentMixin.mixInto(ViewSettingsDialog.prototype);
 
 	return ViewSettingsDialog;
 

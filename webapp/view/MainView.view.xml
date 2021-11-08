@@ -1,12 +1,12 @@
 <mvc:View controllerName="com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.MainView"
-  displayBlock="true" xmlns="sap.m" xmlns:f="sap.f" xmlns:tnt="sap.tnt" xmlns:core="sap.ui.core"
+  displayBlock="true" xmlns="sap.m" xmlns:tnt="sap.tnt" xmlns:core="sap.ui.core"
   xmlns:mvc="sap.ui.core.mvc">
   <!-- xmlns:aow="aow.artifact.control" -->
   <tnt:ToolPage id="toolPage">
     <tnt:header>
       
       <tnt:ToolHeader>
-        <Image src="resources/img/favicon.ico">
+        <Image src="resources/img/favicon.ico" width="48px" height="48px">
           <layoutData>
             <OverflowToolbarLayoutData priority="Disappear" />
           </layoutData>
@@ -17,7 +17,7 @@
           </layoutData>
         </Text>
         <ToolbarSpacer />
-        <Image src="resources/img/github.png" height="50%" press="goToRepo" />
+        <Image src="resources/img/github.png" height="22px" width="22px" press="goToRepo" />
         <Link text="{i18n>forkMe}" target="_blank"
           href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge"
           visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }" class="sapUiMediumMarginEnd" />
@@ -35,19 +35,12 @@
     <tnt:mainContents>
       <ScrollContainer id="all-page" horizontal="false" vertical="true" height="100%">
 
-        <MessageStrip text="{i18n>performanceNote}" type="Warning" showIcon="true" showCloseButton="true"
-          class="sapUiSmallMarginTopBottom">
-          <link>
-          <Link text="{i18n>performanceNoteLink}" target="_blank"
-            href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge" />
-          </link>
-        </MessageStrip>
         <List id="all-list" items="{sample>/}">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
-              <Title id="all-bar-info" text="{i18n>SAP BTP Services}" level="H4" />
+              <Title id="all-bar-info" text="{i18n>mainView_listTitle}" level="H4" />
               <ToolbarSpacer id="all-bar-spacer" />
-              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>Search for the name or description}"
+              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>mainView_searchFieldPlaceholder}"
                 liveChange=".liveSearch" />
             </OverflowToolbar>
           </headerToolbar>

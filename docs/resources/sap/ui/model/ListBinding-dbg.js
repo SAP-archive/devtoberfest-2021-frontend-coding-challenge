@@ -1,7 +1,7 @@
 /*!
 
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -86,6 +86,13 @@ sap.ui.define(['./Binding', './Filter', './Sorter', 'sap/base/util/array/diff'],
 	 * @name sap.ui.model.ListBinding.prototype.getContexts
 	 * @param {int} [iStartIndex=0] the startIndex where to start the retrieval of contexts
 	 * @param {int} [iLength=length of the list] determines how many contexts to retrieve beginning from the start index.
+	 * @param {int} [iMaximumPrefetchSize]
+	 *   The maximum number of contexts to read before and after the given range; with this,
+	 *   controls can prefetch data that is likely to be needed soon, e.g. when scrolling down in a
+	 *   table. This parameter is model-specific and not implemented by all models.
+	 * @param {boolean} [bKeepCurrent]
+	 *   Whether this call keeps the result of {@link #getCurrentContexts} untouched; since 1.86.0.
+	 *   This parameter is model-specific and not implemented by all models.
 	 * @return {sap.ui.model.Context[]} the array of contexts for each row of the bound list
 	 *
 	 * @protected
@@ -116,10 +123,10 @@ sap.ui.define(['./Binding', './Filter', './Sorter', 'sap/base/util/array/diff'],
 	 * Please either use the automatic grouping of filters (where applicable) or use explicit
 	 * AND/OR filters, a mixture of both is not supported.
 	 *
-	 * @param {sap.ui.model.Filter[]} aFilters Array of filter objects
+	 * @param {sap.ui.model.Filter|sap.ui.model.Filter[]} aFilters Single filter object or an array of filter objects
 	 * @param {sap.ui.model.FilterType} [sFilterType=undefined] Type of the filter which should
 	 *  be adjusted; if no type is given, the behavior depends on the model implementation
-	 * @return {sap.ui.model.ListBinding} returns <code>this</code> to facilitate method chaining
+	 * @return {this} returns <code>this</code> to facilitate method chaining
 	 *
 	 * @function
 	 * @name sap.ui.model.ListBinding.prototype.filter
@@ -142,7 +149,7 @@ sap.ui.define(['./Binding', './Filter', './Sorter', 'sap/base/util/array/diff'],
 	 * @function
 	 * @name sap.ui.model.ListBinding.prototype.sort
 	 * @param {sap.ui.model.Sorter|Array} aSorters the Sorter object or an array of sorters which defines the sort order
-	 * @return {sap.ui.model.ListBinding} returns <code>this</code> to facilitate method chaining
+	 * @return {this} returns <code>this</code> to facilitate method chaining
 	 * @public
 	 */
 
@@ -159,6 +166,25 @@ sap.ui.define(['./Binding', './Filter', './Sorter', 'sap/base/util/array/diff'],
 	 */
 	ListBinding.prototype.getCurrentContexts = function() {
 		return this.getContexts();
+	};
+
+	/**
+	 * Returns the count of entries in the list, or <code>undefined</code> if it is unknown.
+	 * The count is by default identical to the list length if it is final. Concrete subclasses may,
+	 * however, override the method, for example:
+	 * <ul>
+	 *   <li> for server-side models where lists are not completely read by the client,
+	 *   <li> for lists representing hierarchical data.
+	 * </ul>
+	 *
+	 * @returns {number|undefined} The count of entries
+	 * @public
+	 * @see #getLength
+	 * @see #isLengthFinal
+	 * @since 1.93.0
+	 */
+	ListBinding.prototype.getCount = function() {
+		return this.isLengthFinal() ? this.getLength() : undefined;
 	};
 
 	/**
@@ -427,48 +453,33 @@ sap.ui.define(['./Binding', './Filter', './Sorter', 'sap/base/util/array/diff'],
 	};
 
 	/**
-	 * Checks whether an update of the data state of this binding is required.
+	 * Requests a {@link sap.ui.model.Filter} object which can be used to filter the list binding by
+	 * entries with model messages. With the filter callback, you can define if a message is
+	 * considered when creating the filter for entries with messages.
 	 *
-	 * @param {map} mPaths A Map of paths to check if update needed
-	 * @private
-	 * @since 1.58
+	 * The resulting filter does not consider application or control filters specified for this list
+	 * binding in its constructor or in its {@link #filter} method; add filters which you want to
+	 * keep with the "and" conjunction to the resulting filter before calling {@link #filter}.
+	 *
+	 * The implementation of this method is optional for model specific implementations of
+	 * <code>sap.ui.model.ListBinding</code>. Check for existence of this function before calling
+	 * it.
+	 *
+	 * @abstract
+	 * @function
+	 * @name sap.ui.model.ListBinding.prototype.requestFilterForMessages
+	 * @param {function(sap.ui.core.message.Message):boolean} [fnFilter]
+	 *   A callback function to filter only relevant messages. The callback returns whether the
+	 *   given {@link sap.ui.core.message.Message} is considered. If no callback function is given,
+	 *   all messages are considered.
+	 * @returns {Promise<sap.ui.model.Filter>}
+	 *   A Promise that resolves with a {@link sap.ui.model.Filter} representing the entries with
+	 *   messages; it resolves with <code>null</code> if the binding is not resolved or if the
+	 *   binding knows that there is no message for any entry
+	 *
+	 * @protected
+	 * @since 1.77.0
 	 */
-	ListBinding.prototype.checkDataState = function(mPaths) {
-		var sResolvedPath = this.oModel ? this.oModel.resolve(this.sPath, this.oContext) : null,
-		oDataState = this.getDataState();
-
-		if (!mPaths || sResolvedPath && sResolvedPath in mPaths) {
-			if (sResolvedPath) {
-				oDataState.setModelMessages(this.oModel.getMessagesByPath(sResolvedPath));
-			}
-			this._fireDateStateChange(oDataState);
-
-		}
-	};
-
-	ListBinding.prototype._fireDateStateChange = function(oDataState){
-		var that = this;
-		function fireChange() {
-			that.fireEvent("AggregatedDataStateChange", { dataState: oDataState });
-			oDataState.changed(false);
-			that._sDataStateTimout = null;
-		}
-
-		if (oDataState && oDataState.changed()) {
-			if (this.mEventRegistry["DataStateChange"]) {
-				this.fireEvent("DataStateChange", { dataState: oDataState });
-			}
-			if (this.bIsBeingDestroyed) {
-				fireChange();
-			} else if (this.mEventRegistry["AggregatedDataStateChange"]) {
-				if (!this._sDataStateTimout) {
-					this._sDataStateTimout = setTimeout(fireChange, 0);
-				}
-			}
-		}
-	};
-
 
 	return ListBinding;
-
 });
