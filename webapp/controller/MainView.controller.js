@@ -11,7 +11,6 @@ sap.ui.define(
         return Controller.extend(
             "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.MainView",
             {
-
                 onInit: function () {
                     const useDarkTheme =
                         window.matchMedia &&
@@ -26,7 +25,7 @@ sap.ui.define(
                     });
                     this.getView().setModel(settingsModel, "settings");
                 },
-
+                //test
                 liveSearch: function (oEvent) {
                     const value = oEvent.getParameter("newValue");
                     const list = this.getView().byId("all-list");
