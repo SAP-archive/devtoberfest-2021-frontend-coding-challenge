@@ -1,0 +1,1 @@
+sap.ui.define([],function(){"use strict";return{translateState:function(e){if(!e){return""}const t=this.getView().getModel("i18n").getResourceBundle();return t.getText(e)}}});
