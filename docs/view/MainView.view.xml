@@ -41,7 +41,7 @@
               <Title id="all-bar-info" text="{i18n>mainView_listTitle}" level="H4" />
               <ToolbarSpacer id="all-bar-spacer" />
               <SearchField id="all-bar-search" width="60%" placeholder="{i18n>mainView_searchFieldPlaceholder}"
-                liveChange=".liveSearch" />
+                liveChange="liveSearch" />
             </OverflowToolbar>
           </headerToolbar>
           <StandardListItem title="{sample>name}" description="{sample>description}" infoState="Information"
