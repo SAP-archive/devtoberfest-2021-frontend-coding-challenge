@@ -118,9 +118,9 @@ Copyright (c) 2021 SAP SE or an SAP affiliate company. All rights reserved. This
 
 [test-image]: https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/actions/workflows/push.yaml/badge.svg
 [test-url]: https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/actions/workflows/push.yaml
-[license-image]: https://img.shields.io/github/license/SAP-samples/devtoberfest-2021-frontend-coding-challenge
+[license-image]: https://img.shields.io/github/license/SAP-samples/devtoberfest-2021-frontend-coding-challenge.svg
 [license-url]: https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/blob/master/LICENSE
-[reuse-image]: https://api.reuse.software/badge/github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/
-[reuse-url]: https://api.reuse.software/info/github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/
+[reuse-image]: https://api.reuse.software/badge/github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge
+[reuse-url]: https://api.reuse.software/info/github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge
 [vscode-image]: https://open.vscode.dev/badges/open-in-vscode.svg
 [vscode-url]: https://open.vscode.dev/SAP-samples/devtoberfest-2021-frontend-coding-challenge/
