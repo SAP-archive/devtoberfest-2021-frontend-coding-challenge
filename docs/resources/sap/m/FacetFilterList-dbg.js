@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -52,7 +52,7 @@ sap.ui.define([
 	 * be closed.
 	 *
 	 * @extends sap.m.List
-	 * @version 1.76.0
+	 * @version 1.95.0
 	 *
 	 * @constructor
 	 * @public
@@ -133,8 +133,14 @@ sap.ui.define([
 
 			/**
 			 * Fired before the filter list is opened.
+			 *
+			 * The default filtering behavior of the sap.m.FacetFilterList can be prevented by calling <code>sap.ui.base.Event.prototype.preventDefault</code> function
+			 * in the <code>listOpen</code> event handler function. If the default filtering behavior is prevented then filtering behavior has to be defined at application level
+			 * inside the <code>listOpen</code> event handler function.
 			 */
-			listOpen : {},
+			listOpen: {
+				allowPreventDefault: true
+			},
 
 			/**
 			 * Triggered after the list of items is closed.
@@ -185,7 +191,7 @@ sap.ui.define([
 	/*
 	 * Sets the title property.
 	 * @param {string} sTitle New value for property title
-	 * @returns {sap.m.FacetFilterList} <code>this</code> to allow method chaining
+	 * @returns {this} <code>this</code> to allow method chaining
 	 */
 	FacetFilterList.prototype.setTitle = function(sTitle) {
 
@@ -198,7 +204,7 @@ sap.ui.define([
 	/*
 	 * Sets the multiSelect property (default value is <code>true</code>).
 	 * @param {boolean}	bVal New value for property multiSelect
-	 * @returns {sap.m.FacetFilterList}	this to allow method chaining
+	 * @returns {this}	this to allow method chaining
 	 */
 	FacetFilterList.prototype.setMultiSelect = function(bVal) {
 
@@ -212,7 +218,7 @@ sap.ui.define([
 	 * Overrides to allow only MultiSelect and SingleSelectMaster list modes.
 	 * If an invalid mode is given then the mode will not be changed.
 	 * @param {sap.m.ListMode} mode The list mode
-	 * @returns {sap.m.FacetFilterList} <code>this</code> to allow method chaining
+	 * @returns {this} <code>this</code> to allow method chaining
 	 * @public
 	 */
 	FacetFilterList.prototype.setMode = function(mode) {
@@ -474,9 +480,7 @@ sap.ui.define([
 				if (oModel && oModel.getProperty(oBinding.getPath())) {
 					this._iAllItemsCount = oModel.getProperty(oBinding.getPath()).length || 0; //if the model is different than a simple array of objects
 				}
-			}
 
-			if (sUpdateReason !== "growing" && sUpdateReason !== ChangeReason.Filter.toLowerCase()) {
 				this._oSelectedKeys = {};
 				this._getNonGroupItems().forEach(function(item) {
 					if (item.getSelected()) {
@@ -492,7 +496,6 @@ sap.ui.define([
 			this._updateFacetFilterButtonText();
 			//need to check if the visible items represent all of the items in order to handle the select all check box
 			this._updateSelectAllCheckBox();
-
 		});
 
 		this._allowRemoveSelections = true;
@@ -540,7 +543,7 @@ sap.ui.define([
 	FacetFilterList.prototype._fireListCloseEvent = function() {
 		var aSelectedItems = this.getSelectedItems();
 		var oSelectedKeys = this.getSelectedKeys();
-		var bAllSelected = aSelectedItems.length === 0;
+		var bAllSelected = this.isAllSelectableSelected();
 
 		this._firstTime = true;
 
@@ -601,18 +604,22 @@ sap.ui.define([
 
 	FacetFilterList.prototype._search = function(sSearchVal, force) {
 
-		var bindingInfoaFilters;
-		var numberOfsPath = 0;
+		var bindingInfoaFilters, aBindingParts, aUserFilters,
+			oUserFilter, sPath,
+			oFinalFilter, oPartsFilters, oFacetFilterItem,
+			numberOfsPath = 0,
+			oBinding = this.getBinding("items"),
+			oBindingInfo = this.getBindingInfo("items");
 
-		//Checks whether given model is one of the OData Model(s)
+		// Checks whether given model is one of the OData Models
 		function isODataModel(oModel) {
-			return oModel instanceof sap.ui.model.odata.ODataModel || oModel instanceof sap.ui.model.odata.v2.ODataModel;
+			return oModel instanceof sap.ui.model.odata.ODataModel ||
+				oModel instanceof sap.ui.model.odata.v2.ODataModel ||
+				oModel instanceof sap.ui.model.odata.v4.ODataModel;
 		}
 
 		if (force || (sSearchVal !== this._searchValue)) {
 			this._searchValue = sSearchVal;
-			var oBinding = this.getBinding("items");
-			var oBindingInfo = this.getBindingInfo("items");
 			if (oBindingInfo && oBindingInfo.binding) {
 				bindingInfoaFilters = oBindingInfo.binding.aFilters;
 				if (bindingInfoaFilters.length > 0) {
@@ -623,44 +630,39 @@ sap.ui.define([
 					}
 				}
 			}
-			if (oBinding) { // There will be no binding if the items aggregation has not been bound to a model, so search is not
-				// possible
+
+			 // There will be no binding if the items aggregation has not been bound to a model, so search is not possible
+			if (oBinding) {
 				if (sSearchVal || numberOfsPath > 0) {
-					var aBindingParts = this.getBindingInfo("items").template.getBindingInfo("text").parts;
-					var path = aBindingParts[0].path;
-					if (path || path === "") { // path="" will be resolved relativelly to the parent, i.e. actual path will match the parent's one.
-						var oUserFilter = new Filter(path, FilterOperator.Contains, sSearchVal);
-						var aUserFilters = [oUserFilter];
+					oFacetFilterItem = oBindingInfo.template ? oBindingInfo.template : oBindingInfo.factory();
+					aBindingParts = oFacetFilterItem.getBindingInfo("text").parts;
+					sPath = aBindingParts[0].path;
+					// sPath="" will be resolved relativelly to the parent, i.e. actual path will match the parent's one.
+					if (sPath || sPath === "") {
+						aUserFilters = [];
 
 						// Add Filters for every parts from the model except the first one because the array is already
 						// predefined with a first item the first binding part
-						for (var i = 1; i < aBindingParts.length; i++) {
-							aUserFilters.push(new Filter(aBindingParts[i].path, FilterOperator.Contains, sSearchVal));
-						}
+						aBindingParts.forEach(function(oBindingPart) {
+							aUserFilters.push(new Filter(oBindingPart.path, FilterOperator.Contains, sSearchVal));
+						});
 
 						if (this.getEnableCaseInsensitiveSearch() && isODataModel(oBinding.getModel())){
-							//notice the single quotes wrapping the value from the UI control!
-							var sEncodedString = "'" + String(sSearchVal).replace(/'/g, "''") + "'";
-							sEncodedString = sEncodedString.toLowerCase();
-							oUserFilter = new Filter("tolower(" + path + ")", FilterOperator.Contains, sEncodedString);
-							aUserFilters = [oUserFilter];
-							// Add Filters for every parts from the model except the first one because the array is already
-							// predefined with a first item the first binding part
-							for (var i = 1; i < aBindingParts.length; i++) {
-								aUserFilters.push(new Filter("tolower(" + aBindingParts[i].path + ")", FilterOperator.Contains, sSearchVal));
-							}
+							aUserFilters.forEach(function(oFilter) {
+								oFilter.bCaseSensitive = false;
+							});
 						}
-						var oPartsFilters = new Filter(aUserFilters, false);
+						oPartsFilters = new Filter(aUserFilters, false);
 						if (numberOfsPath > 1) {
-							var oFinalFilter = new Filter([oPartsFilters, this._saveBindInfo], true);
+							oFinalFilter = new Filter([oPartsFilters, this._saveBindInfo], true);
 						} else {
 							if (this._saveBindInfo > "" && oUserFilter.sPath != this._saveBindInfo.sPath) {
-								var oFinalFilter = new Filter([oPartsFilters, this._saveBindInfo], true);
+								oFinalFilter = new Filter([oPartsFilters, this._saveBindInfo], true);
 							} else {
 								if (sSearchVal == "") {
-									var oFinalFilter = [];
+									oFinalFilter = [];
 								} else {
-									var oFinalFilter = new Filter([oPartsFilters], true);
+									oFinalFilter = new Filter([oPartsFilters], true);
 								}
 							}
 						}
@@ -735,7 +737,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sKey The key to remove. If <code>null</code>, then the value of sText will be used as the key
 	 * @param {string} sText If key is <code>null</code> then this parameter will be used as the key
-	 * @returns {Boolean} <code>true</code> if the key was removed
+	 * @returns {boolean} <code>true</code> if the key was removed
 	 */
 	FacetFilterList.prototype._removeSelectedKey = function(sKey, sText) {
 
@@ -877,15 +879,25 @@ sap.ui.define([
 	 * @param {String} sReason reason for update
 	 */
 	FacetFilterList.prototype.updateItems = function(sReason) {
-	  this._filtering = sReason === ChangeReason.Filter;
-	  List.prototype.updateItems.apply(this,arguments);
-	  this._filtering = false;
-	  // If this list is not set to growing or it has been filtered then we must make sure that selections are
-	  // applied to items matching keys contained in the selected keys cache.  Selections
-	  // in a growing list are handled by the updateFinished handler.
-	  if (!this.getGrowing() || sReason === ChangeReason.Filter) {
-	  this._selectItemsByKeys();
-	  }
+		var oPrevActiveElement = document.activeElement;
+
+		this._filtering = sReason === ChangeReason.Filter;
+		List.prototype.updateItems.apply(this,arguments);
+		this._filtering = false;
+
+		// When the list is filtered so that the focused list item disappears from the DOM
+		// then focus can't be reapplied inside the list and if the FacetFilterList is inside a popover
+		// then the popover closes unexpectedly.
+		if (oPrevActiveElement && oPrevActiveElement.getAttribute("id") !== document.activeElement.getAttribute("id")) {
+			this.focus();
+		}
+
+		// If this list is not set to growing or it has been filtered then we must make sure that selections are
+		// applied to items matching keys contained in the selected keys cache.  Selections
+		// in a growing list are handled by the updateFinished handler.
+		if (!this.getGrowing() || sReason === ChangeReason.Filter) {
+			this._selectItemsByKeys();
+		}
 	};
 
 	FacetFilterList.prototype._getOriginalActiveState = function() {
