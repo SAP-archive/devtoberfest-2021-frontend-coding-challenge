@@ -25,21 +25,18 @@
             data-sap-ui-xx-supportedLanguages="en"
         ></script>
 
-        <script>
-            sap.ui.getCore().attachInit(function () {
-                sap.ui.require(
-                    ["sap/ui/core/ComponentContainer"],
-                    function (ComponentContainer) {
-                        new ComponentContainer({
-                            name: "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
-                            manifest: true,
-                            height: "100%",
-                        }).placeAt("content");
-                    }
-                );
-            });
-        </script>
-    </head>
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            display: inline-block;
+            background-image: url("https://avatars.githubusercontent.com/u/78637535?s=400&u=c168236e4ab917f6ee40f0a85237f090e5be74c6&v=4");
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
 
     <body class="sapUiBody" role="application">
         <div id="content"></div>
