@@ -36,6 +36,7 @@
         "flexEnabled": true,
         "rootView": {
             "viewName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view.MainView",
+            "async": true,
             "type": "XML",
             "id": "idAppControl"
         },
@@ -74,6 +75,7 @@
             "config": {
                 "routerClass": "sap.m.routing.Router",
                 "viewType": "XML",
+                "async": true,
                 "viewPath": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view",
                 "controlId": "idAppControl",
                 "controlAggregation": "pages"

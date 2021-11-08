@@ -5,7 +5,7 @@ type: application
 resources:
     configuration:
         paths:
-            webapp: webapp
+            webapp: docs
 framework:
     name: SAPUI5
     version: 1.76.1
