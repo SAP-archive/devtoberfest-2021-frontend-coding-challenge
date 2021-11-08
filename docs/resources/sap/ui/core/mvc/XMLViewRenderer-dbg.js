@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -60,6 +60,7 @@ sap.ui.define([
 	 * @private
 	 */
 	var XMLViewRenderer = {
+		apiVersion: 2
 	};
 
 
@@ -71,48 +72,44 @@ sap.ui.define([
 	 */
 	XMLViewRenderer.render = function(rm, oControl) {
 		// write the HTML into the render manager
+		var aParsedContent = oControl._aParsedContent;
 		var $oldContent = oControl._$oldContent = RenderManager.findPreservedContent(oControl.getId());
 		if ( $oldContent.length === 0) {
 			// Log.debug("rendering " + oControl + " anew");
 			var bSubView = oControl.isSubView();
 			if (!bSubView) {
-				rm.write("<div");
-				rm.writeControlData(oControl);
-				rm.addClass("sapUiView");
-				rm.addClass("sapUiXMLView");
+				rm.openStart("div", oControl);
+				rm.class("sapUiView");
+				rm.class("sapUiXMLView");
 				ViewRenderer.addDisplayClass(rm, oControl);
 				if (!oControl.oAsyncState || !oControl.oAsyncState.suppressPreserve) {
 					// do not preserve when rendering initially in async mode
-					rm.writeAttribute("data-sap-ui-preserve", oControl.getId());
+					rm.attr("data-sap-ui-preserve", oControl.getId());
 				}
-				if (oControl.getWidth()) {
-					rm.addStyle("width", oControl.getWidth());
-				}
-				if (oControl.getHeight()) {
-					rm.addStyle("height", oControl.getHeight());
-				}
-				rm.writeStyles();
-
-				rm.writeClasses();
-
-				rm.write(">");
+				rm.style("width", oControl.getWidth());
+				rm.style("height", oControl.getHeight());
+				rm.openEnd();
 			}
-			if (oControl._aParsedContent) {
-				for (var i = 0; i < oControl._aParsedContent.length; i++) {
-					var fragment = oControl._aParsedContent[i];
-					if (fragment && typeof (fragment) === "string") {
-						rm.write(fragment);
+			if (aParsedContent) {
+				for (var i = 0; i < aParsedContent.length; i++) {
+					var vRmInfo = aParsedContent[i];
+					// apply RenderManagerAPI calls which might have been recorded during XML processing for all encountered HTML elements in an XMLView
+					if (Array.isArray(vRmInfo)) {
+						rm[vRmInfo[0]].apply(rm, vRmInfo[1]);
 					} else {
-						rm.renderControl(fragment);
-						// when the child control did not render anything (e.g. visible=false), we add a placeholder to know where to render the child later
-						if ( !fragment.bOutput ) {
-							rm.write('<div id="' + PREFIX_DUMMY + fragment.getId() + '" class="sapUiHidden"></div>');
+						rm.renderControl(vRmInfo);
+						// when the child control did not render anything, we add a placeholder to know where to render the child later
+						if ( !vRmInfo.bOutput ) {
+							rm.openStart("div", PREFIX_DUMMY + vRmInfo.getId());
+							rm.class("sapUiHidden");
+							rm.openEnd();
+							rm.close("div");
 						}
 					}
 				}
 			}
 			if (!bSubView) {
-				rm.write("</div>");
+				rm.close("div");
 			}
 
 		} else {
@@ -121,16 +118,18 @@ sap.ui.define([
 			rm.renderControl(oControl.oAfterRenderingNotifier);
 
 			// preserve mode: render a temporary element and all child controls
-			rm.write('<div id="' + PREFIX_TEMPORARY + oControl.getId() + '" class="sapUiHidden">');
-			for (var i = 0; i < oControl._aParsedContent.length; i++) {
-				var fragment = oControl._aParsedContent[i];
-				if ( typeof (fragment) !== "string") {
-
+			rm.openStart("div", PREFIX_TEMPORARY + oControl.getId());
+			rm.class("sapUiHidden");
+			rm.openEnd();
+			for (var i = 0; i < aParsedContent.length; i++) {
+				var vFragment = aParsedContent[i];
+				// if the parsed content does not have a corresponding _renderManagerAPICall, it's a control
+				if (!Array.isArray(vFragment)) {
 					// render DOM string for child control
-					rm.renderControl(fragment);
+					rm.renderControl(vFragment);
 
 					// replace any old DOM (or invisible placeholder) for a child control with a dummy placeholder
-					var sFragmentId = fragment.getId(),
+					var sFragmentId = vFragment.getId(),
 						$fragment = jQuery(document.getElementById(sFragmentId));
 					if ($fragment.length == 0) {
 						$fragment = jQuery(document.getElementById(PREFIX_INVISIBLE + sFragmentId));
@@ -140,7 +139,7 @@ sap.ui.define([
 					}
 				}
 			}
-			rm.write('</div>');
+			rm.close("div");
 
 		}
 	};

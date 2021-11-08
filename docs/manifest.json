@@ -39,6 +39,7 @@
             "type": "XML",
             "id": "idAppControl"
         },
+        "async": true,
         "dependencies": {
             "minUI5Version": "1.60.0",
             "libs": {
@@ -71,6 +72,7 @@
             ]
         },
         "routing": {
+            "async": true,
             "config": {
                 "routerClass": "sap.m.routing.Router",
                 "viewType": "XML",

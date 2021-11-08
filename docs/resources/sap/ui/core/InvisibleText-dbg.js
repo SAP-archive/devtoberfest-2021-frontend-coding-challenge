@@ -1,12 +1,16 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.ui.core.InvisibleText.
-sap.ui.define(['./Control', './library', "sap/base/Log", "sap/base/security/encodeXML"],
-	function(Control, library, Log, encodeXML) {
+sap.ui.define([
+	"./Control",
+	"sap/base/Log",
+	"sap/base/security/encodeXML",
+	"./library" // ensure loading of CSS
+], function(Control, Log, encodeXML) {
 	"use strict";
 
 
@@ -25,7 +29,7 @@ sap.ui.define(['./Control', './library', "sap/base/Log", "sap/base/security/enco
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.96.0
 	 *
 	 * @public
 	 * @since 1.27.0
@@ -45,27 +49,28 @@ sap.ui.define(['./Control', './library', "sap/base/Log", "sap/base/security/enco
 			}
 		},
 
-		renderer : function(oRm, oControl) {
-			// The text is hidden through "display: none" in the shared CSS class
-			// "sapUiInvisibleText", as an alternative in case screen readers have trouble with
-			// "display: none", the following class definition could be used:
-			//	.sapUiInvisibleText {
-			//		display: inline-block !important;
-			//		visibility: hidden !important;
-			//		width: 0 !important;
-			//		height: 0 !important;
-			//		overflow: hidden !important;
-			//		position: absolute !important;
-			//	}
+		renderer : {
+			apiVersion : 2,
+			render: function(oRm, oControl) {
+				// The text is hidden through "display: none" in the shared CSS class
+				// "sapUiInvisibleText", as an alternative in case screen readers have trouble with
+				// "display: none", the following class definition could be used:
+				//	.sapUiInvisibleText {
+				//		display: inline-block !important;
+				//		visibility: hidden !important;
+				//		width: 0 !important;
+				//		height: 0 !important;
+				//		overflow: hidden !important;
+				//		position: absolute !important;
+				//	}
 
-			oRm.write("<span");
-			oRm.writeControlData(oControl);
-			oRm.addClass("sapUiInvisibleText");
-			oRm.writeClasses();
-			oRm.writeAttribute("aria-hidden", "true");
-			oRm.write(">");
-			oRm.writeEscaped(oControl.getText() || "");
-			oRm.write("</span>");
+				oRm.openStart("span", oControl);
+				oRm.class("sapUiInvisibleText");
+				oRm.attr("aria-hidden", "true");
+				oRm.openEnd();
+				oRm.text(oControl.getText() || "");
+				oRm.close("span");
+			}
 		}
 	});
 
@@ -78,7 +83,7 @@ sap.ui.define(['./Control', './library', "sap/base/Log", "sap/base/security/enco
 	}
 
 	/**
-	 * @return {sap.ui.core.InvisibleText} Returns <code>this</code> to allow method chaining
+	 * @return {this} Returns <code>this</code> to allow method chaining
 	 * @public
 	 * @deprecated As of version 1.27, local BusyIndicator is not supported by control.
 	 * @function
@@ -86,7 +91,7 @@ sap.ui.define(['./Control', './library', "sap/base/Log", "sap/base/security/enco
 	InvisibleText.prototype.setBusy = makeNotSupported("Property busy");
 
 	/**
-	 * @return {sap.ui.core.InvisibleText} Returns <code>this</code> to allow method chaining
+	 * @return {this} Returns <code>this</code> to allow method chaining
 	 * @public
 	 * @deprecated As of version 1.27, local BusyIndicator is not supported by control.
 	 * @function
@@ -94,7 +99,7 @@ sap.ui.define(['./Control', './library', "sap/base/Log", "sap/base/security/enco
 	InvisibleText.prototype.setBusyIndicatorDelay = makeNotSupported("Property busy");
 
 	/**
-	 * @return {sap.ui.core.InvisibleText} Returns <code>this</code> to allow method chaining
+	 * @return {this} Returns <code>this</code> to allow method chaining
 	 * @public
 	 * @deprecated As of version 1.54, local BusyIndicator is not supported by control.
 	 * @function
@@ -102,7 +107,7 @@ sap.ui.define(['./Control', './library', "sap/base/Log", "sap/base/security/enco
 	InvisibleText.prototype.setBusyIndicatorSize = makeNotSupported("Property busy");
 
 	/**
-	 * @return {sap.ui.core.InvisibleText} Returns <code>this</code> to allow method chaining
+	 * @return {this} Returns <code>this</code> to allow method chaining
 	 * @public
 	 * @deprecated As of version 1.27, property <code>visible</code> is not supported by control.
 	 * @function
@@ -110,7 +115,7 @@ sap.ui.define(['./Control', './library', "sap/base/Log", "sap/base/security/enco
 	InvisibleText.prototype.setVisible = makeNotSupported("Property visible");
 
 	/**
-	 * @return {sap.ui.core.InvisibleText} Returns <code>this</code> to allow method chaining
+	 * @return {this} Returns <code>this</code> to allow method chaining
 	 * @public
 	 * @deprecated As of version 1.27, tooltip is not supported by control.
 	 * @function
@@ -118,6 +123,9 @@ sap.ui.define(['./Control', './library', "sap/base/Log", "sap/base/security/enco
 	InvisibleText.prototype.setTooltip = makeNotSupported("Aggregation tooltip");
 
 	InvisibleText.prototype.setText = function(sText) {
+		// For performance reasons, we suppress the invalidation and update the DOM directly.
+		// A lot of controls don't really render the invisible Text in their own DOM,
+		// but use it to store aria information and then call toStatic().
 		this.setProperty("text", sText, true);
 		this.$().html(encodeXML(this.getText() || ""));
 		return this;
@@ -133,7 +141,7 @@ sap.ui.define(['./Control', './library', "sap/base/Log", "sap/base/security/enco
 	/**
 	 * Adds <code>this</code> control into the static, hidden area UI area container.
 	 *
-	 * @return {sap.ui.core.InvisibleText} Returns <code>this</code> to allow method chaining
+	 * @return {this} Returns <code>this</code> to allow method chaining
 	 * @public
 	 * @see sap.ui.core.Control#placeAt
 	 */

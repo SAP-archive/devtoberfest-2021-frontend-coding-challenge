@@ -31,6 +31,10 @@
 	}
 }
 
+.Stretch .sapMNwCCTxt{
+	max-width: none;
+}
+
 .sapMNwCSbh {
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -45,9 +49,11 @@
 	font-size: @sapMFontMediumSize;
 }
 
-.sapMNwCCTxt .sapMText {
+.sapMNwCCTxt .sapMText, .sapMNwCCTxt .sapMFT {
 	font-size: @sapMFontMediumSize;
 	color: @sapUiContentContrastTextColor;
+	overflow-wrap: break-word;
+	white-space: pre-line;
 }
 
 .sapMNwC:focus:not([tabindex]) {
