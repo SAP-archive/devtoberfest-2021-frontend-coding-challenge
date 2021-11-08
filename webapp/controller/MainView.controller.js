@@ -2,16 +2,13 @@ sap.ui.define(
     [
         "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/controller/BaseController",
         "sap/ui/model/json/JSONModel",
-        "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/model/formatter",
     ],
-    function (Controller, JSONModel, formatter) {
+    function (Controller, JSONModel) {
         "use strict";
 
         return Controller.extend(
             "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.MainView",
             {
-                formatter,
-
                 onInit: function () {
                     const useDarkTheme =
                         window.matchMedia &&
@@ -61,6 +58,12 @@ sap.ui.define(
                         .applyTheme(
                             lightTheme ? "sap_fiori_3" : "sap_fiori_3_dark"
                         );
+                },
+
+                goToRepo: function () {
+                    window.open(
+                        "https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge"
+                    );
                 },
             }
         );
