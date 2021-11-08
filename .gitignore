@@ -10,5 +10,3 @@ mta-*
 approuter/*/webapp/
 
 .DS_Store
-docs
-!docs/.keepMe
