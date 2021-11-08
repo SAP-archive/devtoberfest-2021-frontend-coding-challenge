@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -25,7 +25,7 @@ sap.ui.define([
 	 * Applies mask support for input controls.
 	 * It should should be applied to the prototype of a <code>sap.m.InputBase</code>.
 	 *
-	 * @version 1.76.0
+	 * @version 1.95.0
 	 * @private
 	 * @mixin
 	 * @alias sap.m.MaskEnabler
@@ -213,7 +213,7 @@ sap.ui.define([
 		 * Setter for property <code>value</code>.
 		 *
 		 * @param {string} sValue New value for property <code>value</code>.
-		 * @return {sap.m.MaskInput} <code>this</code> to allow method chaining.
+		 * @return {this} <code>this</code> to allow method chaining.
 		 * @public
 		 */
 		this.setValue = MaskEnabler.setValue = function (sValue) {
@@ -1171,12 +1171,10 @@ sap.ui.define([
 		/**
 		 * Determines the browser specific minimal delay time for setTimeout.
 		 *
-		 * Todo: This logic is a good candidate to be implemented generally in jQuery.sap.delayedCall method.
-		 *
 		 * @private
 		 */
 		this._getMinBrowserDelay = function () {
-			return !Device.browser.msie ? 4 : 50;
+			return 4;
 		};
 
 		/**
@@ -1483,7 +1481,7 @@ sap.ui.define([
 
 		/**
 		 * Checks if the current environment is Android PS with browser Chrome
- 		 * @returns {boolean} true if it is both Chrome and Android, otherwise - false.
+		 * @returns {boolean} true if it is both Chrome and Android, otherwise - false.
 		 * @private
 		 */
 		this._isChromeOnAndroid = function() {

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -27,7 +27,7 @@ sap.ui.define(['sap/m/Button', 'sap/m/ButtonRenderer'],
 	 * @implements sap.f.IShellBar
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.95.0
 	 *
 	 * @constructor
 	 * @public
@@ -36,10 +36,13 @@ sap.ui.define(['sap/m/Button', 'sap/m/ButtonRenderer'],
 	 * @ui5-metamodel This control/element also will be described in the UI5 (legacy) designtime metamodel
 	 */
 	var OverflowToolbarButton = Button.extend("sap.m.OverflowToolbarButton", /** @lends sap.m.OverflowToolbarButton.prototype */ {
-		interfaces: [
-			"sap.f.IShellBar"
-		],
-		renderer: ButtonRenderer.render
+		metadata: {
+			interfaces: [
+				"sap.f.IShellBar",
+				"sap.m.IOverflowToolbarContent"
+			]
+		},
+		renderer: ButtonRenderer
 	});
 
 	OverflowToolbarButton.prototype._getText = function() {
@@ -49,6 +52,34 @@ sap.ui.define(['sap/m/Button', 'sap/m/ButtonRenderer'],
 
 			return "";
 	};
+
+	OverflowToolbarButton.prototype._getTooltip = function() {
+			var sTooltip = Button.prototype._getTooltip.call(this);
+
+			if (this._bInOverflow) {
+				return this._getText() === sTooltip ? "" : sTooltip;
+			}
+
+			return sTooltip;
+	};
+
+		/**
+		 * OVERFLOW TOOLBAR settings
+		 */
+		OverflowToolbarButton.prototype._onBeforeEnterOverflow = function () {this._bInOverflow = true;};
+
+		OverflowToolbarButton.prototype._onAfterExitOverflow = function () {this._bInOverflow = false;};
+
+		OverflowToolbarButton.prototype.getOverflowToolbarConfig = function () {
+			var oConfig = {
+				canOverflow: true
+			};
+
+			oConfig.onBeforeEnterOverflow = this._onBeforeEnterOverflow.bind(this);
+			oConfig.onAfterExitOverflow = this._onAfterExitOverflow.bind(this);
+
+			return oConfig;
+		};
 
 	return OverflowToolbarButton;
 

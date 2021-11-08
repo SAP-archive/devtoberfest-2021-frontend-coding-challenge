@@ -1,21 +1,19 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides the JSON model implementation of a list binding
 sap.ui.define([
-	'sap/ui/model/ChangeReason',
-	'sap/ui/model/ClientListBinding',
 	"sap/base/strings/hash",
 	"sap/base/util/deepEqual",
-	"sap/ui/thirdparty/jquery"
-],
-	function(ChangeReason, ClientListBinding, hash, deepEqual, jQuery) {
+	"sap/base/util/deepExtend",
+	"sap/base/util/each",
+	"sap/ui/model/ChangeReason",
+	"sap/ui/model/ClientListBinding"
+], function(hash, deepEqual, deepExtend, each, ChangeReason, ClientListBinding) {
 	"use strict";
-
-
 
 	/**
 	 *
@@ -33,8 +31,8 @@ sap.ui.define([
 	 */
 	var MessageListBinding = ClientListBinding.extend("sap.ui.model.message.MessageListBinding");
 
-	/**
-	 * Define the symbol function when extended change detection is enabled
+	/*
+	 * Define the symbol function when extended change detection is enabled.
 	 * @override
 	 */
 	MessageListBinding.prototype.enableExtendedChangeDetection = function() {
@@ -117,7 +115,7 @@ sap.ui.define([
 		var oList = this.oModel._getObject(this.sPath, this.oContext);
 		if (Array.isArray(oList)) {
 			if (this.bUseExtendedChangeDetection) {
-				this.oList = jQuery.extend(true, [], oList);
+				this.oList = deepExtend([], oList);
 			} else {
 				this.oList = oList.slice(0);
 			}
@@ -167,7 +165,7 @@ sap.ui.define([
 				if (this.aLastContexts.length != aContexts.length) {
 					bChangeDetected = true;
 				} else {
-					jQuery.each(this.aLastContextData, function(iIndex, oLastData) {
+					each(this.aLastContextData, function(iIndex, oLastData) {
 						if (that.getContextData(aContexts[iIndex]) !== oLastData) {
 							bChangeDetected = true;
 							return false;
