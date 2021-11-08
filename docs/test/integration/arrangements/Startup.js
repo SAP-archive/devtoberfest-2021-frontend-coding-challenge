@@ -1,1 +1,0 @@
-sap.ui.define(["sap/ui/test/Opa5"],function(e){"use strict";return e.extend("com.devtoberfest.devtoberfest2021FrontendCodingChallenge.test.integration.arrangements.Startup",{iStartMyApp:function(){this.iStartMyUIComponent({componentConfig:{name:"com.devtoberfest.devtoberfest2021FrontendCodingChallenge",async:false,manifest:true}})}})});
