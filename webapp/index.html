@@ -15,7 +15,7 @@
 
         <script
             id="sap-ui-bootstrap"
-            src="resources/sap-ui-core.js"
+            src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"
             data-sap-ui-theme="sap_fiori_3"
             data-sap-ui-resourceroots='{
         "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./"
@@ -24,6 +24,7 @@
             data-sap-ui-compatVersion="edge"
             data-sap-ui-frameOptions="trusted"
             data-sap-ui-async="true"
+            data-sap-ui-preload="async"
         ></script>
 
         <script>
@@ -46,9 +47,7 @@
         <div id="content">
             <!-- Loading splash screen -->
             <div
-                id="busyIndicator"
-                style="text-align: center; font-family: Sans, Arial"
-            >
+                id="busyIndicator">
                 <!-- static header text -->
                 <h3>My UI5 App is loading</h3>
                 
