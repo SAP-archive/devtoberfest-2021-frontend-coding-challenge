@@ -2,12 +2,13 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="resources/img/favicon.ico" rel="shortcut icon" type="image/x-icon">
+        <link id="animation" rel="stylesheet" type="text/css" href="css/beer-loader.css">
 
         <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
 
         <script id="sap-ui-bootstrap" src="resources/sap-ui-custom.js" data-sap-ui-theme="sap_fiori_3" data-sap-ui-resourceroots="{
         &quot;com.devtoberfest.devtoberfest2021FrontendCodingChallenge&quot;: &quot;./&quot;
-      }" data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatversion="edge" data-sap-ui-frameoptions="trusted"></script>
+      }" data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatversion="edge" data-sap-ui-async="true" data-sap-ui-libs="sap.ui.core,sap.m,sap.tnt,sap.ui.layout" data-sap-ui-frameoptions="trusted"></script>
 
         <script>
             sap.ui.getCore().attachInit(function () {
@@ -25,8 +26,24 @@
         </script>
     </head>
 
-    <body class="sapUiBody" role="application">
-        <div id="content"></div>
+    <body class="sapUiBody" id="content">
+        <div id="busyIndicator">
+            <div class="wrapper">
+                <div class="glass-wrapper">
+                    <div class="glass">
+                        <div class="beer">
+                            <div class="foam"><span class="foambubble"></span><span class="foambubble"></span><span class="foambubble"></span><span class="foambubble"></span><span class="foambubble"></span></div>
+                            <div class="bubbles"><span class="bubble"></span><span class="bubble"></span><span class="bubble"></span><span class="bubble"></span><span class="bubble"></span><span class="bubble"></span><span class="bubble"></span><span class="bubble"></span><span class="bubble"></span></div>
+                        </div>
+                    </div>
+                    <div class="foamtop"><span class="ft-bubble"></span><span class="ft-bubble"></span><span class="ft-bubble"></span><span class="ft-bubble"></span></div>
+                    <div class="coaster"></div>
+                </div>
+                <div class="disclaimer">
+                    <p>👋 Feel free to use this! If you do, let me know via Twitter :) =&gt; <a href="https://twitter.com/herrbertling">@herrbertling</a></p>
+                </div>
+            </div>
+        </div>
     
 
 </body></html>
