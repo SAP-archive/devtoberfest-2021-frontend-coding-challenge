@@ -37,6 +37,7 @@
         "rootView": {
             "viewName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view.MainView",
             "type": "XML",
+            "async": true,
             "id": "idAppControl"
         },
         "dependencies": {
@@ -76,6 +77,7 @@
                 "viewType": "XML",
                 "viewPath": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view",
                 "controlId": "idAppControl",
+                "async": true,                
                 "controlAggregation": "pages"
             },
             "routes": [
