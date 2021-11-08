@@ -1,0 +1,6 @@
+/*!
+ * OpenUI5
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
+ */
+sap.ui.define(["sap/m/DynamicDateOption"],function(e){"use strict";var t=e.extend("sap.m.CustomDynamicDateOption",{metadata:{library:"sap.m",properties:{getText:{type:"function"},getValueHelpUITypes:{type:"function"},createValueHelpUI:{type:"function"},validateValueHelpUI:{type:"function"},getValueHelpOutput:{type:"function"},getGroup:{type:"function"},getGroupHeader:{type:"function"},format:{type:"function"},parse:{type:"function"},toDates:{type:"function"},enhanceFormattedValue:{type:"function"}}}});function a(e){return e.charAt(0).toUpperCase()+e.slice(1)}["getText","getValueHelpUITypes","createValueHelpUI","getValueHelpOutput","validateValueHelpUI","getGroup","getGroupHeader","format","parse","toDates","enhanceFormattedValue"].forEach(function(p){t.prototype[p]=function(){var t="get"+a(p);var n=this[t]();return n?n.apply(this,arguments):e.prototype[p].apply(this,arguments)}});return t});

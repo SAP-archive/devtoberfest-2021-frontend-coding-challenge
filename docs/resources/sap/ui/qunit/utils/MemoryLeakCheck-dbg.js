@@ -1,13 +1,13 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 /*global QUnit*/
 
-sap.ui.define([ 'jquery.sap.global', 'sap/ui/core/Core', 'sap/ui/base/Object', 'sap/ui/core/Element', 'sap/ui/core/Control' ],
-		function(jQuery, Core, BaseObject, Element, Control) {
+sap.ui.define([ 'jquery.sap.global', 'sap/ui/core/Element', 'sap/ui/core/Control', 'sap/ui/core/Core' /* provides sap.ui.getCore() */ ],
+		function(jQuery, Element, Control) {
 	"use strict";
 
 	//TODO: global jquery call found
@@ -29,7 +29,7 @@ sap.ui.define([ 'jquery.sap.global', 'sap/ui/core/Core', 'sap/ui/base/Object', '
 	 * @namespace
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.95.0
 	 *
 	 * @public
 	 * @since 1.48.0

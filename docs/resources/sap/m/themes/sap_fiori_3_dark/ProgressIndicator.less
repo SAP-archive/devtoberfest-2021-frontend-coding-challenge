@@ -2,6 +2,7 @@
 /* CSS for control sap.m/ProgressIndicator  */
 /* Quartz Dark theme                        */
 /* ======================================== */
+@sapMPITextLeftTextThreshold: 0.5;
 
 .sapMPITextLeft,
 .sapMPITextRight {
@@ -17,7 +18,10 @@
 	margin: 0.5rem 0;
 }
 
-.sap-phone .sapMPI:not(.sapMPIDisplayOnly),
-.sap-tablet .sapMPI:not(.sapMPIDisplayOnly) {
+.sapMPI:not(.sapMPIDisplayOnly) {
 	margin: 0.875rem 0;
+}
+
+.sapUiSizeCompact .sapMPI:not(.sapMPIDisplayOnly) {
+	margin: 0.5rem 0;
 }
