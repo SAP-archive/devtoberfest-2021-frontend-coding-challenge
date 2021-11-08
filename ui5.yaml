@@ -21,7 +21,7 @@ builder:
               sections:
                   - mode: raw
                     filters:
-                        - sap/ui/thirdparty/baseuri.js
+                        # - sap/ui/thirdparty/baseuri.js
                         - sap/ui/core/date/_Calendars.js
                         # - sap/ui/thirdparty/es6-promise.js
                         # - sap/ui/thirdparty/es6-shim-nopromise.js
@@ -59,7 +59,9 @@ builder:
                         - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/Component.js
                         - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/manifest.json
                         - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/controller/**
+                        - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/css/**
                         - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/i18n/**
+                        - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/model/**
                         - com/devtoberfest/devtoberfest2021FrontendCodingChallenge/view/**
                     resolve: true
                     sort: true
