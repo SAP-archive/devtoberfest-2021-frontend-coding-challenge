@@ -11,6 +11,7 @@ sap.ui.define(
         return Controller.extend(
             "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.MainView",
             {
+                //test
                 onInit: function () {
                     const useDarkTheme =
                         window.matchMedia &&
