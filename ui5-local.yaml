@@ -1,6 +1,6 @@
 specVersion: "2.4"
 metadata:
-  name: com.devtoberfest.devtoberfests2021frontendcodingchallenge
+  name: com.devtoberfest.devtoberfest2021frontendcodingchallenge
 type: application
 framework:
   name: SAPUI5
