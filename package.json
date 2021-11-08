@@ -7,7 +7,8 @@
     "scripts": {
         "start": "ui5 serve --open index.html",
         "serve": "ui5 serve",
-        "build": "ui5 build --clean-dest --dest docs --include-task generateComponentPreload ",
+        "build": "ui5 build preload --dest docs ",
+        "buildnew": "ui5 build --exclude-task=* --include-task=generateManifestBundle --dest docs ",
         "buildold": "ui5 build --clean-dest --dest docs self-contained --all ",
         "prettier": "prettier -w .",
         "test": "run-s karma",
