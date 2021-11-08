@@ -8,3 +8,5 @@ deployer/resources/
 Makefile*
 mta-*
 approuter/*/webapp/
+
+.DS_Store
