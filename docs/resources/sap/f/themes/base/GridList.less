@@ -1,0 +1,79 @@
+.sapFGridList {
+	/* List headers overrides */
+	& > .sapMListHdrText,
+	& > .sapMListHdrTBar {
+		margin-bottom: 0.5rem;
+	}
+
+	.sapMLIBCounter {
+		padding-right: 1rem;
+	}
+
+	> .sapMListUl {
+		> .sapMLIBFocusable:focus {
+			outline: none;
+		}
+
+		> .sapMLIBFocusable:focus::after {
+			border: @sapUiContentFocusWidth @sapUiContentFocusStyle @sapUiContentFocusColor;
+			position: absolute;
+			content: " ";
+			top: 1px;
+			right: 1px;
+			bottom: 1px;
+			left: 1px;
+			z-index: 2;
+			pointer-events: none;
+		}
+	}
+
+}
+
+.sapFGridList ul {
+	margin-bottom: 0.5rem;
+}
+
+.sapFGridListDefault {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+	grid-gap: 0.5rem 0.5rem;
+}
+
+/* List Group headers overrides. */
+.sapFGridListGroup {
+	& > .sapMLIB.sapMGHLI {
+		background: none;
+		border: none;
+		padding-top: 0.25rem;
+		grid-column: ~"1 / -1";
+		width: 100%;
+
+		& .sapMGHLITitle {
+			font-size: 1.125rem;
+			color: @sapUiGroupTitleTextColor;
+		}
+	}
+}
+
+/* List Item overrides. */
+.sapFGridList > .sapMListUl > .sapMLIB:not(.sapMGHLI) {
+	border-radius: 0.25rem;
+	border: none;
+	box-shadow: @sapUiShadowLevel0;
+
+	// Highlighted items
+	> .sapMLIBHighlight {
+		border-top-left-radius: 0.25rem;
+		border-bottom-left-radius: 0.25rem;
+	}
+	& > .sapMLIBContent {
+		height: 100%;
+	}
+}
+
+.sapFGridList > .sapMListUl > .sapUiBlockLayerTabbable {
+	// There are "span" helpers, which purpose is to block navigation into the blocked controls content.
+	// If the focus reaches the span before the blocked/busy control it is forwarded to the one after the control.
+	// These spans should not be visible.
+	position: absolute;
+}

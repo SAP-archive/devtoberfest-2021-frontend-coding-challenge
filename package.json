@@ -10,7 +10,7 @@
         "start:dev": "ui5 serve --open index.html",
         "serve": "ui5 --config ui5-docs.yaml serve",
         "serve:dev": "ui5 serve",
-        "build:progressive": "ui5 build --exclude-task=generateFlexChangesBundle createDebugFiles --dest docs",
+        "build:progressive": "ui5 build -a --exclude-task=generateFlexChangesBundle createDebugFiles --dest docs",
         "build": "run-s clean build:progressive",
         "build:std": "ui5 build --clean-dest --dest docs self-contained --all ",
         "prettier": "prettier -w .",
