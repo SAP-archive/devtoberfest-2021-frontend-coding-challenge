@@ -9,7 +9,7 @@
 
         <script id="sap-ui-bootstrap" src="resources/sap-ui-custom.js" data-sap-ui-theme="sap_fiori_3" data-sap-ui-resourceroots="{
         &quot;com.devtoberfest.devtoberfest2021FrontendCodingChallenge&quot;: &quot;./&quot;
-      }" data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatversion="edge" data-sap-ui-frameoptions="trusted" data-sap-ui-async="true"></script>
+      }" data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatversion="edge" data-sap-ui-frameoptions="trusted" data-sap-ui-async="true" data-sap-ui-preload="async"></script>
 
         <script>
             sap.ui.getCore().attachInit(function () {
@@ -30,7 +30,7 @@
     <body class="sapUiBody" role="application">
         <div id="content">
             <!-- Loading splash screen -->
-            <div id="busyIndicator" style="text-align: center; font-family: Sans, Arial">
+            <div id="busyIndicator">
                 <!-- static header text -->
                 <h3>My UI5 App is loading</h3>
                 
