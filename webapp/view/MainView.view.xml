@@ -7,7 +7,7 @@
   <tnt:ToolPage id="toolPage">
     <tnt:header>
       <tnt:ToolHeader>
-        <Image src="resources/img/favicon.ico" lazyLoading="true" height="48px" width="48px">
+        <Image src="resources/img/favicon.webp" lazyLoading="true" height="48px" width="48px">
           <layoutData>
             <OverflowToolbarLayoutData priority="Disappear" />
           </layoutData>

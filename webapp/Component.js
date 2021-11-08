@@ -1,10 +1,6 @@
 sap.ui.define(
-    [
-        "sap/ui/core/UIComponent",
-        "sap/ui/Device",
-        "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/model/models",
-    ],
-    function (UIComponent, Device, models) {
+    ["sap/ui/core/UIComponent", "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/model/models"],
+    function (UIComponent, models) {
         "use strict";
 
         return UIComponent.extend("com.devtoberfest.devtoberfest2021FrontendCodingChallenge.Component", {
