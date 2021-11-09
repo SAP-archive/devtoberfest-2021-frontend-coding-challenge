@@ -7,9 +7,9 @@
   <tnt:ToolPage id="toolPage">
     <tnt:header>
 
-      <tnt:ToolHeader id="toolHeader2">
+      <tnt:ToolHeader id="toolHeader0">
         <Image id="image0"
-          src="resources/img/favicon.ico">
+          src="images/favicon.ico">
           <layoutData>
             <OverflowToolbarLayoutData id="overflowToolbarLayoutData0"
               priority="Disappear" />
