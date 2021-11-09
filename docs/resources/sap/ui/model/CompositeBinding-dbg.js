@@ -1,34 +1,24 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides an abstract property binding.
 sap.ui.define([
-	'sap/ui/base/DataType',
-	'./BindingMode',
-	'./ChangeReason',
-	'./PropertyBinding',
-	'./CompositeType',
-	'./CompositeDataState',
-	"sap/ui/base/SyncPromise",
-	"sap/base/util/deepEqual",
+	"./BindingMode",
+	"./ChangeReason",
+	"./CompositeDataState",
+	"./CompositeType",
+	"./Context",
+	"./PropertyBinding",
 	"sap/base/assert",
-	"sap/base/Log"
-],
-	function(
-		DataType,
-		BindingMode,
-		ChangeReason,
-		PropertyBinding,
-		CompositeType,
-		CompositeDataState,
-		SyncPromise,
-		deepEqual,
-		assert,
-		Log
-	) {
+	"sap/base/Log",
+	"sap/base/util/deepEqual",
+	"sap/ui/base/DataType",
+	"sap/ui/base/SyncPromise"
+], function(BindingMode, ChangeReason, CompositeDataState, CompositeType, Context, PropertyBinding,
+		assert, Log, deepEqual, DataType, SyncPromise) {
 	"use strict";
 
 
@@ -70,12 +60,20 @@ sap.ui.define([
 	var CompositeBinding = PropertyBinding.extend("sap.ui.model.CompositeBinding", /** @lends sap.ui.model.CompositeBinding.prototype */ {
 
 		constructor : function (aBindings, bRawValues, bInternalValues) {
+			var oModel;
+
 			PropertyBinding.apply(this, [null,""]);
 			this.aBindings = aBindings;
 			this.aValues = null;
 			this.bRawValues = bRawValues;
 			this.bPreventUpdate = false;
 			this.bInternalValues = bInternalValues;
+			this.bMultipleModels = this.aBindings.some(function (oBinding) {
+				var oCurrentModel = oBinding.getModel();
+
+				oModel = oModel || oCurrentModel;
+				return oModel && oCurrentModel && oCurrentModel !== oModel;
+			});
 		},
 		metadata : {
 
@@ -87,10 +85,10 @@ sap.ui.define([
 	});
 
 	CompositeBinding.prototype.destroy = function() {
-		PropertyBinding.prototype.destroy.apply(this);
 		this.aBindings.forEach(function(oBinding) {
 			oBinding.destroy();
 		});
+		PropertyBinding.prototype.destroy.apply(this);
 	};
 
 	CompositeBinding.prototype.getPath = function() {
@@ -124,6 +122,8 @@ sap.ui.define([
 	 * @public
 	 */
 	CompositeBinding.prototype.setType = function(oType, sInternalType) {
+		var that = this;
+
 		if (oType && !(oType instanceof CompositeType)) {
 			throw new Error("Only CompositeType can be used as type for composite bindings!");
 		}
@@ -131,6 +131,15 @@ sap.ui.define([
 
 		// If a composite type is used, the type decides whether to use raw values or not
 		if (this.oType) {
+			oType.getPartsIgnoringMessages().forEach(function (i) {
+				var oBinding = that.aBindings[i];
+
+				if (oBinding && oBinding.supportsIgnoreMessages()
+						&& oBinding.getIgnoreMessages() === undefined) {
+					oBinding.setIgnoreMessages(true);
+				}
+			});
+
 			this.bRawValues = this.oType.getUseRawValues();
 			this.bInternalValues = this.oType.getUseInternalValues();
 
@@ -141,16 +150,47 @@ sap.ui.define([
 	};
 
 	/**
-	 * sets the context for each property binding in this composite binding
-	 * @param {object} oContext the new context for the bindings
+	 * Sets the context for the property bindings of this composite binding which are either checked
+	 * thruthy via <code>mParameters.fnIsBindingRelevant</code> or whose model is the given
+	 * context's model.
+	 *
+	 * @param {sap.ui.model.Context} oContext
+	 *   The new context for the bindings
+	 * @param {Object<string,any>} [mParameters]
+	 *   Additional map of binding specific parameters
+	 * @param {function} [mParameters.fnIsBindingRelevant]
+	 *   A callback function that checks whether the given context needs to be propagated to a
+	 *   property binding of this composite binding. It gets the index of a property binding as
+	 *   parameter and returns whether the given context needs to be propagated to that property
+	 *   binding.
 	 */
-	CompositeBinding.prototype.setContext = function(oContext) {
-		this.aBindings.forEach(function(oBinding) {
-			// null context could also be set
-			if (!oContext || oBinding.updateRequired(oContext.getModel())) {
+	CompositeBinding.prototype.setContext = function (oContext, mParameters) {
+		var bCheckUpdate, bForceUpdate,
+			aBindings = this.aBindings,
+			oModel = oContext && oContext.getModel(),
+			fnIsBindingRelevant = mParameters && mParameters.fnIsBindingRelevant
+				? mParameters.fnIsBindingRelevant
+				: function (i) {
+					// check if oModel is given since a context's model may have been destroyed
+					return !oContext || oModel && oModel === aBindings[i].getModel();
+				};
+
+		aBindings.forEach(function (oBinding, i) {
+			var oBindingContext;
+
+			if (fnIsBindingRelevant(i)) {
+				oBindingContext = oBinding.getContext();
+				bCheckUpdate = bCheckUpdate
+					|| oBinding.isRelative() && Context.hasChanged(oBindingContext, oContext);
+				bForceUpdate = bForceUpdate || (bCheckUpdate && oBindingContext !== oContext);
+
 				oBinding.setContext(oContext);
 			}
 		});
+
+		if (bCheckUpdate) {
+			this.checkUpdate(bForceUpdate && this.getDataState().getControlMessages().length);
+		}
 	};
 
 	/**
@@ -240,6 +280,9 @@ sap.ui.define([
 	 * nested binding, except for undefined values in the array.
 	 *
 	 * @param {object} oValue the value to set for this binding
+	 * @return {undefined|Promise} a promise in case of asynchronous type parsing or validation
+	 * @throws sap.ui.model.ParseException
+	 * @throws sap.ui.model.ValidateException
 	 *
 	 * @public
 	 */
@@ -768,6 +811,17 @@ sap.ui.define([
 		if (this.bPreventUpdate || (this.bSuspended && !bForceUpdate)) {
 			return;
 		}
+		// do not fire change event in case the destruction of the model for one part leads to the
+		// update of a model for another part of this binding
+		if (this.bMultipleModels
+			&& this.aBindings.some(function (oBinding) {
+				var oModel = oBinding.getModel();
+
+				return oModel && oModel.bDestroyed;
+			})) {
+			return;
+		}
+
 		var oDataState = this.getDataState();
 		var aOriginalValues = this.getOriginalValue();
 		if (bForceUpdate || !deepEqual(aOriginalValues, this.aOriginalValues)) {
