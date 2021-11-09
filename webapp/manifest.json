@@ -37,13 +37,15 @@
         "rootView": {
             "viewName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view.MainView",
             "type": "XML",
-            "id": "idAppControl"
+            "id": "idAppControl",
+            "async": true
         },
         "dependencies": {
             "minUI5Version": "1.60.0",
             "libs": {
                 "sap.ui.core": {},
                 "sap.m": {},
+                "sap.tnt": {},
                 "sap.ui.layout": {}
             }
         },
@@ -60,7 +62,8 @@
             },
             "sample": {
                 "type": "sap.ui.model.json.JSONModel",
-                "dataSource": "dataSource"
+                "dataSource": "dataSource",
+                "preload": true
             }
         },
         "resources": {
@@ -76,7 +79,8 @@
                 "viewType": "XML",
                 "viewPath": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view",
                 "controlId": "idAppControl",
-                "controlAggregation": "pages"
+                "controlAggregation": "pages",
+                "async": true
             },
             "routes": [
                 {
@@ -90,7 +94,8 @@
                     "viewType": "XML",
                     "viewLevel": 1,
                     "viewId": "idAppControl",
-                    "viewName": "MainView"
+                    "viewName": "MainView",
+                    "async": true
                 }
             }
         }
