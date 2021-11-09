@@ -34,7 +34,6 @@
     },
     "library": {
       "i18n": {
-        "bundleUrl": "messagebundle.properties",
         "supportedLocales": [
           "",
           "ar",
