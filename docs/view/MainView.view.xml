@@ -1,13 +1,10 @@
 <mvc:View controllerName="com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.MainView" displayBlock="true"
   xmlns="sap.m"
-  xmlns:f="sap.f"
   xmlns:tnt="sap.tnt"
   xmlns:core="sap.ui.core"
   xmlns:mvc="sap.ui.core.mvc">
-  <!-- xmlns:aow="aow.artifact.control" -->
   <tnt:ToolPage id="toolPage">
     <tnt:header>
-
       <tnt:ToolHeader>
         <Image src="resources/img/favicon.ico">
           <layoutData>
@@ -32,9 +29,9 @@
         <List id="all-list" items="{sample>/}">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
-              <Title id="all-bar-info" text="{i18n>SAP BTP Services}" level="H4" />
+              <Title id="all-bar-info" text="{i18n>subheader}" level="H4" />
               <ToolbarSpacer id="all-bar-spacer" />
-              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>Search for the name or description}" liveChange=".liveSearch" />
+              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>barSearchTitle}" liveChange=".liveSearch" />
             </OverflowToolbar>
           </headerToolbar>
           <StandardListItem title="{sample>name}" description="{sample>description}" infoState="Information" icon="{sample>icon}" info="{sample>category}" />
