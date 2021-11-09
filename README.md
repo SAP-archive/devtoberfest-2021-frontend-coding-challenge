@@ -126,3 +126,4 @@ Copyright (c) 2021 SAP SE or an SAP affiliate company. All rights reserved. This
 [reuse-url]: https://api.reuse.software/info/github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge
 [vscode-image]: https://open.vscode.dev/badges/open-in-vscode.svg
 [vscode-url]: https://open.vscode.dev/SAP-samples/devtoberfest-2021-frontend-coding-challenge/
+
