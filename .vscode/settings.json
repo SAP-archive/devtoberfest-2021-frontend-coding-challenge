@@ -1,3 +1,4 @@
 {
-    "actions": []
+    "actions": [],
+    "npm-scripts.showStartNotification": false
 }
