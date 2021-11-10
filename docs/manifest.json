@@ -69,7 +69,8 @@
             },
             "sample": {
                 "type": "sap.ui.model.json.JSONModel",
-                "dataSource": "dataSource"
+                "dataSource": "dataSource",
+                "preload": true
             }
         },
         "resources": {
