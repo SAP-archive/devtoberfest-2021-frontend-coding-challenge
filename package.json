@@ -5,9 +5,11 @@
     "author": "SAP SE",
     "license": "Apache-2.0",
     "scripts": {
-        "start": "ui5 serve --open index.html",
-        "serve": "ui5 serve",
-        "build": "ui5 build --clean-dest --dest docs self-contained --all ",
+        "start": "ui5 serve --h2 --open index.html",
+        "serve": "ui5 serve --h2",
+        "serve:dist": "ui5 serve --h2 --config ui5-dist.yaml ",
+        "build": "ui5 build --clean-dest --dest dist self-contained --all ",
+        "build:refresh": "ui5 build --dest dist self-contained --all ",
         "prettier": "prettier -w .",
         "test": "run-s karma",
         "karma": "run-s clearCoverage karma-ci",
@@ -15,7 +17,7 @@
         "karma-ci": "karma start karma-ci.conf.js"
     },
     "devDependencies": {
-        "@ui5/cli": "^2.14.0",
+        "@ui5/cli": "^2.12",
         "karma": "^6.3.4",
         "karma-chrome-launcher": "^3.1.0",
         "karma-coverage": "^2.0.3",
