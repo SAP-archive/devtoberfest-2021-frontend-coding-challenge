@@ -37,8 +37,7 @@
         "rootView": {
             "viewName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view.MainView",
             "type": "XML",
-            "id": "idAppControl",
-            "async": true
+            "id": "idAppControl"
         },
         "dependencies": {
             "minUI5Version": "1.60.0",

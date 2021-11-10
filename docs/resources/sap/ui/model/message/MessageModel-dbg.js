@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -22,12 +22,14 @@ sap.ui.define(['sap/ui/model/BindingMode', 'sap/ui/model/ClientModel', 'sap/ui/m
 	 * Constructor for a new JSONModel.
 	 *
 	 * @class
-	 * Model implementation for Messages
+	 * Model implementation for Messages.
+	 *
+	 * This model is not prepared to be inherited from.
 	 *
 	 * @extends sap.ui.model.ClientModel
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.95.0
 	 *
 	 * @param {sap.ui.core.message.MessageManager} oMessageManager The MessageManager instance
 	 * @public
