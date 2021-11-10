@@ -1,0 +1,63 @@
+<mvc:View controllerName="com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.MainView"
+  displayBlock="true" xmlns="sap.m" xmlns:core="sap.ui.core"
+  xmlns:mvc="sap.ui.core.mvc">
+  <!-- xmlns:aow="aow.artifact.control" -->
+  <App>
+  <Page id="toolPage">
+    <customHeader>
+      
+      <Toolbar>
+      
+        <Image src="/resources/img/favicon.ico" height="48px" width="48px" >
+          <layoutData>
+            <OverflowToolbarLayoutData priority="Disappear" />
+          </layoutData>
+        </Image>
+        <Text text="{i18n>title}" wrapping="false">
+          <layoutData>
+            <OverflowToolbarLayoutData priority="NeverOverflow" />
+          </layoutData>
+        </Text>
+
+        <ToolbarSpacer />
+        
+        <Image src="/resources/img/github.png" height="22px" width="22px" press="goToRepo" />
+        <Link text="{i18n>forkMe}" target="_blank"
+          href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge"
+          visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }" class="sapUiMediumMarginEnd" />
+        <core:Icon id="barDarkIcon" visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }"
+          src="sap-icon://energy-saving-lightbulb" color="{= !${settings>/lightTheme} ? '#f9d001' : ''}"
+          tooltip="{i18n>dark}" />
+        <Switch id="barThemeSwitch" visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }"
+          state="{settings>/lightTheme}" customTextOff="{i18n>dark}" customTextOn="{i18n>light}" change="onToggleTheme"
+          tooltip="{= ${settings>/lightTheme} ? ${i18n>dark} : ${i18n>light} }" />
+        <core:Icon id="barLightIcon" visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }"
+          src="sap-icon://circle-task-2" color="{= ${settings>/lightTheme} ? '#f9d001' : ''}" tooltip="{i18n>light}"
+          class="sapUiMediumMarginEnd" />
+      </Toolbar>
+    </customHeader>
+
+<!-- MessageStrip bad for perf-->
+    <VBox class="sapUiSmallMargin">
+        <Text text="{i18n>performanceNote}" />
+        <Link text="{i18n>performanceNoteLink}" target="_blank"
+            href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge" />
+    </VBox>
+
+
+        <List id="all-list" items="{sample>/}" growing="true" growingThreshold="20">
+          <headerToolbar>
+            <OverflowToolbar id="all-list-bar">
+              <Title id="all-bar-info" text="{i18n>SAP_BTP_Services}" level="H4" />
+              <ToolbarSpacer id="all-bar-spacer" />
+              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>searchHint}"
+                liveChange=".liveSearch" />
+            </OverflowToolbar>
+          </headerToolbar>
+          <StandardListItem title="{sample>name}" description="{sample>description}" infoState="Information"
+            icon="{sample>icon}" info="{sample>category}" iconDensityAware="false" />
+        </List>
+
+  </Page>
+  </App>
+</mvc:View>
