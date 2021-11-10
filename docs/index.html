@@ -3,12 +3,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="resources/img/favicon.ico" rel="shortcut icon" type="image/x-icon">
 
+        <link id="animation" rel="stylesheet" type="text/css" href="css/progress-indicator.css">
+
         <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
 
         <script id="sap-ui-bootstrap" src="resources/sap-ui-custom.js" data-sap-ui-async="true" data-sap-ui-theme="sap_fiori_3" data-sap-ui-resourceroots="{
         &quot;com.devtoberfest.devtoberfest2021FrontendCodingChallenge&quot;: &quot;./&quot;
       }" data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatversion="edge" data-sap-ui-preload="async" data-sap-ui-frameoptions="trusted"></script>
-
 
         <script>
             sap.ui.getCore().attachInit(function () {
@@ -20,6 +21,9 @@
                             manifest: true,
                             height: "100%",
                         }).placeAt("content");
+                        
+                        let stylesheet = document.getElementById("animation");
+                        stylesheet.parentNode.removeChild(stylesheet);
                     }
                 );
             });
@@ -27,7 +31,21 @@
     </head>
 
     <body class="sapUiBody" role="application">
-        <div id="content"></div>
+        <div id="content">
+            <div id="busyIndicator" style="text-align: center; font-family: Sans, Arial">
+                <h3>Loading.../h3&gt;
+                
+                <img src="resources/img/sapui5-logo.png" height="227px" width="551px" class="logo">
+                <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                </div>
+
+                <center><h5>Loading...</h5></center>
+            </h3></div>
+        </div>
     
 
 </body></html>
