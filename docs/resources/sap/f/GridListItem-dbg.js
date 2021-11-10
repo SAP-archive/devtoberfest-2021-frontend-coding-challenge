@@ -1,16 +1,13 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 	"sap/m/ListItemBase",
 	"./GridListItemRenderer"
-], function (
-	ListItemBase,
-	GridListItemRenderer
-) {
+], function (ListItemBase) {
 	"use strict";
 
 	/**
@@ -27,7 +24,7 @@ sap.ui.define([
 	 * @extends sap.m.ListItemBase
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.95.0
 	 *
 	 * @since 1.70
 	 * @constructor
@@ -55,7 +52,7 @@ sap.ui.define([
 	 * @override
 	 */
 	GridListItem.prototype.getContentAnnouncement = function() {
-		return this.getContent().map(function(oContent) {
+		return this.getContent().map(function (oContent) {
 			return ListItemBase.getAccessibilityText(oContent);
 		}).join(" ").trim();
 	};

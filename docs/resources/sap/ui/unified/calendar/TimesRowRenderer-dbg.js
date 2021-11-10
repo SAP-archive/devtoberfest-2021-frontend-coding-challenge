@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -126,7 +126,7 @@ sap.ui.define(['sap/ui/unified/calendar/CalendarUtils', 'sap/ui/core/date/Univer
 			sDay = oFormatDate.format(oItemDate, true);
 			if (aDayIntervals.length > 0 && aDayIntervals[aDayIntervals.length - 1].sDay == sDay) {
 				aDayIntervals[aDayIntervals.length - 1].iItems++;
-			}else {
+			} else  {
 				aDayIntervals.push({sDay: sDay, iItems: 1});
 			}
 			oItemDate.setUTCMinutes(oItemDate.getUTCMinutes() + iMinutes);
@@ -274,6 +274,17 @@ sap.ui.define(['sap/ui/unified/calendar/CalendarUtils', 'sap/ui/core/date/Univer
 
 		oRm.accessibilityState(null, mAccProps);
 		oRm.openEnd();
+
+		if (oType && oType.type != CalendarDayType.None){ //if there's a special date, render it
+			oRm.openStart("div");
+			oRm.class("sapUiCalSpecialDate");
+			if (oType.color) { // if there's a custom color, render it
+				oRm.style("background-color", oType.color);
+			}
+			oRm.openEnd(); // div
+			oRm.close("div");
+		}
+
 		oRm.openStart("span");
 		oRm.class("sapUiCalItemText");
 		oRm.openEnd();

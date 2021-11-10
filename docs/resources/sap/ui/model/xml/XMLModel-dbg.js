@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -40,12 +40,14 @@ sap.ui.define([
 	 * Constructor for a new XMLModel.
 	 *
 	 * @class
-	 * Model implementation for XML format
+	 * Model implementation for the XML format.
+	 *
+	 * This model is not prepared to be inherited from.
 	 *
 	 * @extends sap.ui.model.ClientModel
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.95.0
 	 *
 	 * @param {object} oData either the URL where to load the XML from or an XML
 	 * @public
@@ -116,7 +118,10 @@ sap.ui.define([
 	 *
 	 * @param {string} sURL A string containing the URL to which the request is sent
 	 * @param {object | string} [oParameters] A map of parameters or a single parameter string that is sent to the server with the request
-	 * @param {boolean} [bAsync=true] Whether the request should be asynchronous or not
+	 * @param {boolean} [bAsync=true] By default, all requests are sent asynchronous.
+	 * <b>Do not use <code>bAsync=false</code></b> because synchronous requests may temporarily lock
+	 * the browser, disabling any actions while the request is active. Cross-domain requests do not
+	 * support synchronous operation.
 	 * @param {string} [sType=GET] HTTP method of request
 	 * @param {string} [bCache=false] Force no caching if false
 	 * @param {object} [mHeaders] An object of additional header key/value pairs to send along with the request
@@ -336,16 +341,7 @@ sap.ui.define([
 		}
 		var sNameSpace = this._getNameSpace(sName),
 			sLocalName = this._getLocalName(sName);
-		if (oNode.getAttributeNS) {
-			return oNode.getAttributeNS(sNameSpace, sLocalName);
-		} else { // IE8
-			if (!this.oDocNSPrefixes) {
-				this.oDocNSPrefixes = this._getDocNSPrefixes();
-			}
-			var sPrefix = this.oDocNSPrefixes[sNameSpace];
-			sName = (sPrefix ? sPrefix + ":" : "") + sLocalName;
-			return oNode.getAttribute(sName);
-		}
+		return oNode.getAttributeNS(sNameSpace, sLocalName);
 	};
 
 	/**

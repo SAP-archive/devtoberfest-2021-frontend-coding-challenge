@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -240,6 +240,7 @@ sap.ui.define(["sap/base/util/each"],
 					// for compatibility reasons (OData Tree Binding)
 					return undefined;
 				},
+				detachSelectionChanged: function() {}, // for compatibility
 				clearSelection: function () {
 					that._oSelection.clearSelection();
 				},
