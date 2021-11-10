@@ -44,7 +44,7 @@
             </OverflowToolbar>
           </headerToolbar>
           <StandardListItem title="{sample>name}" description="{sample>description}" infoState="Information"
-            icon="{sample>icon}" info="{sample>category}" />
+            icon="{sample>icon}" iconDensityAware="false" info="{sample>category}" />
         </List>
       </ScrollContainer>
     </tnt:mainContents>
