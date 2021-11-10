@@ -18,7 +18,7 @@ framework:
         - name: themelib_sap_fiori_3
 server:
     customMiddleware:
-        - name: fiori-tools-appreload
+        - name: ui5-middleware-livereload
           afterMiddleware: compression
           configuration:
               port: 35729
