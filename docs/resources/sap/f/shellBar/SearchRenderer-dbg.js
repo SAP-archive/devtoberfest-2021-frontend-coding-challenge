@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -21,8 +21,7 @@ sap.ui.define([],
 				oCancelButton = oSearch._getCancelButton(),
 				oSearchButton = oSearch._getSearchButton(),
 				bIsOpen = oSearch.getIsOpen(),
-				bPhoneMode = oSearch.getPhoneMode(),
-				iSearchWidth = oSearch.getWidth();
+				bPhoneMode = oSearch.getPhoneMode();
 
 			oRm.openStart("div", oSearch);
 			if (bIsOpen) {
@@ -31,19 +30,20 @@ sap.ui.define([],
 			if (bPhoneMode) {
 				oRm.class("sapFShellBarSearchFullWidth");
 			}
-			if (iSearchWidth && bIsOpen && !bPhoneMode) {
-				oRm.style("width", iSearchWidth);
-			}
 			oRm.openEnd();
 
-			if (bIsOpen) {
-				oRm.renderControl(oSearchField);
-			}
-			oRm.renderControl(oSearchButton);
-			if (bIsOpen && bPhoneMode) {
-				oRm.renderControl(oCancelButton);
-			}
+			oRm.openStart("div");
+			oRm.class("sapFShellBarSearchWrap");
+			oRm.openEnd();
 
+				if (bIsOpen) {
+					oRm.renderControl(oSearchField);
+				}
+				oRm.renderControl(oSearchButton);
+				if (bIsOpen) {
+					oRm.renderControl(oCancelButton);
+				}
+			oRm.close("div");
 			oRm.close("div");
 		};
 
