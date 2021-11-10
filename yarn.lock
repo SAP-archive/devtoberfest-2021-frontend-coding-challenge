@@ -227,6 +227,71 @@
     "@nodelib/fs.scandir" "2.1.5"
     "fastq" "^1.6.0"
 
+"@sap/di.code-validation.core@1.0.13":
+  "integrity" "sha512-YdSJsyYGeSLVcmsFZYSW3ZfitaYGKygjTrwMxt3x8lRGmGb8gEMlQ8bsWKvoSF8M1D/aDzbKdBBxA5yk++Norw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@sap/di.code-validation.core/-/di.code-validation.core-1.0.13.tgz"
+  "version" "1.0.13"
+  dependencies:
+    "optionator" "0.8.1"
+
+"@sap/di.code-validation.js@1.1.9":
+  "integrity" "sha512-yakrYGw0tth9pWoYz/COZ8lWRBCwhM4gOUrkHq2BqKYs7aFVqrDj+P+fiV8mzfKEOc4E3p/oLELqmW5iikYElA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@sap/di.code-validation.js/-/di.code-validation.js-1.1.9.tgz"
+  "version" "1.1.9"
+  dependencies:
+    "@sap/di.code-validation.core" "1.0.13"
+    "eslint" "4.0.0"
+    "grunt" "1.0.4"
+    "grunt-mkdir" "1.0.0"
+
+"@sap/di.code-validation.json@1.0.10":
+  "integrity" "sha512-vJlhlS051Lzkf6mEy7iBfm3U8dtJesK8BQjTy9BTlvwF4MUIpQqLIVjn1prSEoFhaFqbnspwtIsgv0wpNoSVvg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@sap/di.code-validation.json/-/di.code-validation.json-1.0.10.tgz"
+  "version" "1.0.10"
+  dependencies:
+    "amdefine" "1.0.0"
+    "q" "1.5.1"
+    "vscode-json-languageservice" "3.0.4"
+    "vscode-languageserver-protocol" "3.5.0"
+
+"@sap/di.code-validation.xml@1.1.20":
+  "integrity" "sha512-YhiKPaDb0hTRPVkSoMeV1nb+45QpsWiZ3aIKOI7y0ROglndFD2kodw1K69UwMFgl5Bw3YFR831afqr4vi3Atkw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@sap/di.code-validation.xml/-/di.code-validation.xml-1.1.20.tgz"
+  "version" "1.1.20"
+  dependencies:
+    "@sap/di.code-validation.core" "1.0.13"
+    "amdefine" "1.0.0"
+    "fontoxpath" "2.7.9"
+    "sax" "1.2.4"
+    "xmldom" "0.1.27"
+
+"@sap/ui5-builder-webide-extension@1.0.x":
+  "integrity" "sha512-IF7RvUkeXNggM5qDyEtZ9P1tHbmPJ+AAyprCGF6Y3BEBq48D50076NRx6ZjCSipjx/lgnagulvsGHbwtAA3whg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@sap/ui5-builder-webide-extension/-/ui5-builder-webide-extension-1.0.14.tgz"
+  "version" "1.0.14"
+  dependencies:
+    "@sap/di.code-validation.core" "1.0.13"
+    "@sap/di.code-validation.js" "1.1.9"
+    "@sap/di.code-validation.json" "1.0.10"
+    "@sap/di.code-validation.xml" "1.1.20"
+    "@ui5/fs" "1.0.2"
+    "js-yaml" "3.13.1"
+    "lodash" "4.17.15"
+
+"@sap/ux-ui5-tooling@1":
+  "integrity" "sha512-qOSApaP3yJBLWe0ysRtVH2HYcLiVcH4W6gZcgmQSaSehZHcA+NBoAyjsc1e7mlCXy2LTQjJKlA7mL0MuDM3uvg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@sap/ux-ui5-tooling/-/ux-ui5-tooling-1.4.0.tgz"
+  "version" "1.4.0"
+  dependencies:
+    "@ui5/fs" "^2.0.6"
+    "async-retry" "1.3.1"
+    "express" "4.17.1"
+    "livereload" "0.9.1"
+    "lodash" "4.17.21"
+    "update-notifier-webpack" "5.0.1"
+  optionalDependencies:
+    "keytar" "7.7.0"
+
 "@sindresorhus/is@^0.14.0":
   "integrity" "sha512-9NET910DNaIPngYnLLPeg+Ogzqsi9uM4mSboU5y6p8S5DzMTVEsJZrawi+BoDNUVBa2DhJqQYUFvMDfgU062LQ=="
   "resolved" "https://registry.npmjs.org/@sindresorhus/is/-/is-0.14.0.tgz"
@@ -254,7 +319,20 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@types/cors/-/cors-2.8.12.tgz"
   "version" "2.8.12"
 
-"@types/node@>=10.0.0":
+"@types/glob@^7.1.1":
+  "integrity" "sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@types/glob/-/glob-7.2.0.tgz"
+  "version" "7.2.0"
+  dependencies:
+    "@types/minimatch" "*"
+    "@types/node" "*"
+
+"@types/minimatch@*":
+  "integrity" "sha512-Klz949h02Gz2uZCMGwDUSDS1YBlTdDDgbWHi+81l29tQALUtvz4rAYi5uoVhE5Lagoq6DeqAUlbrHvW/mXDgdQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@types/minimatch/-/minimatch-3.0.5.tgz"
+  "version" "3.0.5"
+
+"@types/node@*", "@types/node@>=10.0.0":
   "integrity" "sha512-S63Dlv4zIPb8x6MMTgDq5WWRJQe56iBEY0O3SOFA9JrRienkOVDXSXBjjJw6HTNQYSE2JI6GMCR6LVbIMHJVvA=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@types/node/-/node-16.7.10.tgz"
   "version" "16.7.10"
@@ -309,6 +387,23 @@
     "update-notifier" "^5.1.0"
     "yargs" "^16.2.0"
 
+"@ui5/fs@^1.1.2":
+  "integrity" "sha512-WKoHz5IA10jr2rl2BrmJG7RtEnkpLqkQX84phBT+7onX9I+Yv72MspHZCQbHpGoaJxt6G3TavggchZ7FKroGEw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@ui5/fs/-/fs-1.1.2.tgz"
+  "version" "1.1.2"
+  dependencies:
+    "@ui5/logger" "^1.0.1"
+    "clone" "^2.1.0"
+    "globby" "^10.0.0"
+    "graceful-fs" "^4.2.0"
+    "make-dir" "^3.0.0"
+    "micromatch" "^4.0.2"
+    "minimatch" "^3.0.3"
+    "mock-require" "^3.0.3"
+    "pretty-hrtime" "^1.0.3"
+    "random-int" "^2.0.0"
+    "slash" "^3.0.0"
+
 "@ui5/fs@^2.0.6":
   "integrity" "sha512-dBugwsHP7F7IrfVAaqf7FSDhknK6RhrLOpgkp7FmL/WRA02Q3FQzroFJc7CZEP4bOnAvWC3TpghOfHV2/RqR3A=="
   "resolved" "https://registry.npmjs.org/@ui5/fs/-/fs-2.0.6.tgz"
@@ -324,7 +419,31 @@
     "pretty-hrtime" "^1.0.3"
     "random-int" "^2.0.1"
 
-"@ui5/logger@^2.0.1":
+"@ui5/fs@1.0.2":
+  "integrity" "sha512-8Fc4iqpo/sm2KMGV0MiesqWPoCVDf9OnWVWqdoJ0c7GwAh6olt2EDPtnjtQ0tLMW2Uovdh/Nz+S1qecY0Yb1GA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@ui5/fs/-/fs-1.0.2.tgz"
+  "version" "1.0.2"
+  dependencies:
+    "@ui5/logger" "^1.0.1"
+    "clone" "^2.1.0"
+    "dir-glob" "2.0.0"
+    "globby" "^7.1.1"
+    "graceful-fs" "^4.1.15"
+    "make-dir" "^2.1.0"
+    "micromatch" "^3.1.4"
+    "minimatch" "^3.0.3"
+    "mock-require" "^3.0.3"
+    "pretty-hrtime" "^1.0.3"
+    "random-int" "^1.0.0"
+
+"@ui5/logger@^1.0.1":
+  "integrity" "sha512-k49q5D7EBk4vGzpM81KDNyGL4YaB12v8qYNqR7/5f4xoAksotf7h3VeAjCmJFSttEOnC9LNb9GYTzJAWJoCv7w=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/@ui5/logger/-/logger-1.0.2.tgz"
+  "version" "1.0.2"
+  dependencies:
+    "npmlog" "^4.1.2"
+
+"@ui5/logger@^2.0.0", "@ui5/logger@^2.0.1":
   "integrity" "sha512-FU5moQF9HATZEIJVQxXWRsUKMveIRJNPSmH3Mptcuc05f6gKu1BWcamDaDHXmMSyoKRounY9Aok94NTQMi7eDw=="
   "resolved" "https://registry.npmjs.org/@ui5/logger/-/logger-2.0.1.tgz"
   "version" "2.0.1"
@@ -409,6 +528,11 @@
     "treeify" "^1.0.1"
     "yesno" "^0.3.1"
 
+"abbrev@1":
+  "integrity" "sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/abbrev/-/abbrev-1.1.1.tgz"
+  "version" "1.1.1"
+
 "accepts@~1.3.4", "accepts@~1.3.5", "accepts@~1.3.7":
   "integrity" "sha512-Il80Qs2WjYlJIBNzNkK6KYqlVMTbZLXgHx2oT0pU/fjRHyEp+PEfEPY0R3WCwAGVOtauxh1hOxNgIf5bv7dQpA=="
   "resolved" "https://registry.npmjs.org/accepts/-/accepts-1.3.7.tgz"
@@ -417,10 +541,27 @@
     "mime-types" "~2.1.24"
     "negotiator" "0.6.2"
 
+"acorn-jsx@^3.0.0":
+  "integrity" "sha1-r9+UiPsezvyDSPb7IvRk4ypYs2s="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/acorn-jsx/-/acorn-jsx-3.0.1.tgz"
+  "version" "3.0.1"
+  dependencies:
+    "acorn" "^3.0.4"
+
 "acorn-jsx@^5.2.0":
   "integrity" "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="
   "resolved" "https://registry.npmjs.org/acorn-jsx/-/acorn-jsx-5.3.2.tgz"
   "version" "5.3.2"
+
+"acorn@^3.0.4":
+  "integrity" "sha1-ReN/s56No/JbruP/U2niu18iAXo="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/acorn/-/acorn-3.3.0.tgz"
+  "version" "3.3.0"
+
+"acorn@^5.5.0":
+  "integrity" "sha512-1D++VG7BhrtvQpNbBzovKNc1FLGGEE/oGe7b9xJm/RFHMBeUaUGpluV9RLjZa47YFdPcDAenEYuq9pQPcMdLJg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/acorn/-/acorn-5.7.4.tgz"
+  "version" "5.7.4"
 
 "acorn@^6.0.0 || ^7.0.0 || ^8.0.0", "acorn@^7.1.1":
   "integrity" "sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A=="
@@ -453,7 +594,12 @@
   "resolved" "https://registry.npmjs.org/ajv-errors/-/ajv-errors-1.0.1.tgz"
   "version" "1.0.1"
 
-"ajv@^6.12.6", "ajv@>=5.0.0":
+"ajv-keywords@^3.0.0":
+  "integrity" "sha512-5p6WTN0DdTGVQk6VjcEju19IgaHudalcfabD7yhDGeA6bcQnmL+CpveLJq/3hvfwd1aof6L386Ougkx6RfyMIQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ajv-keywords/-/ajv-keywords-3.5.2.tgz"
+  "version" "3.5.2"
+
+"ajv@^6.0.1", "ajv@^6.12.6", "ajv@^6.9.1", "ajv@>=5.0.0":
   "integrity" "sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g=="
   "resolved" "https://registry.npmjs.org/ajv/-/ajv-6.12.6.tgz"
   "version" "6.12.6"
@@ -463,17 +609,32 @@
     "json-schema-traverse" "^0.4.1"
     "uri-js" "^4.2.2"
 
+"amdefine@1.0.0":
+  "integrity" "sha1-/RdHRwDLXMnCtwnwvp0jzjwZjDM="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/amdefine/-/amdefine-1.0.0.tgz"
+  "version" "1.0.0"
+
 "ansi-align@^3.0.0":
-  "integrity" "sha512-ZpClVKqXN3RGBmKibdfWzqCY4lnjEuoNzU5T0oEFpfd/z5qJHVarukridD4juLO2FXMiwUQxr9WqQtaYa8XRYw=="
-  "resolved" "https://registry.npmjs.org/ansi-align/-/ansi-align-3.0.0.tgz"
-  "version" "3.0.0"
+  "integrity" "sha512-IOfwwBF5iczOjp/WeY4YxyjqAFMQoZufdQWDd19SEExbVLNXqvpzSJ/M7Za4/sCPmQ0+GRquoA7bGcINcxew6w=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ansi-align/-/ansi-align-3.0.1.tgz"
+  "version" "3.0.1"
   dependencies:
-    "string-width" "^3.0.0"
+    "string-width" "^4.1.0"
+
+"ansi-escapes@^3.0.0":
+  "integrity" "sha512-cBhpre4ma+U0T1oM5fXg7Dy1Jw7zzwv7lt/GoCpr+hDQJoYnKVPLL4dCvSEFMmQurOQvSrwT7SL/DAlhBI97RQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ansi-escapes/-/ansi-escapes-3.2.0.tgz"
+  "version" "3.2.0"
 
 "ansi-regex@^2.0.0":
   "integrity" "sha1-w7M6te42DYbg5ijwRorn7yfWVN8="
   "resolved" "https://registry.npmjs.org/ansi-regex/-/ansi-regex-2.1.1.tgz"
   "version" "2.1.1"
+
+"ansi-regex@^3.0.0":
+  "integrity" "sha1-7QMXwyIGT3lGbAKWa922Bas32Zg="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ansi-regex/-/ansi-regex-3.0.0.tgz"
+  "version" "3.0.0"
 
 "ansi-regex@^4.1.0":
   "integrity" "sha512-1apePfXM1UOSqw0o9IiFAovVz9M5S1Dg+4TrDwfMewQ6p/rmMueb7tWZjQ1rx4Loy1ArBggoqGpfqqdI4rondg=="
@@ -484,6 +645,16 @@
   "integrity" "sha512-bY6fj56OUQ0hU1KjFNDQuJFezqKdrAyFdIevADiqrWHwSlbmBNMHp5ak2f40Pm8JTFyM2mqxkG6ngkHO11f/lg=="
   "resolved" "https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.0.tgz"
   "version" "5.0.0"
+
+"ansi-regex@^5.0.1":
+  "integrity" "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ansi-regex/-/ansi-regex-5.0.1.tgz"
+  "version" "5.0.1"
+
+"ansi-styles@^2.2.1":
+  "integrity" "sha1-tDLdM1i2NM914eRmQ2gkBTPB3b4="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ansi-styles/-/ansi-styles-2.2.1.tgz"
+  "version" "2.2.1"
 
 "ansi-styles@^3.2.1":
   "integrity" "sha512-VT0ZI6kZRdTh8YyJw3SMbYm/u+NqfsAxEpWO0Pf9sq8/e94WxxOpPKx9FR1FlyCtOVDNOQ+8ntlqFxiRc+r5qA=="
@@ -532,6 +703,26 @@
   "resolved" "https://registry.npmjs.org/argparse/-/argparse-2.0.1.tgz"
   "version" "2.0.1"
 
+"arr-diff@^4.0.0":
+  "integrity" "sha1-1kYQdP6/7HHn4VI1dhoyml3HxSA="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/arr-diff/-/arr-diff-4.0.0.tgz"
+  "version" "4.0.0"
+
+"arr-flatten@^1.1.0":
+  "integrity" "sha512-L3hKV5R/p5o81R7O02IGnwpDmkp6E982XhtbuwSe3O4qOtMMMtodicASA1Cny2U+aCXcNpml+m4dPsvsJ3jatg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/arr-flatten/-/arr-flatten-1.1.0.tgz"
+  "version" "1.1.0"
+
+"arr-union@^3.1.0":
+  "integrity" "sha1-45sJrqne+Gao8gbiiK9jkZuuOcQ="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/arr-union/-/arr-union-3.1.0.tgz"
+  "version" "3.1.0"
+
+"array-find-index@^1.0.1":
+  "integrity" "sha1-3wEKoSh+Fku9pvlyOwqWoexBh6E="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/array-find-index/-/array-find-index-1.0.2.tgz"
+  "version" "1.0.2"
+
 "array-flatten@1.1.1":
   "integrity" "sha1-ml9pkFGx5wczKPKgCJaLZOopVdI="
   "resolved" "https://registry.npmjs.org/array-flatten/-/array-flatten-1.1.1.tgz"
@@ -542,10 +733,49 @@
   "resolved" "https://registry.npmjs.org/array-flatten/-/array-flatten-3.0.0.tgz"
   "version" "3.0.0"
 
+"array-union@^1.0.1":
+  "integrity" "sha1-mjRBDk9OPaI96jdb5b5w8kd47Dk="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/array-union/-/array-union-1.0.2.tgz"
+  "version" "1.0.2"
+  dependencies:
+    "array-uniq" "^1.0.1"
+
 "array-union@^2.1.0":
   "integrity" "sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw=="
   "resolved" "https://registry.npmjs.org/array-union/-/array-union-2.1.0.tgz"
   "version" "2.1.0"
+
+"array-uniq@^1.0.1":
+  "integrity" "sha1-r2rId6Jcx/dOBYiUdThY39sk/bY="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/array-uniq/-/array-uniq-1.0.3.tgz"
+  "version" "1.0.3"
+
+"array-unique@^0.3.2":
+  "integrity" "sha1-qJS3XUvE9s1nnvMkSp/Y9Gri1Cg="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/array-unique/-/array-unique-0.3.2.tgz"
+  "version" "0.3.2"
+
+"arrify@^1.0.1":
+  "integrity" "sha1-iYUI2iIm84DfkEcoRWhJwVAaSw0="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/arrify/-/arrify-1.0.1.tgz"
+  "version" "1.0.1"
+
+"assign-symbols@^1.0.0":
+  "integrity" "sha1-WWZ/QfrdTyDMvCu5a41Pf3jsA2c="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/assign-symbols/-/assign-symbols-1.0.0.tgz"
+  "version" "1.0.0"
+
+"async-limiter@~1.0.0":
+  "integrity" "sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/async-limiter/-/async-limiter-1.0.1.tgz"
+  "version" "1.0.1"
+
+"async-retry@1.3.1":
+  "integrity" "sha512-aiieFW/7h3hY0Bq5d+ktDBejxuwR78vRu9hDUdR8rNhSaQ29VzPL4AoIRG7D/c7tdenwOcKvgPM6tIxB3cB6HA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/async-retry/-/async-retry-1.3.1.tgz"
+  "version" "1.3.1"
+  dependencies:
+    "retry" "0.12.0"
 
 "async@^2.6.0":
   "integrity" "sha512-zflvls11DCy+dQWzTW2dzuilv8Z5X/pjfmZOWba6TNIVDm+2UDaJmXSOXlasHKfNBs8oo3M0aT50fDEWfKZjXg=="
@@ -566,20 +796,52 @@
   "resolved" "https://registry.npmjs.org/async/-/async-3.2.1.tgz"
   "version" "3.2.1"
 
+"async@~1.5.2":
+  "integrity" "sha1-7GphrlZIDAw8skHJVhjiCJL5Zyo="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/async/-/async-1.5.2.tgz"
+  "version" "1.5.2"
+
 "atob@^2.1.2":
   "integrity" "sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg=="
   "resolved" "https://registry.npmjs.org/atob/-/atob-2.1.2.tgz"
   "version" "2.1.2"
+
+"babel-code-frame@^6.22.0":
+  "integrity" "sha1-Y/1D99weO7fONZR9uP42mj9Yx0s="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/babel-code-frame/-/babel-code-frame-6.26.0.tgz"
+  "version" "6.26.0"
+  dependencies:
+    "chalk" "^1.1.3"
+    "esutils" "^2.0.2"
+    "js-tokens" "^3.0.2"
 
 "balanced-match@^1.0.0":
   "integrity" "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw=="
   "resolved" "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"
   "version" "1.0.2"
 
+"base@^0.11.1":
+  "integrity" "sha512-5T6P4xPgpp0YDFvSWwEZ4NoE3aM4QBQXDzmVbraCkFj8zHM+mba8SyqB5DbZWyR7mYHo6Y7BdQo3MoA4m0TeQg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/base/-/base-0.11.2.tgz"
+  "version" "0.11.2"
+  dependencies:
+    "cache-base" "^1.0.1"
+    "class-utils" "^0.3.5"
+    "component-emitter" "^1.2.1"
+    "define-property" "^1.0.0"
+    "isobject" "^3.0.1"
+    "mixin-deep" "^1.2.0"
+    "pascalcase" "^0.1.1"
+
 "base64-arraybuffer@0.1.4":
   "integrity" "sha1-mBjHngWbE1X5fgQooBfIOOkLqBI="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/base64-arraybuffer/-/base64-arraybuffer-0.1.4.tgz"
   "version" "0.1.4"
+
+"base64-js@^1.3.1":
+  "integrity" "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/base64-js/-/base64-js-1.5.1.tgz"
+  "version" "1.5.1"
 
 "base64id@~2.0.0", "base64id@2.0.0":
   "integrity" "sha512-lGe34o6EHj9y3Kts9R4ZYs/Gr+6N7MCaMlIFA3F1R2O5/m7K06AxfSeO5530PEERE6/WyEg3lsuyw4GHlPZHog=="
@@ -590,6 +852,15 @@
   "integrity" "sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/binary-extensions/-/binary-extensions-2.2.0.tgz"
   "version" "2.2.0"
+
+"bl@^4.0.3":
+  "integrity" "sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/bl/-/bl-4.1.0.tgz"
+  "version" "4.1.0"
+  dependencies:
+    "buffer" "^5.5.0"
+    "inherits" "^2.0.4"
+    "readable-stream" "^3.4.0"
 
 "bluebird@^3.5.1", "bluebird@^3.5.3", "bluebird@^3.5.5", "bluebird@^3.7.2":
   "integrity" "sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg=="
@@ -617,6 +888,20 @@
   "resolved" "https://registry.npmjs.org/boolbase/-/boolbase-1.0.0.tgz"
   "version" "1.0.0"
 
+"boxen@^4.2.0":
+  "integrity" "sha512-eB4uT9RGzg2odpER62bBwSLvUeGC+WbRjjyyFhGsKnc8wp/m0+hQsMUvUe3H2V0D5vw0nBdO1hCJoZo5mKeuIQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/boxen/-/boxen-4.2.0.tgz"
+  "version" "4.2.0"
+  dependencies:
+    "ansi-align" "^3.0.0"
+    "camelcase" "^5.3.1"
+    "chalk" "^3.0.0"
+    "cli-boxes" "^2.2.0"
+    "string-width" "^4.1.0"
+    "term-size" "^2.1.0"
+    "type-fest" "^0.8.1"
+    "widest-line" "^3.1.0"
+
 "boxen@^5.0.0":
   "integrity" "sha512-49VBlw+PrWEF51aCmy7QIteYPIFZxSpvqBdP/2itCPPlJ49kj9zg/XPRFrdkne2W+CfwXUls8exMvu1RysZpKA=="
   "resolved" "https://registry.npmjs.org/boxen/-/boxen-5.0.1.tgz"
@@ -638,6 +923,22 @@
   dependencies:
     "balanced-match" "^1.0.0"
     "concat-map" "0.0.1"
+
+"braces@^2.3.1":
+  "integrity" "sha512-aNdbnj9P8PjdXU4ybaWLK2IF3jc/EoDYbC7AazW6to3TRsfXxscC9UXOB5iDiEQrkyIbWp2SLQda4+QAa7nc3w=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/braces/-/braces-2.3.2.tgz"
+  "version" "2.3.2"
+  dependencies:
+    "arr-flatten" "^1.1.0"
+    "array-unique" "^0.3.2"
+    "extend-shallow" "^2.0.1"
+    "fill-range" "^4.0.0"
+    "isobject" "^3.0.1"
+    "repeat-element" "^1.1.2"
+    "snapdragon" "^0.8.1"
+    "snapdragon-node" "^2.0.1"
+    "split-string" "^3.0.2"
+    "to-regex" "^3.0.1"
 
 "braces@^3.0.1", "braces@^3.0.2", "braces@~3.0.2":
   "integrity" "sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A=="
@@ -666,6 +967,14 @@
   "integrity" "sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ=="
   "resolved" "https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.2.tgz"
   "version" "1.1.2"
+
+"buffer@^5.5.0":
+  "integrity" "sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/buffer/-/buffer-5.7.1.tgz"
+  "version" "5.7.1"
+  dependencies:
+    "base64-js" "^1.3.1"
+    "ieee754" "^1.1.13"
 
 "builtins@^1.0.3":
   "integrity" "sha1-y5T662HIaWRR2zZTThQi+U8K7og="
@@ -703,6 +1012,21 @@
     "unique-filename" "^1.1.1"
     "y18n" "^4.0.0"
 
+"cache-base@^1.0.1":
+  "integrity" "sha512-AKcdTnFSWATd5/GCPRxr2ChwIJ85CeyrEyjRHlKxQ56d4XJMGym0uAiKn0xbLOGOl3+yRpOTi484dVCEc5AUzQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/cache-base/-/cache-base-1.0.1.tgz"
+  "version" "1.0.1"
+  dependencies:
+    "collection-visit" "^1.0.0"
+    "component-emitter" "^1.2.1"
+    "get-value" "^2.0.6"
+    "has-value" "^1.0.0"
+    "isobject" "^3.0.1"
+    "set-value" "^2.0.0"
+    "to-object-path" "^0.3.0"
+    "union-value" "^1.0.0"
+    "unset-value" "^1.0.0"
+
 "cacheable-request@^6.0.0":
   "integrity" "sha512-Oj3cAGPCqOZX7Rz64Uny2GYAZNliQSqfbePrgAQ1wKAihYmCUnraBtJtKcGR4xz7wF+LoJC+ssFZvv5BgF9Igg=="
   "resolved" "https://registry.npmjs.org/cacheable-request/-/cacheable-request-6.1.0.tgz"
@@ -724,6 +1048,36 @@
     "function-bind" "^1.1.1"
     "get-intrinsic" "^1.0.2"
 
+"caller-path@^0.1.0":
+  "integrity" "sha1-lAhe9jWB7NPaqSREqP6U6CV3dR8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/caller-path/-/caller-path-0.1.0.tgz"
+  "version" "0.1.0"
+  dependencies:
+    "callsites" "^0.2.0"
+
+"callsites@^0.2.0":
+  "integrity" "sha1-r6uWJikQp/M8GaV3WCXGnzTjUMo="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/callsites/-/callsites-0.2.0.tgz"
+  "version" "0.2.0"
+
+"camelcase-keys@^2.0.0":
+  "integrity" "sha1-MIvur/3ygRkFHvodkyITyRuPkuc="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/camelcase-keys/-/camelcase-keys-2.1.0.tgz"
+  "version" "2.1.0"
+  dependencies:
+    "camelcase" "^2.0.0"
+    "map-obj" "^1.0.0"
+
+"camelcase@^2.0.0":
+  "integrity" "sha1-fB0W1nmhu+WcoCys7PsBHiAfWh8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/camelcase/-/camelcase-2.1.1.tgz"
+  "version" "2.1.1"
+
+"camelcase@^5.3.1":
+  "integrity" "sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/camelcase/-/camelcase-5.3.1.tgz"
+  "version" "5.3.1"
+
 "camelcase@^6.2.0":
   "integrity" "sha512-c7wVvbw3f37nuobQNtgsgG9POC9qMbNuMQmTCqZv23b6MIz0fcYpBiOlv9gEN/hdLdnZTDQhg6e9Dq5M1vKvfg=="
   "resolved" "https://registry.npmjs.org/camelcase/-/camelcase-6.2.0.tgz"
@@ -741,7 +1095,18 @@
   dependencies:
     "lodash" "^4.17.15"
 
-"chalk@^2.0.0", "chalk@^2.4.1":
+"chalk@^1.1.3":
+  "integrity" "sha1-qBFcVeSnAv5NFQq9OHKCKn4J/Jg="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/chalk/-/chalk-1.1.3.tgz"
+  "version" "1.1.3"
+  dependencies:
+    "ansi-styles" "^2.2.1"
+    "escape-string-regexp" "^1.0.2"
+    "has-ansi" "^2.0.0"
+    "strip-ansi" "^3.0.0"
+    "supports-color" "^2.0.0"
+
+"chalk@^2.0.0", "chalk@^2.1.0", "chalk@^2.4.1", "chalk@~2.4.1":
   "integrity" "sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ=="
   "resolved" "https://registry.npmjs.org/chalk/-/chalk-2.4.2.tgz"
   "version" "2.4.2"
@@ -750,6 +1115,14 @@
     "escape-string-regexp" "^1.0.5"
     "supports-color" "^5.3.0"
 
+"chalk@^3.0.0":
+  "integrity" "sha512-4D3B6Wf41KOYRFdszmDqMCGq5VV/uMAB273JILmO+3jAlh8X4qDtdtgCR3fxtbLEMzSx22QdhnDcJvu2u1fVwg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/chalk/-/chalk-3.0.0.tgz"
+  "version" "3.0.0"
+  dependencies:
+    "ansi-styles" "^4.1.0"
+    "supports-color" "^7.1.0"
+
 "chalk@^4.1.0", "chalk@^4.1.1", "chalk@^4.1.2":
   "integrity" "sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/chalk/-/chalk-4.1.2.tgz"
@@ -757,6 +1130,11 @@
   dependencies:
     "ansi-styles" "^4.1.0"
     "supports-color" "^7.1.0"
+
+"chardet@^0.4.0":
+  "integrity" "sha1-tUc7M9yXxCTl2Y3IfVXU2KKci/I="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/chardet/-/chardet-0.4.2.tgz"
+  "version" "0.4.2"
 
 "cheerio-select@^1.4.0":
   "integrity" "sha512-qocaHPv5ypefh6YNxvnbABM07KMxExbtbfuJoIie3iZXX1ERwYmJcIiRrr9H05ucQP1k28dav8rpdDgjQd8drg=="
@@ -782,7 +1160,7 @@
     "parse5-htmlparser2-tree-adapter" "^6.0.1"
     "tslib" "^2.2.0"
 
-"chokidar@^3.5.0", "chokidar@^3.5.1":
+"chokidar@^3.3.0", "chokidar@^3.5.0", "chokidar@^3.5.1":
   "integrity" "sha512-ekGhOnNVPgT77r4K/U3GDhu+FQ2S8TnK/s2KbIGXi0SZWuwkZ2QNyfWdZW+TVfn84DpEP7rLeCt2UI6bJ8GwbQ=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/chokidar/-/chokidar-3.5.2.tgz"
   "version" "3.5.2"
@@ -807,9 +1185,41 @@
   "resolved" "https://registry.npmjs.org/ci-info/-/ci-info-2.0.0.tgz"
   "version" "2.0.0"
 
+"circular-json@^0.3.1":
+  "integrity" "sha512-UZK3NBx2Mca+b5LsG7bY183pHWt5Y1xts4P3Pz7ENTwGVnJOUWbRb3ocjvX7hx9tq/yTAdclXm9sZ38gNuem4A=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/circular-json/-/circular-json-0.3.3.tgz"
+  "version" "0.3.3"
+
+"class-utils@^0.3.5":
+  "integrity" "sha512-qOhPa/Fj7s6TY8H8esGu5QNpMMQxz79h+urzrNYN6mn+9BnxlDGf5QZ+XeCDsxSjPqsSR56XOZOJmpeurnLMeg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/class-utils/-/class-utils-0.3.6.tgz"
+  "version" "0.3.6"
+  dependencies:
+    "arr-union" "^3.1.0"
+    "define-property" "^0.2.5"
+    "isobject" "^3.0.0"
+    "static-extend" "^0.1.1"
+
+"cli-boxes@^2.2.0":
+  "integrity" "sha512-y4coMcylgSCdVinjiDBuR8PCC2bLjyGTwEmPb9NHR/QaNU6EUOXcTY/s6VjGMD6ENSEaeQYHCY0GNGS5jfMwPw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/cli-boxes/-/cli-boxes-2.2.1.tgz"
+  "version" "2.2.1"
+
 "cli-boxes@^2.2.1":
   "integrity" "sha512-y4coMcylgSCdVinjiDBuR8PCC2bLjyGTwEmPb9NHR/QaNU6EUOXcTY/s6VjGMD6ENSEaeQYHCY0GNGS5jfMwPw=="
   "resolved" "https://registry.npmjs.org/cli-boxes/-/cli-boxes-2.2.1.tgz"
+  "version" "2.2.1"
+
+"cli-cursor@^2.1.0":
+  "integrity" "sha1-s12sN2R5+sw+lHR9QdDQ9SOP/LU="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/cli-cursor/-/cli-cursor-2.1.0.tgz"
+  "version" "2.1.0"
+  dependencies:
+    "restore-cursor" "^2.0.0"
+
+"cli-width@^2.0.0":
+  "integrity" "sha512-GRMWDxpOB6Dgk2E5Uo+3eEBvtOOlimMmpbFiKuLFnQzYDavtLFY3K5ona41jgN/WdRZtG7utuVSVTL4HbZHGkw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/cli-width/-/cli-width-2.2.1.tgz"
   "version" "2.2.1"
 
 "cliui@^7.0.2":
@@ -837,6 +1247,19 @@
   "integrity" "sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c="
   "resolved" "https://registry.npmjs.org/code-point-at/-/code-point-at-1.1.0.tgz"
   "version" "1.1.0"
+
+"coffeescript@~1.10.0":
+  "integrity" "sha1-56qDAZF+9iGzXYo580jc3R234z4="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/coffeescript/-/coffeescript-1.10.0.tgz"
+  "version" "1.10.0"
+
+"collection-visit@^1.0.0":
+  "integrity" "sha1-S8A3PBZLwykbTTaMgpzxqApZ3KA="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/collection-visit/-/collection-visit-1.0.0.tgz"
+  "version" "1.0.0"
+  dependencies:
+    "map-visit" "^1.0.0"
+    "object-visit" "^1.0.0"
 
 "color-convert@^1.9.0":
   "integrity" "sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg=="
@@ -872,6 +1295,11 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/colors/-/colors-1.4.0.tgz"
   "version" "1.4.0"
 
+"colors@~1.1.2":
+  "integrity" "sha1-FopHAXVran9RoSzgyXv6KMCE7WM="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/colors/-/colors-1.1.2.tgz"
+  "version" "1.1.2"
+
 "command-exists@^1.2.2":
   "integrity" "sha512-LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w=="
   "resolved" "https://registry.npmjs.org/command-exists/-/command-exists-1.2.9.tgz"
@@ -882,7 +1310,7 @@
   "resolved" "https://registry.npmjs.org/commander/-/commander-2.20.3.tgz"
   "version" "2.20.3"
 
-"component-emitter@~1.3.0":
+"component-emitter@^1.2.1", "component-emitter@~1.3.0":
   "integrity" "sha512-Rd3se6QB+sO1TwqZjscQrurpEPIfO0/yYnSin6Q/rD3mOutHvUrCAhJub3r90uNb+SESBuE0QYoB90YdfatsRg=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/component-emitter/-/component-emitter-1.3.0.tgz"
   "version" "1.3.0"
@@ -912,7 +1340,7 @@
   "resolved" "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz"
   "version" "0.0.1"
 
-"concat-stream@^1.5.0":
+"concat-stream@^1.5.0", "concat-stream@^1.6.0":
   "integrity" "sha512-27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw=="
   "resolved" "https://registry.npmjs.org/concat-stream/-/concat-stream-1.6.2.tgz"
   "version" "1.6.2"
@@ -1013,6 +1441,11 @@
     "rimraf" "^2.5.4"
     "run-queue" "^1.0.0"
 
+"copy-descriptor@^0.1.0":
+  "integrity" "sha1-Z29us8OZl8LuGsOpJP1hJHSPV40="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/copy-descriptor/-/copy-descriptor-0.1.1.tgz"
+  "version" "0.1.1"
+
 "core-util-is@~1.0.0":
   "integrity" "sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/core-util-is/-/core-util-is-1.0.3.tgz"
@@ -1067,6 +1500,13 @@
     "source-map" "^0.6.1"
     "source-map-resolve" "^0.6.0"
 
+"currently-unhandled@^0.4.1":
+  "integrity" "sha1-mI3zP+qxke95mmE2nddsF635V+o="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/currently-unhandled/-/currently-unhandled-0.4.1.tgz"
+  "version" "0.4.1"
+  dependencies:
+    "array-find-index" "^1.0.1"
+
 "custom-event@~1.0.0":
   "integrity" "sha1-XQKkaFCt8bSjF5RqOSj8y1v9BCU="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/custom-event/-/custom-event-1.0.1.tgz"
@@ -1101,6 +1541,21 @@
   "integrity" "sha512-eyTcpKOcamdhWJXj56DpQMo1ylSQpcGtGKXcU0Tb97+K56/CF5amAqqqNj0+KvA0iw2ynxtHWFsPDSClCxe48w=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/date-format/-/date-format-3.0.0.tgz"
   "version" "3.0.0"
+
+"dateformat@~1.0.12":
+  "integrity" "sha1-nxJLZ1lMk3/3BpMuSmQsyo27/uk="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/dateformat/-/dateformat-1.0.12.tgz"
+  "version" "1.0.12"
+  dependencies:
+    "get-stdin" "^4.0.1"
+    "meow" "^3.3.0"
+
+"debug@^2.2.0", "debug@^2.3.3", "debug@^2.6.8", "debug@2.6.9":
+  "integrity" "sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA=="
+  "resolved" "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"
+  "version" "2.6.9"
+  dependencies:
+    "ms" "2.0.0"
 
 "debug@^3.1.0":
   "integrity" "sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ=="
@@ -1137,19 +1592,17 @@
   dependencies:
     "ms" "2.1.2"
 
-"debug@2.6.9":
-  "integrity" "sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA=="
-  "resolved" "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"
-  "version" "2.6.9"
-  dependencies:
-    "ms" "2.0.0"
-
 "debug@3.1.0":
   "integrity" "sha512-OX8XqP7/1a9cqkxYw2yXss15f26NKWBpDXQd0/uK/KPqdQhxbPa994hnzjcE2VqQpDslf55723cKPUOGSmMY3g=="
   "resolved" "https://registry.npmjs.org/debug/-/debug-3.1.0.tgz"
   "version" "3.1.0"
   dependencies:
     "ms" "2.0.0"
+
+"decamelize@^1.1.2":
+  "integrity" "sha1-9lNNFRSCabIDUue+4m9QH5oZEpA="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/decamelize/-/decamelize-1.2.0.tgz"
+  "version" "1.2.0"
 
 "decode-uri-component@^0.2.0":
   "integrity" "sha1-6zkTMzRYd1y4TNGh+uBiEGu4dUU="
@@ -1158,15 +1611,27 @@
 
 "decompress-response@^3.3.0":
   "integrity" "sha1-gKTdMjdIOEv6JICDYirt7Jgq3/M="
-  "resolved" "https://registry.npmjs.org/decompress-response/-/decompress-response-3.3.0.tgz"
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/decompress-response/-/decompress-response-3.3.0.tgz"
   "version" "3.3.0"
   dependencies:
     "mimic-response" "^1.0.0"
+
+"decompress-response@^4.2.0":
+  "integrity" "sha512-jOSne2qbyE+/r8G1VU+G/82LBs2Fs4LAsTiLSHOCOMZQl2OKZ6i8i4IyHemTe+/yIXOtTcRQMzPcgyhoFlqPkw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/decompress-response/-/decompress-response-4.2.1.tgz"
+  "version" "4.2.1"
+  dependencies:
+    "mimic-response" "^2.0.0"
 
 "deep-extend@^0.6.0":
   "integrity" "sha512-LOHxIOaPYdHlJRtCQfDIVZtfw/ufM8+rVj649RIHzcm/vGwQRXFt6OPqIFWsm2XEMrNIEtWR64sY1LEKD2vAOA=="
   "resolved" "https://registry.npmjs.org/deep-extend/-/deep-extend-0.6.0.tgz"
   "version" "0.6.0"
+
+"deep-is@~0.1.3":
+  "integrity" "sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/deep-is/-/deep-is-0.1.4.tgz"
+  "version" "0.1.4"
 
 "defer-to-connect@^1.0.1":
   "integrity" "sha512-0ISdNousHvZT2EiFlZeZAHBUvSxmKswVCEf8hW7KWgG4a8MVEu/3Vb6uWYozkjylyCxe0JBIiRB1jV45S70WVQ=="
@@ -1179,6 +1644,28 @@
   "version" "1.1.3"
   dependencies:
     "object-keys" "^1.0.12"
+
+"define-property@^0.2.5":
+  "integrity" "sha1-w1se+RjsPJkPmlvFe+BKrOxcgRY="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/define-property/-/define-property-0.2.5.tgz"
+  "version" "0.2.5"
+  dependencies:
+    "is-descriptor" "^0.1.0"
+
+"define-property@^1.0.0":
+  "integrity" "sha1-dp66rz9KY6rTr56NMEybvnm/sOY="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/define-property/-/define-property-1.0.0.tgz"
+  "version" "1.0.0"
+  dependencies:
+    "is-descriptor" "^1.0.0"
+
+"define-property@^2.0.2":
+  "integrity" "sha512-jwK2UV4cnPpbcG7+VRARKTZPUWowwXA8bzH5NP6ud0oeAxyYPuGZUAC7hMugpCdz4BeSZl2Dl9k66CHJ/46ZYQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/define-property/-/define-property-2.0.2.tgz"
+  "version" "2.0.2"
+  dependencies:
+    "is-descriptor" "^1.0.2"
+    "isobject" "^3.0.1"
 
 "delegates@^1.0.0":
   "integrity" "sha1-hMbhWbgZBP3KWaDvRM2HDTElD5o="
@@ -1194,6 +1681,11 @@
   "integrity" "sha1-l4hXRCxEdJ5CBmE+N5RiBYJqvYA="
   "resolved" "https://registry.npmjs.org/destroy/-/destroy-1.0.4.tgz"
   "version" "1.0.4"
+
+"detect-libc@^1.0.3":
+  "integrity" "sha1-+hN8S9aY7fVc1c0CrFWfkaTEups="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/detect-libc/-/detect-libc-1.0.3.tgz"
+  "version" "1.0.3"
 
 "detect-node@^2.0.4":
   "integrity" "sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g=="
@@ -1216,12 +1708,27 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/di/-/di-0.0.1.tgz"
   "version" "0.0.1"
 
+"dir-glob@^2.0.0", "dir-glob@2.0.0":
+  "integrity" "sha512-37qirFDz8cA5fimp9feo43fSuRo2gHwaIn6dXL8Ber1dGwUosDrGZeCCXq57WnIqE4aQ+u3eQZzsk1yOzhdwag=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/dir-glob/-/dir-glob-2.0.0.tgz"
+  "version" "2.0.0"
+  dependencies:
+    "arrify" "^1.0.1"
+    "path-type" "^3.0.0"
+
 "dir-glob@^3.0.1":
   "integrity" "sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA=="
   "resolved" "https://registry.npmjs.org/dir-glob/-/dir-glob-3.0.1.tgz"
   "version" "3.0.1"
   dependencies:
     "path-type" "^4.0.0"
+
+"doctrine@^2.0.0":
+  "integrity" "sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/doctrine/-/doctrine-2.1.0.tgz"
+  "version" "2.1.0"
+  dependencies:
+    "esutils" "^2.0.2"
 
 "dom-serialize@^2.2.1":
   "integrity" "sha1-ViromZ9Evl6jB29UGdzVnrQ6yVs="
@@ -1317,7 +1824,7 @@
   dependencies:
     "iconv-lite" "^0.6.2"
 
-"end-of-stream@^1.0.0", "end-of-stream@^1.1.0":
+"end-of-stream@^1.0.0", "end-of-stream@^1.1.0", "end-of-stream@^1.4.1":
   "integrity" "sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q=="
   "resolved" "https://registry.npmjs.org/end-of-stream/-/end-of-stream-1.4.4.tgz"
   "version" "1.4.4"
@@ -1364,7 +1871,7 @@
   "resolved" "https://registry.npmjs.org/err-code/-/err-code-1.1.2.tgz"
   "version" "1.1.2"
 
-"error-ex@^1.3.1":
+"error-ex@^1.2.0", "error-ex@^1.3.1":
   "integrity" "sha512-7dFHNmqeFSEt2ZBsCriorKnn3Z2pj+fd9kmI6QoWw4//DL+icEBfc0U7qJCisqrTsKTjw4fNFy2pW9OqStD84g=="
   "resolved" "https://registry.npmjs.org/error-ex/-/error-ex-1.3.2.tgz"
   "version" "1.3.2"
@@ -1497,7 +2004,7 @@
   "resolved" "https://registry.npmjs.org/escape-html/-/escape-html-1.0.3.tgz"
   "version" "1.0.3"
 
-"escape-string-regexp@^1.0.3", "escape-string-regexp@^1.0.5":
+"escape-string-regexp@^1.0.2", "escape-string-regexp@^1.0.3", "escape-string-regexp@^1.0.5":
   "integrity" "sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ="
   "resolved" "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz"
   "version" "1.0.5"
@@ -1527,10 +2034,64 @@
     "esrecurse" "^4.1.0"
     "estraverse" "^4.1.1"
 
+"eslint-scope@^3.7.1":
+  "integrity" "sha512-W+B0SvF4gamyCTmUc+uITPY0989iXVfKvhwtmJocTaYoc/3khEHmEmvfY/Gn9HA9VV75jrQECsHizkNw1b68FA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/eslint-scope/-/eslint-scope-3.7.3.tgz"
+  "version" "3.7.3"
+  dependencies:
+    "esrecurse" "^4.1.0"
+    "estraverse" "^4.1.1"
+
 "eslint-visitor-keys@^1.1.0":
   "integrity" "sha512-6J72N8UNa462wa/KFODt/PJ3IU60SDpC3QXC1Hjc1BXXpfL2C9R5+AU7jhe0F6GREqVMh4Juu+NY7xn+6dipUQ=="
   "resolved" "https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-1.3.0.tgz"
   "version" "1.3.0"
+
+"eslint@4.0.0":
+  "integrity" "sha1-cnfAFDf99B3M0WjVqg5Jt1yh8mA="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/eslint/-/eslint-4.0.0.tgz"
+  "version" "4.0.0"
+  dependencies:
+    "babel-code-frame" "^6.22.0"
+    "chalk" "^1.1.3"
+    "concat-stream" "^1.6.0"
+    "debug" "^2.6.8"
+    "doctrine" "^2.0.0"
+    "eslint-scope" "^3.7.1"
+    "espree" "^3.4.3"
+    "esquery" "^1.0.0"
+    "estraverse" "^4.2.0"
+    "esutils" "^2.0.2"
+    "file-entry-cache" "^2.0.0"
+    "glob" "^7.1.2"
+    "globals" "^9.17.0"
+    "ignore" "^3.3.3"
+    "imurmurhash" "^0.1.4"
+    "inquirer" "^3.0.6"
+    "is-my-json-valid" "^2.16.0"
+    "is-resolvable" "^1.0.0"
+    "js-yaml" "^3.8.4"
+    "json-stable-stringify" "^1.0.1"
+    "levn" "^0.3.0"
+    "lodash" "^4.17.4"
+    "mkdirp" "^0.5.1"
+    "natural-compare" "^1.4.0"
+    "optionator" "^0.8.2"
+    "path-is-inside" "^1.0.2"
+    "pluralize" "^4.0.0"
+    "progress" "^2.0.0"
+    "require-uncached" "^1.0.3"
+    "strip-json-comments" "~2.0.1"
+    "table" "^4.0.1"
+    "text-table" "~0.2.0"
+
+"espree@^3.4.3":
+  "integrity" "sha512-yAcIQxtmMiB/jL32dzEp2enBeidsB7xWPLNiw3IIkpVds1P+h7qF9YwJq1yUNzp2OKXgAprs4F61ih66UsoD1A=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/espree/-/espree-3.5.4.tgz"
+  "version" "3.5.4"
+  dependencies:
+    "acorn" "^5.5.0"
+    "acorn-jsx" "^3.0.0"
 
 "espree@^6.2.1":
   "integrity" "sha512-ysCxRQY3WaXJz9tdbWOwuWr5Y/XrPTGX9Kiz3yoUXwW0VZ4w30HTkQLaGx/+ttFjF8i+ACbArnB4ce68a9m5hw=="
@@ -1541,6 +2102,18 @@
     "acorn-jsx" "^5.2.0"
     "eslint-visitor-keys" "^1.1.0"
 
+"esprima@^4.0.0":
+  "integrity" "sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/esprima/-/esprima-4.0.1.tgz"
+  "version" "4.0.1"
+
+"esquery@^1.0.0":
+  "integrity" "sha512-cCDispWt5vHHtwMY2YrAQ4ibFkAL8RbH5YGBnZBc90MolvvfkkQcJro/aZiAQUlQ3qgrYS6D6v8Gc5G5CQsc9w=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/esquery/-/esquery-1.4.0.tgz"
+  "version" "1.4.0"
+  dependencies:
+    "estraverse" "^5.1.0"
+
 "esrecurse@^4.1.0":
   "integrity" "sha512-KmfKL3b6G+RXvP8N1vr3Tq1kL/oCFgn2NYXEtqP8/L3pKapUA4G8cFVaoF3SU323CD4XypR/ffioHmkti6/Tag=="
   "resolved" "https://registry.npmjs.org/esrecurse/-/esrecurse-4.3.0.tgz"
@@ -1548,15 +2121,25 @@
   dependencies:
     "estraverse" "^5.2.0"
 
-"estraverse@^4.1.1":
+"estraverse@^4.1.1", "estraverse@^4.2.0":
   "integrity" "sha512-39nnKffWz8xN1BU/2c79n9nB9HDzo0niYUqx6xyqUnyoAnQyyWpOTdZEeiCch8BBu515t4wp9ZmgVfVhn9EBpw=="
   "resolved" "https://registry.npmjs.org/estraverse/-/estraverse-4.3.0.tgz"
   "version" "4.3.0"
+
+"estraverse@^5.1.0":
+  "integrity" "sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/estraverse/-/estraverse-5.3.0.tgz"
+  "version" "5.3.0"
 
 "estraverse@^5.2.0":
   "integrity" "sha512-BxbNGGNm0RyRYvUdHpIwv9IWzeM9XClbOxwoATuFdOE7ZE6wHL+HQ5T8hoPM+zHvmKzzsEqhgy0GrQ5X13afiQ=="
   "resolved" "https://registry.npmjs.org/estraverse/-/estraverse-5.2.0.tgz"
   "version" "5.2.0"
+
+"esutils@^2.0.2":
+  "integrity" "sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/esutils/-/esutils-2.0.3.tgz"
+  "version" "2.0.3"
 
 "etag@^1.8.1", "etag@~1.8.1":
   "integrity" "sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc="
@@ -1571,12 +2154,40 @@
     "d" "1"
     "es5-ext" "~0.10.14"
 
+"eventemitter2@~0.4.13":
+  "integrity" "sha1-j2G3XN4BKy6esoTUVFWDtWQ7Yas="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/eventemitter2/-/eventemitter2-0.4.14.tgz"
+  "version" "0.4.14"
+
 "eventemitter3@^4.0.0":
   "integrity" "sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw=="
   "resolved" "https://registry.npmjs.org/eventemitter3/-/eventemitter3-4.0.7.tgz"
   "version" "4.0.7"
 
-"express@^4.17.1":
+"exit@~0.1.1":
+  "integrity" "sha1-BjJjj42HfMghB9MKD/8aF8uhzQw="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/exit/-/exit-0.1.2.tgz"
+  "version" "0.1.2"
+
+"expand-brackets@^2.1.4":
+  "integrity" "sha1-t3c14xXOMPa27/D4OwQVGiJEliI="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/expand-brackets/-/expand-brackets-2.1.4.tgz"
+  "version" "2.1.4"
+  dependencies:
+    "debug" "^2.3.3"
+    "define-property" "^0.2.5"
+    "extend-shallow" "^2.0.1"
+    "posix-character-classes" "^0.1.0"
+    "regex-not" "^1.0.0"
+    "snapdragon" "^0.8.1"
+    "to-regex" "^3.0.1"
+
+"expand-template@^2.0.3":
+  "integrity" "sha512-XYfuKMvj4O35f/pOXLObndIRvyQ+/+6AhODh+OKWj9S9498pHHn/IMszH+gt0fBCRWMNfk1ZSp5x3AifmnI2vg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/expand-template/-/expand-template-2.0.3.tgz"
+  "version" "2.0.3"
+
+"express@^4.17.1", "express@4.17.1":
   "integrity" "sha512-mHJ9O79RqluphRrcw2X/GTh3k9tVv8YcoyY4Kkh4WDMUYKRZUq0h1o0w2rrrxBqM7VoeUVqgb27xlEMXTnYt4g=="
   "resolved" "https://registry.npmjs.org/express/-/express-4.17.1.tgz"
   "version" "4.17.1"
@@ -1619,17 +2230,55 @@
   dependencies:
     "type" "^2.5.0"
 
+"extend-shallow@^2.0.1":
+  "integrity" "sha1-Ua99YUrZqfYQ6huvu5idaxxWiQ8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/extend-shallow/-/extend-shallow-2.0.1.tgz"
+  "version" "2.0.1"
+  dependencies:
+    "is-extendable" "^0.1.0"
+
+"extend-shallow@^3.0.0", "extend-shallow@^3.0.2":
+  "integrity" "sha1-Jqcarwc7OfshJxcnRhMcJwQCjbg="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/extend-shallow/-/extend-shallow-3.0.2.tgz"
+  "version" "3.0.2"
+  dependencies:
+    "assign-symbols" "^1.0.0"
+    "is-extendable" "^1.0.1"
+
 "extend@^3.0.0":
   "integrity" "sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g=="
   "resolved" "https://registry.npmjs.org/extend/-/extend-3.0.2.tgz"
   "version" "3.0.2"
+
+"external-editor@^2.0.4":
+  "integrity" "sha512-bSn6gvGxKt+b7+6TKEv1ZycHleA7aHhRHyAqJyp5pbUFuYYNIzpZnQDk7AsYckyWdEnTeAnay0aCy2aV6iTk9A=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/external-editor/-/external-editor-2.2.0.tgz"
+  "version" "2.2.0"
+  dependencies:
+    "chardet" "^0.4.0"
+    "iconv-lite" "^0.4.17"
+    "tmp" "^0.0.33"
+
+"extglob@^2.0.4":
+  "integrity" "sha512-Nmb6QXkELsuBr24CJSkilo6UHHgbekK5UiZgfE6UHD3Eb27YC6oD+bhcT+tJ6cl8dmsgdQxnWlcry8ksBIBLpw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/extglob/-/extglob-2.0.4.tgz"
+  "version" "2.0.4"
+  dependencies:
+    "array-unique" "^0.3.2"
+    "define-property" "^1.0.0"
+    "expand-brackets" "^2.1.4"
+    "extend-shallow" "^2.0.1"
+    "fragment-cache" "^0.2.1"
+    "regex-not" "^1.0.0"
+    "snapdragon" "^0.8.1"
+    "to-regex" "^3.0.1"
 
 "fast-deep-equal@^3.1.1":
   "integrity" "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
   "resolved" "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz"
   "version" "3.1.3"
 
-"fast-glob@^3.1.1":
+"fast-glob@^3.0.3", "fast-glob@^3.1.1":
   "integrity" "sha512-rYGMRwip6lUMvYD3BTScMwT1HtAs2d71SMv66Vrxs0IekGZEjhM0pcMfjQPnknBt2zeCwQMEupiN02ZP4DiT1Q=="
   "resolved" "https://registry.npmjs.org/fast-glob/-/fast-glob-3.2.7.tgz"
   "version" "3.2.7"
@@ -1645,6 +2294,16 @@
   "resolved" "https://registry.npmjs.org/fast-json-stable-stringify/-/fast-json-stable-stringify-2.1.0.tgz"
   "version" "2.1.0"
 
+"fast-levenshtein@^1.1.0":
+  "integrity" "sha1-5qdUzI8V5YmHqpy9J69m/W9OWvk="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/fast-levenshtein/-/fast-levenshtein-1.1.4.tgz"
+  "version" "1.1.4"
+
+"fast-levenshtein@~2.0.6":
+  "integrity" "sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz"
+  "version" "2.0.6"
+
 "fastq@^1.6.0":
   "integrity" "sha512-VNX0QkHK3RsXVKr9KrlUv/FoTa0NdbYoHHl7uXHv2rzyHSlxjdNAKug2twd9luJxpcyNeAgf5iPPMutJO67Dfg=="
   "resolved" "https://registry.npmjs.org/fastq/-/fastq-1.12.0.tgz"
@@ -1656,6 +2315,31 @@
   "integrity" "sha512-0btnI/H8f2pavGMN8w40mlSKOfTK2SVJmBfBeVIj3kNw0swwgzyRq0d5TJVOwodFmtvpPeWPN/MCcfuWF0Ezbw=="
   "resolved" "https://registry.npmjs.org/figgy-pudding/-/figgy-pudding-3.5.2.tgz"
   "version" "3.5.2"
+
+"figures@^2.0.0":
+  "integrity" "sha1-OrGi0qYsi/tDGgyUy3l6L84nyWI="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/figures/-/figures-2.0.0.tgz"
+  "version" "2.0.0"
+  dependencies:
+    "escape-string-regexp" "^1.0.5"
+
+"file-entry-cache@^2.0.0":
+  "integrity" "sha1-w5KZDD5oR4PYOLjISkXYoEhFg2E="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/file-entry-cache/-/file-entry-cache-2.0.0.tgz"
+  "version" "2.0.0"
+  dependencies:
+    "flat-cache" "^1.2.1"
+    "object-assign" "^4.0.1"
+
+"fill-range@^4.0.0":
+  "integrity" "sha1-1USBHUKPmOsGpj3EAtJAPDKMOPc="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/fill-range/-/fill-range-4.0.0.tgz"
+  "version" "4.0.0"
+  dependencies:
+    "extend-shallow" "^2.0.1"
+    "is-number" "^3.0.0"
+    "repeat-string" "^1.6.1"
+    "to-regex-range" "^2.1.0"
 
 "fill-range@^7.0.1":
   "integrity" "sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ=="
@@ -1676,6 +2360,14 @@
     "parseurl" "~1.3.3"
     "statuses" "~1.5.0"
     "unpipe" "~1.0.0"
+
+"find-up@^1.0.0":
+  "integrity" "sha1-ay6YIrGizgpgq2TWEOzK1TyyTQ8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/find-up/-/find-up-1.1.2.tgz"
+  "version" "1.1.2"
+  dependencies:
+    "path-exists" "^2.0.0"
+    "pinkie-promise" "^2.0.0"
 
 "find-up@^3.0.0":
   "integrity" "sha512-1yD6RmLI1XBfxugvORwlck6f75tYL+iR0jqwsOrOxMZyGYqUuDhJ0l4AXdO1iX/FTs9cBAMEk1gWSEx1kSbylg=="
@@ -1700,6 +2392,23 @@
     "locate-path" "^5.0.0"
     "path-exists" "^4.0.0"
 
+"findup-sync@~0.3.0":
+  "integrity" "sha1-N5MKpdgWt3fANEXhlmzGeQpMCxY="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/findup-sync/-/findup-sync-0.3.0.tgz"
+  "version" "0.3.0"
+  dependencies:
+    "glob" "~5.0.0"
+
+"flat-cache@^1.2.1":
+  "integrity" "sha512-VwyB3Lkgacfik2vhqR4uv2rvebqmDvFu4jlN/C1RzWoJEo8I7z4Q404oiqYCkq41mni8EzQnm95emU9seckwtg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/flat-cache/-/flat-cache-1.3.4.tgz"
+  "version" "1.3.4"
+  dependencies:
+    "circular-json" "^0.3.1"
+    "graceful-fs" "^4.1.2"
+    "rimraf" "~2.6.2"
+    "write" "^0.2.1"
+
 "flatted@^2.0.1":
   "integrity" "sha512-r5wGx7YeOwNWNlCA0wQ86zKyDLMQr+/RB8xy74M4hTphfmjlijTSSXGuH8rnvKZnfT9i+75zmd8jcKdMR4O6jA=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/flatted/-/flatted-2.0.2.tgz"
@@ -1718,10 +2427,27 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/follow-redirects/-/follow-redirects-1.14.3.tgz"
   "version" "1.14.3"
 
+"fontoxpath@2.7.9":
+  "integrity" "sha512-WclmxKKxSfyVnNMpLVvA2RIihZ9D2xAgwmrnSZG5N68c1GJaPvezaW5MnM/v6pinp2kmLVkSNpT8L2bPSpWDAg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/fontoxpath/-/fontoxpath-2.7.9.tgz"
+  "version" "2.7.9"
+
+"for-in@^1.0.2":
+  "integrity" "sha1-gQaNKVqBQuwKxybG4iAMMPttXoA="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/for-in/-/for-in-1.0.2.tgz"
+  "version" "1.0.2"
+
 "forwarded@0.2.0":
   "integrity" "sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow=="
   "resolved" "https://registry.npmjs.org/forwarded/-/forwarded-0.2.0.tgz"
   "version" "0.2.0"
+
+"fragment-cache@^0.2.1":
+  "integrity" "sha1-QpD60n8T6Jvn8zeZxrxaCr//DRk="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/fragment-cache/-/fragment-cache-0.2.1.tgz"
+  "version" "0.2.1"
+  dependencies:
+    "map-cache" "^0.2.2"
 
 "fresh@^0.5.2", "fresh@0.5.2":
   "integrity" "sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac="
@@ -1735,6 +2461,11 @@
   dependencies:
     "inherits" "^2.0.1"
     "readable-stream" "^2.0.0"
+
+"fs-constants@^1.0.0":
+  "integrity" "sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/fs-constants/-/fs-constants-1.0.0.tgz"
+  "version" "1.0.0"
 
 "fs-extra@^8.1.0":
   "integrity" "sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g=="
@@ -1786,6 +2517,20 @@
     "strip-ansi" "^3.0.1"
     "wide-align" "^1.1.0"
 
+"generate-function@^2.0.0":
+  "integrity" "sha512-eeB5GfMNeevm/GRYq20ShmsaGcmI81kIX2K9XQx5miC8KdHaC6Jm0qQ8ZNeGOi7wYB8OsdxKs+Y2oVuTFuVwKQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/generate-function/-/generate-function-2.3.1.tgz"
+  "version" "2.3.1"
+  dependencies:
+    "is-property" "^1.0.2"
+
+"generate-object-property@^1.1.0":
+  "integrity" "sha1-nA4cQDCM6AT0eDYYuTf6iPmdUNA="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/generate-object-property/-/generate-object-property-1.2.0.tgz"
+  "version" "1.2.0"
+  dependencies:
+    "is-property" "^1.0.0"
+
 "genfun@^5.0.0":
   "integrity" "sha512-KGDOARWVga7+rnB3z9Sd2Letx515owfk0hSxHGuqjANb1M+x2bGZGqHLiozPsYMdM2OubeMni/Hpwmjq6qIUhA=="
   "resolved" "https://registry.npmjs.org/genfun/-/genfun-5.0.0.tgz"
@@ -1795,6 +2540,11 @@
   "integrity" "sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/gensync/-/gensync-1.0.0-beta.2.tgz"
   "version" "1.0.0-beta.2"
+
+"get-caller-file@^1.0.2":
+  "integrity" "sha512-3t6rVToeoZfYSGd8YoLFR2DJkiQrIiUrGcjvFX2mDw3bn6k2OtwHN0TNCLbBO+w8qTvimhDkv+LSscbJY1vE6w=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/get-caller-file/-/get-caller-file-1.0.3.tgz"
+  "version" "1.0.3"
 
 "get-caller-file@^2.0.5":
   "integrity" "sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg=="
@@ -1815,6 +2565,11 @@
   "resolved" "https://registry.npmjs.org/get-port/-/get-port-3.2.0.tgz"
   "version" "3.2.0"
 
+"get-stdin@^4.0.1":
+  "integrity" "sha1-uWjGsKBDhDJJAui/Gl3zJXmkUP4="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/get-stdin/-/get-stdin-4.0.1.tgz"
+  "version" "4.0.1"
+
 "get-stream@^4.1.0":
   "integrity" "sha512-GMat4EJ5161kIy2HevLlr4luNjBgvmj413KaQA7jt4V8B4RDsfpHk7WQ9GVqfYyyx8OS/L66Kox+rJRNklLK7w=="
   "resolved" "https://registry.npmjs.org/get-stream/-/get-stream-4.1.0.tgz"
@@ -1829,6 +2584,21 @@
   dependencies:
     "pump" "^3.0.0"
 
+"get-value@^2.0.3", "get-value@^2.0.6":
+  "integrity" "sha1-3BXKHGcjh8p2vTesCjlbogQqLCg="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/get-value/-/get-value-2.0.6.tgz"
+  "version" "2.0.6"
+
+"getobject@~0.1.0":
+  "integrity" "sha1-BHpEl4n6Fg0Bj1SG7ZEyC27HiFw="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/getobject/-/getobject-0.1.0.tgz"
+  "version" "0.1.0"
+
+"github-from-package@0.0.0":
+  "integrity" "sha1-l/tdlr/eiXMxPyDoKI75oWf6ZM4="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/github-from-package/-/github-from-package-0.0.0.tgz"
+  "version" "0.0.0"
+
 "glob-parent@^5.1.2", "glob-parent@~5.1.2":
   "integrity" "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow=="
   "resolved" "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.2.tgz"
@@ -1836,7 +2606,7 @@
   dependencies:
     "is-glob" "^4.0.1"
 
-"glob@^7.0.0", "glob@^7.1.1", "glob@^7.1.3", "glob@^7.1.4", "glob@^7.1.6", "glob@^7.1.7":
+"glob@^7.0.0", "glob@^7.1.1", "glob@^7.1.2", "glob@^7.1.3", "glob@^7.1.4", "glob@^7.1.6", "glob@^7.1.7":
   "integrity" "sha512-OvD9ENzPLbegENnYP5UUfJIirTg4+XwMWGaQfQTY0JenxNvvIKP3U3/tAQSPIu/lHxXYSZmpXlUHeqAIdKzBLQ=="
   "resolved" "https://registry.npmjs.org/glob/-/glob-7.1.7.tgz"
   "version" "7.1.7"
@@ -1847,6 +2617,36 @@
     "minimatch" "^3.0.4"
     "once" "^1.3.0"
     "path-is-absolute" "^1.0.0"
+
+"glob@~5.0.0":
+  "integrity" "sha1-G8k2ueAvSmA/zCIuz3Yz0wuLk7E="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/glob/-/glob-5.0.15.tgz"
+  "version" "5.0.15"
+  dependencies:
+    "inflight" "^1.0.4"
+    "inherits" "2"
+    "minimatch" "2 || 3"
+    "once" "^1.3.0"
+    "path-is-absolute" "^1.0.0"
+
+"glob@~7.0.0":
+  "integrity" "sha1-IRuvr0nlJbjNkyYNFKsTYVKz9Xo="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/glob/-/glob-7.0.6.tgz"
+  "version" "7.0.6"
+  dependencies:
+    "fs.realpath" "^1.0.0"
+    "inflight" "^1.0.4"
+    "inherits" "2"
+    "minimatch" "^3.0.2"
+    "once" "^1.3.0"
+    "path-is-absolute" "^1.0.0"
+
+"global-dirs@^2.0.1":
+  "integrity" "sha512-MG6kdOUh/xBnyo9cJFeIKkLEc1AyFq42QTU4XiX51i2NEdxLxLWXIjEjmqKeSuKR7pAZjTqUVoT2b2huxVLgYQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/global-dirs/-/global-dirs-2.1.0.tgz"
+  "version" "2.1.0"
+  dependencies:
+    "ini" "1.3.7"
 
 "global-dirs@^3.0.0":
   "integrity" "sha512-v8ho2DS5RiCjftj1nD9NmnfaOzTdud7RRnVd9kFNOjqZbISlx5DQ+OrTkywgd0dIt7oFCvKetZSHoHcP3sDdiA=="
@@ -1860,6 +2660,25 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/globals/-/globals-11.12.0.tgz"
   "version" "11.12.0"
 
+"globals@^9.17.0":
+  "integrity" "sha512-S0nG3CLEQiY/ILxqtztTWH/3iRRdyBLw6KMDxnKMchrtbj2OFmehVh0WUCfW3DUrIgx/qFrJPICrq4Z4sTR9UQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/globals/-/globals-9.18.0.tgz"
+  "version" "9.18.0"
+
+"globby@^10.0.0":
+  "integrity" "sha512-7dUi7RvCoT/xast/o/dLN53oqND4yk0nsHkhRgn9w65C4PofCLOoJ39iSOg+qVDdWQPIEj+eszMHQ+aLVwwQSg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/globby/-/globby-10.0.2.tgz"
+  "version" "10.0.2"
+  dependencies:
+    "@types/glob" "^7.1.1"
+    "array-union" "^2.1.0"
+    "dir-glob" "^3.0.1"
+    "fast-glob" "^3.0.3"
+    "glob" "^7.1.3"
+    "ignore" "^5.1.1"
+    "merge2" "^1.2.3"
+    "slash" "^3.0.0"
+
 "globby@^11.0.1", "globby@^11.0.4":
   "integrity" "sha512-9O4MVG9ioZJ08ffbcyVYyLOJLk5JQ688pJ4eMGLpdWLHq/Wr1D9BlriLQyL0E+jbkuePVZXYFj47QM/v093wHg=="
   "resolved" "https://registry.npmjs.org/globby/-/globby-11.0.4.tgz"
@@ -1871,6 +2690,18 @@
     "ignore" "^5.1.4"
     "merge2" "^1.3.0"
     "slash" "^3.0.0"
+
+"globby@^7.1.1":
+  "integrity" "sha1-+yzP+UAfhgCUXfral0QMypcrhoA="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/globby/-/globby-7.1.1.tgz"
+  "version" "7.1.1"
+  dependencies:
+    "array-union" "^1.0.1"
+    "dir-glob" "^2.0.0"
+    "glob" "^7.1.2"
+    "ignore" "^3.3.5"
+    "pify" "^3.0.0"
+    "slash" "^1.0.0"
 
 "got@^9.6.0":
   "integrity" "sha512-R7eWptXuGYxwijs0eV+v3o6+XH1IqVK8dJOEecQfTmkncw9AV4dcw/Dhxi8MdlqPthxxpZyizMzyg8RTmEsG+Q=="
@@ -1894,10 +2725,91 @@
   "resolved" "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.8.tgz"
   "version" "4.2.8"
 
+"grunt-cli@~1.2.0":
+  "integrity" "sha1-VisRnrsGndtGSs4oRVAb6Xs1tqg="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/grunt-cli/-/grunt-cli-1.2.0.tgz"
+  "version" "1.2.0"
+  dependencies:
+    "findup-sync" "~0.3.0"
+    "grunt-known-options" "~1.1.0"
+    "nopt" "~3.0.6"
+    "resolve" "~1.1.0"
+
+"grunt-known-options@~1.1.0":
+  "integrity" "sha512-cHwsLqoighpu7TuYj5RonnEuxGVFnztcUqTqp5rXFGYL4OuPFofwC4Ycg7n9fYwvK6F5WbYgeVOwph9Crs2fsQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/grunt-known-options/-/grunt-known-options-1.1.1.tgz"
+  "version" "1.1.1"
+
+"grunt-legacy-log-utils@~2.0.0":
+  "integrity" "sha512-o7uHyO/J+i2tXG8r2bZNlVk20vlIFJ9IEYyHMCQGfWYru8Jv3wTqKZzvV30YW9rWEjq0eP3cflQ1qWojIe9VFA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/grunt-legacy-log-utils/-/grunt-legacy-log-utils-2.0.1.tgz"
+  "version" "2.0.1"
+  dependencies:
+    "chalk" "~2.4.1"
+    "lodash" "~4.17.10"
+
+"grunt-legacy-log@~2.0.0":
+  "integrity" "sha512-1m3+5QvDYfR1ltr8hjiaiNjddxGdQWcH0rw1iKKiQnF0+xtgTazirSTGu68RchPyh1OBng1bBUjLmX8q9NpoCw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/grunt-legacy-log/-/grunt-legacy-log-2.0.0.tgz"
+  "version" "2.0.0"
+  dependencies:
+    "colors" "~1.1.2"
+    "grunt-legacy-log-utils" "~2.0.0"
+    "hooker" "~0.2.3"
+    "lodash" "~4.17.5"
+
+"grunt-legacy-util@~1.1.1":
+  "integrity" "sha512-9zyA29w/fBe6BIfjGENndwoe1Uy31BIXxTH3s8mga0Z5Bz2Sp4UCjkeyv2tI449ymkx3x26B+46FV4fXEddl5A=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/grunt-legacy-util/-/grunt-legacy-util-1.1.1.tgz"
+  "version" "1.1.1"
+  dependencies:
+    "async" "~1.5.2"
+    "exit" "~0.1.1"
+    "getobject" "~0.1.0"
+    "hooker" "~0.2.3"
+    "lodash" "~4.17.10"
+    "underscore.string" "~3.3.4"
+    "which" "~1.3.0"
+
+"grunt-mkdir@1.0.0":
+  "integrity" "sha1-c+GiasJKCFljY/TdlUsNMkheWOk="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/grunt-mkdir/-/grunt-mkdir-1.0.0.tgz"
+  "version" "1.0.0"
+
+"grunt@>=0.4.0", "grunt@1.0.4":
+  "integrity" "sha512-PYsMOrOC+MsdGEkFVwMaMyc6Ob7pKmq+deg1Sjr+vvMWp35sztfwKE7qoN51V+UEtHsyNuMcGdgMLFkBHvMxHQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/grunt/-/grunt-1.0.4.tgz"
+  "version" "1.0.4"
+  dependencies:
+    "coffeescript" "~1.10.0"
+    "dateformat" "~1.0.12"
+    "eventemitter2" "~0.4.13"
+    "exit" "~0.1.1"
+    "findup-sync" "~0.3.0"
+    "glob" "~7.0.0"
+    "grunt-cli" "~1.2.0"
+    "grunt-known-options" "~1.1.0"
+    "grunt-legacy-log" "~2.0.0"
+    "grunt-legacy-util" "~1.1.1"
+    "iconv-lite" "~0.4.13"
+    "js-yaml" "~3.13.0"
+    "minimatch" "~3.0.2"
+    "mkdirp" "~0.5.1"
+    "nopt" "~3.0.6"
+    "path-is-absolute" "~1.0.0"
+    "rimraf" "~2.6.2"
+
 "handle-thing@^2.0.0":
   "integrity" "sha512-9Qn4yBxelxoh2Ow62nP+Ka/kMnOXRi8BXnRaUwezLNhqelnN49xKz4F/dPP8OYLxLxq6JDtZb2i9XznUQbNPTg=="
   "resolved" "https://registry.npmjs.org/handle-thing/-/handle-thing-2.0.1.tgz"
   "version" "2.0.1"
+
+"has-ansi@^2.0.0":
+  "integrity" "sha1-NPUEnOHs3ysGSa8+8k5F7TVBbZE="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/has-ansi/-/has-ansi-2.0.0.tgz"
+  "version" "2.0.0"
+  dependencies:
+    "ansi-regex" "^2.0.0"
 
 "has-bigints@^1.0.1":
   "integrity" "sha512-LSBS2LjbNBTf6287JEbEzvJgftkF5qFkmCo9hDRpAzKhUOlJ+hx8dd4USs00SgsUNwc4617J9ki5YtEClM2ffA=="
@@ -1931,6 +2843,37 @@
   "resolved" "https://registry.npmjs.org/has-unicode/-/has-unicode-2.0.1.tgz"
   "version" "2.0.1"
 
+"has-value@^0.3.1":
+  "integrity" "sha1-ex9YutpiyoJ+wKIHgCVlSEWZXh8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/has-value/-/has-value-0.3.1.tgz"
+  "version" "0.3.1"
+  dependencies:
+    "get-value" "^2.0.3"
+    "has-values" "^0.1.4"
+    "isobject" "^2.0.0"
+
+"has-value@^1.0.0":
+  "integrity" "sha1-GLKB2lhbHFxR3vJMkw7SmgvmsXc="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/has-value/-/has-value-1.0.0.tgz"
+  "version" "1.0.0"
+  dependencies:
+    "get-value" "^2.0.6"
+    "has-values" "^1.0.0"
+    "isobject" "^3.0.0"
+
+"has-values@^0.1.4":
+  "integrity" "sha1-bWHeldkd/Km5oCCJrThL/49it3E="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/has-values/-/has-values-0.1.4.tgz"
+  "version" "0.1.4"
+
+"has-values@^1.0.0":
+  "integrity" "sha1-lbC2P+whRmGab+V/51Yo1aOe/k8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/has-values/-/has-values-1.0.0.tgz"
+  "version" "1.0.0"
+  dependencies:
+    "is-number" "^3.0.0"
+    "kind-of" "^4.0.0"
+
 "has-yarn@^2.1.0":
   "integrity" "sha512-UqBRqi4ju7T+TqGNdqAO0PaSVGsDGJUBQvk9eUWNGRY1CFGDzYhLWoM7JQEemnlvVcv/YEmc2wNW8BC24EnUsw=="
   "resolved" "https://registry.npmjs.org/has-yarn/-/has-yarn-2.1.0.tgz"
@@ -1942,6 +2885,11 @@
   "version" "1.0.3"
   dependencies:
     "function-bind" "^1.1.1"
+
+"hooker@~0.2.3":
+  "integrity" "sha1-uDT3I8xKJCqmWWNFnfbZhMXT2Vk="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/hooker/-/hooker-0.2.3.tgz"
+  "version" "0.2.3"
 
 "hosted-git-info@^2.1.4", "hosted-git-info@^2.7.1":
   "integrity" "sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw=="
@@ -2031,6 +2979,13 @@
   dependencies:
     "ms" "^2.0.0"
 
+"iconv-lite@^0.4.17", "iconv-lite@~0.4.13", "iconv-lite@0.4.24":
+  "integrity" "sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA=="
+  "resolved" "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.24.tgz"
+  "version" "0.4.24"
+  dependencies:
+    "safer-buffer" ">= 2.1.2 < 3"
+
 "iconv-lite@^0.6.2":
   "integrity" "sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw=="
   "resolved" "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz"
@@ -2038,12 +2993,10 @@
   dependencies:
     "safer-buffer" ">= 2.1.2 < 3.0.0"
 
-"iconv-lite@0.4.24":
-  "integrity" "sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA=="
-  "resolved" "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.24.tgz"
-  "version" "0.4.24"
-  dependencies:
-    "safer-buffer" ">= 2.1.2 < 3"
+"ieee754@^1.1.13":
+  "integrity" "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ieee754/-/ieee754-1.2.1.tgz"
+  "version" "1.2.1"
 
 "iferr@^0.1.5":
   "integrity" "sha1-xg7taebY/bazEEofy8ocGS3FtQE="
@@ -2057,7 +3010,17 @@
   dependencies:
     "minimatch" "^3.0.4"
 
-"ignore@^5.1.4":
+"ignore@^3.3.3":
+  "integrity" "sha512-Pgs951kaMm5GXP7MOvxERINe3gsaVjUWFm+UZPSq9xYriQAksyhg0csnS0KXSNRD5NmNdapXEpjxG49+AKh/ug=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ignore/-/ignore-3.3.10.tgz"
+  "version" "3.3.10"
+
+"ignore@^3.3.5":
+  "integrity" "sha512-Pgs951kaMm5GXP7MOvxERINe3gsaVjUWFm+UZPSq9xYriQAksyhg0csnS0KXSNRD5NmNdapXEpjxG49+AKh/ug=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ignore/-/ignore-3.3.10.tgz"
+  "version" "3.3.10"
+
+"ignore@^5.1.1", "ignore@^5.1.4":
   "integrity" "sha512-BMpfD7PpiETpBl/A6S498BaIJ6Y/ABT93ETbby2fP00v4EbvPBXWEoaR1UBPKs3iR53pJY7EtZk5KACI57i1Uw=="
   "resolved" "https://registry.npmjs.org/ignore/-/ignore-5.1.8.tgz"
   "version" "5.1.8"
@@ -2079,6 +3042,13 @@
   "integrity" "sha1-khi5srkoojixPcT7a21XbyMUU+o="
   "resolved" "https://registry.npmjs.org/imurmurhash/-/imurmurhash-0.1.4.tgz"
   "version" "0.1.4"
+
+"indent-string@^2.1.0":
+  "integrity" "sha1-ji1INIdCEhtKghi3oTfppSBJ3IA="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/indent-string/-/indent-string-2.1.0.tgz"
+  "version" "2.1.0"
+  dependencies:
+    "repeating" "^2.0.0"
 
 "infer-owner@^1.0.3", "infer-owner@^1.0.4":
   "integrity" "sha512-IClj+Xz94+d7irH5qRyfJonOdfTzuDaifE6ZPWfx0N0+/ATZCbuTPq2prFl526urkQd90WyUKIh1DfBQ2hMz9A=="
@@ -2108,10 +3078,35 @@
   "resolved" "https://registry.npmjs.org/ini/-/ini-1.3.8.tgz"
   "version" "1.3.8"
 
+"ini@1.3.7":
+  "integrity" "sha512-iKpRpXP+CrP2jyrxvg1kMUpXDyRUFDWurxbnVT1vQPx+Wz9uCYsMIqYuSBLV+PAaZG/d7kRLKRFc9oDMsH+mFQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ini/-/ini-1.3.7.tgz"
+  "version" "1.3.7"
+
 "ini@2.0.0":
   "integrity" "sha512-7PnF4oN3CvZF23ADhA5wRaYEQpJ8qygSkbtTXWBeXWXmEVRXK+1ITciHWwHhsjv1TmW0MgacIv6hEi5pX5NQdA=="
   "resolved" "https://registry.npmjs.org/ini/-/ini-2.0.0.tgz"
   "version" "2.0.0"
+
+"inquirer@^3.0.6":
+  "integrity" "sha512-h+xtnyk4EwKvFWHrUYsWErEVR+igKtLdchu+o0Z1RL7VU/jVMFbYir2bp6bAj8efFNxWqHX0dIss6fJQ+/+qeQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/inquirer/-/inquirer-3.3.0.tgz"
+  "version" "3.3.0"
+  dependencies:
+    "ansi-escapes" "^3.0.0"
+    "chalk" "^2.0.0"
+    "cli-cursor" "^2.1.0"
+    "cli-width" "^2.0.0"
+    "external-editor" "^2.0.4"
+    "figures" "^2.0.0"
+    "lodash" "^4.3.0"
+    "mute-stream" "0.0.7"
+    "run-async" "^2.2.0"
+    "rx-lite" "^4.0.8"
+    "rx-lite-aggregates" "^4.0.8"
+    "string-width" "^2.1.0"
+    "strip-ansi" "^4.0.0"
+    "through" "^2.3.6"
 
 "internal-slot@^1.0.3":
   "integrity" "sha512-O0DB1JC/sPyZl7cIo78n5dR7eUSwwpYPiXRhTzNxZVAMUuB8vlnRFyLxdrVToks6XPLVnFfbzaVd5WLjhgg+vA=="
@@ -2136,6 +3131,20 @@
   "integrity" "sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g=="
   "resolved" "https://registry.npmjs.org/ipaddr.js/-/ipaddr.js-1.9.1.tgz"
   "version" "1.9.1"
+
+"is-accessor-descriptor@^0.1.6":
+  "integrity" "sha1-qeEss66Nh2cn7u84Q/igiXtcmNY="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-accessor-descriptor/-/is-accessor-descriptor-0.1.6.tgz"
+  "version" "0.1.6"
+  dependencies:
+    "kind-of" "^3.0.2"
+
+"is-accessor-descriptor@^1.0.0":
+  "integrity" "sha512-m5hnHTkcVsPfqx3AKlyttIPb7J+XykHvJP2B9bZDjlhLIoEq4XoK64Vg7boZlVWYK6LUY94dYPEE7Lh0ZkZKcQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-accessor-descriptor/-/is-accessor-descriptor-1.0.0.tgz"
+  "version" "1.0.0"
+  dependencies:
+    "kind-of" "^6.0.0"
 
 "is-arrayish@^0.2.1":
   "integrity" "sha1-d8mYQFJ6qOyxqLppe4BkWnqSap0="
@@ -2164,6 +3173,11 @@
     "call-bind" "^1.0.2"
     "has-tostringtag" "^1.0.0"
 
+"is-buffer@^1.1.5":
+  "integrity" "sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-buffer/-/is-buffer-1.1.6.tgz"
+  "version" "1.1.6"
+
 "is-callable@^1.1.4", "is-callable@^1.2.3":
   "integrity" "sha512-nsuwtxZfMX67Oryl9LCQ+upnC0Z0BgpwntpS89m1H/TLF0zNfzfLMV/9Wa/6MZsj0acpEjAO0KF1xT6ZdLl95w=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-callable/-/is-callable-1.2.4.tgz"
@@ -2183,6 +3197,20 @@
   dependencies:
     "has" "^1.0.3"
 
+"is-data-descriptor@^0.1.4":
+  "integrity" "sha1-C17mSDiOLIYCgueT8YVv7D8wG1Y="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-data-descriptor/-/is-data-descriptor-0.1.4.tgz"
+  "version" "0.1.4"
+  dependencies:
+    "kind-of" "^3.0.2"
+
+"is-data-descriptor@^1.0.0":
+  "integrity" "sha512-jbRXy1FmtAoCjQkVmIVYwuuqDFUbaOeDjmed1tOGPrsMhtJA4rD9tkgA0F1qJ3gRFRXcHYVkdeaP50Q5rE/jLQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-data-descriptor/-/is-data-descriptor-1.0.0.tgz"
+  "version" "1.0.0"
+  dependencies:
+    "kind-of" "^6.0.0"
+
 "is-date-object@^1.0.1":
   "integrity" "sha512-9YQaSxsAiSwcvS33MBk3wTCVnWK+HhF8VZR2jRxehM16QcVOdHqPn4VPHmRK4lSr38n9JriurInLcP90xsYNfQ=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-date-object/-/is-date-object-1.0.5.tgz"
@@ -2190,15 +3218,55 @@
   dependencies:
     "has-tostringtag" "^1.0.0"
 
+"is-descriptor@^0.1.0":
+  "integrity" "sha512-avDYr0SB3DwO9zsMov0gKCESFYqCnE4hq/4z3TdUlukEy5t9C0YRq7HLrsN52NAcqXKaepeCD0n+B0arnVG3Hg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-descriptor/-/is-descriptor-0.1.6.tgz"
+  "version" "0.1.6"
+  dependencies:
+    "is-accessor-descriptor" "^0.1.6"
+    "is-data-descriptor" "^0.1.4"
+    "kind-of" "^5.0.0"
+
+"is-descriptor@^1.0.0", "is-descriptor@^1.0.2":
+  "integrity" "sha512-2eis5WqQGV7peooDyLmNEPUrps9+SXX5c9pL3xEB+4e9HnGuDa7mB7kHxHw4CbqS9k1T2hOH3miL8n8WtiYVtg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-descriptor/-/is-descriptor-1.0.2.tgz"
+  "version" "1.0.2"
+  dependencies:
+    "is-accessor-descriptor" "^1.0.0"
+    "is-data-descriptor" "^1.0.0"
+    "kind-of" "^6.0.2"
+
 "is-docker@^2.0.0":
   "integrity" "sha512-F+i2BKsFrH66iaUFc0woD8sLy8getkwTwtOBjvs56Cx4CgJDeKQeqfz8wAYiSb8JOprWhHH5p77PbmYCvvUuXQ=="
   "resolved" "https://registry.npmjs.org/is-docker/-/is-docker-2.2.1.tgz"
   "version" "2.2.1"
 
+"is-extendable@^0.1.0", "is-extendable@^0.1.1":
+  "integrity" "sha1-YrEQ4omkcUGOPsNqYX1HLjAd/Ik="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-extendable/-/is-extendable-0.1.1.tgz"
+  "version" "0.1.1"
+
+"is-extendable@^0.1.1":
+  "integrity" "sha1-YrEQ4omkcUGOPsNqYX1HLjAd/Ik="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-extendable/-/is-extendable-0.1.1.tgz"
+  "version" "0.1.1"
+
+"is-extendable@^1.0.1":
+  "integrity" "sha512-arnXMxT1hhoKo9k1LZdmlNyJdDDfy2v0fXjFlmok4+i8ul/6WlbVge9bhM74OpNPQPMGUToDtz+KXa1PneJxOA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-extendable/-/is-extendable-1.0.1.tgz"
+  "version" "1.0.1"
+  dependencies:
+    "is-plain-object" "^2.0.4"
+
 "is-extglob@^2.1.1":
   "integrity" "sha1-qIwCU1eR8C7TfHahueqXc8gz+MI="
   "resolved" "https://registry.npmjs.org/is-extglob/-/is-extglob-2.1.1.tgz"
   "version" "2.1.1"
+
+"is-finite@^1.0.0":
+  "integrity" "sha512-cdyMtqX/BOqqNBBiKlIVkytNHm49MtMlYyn1zxzvJKWmFMlGzm+ry5BBfYyeY9YmNKbRSo/o7OX9w9ale0wg3w=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-finite/-/is-finite-1.1.0.tgz"
+  "version" "1.1.0"
 
 "is-fullwidth-code-point@^1.0.0":
   "integrity" "sha1-754xOG8DGn8NZDr4L95QxFfvAMs="
@@ -2224,6 +3292,14 @@
   dependencies:
     "is-extglob" "^2.1.1"
 
+"is-installed-globally@^0.3.2":
+  "integrity" "sha512-wZ8x1js7Ia0kecP/CHM/3ABkAmujX7WPvQk6uu3Fly/Mk44pySulQpnHG46OMjHGXApINnV4QhY3SWnECO2z5g=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-installed-globally/-/is-installed-globally-0.3.2.tgz"
+  "version" "0.3.2"
+  dependencies:
+    "global-dirs" "^2.0.1"
+    "is-path-inside" "^3.0.1"
+
 "is-installed-globally@^0.4.0":
   "integrity" "sha512-iwGqO3J21aaSkC7jWnHP/difazwS7SFeIqxv6wEtLU8Y5KlzFTjyqcSIT0d8s4+dDhKytsk9PJZ2BkS5eZwQRQ=="
   "resolved" "https://registry.npmjs.org/is-installed-globally/-/is-installed-globally-0.4.0.tgz"
@@ -2231,6 +3307,22 @@
   dependencies:
     "global-dirs" "^3.0.0"
     "is-path-inside" "^3.0.2"
+
+"is-my-ip-valid@^1.0.0":
+  "integrity" "sha512-gmh/eWXROncUzRnIa1Ubrt5b8ep/MGSnfAUI3aRp+sqTCs1tv1Isl8d8F6JmkN3dXKc3ehZMrtiPN9eL03NuaQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-my-ip-valid/-/is-my-ip-valid-1.0.0.tgz"
+  "version" "1.0.0"
+
+"is-my-json-valid@^2.16.0":
+  "integrity" "sha512-1JQwulVNjx8UqkPE/bqDaxtH4PXCe/2VRh/y3p99heOV87HG4Id5/VfDswd+YiAfHcRTfDlWgISycnHuhZq1aw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-my-json-valid/-/is-my-json-valid-2.20.6.tgz"
+  "version" "2.20.6"
+  dependencies:
+    "generate-function" "^2.0.0"
+    "generate-object-property" "^1.1.0"
+    "is-my-ip-valid" "^1.0.0"
+    "jsonpointer" "^5.0.0"
+    "xtend" "^4.0.0"
 
 "is-negative-zero@^2.0.1":
   "integrity" "sha512-2z6JzQvZRa9A2Y7xC6dQQm4FSTSTNWjKIYYTt4246eMTJmIo0Q+ZyOsU66X8lxK1AbB92dFeglPLrhwpeRKO6w=="
@@ -2256,6 +3348,13 @@
   dependencies:
     "has-tostringtag" "^1.0.0"
 
+"is-number@^3.0.0":
+  "integrity" "sha1-JP1iAaR4LPUFYcgQJ2r8fRLXEZU="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-number/-/is-number-3.0.0.tgz"
+  "version" "3.0.0"
+  dependencies:
+    "kind-of" "^3.0.2"
+
 "is-number@^7.0.0":
   "integrity" "sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng=="
   "resolved" "https://registry.npmjs.org/is-number/-/is-number-7.0.0.tgz"
@@ -2266,10 +3365,27 @@
   "resolved" "https://registry.npmjs.org/is-obj/-/is-obj-2.0.0.tgz"
   "version" "2.0.0"
 
+"is-path-inside@^3.0.1":
+  "integrity" "sha512-Fd4gABb+ycGAmKou8eMftCupSir5lRxqf4aD/vd0cD2qc4HL07OjCeuHMr8Ro4CoMaeCKDB0/ECBOVWjTwUvPQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-path-inside/-/is-path-inside-3.0.3.tgz"
+  "version" "3.0.3"
+
 "is-path-inside@^3.0.2":
   "integrity" "sha512-Fd4gABb+ycGAmKou8eMftCupSir5lRxqf4aD/vd0cD2qc4HL07OjCeuHMr8Ro4CoMaeCKDB0/ECBOVWjTwUvPQ=="
   "resolved" "https://registry.npmjs.org/is-path-inside/-/is-path-inside-3.0.3.tgz"
   "version" "3.0.3"
+
+"is-plain-object@^2.0.3", "is-plain-object@^2.0.4":
+  "integrity" "sha512-h5PpgXkWitc38BBMYawTYMWJHFZJVnBquFE57xFpjB8pJFiF6gZ+bU+WyI/yqXiFR5mdLsgYNaPe8uao6Uv9Og=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-plain-object/-/is-plain-object-2.0.4.tgz"
+  "version" "2.0.4"
+  dependencies:
+    "isobject" "^3.0.1"
+
+"is-property@^1.0.0", "is-property@^1.0.2":
+  "integrity" "sha1-V/4cTkhHTt1lsJkR8msc1Ald2oQ="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-property/-/is-property-1.0.2.tgz"
+  "version" "1.0.2"
 
 "is-regex@^1.1.3":
   "integrity" "sha512-kvRdxDsxZjhzUX07ZnLydzS1TU/TJlTUHHY4YLL87e37oUA49DfkLqgy+VjFocowy29cKvcSiu+kIv728jTTVg=="
@@ -2278,6 +3394,11 @@
   dependencies:
     "call-bind" "^1.0.2"
     "has-tostringtag" "^1.0.0"
+
+"is-resolvable@^1.0.0":
+  "integrity" "sha512-qgDYXFSR5WvEfuS5dMj6oTMEbrrSaM0CrFk2Yiq/gXnBvD9pMa2jGXxyhGLfvhZpuMZe18CJpFxAt3CRs42NMg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-resolvable/-/is-resolvable-1.1.0.tgz"
+  "version" "1.1.0"
 
 "is-string@^1.0.5", "is-string@^1.0.6":
   "integrity" "sha512-tE2UXzivje6ofPW7l23cjDOMa09gb7xlAqG6jG5ej6uPV32TlWP3NKPigtaGeHNu9fohccRYvIiZMfOOnOYUtg=="
@@ -2298,6 +3419,16 @@
   "resolved" "https://registry.npmjs.org/is-typedarray/-/is-typedarray-1.0.0.tgz"
   "version" "1.0.0"
 
+"is-utf8@^0.2.0":
+  "integrity" "sha1-Sw2hRCEE0bM2NA6AeX6GXPOffXI="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-utf8/-/is-utf8-0.2.1.tgz"
+  "version" "0.2.1"
+
+"is-windows@^1.0.2":
+  "integrity" "sha512-eXK1UInq2bPmjyX6e3VHIzMLobc4J94i4AWn+Hpq3OU5KkrRC96OAcR3PRJ/pGu6m8TRnBHP9dkXQVsT/COVIA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/is-windows/-/is-windows-1.0.2.tgz"
+  "version" "1.0.2"
+
 "is-wsl@^2.1.1":
   "integrity" "sha512-fKzAra0rGJUUBwGBgNkHZuToZcn+TtXHpeCgmkMJMMYx1sQDYaCSyjJBSCa2nH1DGm7s3n1oBnohoVTBaN7Lww=="
   "resolved" "https://registry.npmjs.org/is-wsl/-/is-wsl-2.2.0.tgz"
@@ -2310,7 +3441,7 @@
   "resolved" "https://registry.npmjs.org/is-yarn-global/-/is-yarn-global-0.3.0.tgz"
   "version" "0.3.0"
 
-"isarray@~1.0.0":
+"isarray@~1.0.0", "isarray@1.0.0":
   "integrity" "sha1-u5NdSFgsuhaMBoNJV6VKPgcSTxE="
   "resolved" "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz"
   "version" "1.0.0"
@@ -2324,6 +3455,18 @@
   "integrity" "sha1-6PvzdNxVb/iUehDcsFctYz8s+hA="
   "resolved" "https://registry.npmjs.org/isexe/-/isexe-2.0.0.tgz"
   "version" "2.0.0"
+
+"isobject@^2.0.0":
+  "integrity" "sha1-8GVWEJaj8dou9GJy+BXIQNh+DIk="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/isobject/-/isobject-2.1.0.tgz"
+  "version" "2.1.0"
+  dependencies:
+    "isarray" "1.0.0"
+
+"isobject@^3.0.0", "isobject@^3.0.1":
+  "integrity" "sha1-TkMekrEalzFjaqH5yNHMvP2reN8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/isobject/-/isobject-3.0.1.tgz"
+  "version" "3.0.1"
 
 "istanbul-lib-coverage@^3.0.0":
   "integrity" "sha512-UiUIqxMgRDET6eR+o5HbfRYP1l0hqkWOs7vNxC/mggutCMUIhWMm8gAHb8tHlyfD3/l6rlgNA5cKdDzEAf6hEg=="
@@ -2366,10 +3509,23 @@
     "html-escaper" "^2.0.0"
     "istanbul-lib-report" "^3.0.0"
 
+"js-tokens@^3.0.2":
+  "integrity" "sha1-mGbfOVECEw449/mWvOtlRDIJwls="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/js-tokens/-/js-tokens-3.0.2.tgz"
+  "version" "3.0.2"
+
 "js-tokens@^4.0.0":
   "integrity" "sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ=="
   "resolved" "https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz"
   "version" "4.0.0"
+
+"js-yaml@^3.8.4":
+  "integrity" "sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/js-yaml/-/js-yaml-3.14.1.tgz"
+  "version" "3.14.1"
+  dependencies:
+    "argparse" "^1.0.7"
+    "esprima" "^4.0.0"
 
 "js-yaml@^4.1.0":
   "integrity" "sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA=="
@@ -2377,6 +3533,22 @@
   "version" "4.1.0"
   dependencies:
     "argparse" "^2.0.1"
+
+"js-yaml@~3.13.0":
+  "integrity" "sha512-YfbcO7jXDdyj0DGxYVSlSeQNHbD7XPWvrVWeVUujrQEoZzWJIRrCPoyk6kL6IAjAG2IolMK4T0hNUe0HOUs5Jw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/js-yaml/-/js-yaml-3.13.1.tgz"
+  "version" "3.13.1"
+  dependencies:
+    "argparse" "^1.0.7"
+    "esprima" "^4.0.0"
+
+"js-yaml@3.13.1":
+  "integrity" "sha512-YfbcO7jXDdyj0DGxYVSlSeQNHbD7XPWvrVWeVUujrQEoZzWJIRrCPoyk6kL6IAjAG2IolMK4T0hNUe0HOUs5Jw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/js-yaml/-/js-yaml-3.13.1.tgz"
+  "version" "3.13.1"
+  dependencies:
+    "argparse" "^1.0.7"
+    "esprima" "^4.0.0"
 
 "js2xmlparser@^4.0.1":
   "integrity" "sha512-KrPTolcw6RocpYjdC7pL7v62e55q7qOMHvLX1UCLc5AAS8qeJ6nukarEJAF2KL2PZxlbGueEbINqZR2bDe/gUw=="
@@ -2430,12 +3602,23 @@
   "resolved" "https://registry.npmjs.org/json-schema-traverse/-/json-schema-traverse-0.4.1.tgz"
   "version" "0.4.1"
 
+"json-stable-stringify@^1.0.1":
+  "integrity" "sha1-mnWdOcXy/1A/1TAGRu1EX4jE+a8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/json-stable-stringify/-/json-stable-stringify-1.0.1.tgz"
+  "version" "1.0.1"
+  dependencies:
+    "jsonify" "~0.0.0"
+
 "json5@^2.1.2":
   "integrity" "sha512-f+8cldu7X/y7RAJurMEJmdoKXGB/X550w2Nr3tTbezL6RwEE/iMcm+tZnXeoZtKuOq6ft8+CqzEkrIgx1fPoQA=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/json5/-/json5-2.2.0.tgz"
   "version" "2.2.0"
   dependencies:
     "minimist" "^1.2.5"
+
+"jsonc-parser@1.0.3":
+  "integrity" "sha512-hk/69oAeaIzchq/v3lS50PXuzn5O2ynldopMC+SWBql7J2WtdptfB9dy8Y7+Og5rPkTCpn83zTiO8FMcqlXJ/g=="
+  "version" "1.0.3"
 
 "jsonfile@^4.0.0":
   "integrity" "sha1-h3Gq4HmbZAdrdmQPygWPnBDjPss="
@@ -2444,10 +3627,20 @@
   optionalDependencies:
     "graceful-fs" "^4.1.6"
 
+"jsonify@~0.0.0":
+  "integrity" "sha1-LHS27kHZPKUbe1qu6PUDYx0lKnM="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/jsonify/-/jsonify-0.0.0.tgz"
+  "version" "0.0.0"
+
 "jsonparse@^1.2.0":
   "integrity" "sha1-P02uSpH6wxX3EGL4UhzCOfE2YoA="
   "resolved" "https://registry.npmjs.org/jsonparse/-/jsonparse-1.3.1.tgz"
   "version" "1.3.1"
+
+"jsonpointer@^5.0.0":
+  "integrity" "sha512-PNYZIdMjVIvVgDSYKTT63Y+KZ6IZvGRNNWcxwD+GNnUz1MKPfv30J8ueCjdwcN0nDx2SlshgyB7Oy0epAzVRRg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/jsonpointer/-/jsonpointer-5.0.0.tgz"
+  "version" "5.0.0"
 
 "JSONStream@^1.3.4":
   "integrity" "sha512-E+iruNOY8VV9s4JEbe1aNEm6MiszPRr/UfcHMz0TQh1BXSxHK+ASV1R6W4HpjBhSeS+54PIsAMCBmwD06LLsqQ=="
@@ -2517,12 +3710,51 @@
     "ua-parser-js" "^0.7.28"
     "yargs" "^16.1.1"
 
+"keytar@7.7.0":
+  "integrity" "sha512-YEY9HWqThQc5q5xbXbRwsZTh2PJ36OSYRjSv3NN2xf5s5dpLTjEZnC2YikR29OaVybf9nQ0dJ/80i40RS97t/A=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/keytar/-/keytar-7.7.0.tgz"
+  "version" "7.7.0"
+  dependencies:
+    "node-addon-api" "^3.0.0"
+    "prebuild-install" "^6.0.0"
+
 "keyv@^3.0.0":
   "integrity" "sha512-9ykJ/46SN/9KPM/sichzQ7OvXyGDYKGTaDlKMGCAlg2UK8KRy4jb0d8sFc+0Tt0YYnThq8X2RZgCg74RPxgcVA=="
   "resolved" "https://registry.npmjs.org/keyv/-/keyv-3.1.0.tgz"
   "version" "3.1.0"
   dependencies:
     "json-buffer" "3.0.0"
+
+"kind-of@^3.0.2", "kind-of@^3.0.3":
+  "integrity" "sha1-MeohpzS6ubuw8yRm2JOupR5KPGQ="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/kind-of/-/kind-of-3.2.2.tgz"
+  "version" "3.2.2"
+  dependencies:
+    "is-buffer" "^1.1.5"
+
+"kind-of@^3.2.0":
+  "integrity" "sha1-MeohpzS6ubuw8yRm2JOupR5KPGQ="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/kind-of/-/kind-of-3.2.2.tgz"
+  "version" "3.2.2"
+  dependencies:
+    "is-buffer" "^1.1.5"
+
+"kind-of@^4.0.0":
+  "integrity" "sha1-IIE989cSkosgc3hpGkUGb65y3Vc="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/kind-of/-/kind-of-4.0.0.tgz"
+  "version" "4.0.0"
+  dependencies:
+    "is-buffer" "^1.1.5"
+
+"kind-of@^5.0.0":
+  "integrity" "sha512-NGEErnH6F2vUuXDh+OlbcKW7/wOcfdRHaZ7VWtqCztfHri/++YKmP51OdWeGPuqCOba6kk2OTe5d02VmTB80Pw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/kind-of/-/kind-of-5.1.0.tgz"
+  "version" "5.1.0"
+
+"kind-of@^6.0.0", "kind-of@^6.0.2":
+  "integrity" "sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/kind-of/-/kind-of-6.0.3.tgz"
+  "version" "6.0.3"
 
 "klaw@^3.0.0":
   "integrity" "sha512-0Fo5oir+O9jnXu5EefYbVK+mHMBeEVEy2cmctR1O1NECcCkPRreJKrS6Qt/j3KC2C148Dfo9i3pCmCMsdqGr0g=="
@@ -2547,6 +3779,14 @@
     "css" "^3.0.0"
     "mime" "^1.6.0"
 
+"levn@^0.3.0", "levn@~0.3.0":
+  "integrity" "sha1-OwmSTt+fCDwEkP3UwLxEIeBHZO4="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/levn/-/levn-0.3.0.tgz"
+  "version" "0.3.0"
+  dependencies:
+    "prelude-ls" "~1.1.2"
+    "type-check" "~0.3.2"
+
 "libnpmconfig@^1.2.1":
   "integrity" "sha512-9esX8rTQAHqarx6qeZqmGQKBNZR5OIbl/Ayr0qQDy3oXja2iFVQQI81R6GZ2a02bSNZ9p3YOGX1O6HHCb1X7kA=="
   "resolved" "https://registry.npmjs.org/libnpmconfig/-/libnpmconfig-1.2.1.tgz"
@@ -2568,7 +3808,7 @@
   dependencies:
     "uc.micro" "^1.0.1"
 
-"livereload-js@^3.3.1":
+"livereload-js@^3.1.0", "livereload-js@^3.3.1":
   "integrity" "sha512-w677WnINxFkuixAoUEXOStewzLYGI76XVag+0JWMMEyjJQKs0ibWZMxkTlB96Lm3EjZ7IeOxVziBEbtxVQqQZA=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/livereload-js/-/livereload-js-3.3.2.tgz"
   "version" "3.3.2"
@@ -2582,6 +3822,27 @@
     "livereload-js" "^3.3.1"
     "opts" ">= 1.2.0"
     "ws" "^7.4.3"
+
+"livereload@0.9.1":
+  "integrity" "sha512-9g7sua11kkyZNo2hLRCG3LuZZwqexoyEyecSlV8cAsfAVVCZqLzVir6XDqmH0r+Vzgnd5LrdHDMyjtFnJQLAYw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/livereload/-/livereload-0.9.1.tgz"
+  "version" "0.9.1"
+  dependencies:
+    "chokidar" "^3.3.0"
+    "livereload-js" "^3.1.0"
+    "opts" ">= 1.2.0"
+    "ws" "^6.2.1"
+
+"load-json-file@^1.0.0":
+  "integrity" "sha1-lWkFcI1YtLq0wiYbBPWfMcmTdMA="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/load-json-file/-/load-json-file-1.1.0.tgz"
+  "version" "1.1.0"
+  dependencies:
+    "graceful-fs" "^4.1.2"
+    "parse-json" "^2.2.0"
+    "pify" "^2.0.0"
+    "pinkie-promise" "^2.0.0"
+    "strip-bom" "^2.0.0"
 
 "load-json-file@^4.0.0":
   "integrity" "sha1-L19Fq5HjMhYjT9U62rZo607AmTs="
@@ -2620,10 +3881,15 @@
   "resolved" "https://registry.npmjs.org/lodash.isfinite/-/lodash.isfinite-3.3.2.tgz"
   "version" "3.3.2"
 
-"lodash@^4.17.14", "lodash@^4.17.15", "lodash@^4.17.21":
+"lodash@^4.17.14", "lodash@^4.17.15", "lodash@^4.17.21", "lodash@^4.17.4", "lodash@^4.3.0", "lodash@~4.17.10", "lodash@~4.17.5", "lodash@4.17.21":
   "integrity" "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
   "resolved" "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
   "version" "4.17.21"
+
+"lodash@4.17.15":
+  "integrity" "sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/lodash/-/lodash-4.17.15.tgz"
+  "version" "4.17.15"
 
 "log4js@^6.3.0":
   "integrity" "sha512-Mc8jNuSFImQUIateBFwdOQcmC6Q5maU0VVvdC2R6XMb66/VnT+7WS4D/0EeNMZu1YODmJe5NIn2XftCzEocUgw=="
@@ -2635,6 +3901,14 @@
     "flatted" "^2.0.1"
     "rfdc" "^1.1.4"
     "streamroller" "^2.2.4"
+
+"loud-rejection@^1.0.0":
+  "integrity" "sha1-W0b4AUft7leIcPCG0Eghz5mOVR8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/loud-rejection/-/loud-rejection-1.6.0.tgz"
+  "version" "1.6.0"
+  dependencies:
+    "currently-unhandled" "^0.4.1"
+    "signal-exit" "^3.0.0"
 
 "lowercase-keys@^1.0.0", "lowercase-keys@^1.0.1":
   "integrity" "sha512-G2Lj61tXDnVFFOi8VZds+SoQjtQC3dgokKdDG2mTm1tx4m50NUHBOZSBwQQHyy0V12A0JTG4icfZQH+xPyh8VA=="
@@ -2660,6 +3934,14 @@
   dependencies:
     "yallist" "^4.0.0"
 
+"make-dir@^2.1.0":
+  "integrity" "sha512-LS9X+dc8KLxXCb8dni79fLIIUA5VyZoyjSMCwTluaXA0o27cCK0bhXkpgw+sTXVpPy/lSO57ilRixqk0vDmtRA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/make-dir/-/make-dir-2.1.0.tgz"
+  "version" "2.1.0"
+  dependencies:
+    "pify" "^4.0.1"
+    "semver" "^5.6.0"
+
 "make-dir@^3.0.0", "make-dir@^3.1.0":
   "integrity" "sha512-g3FeP20LNwhALb/6Cz6Dd4F2ngze0jz7tbzrD2wAV+o9FeNHe4rL+yK2md0J/fiSf1sa1ADhXqi5+oVwOM/eGw=="
   "resolved" "https://registry.npmjs.org/make-dir/-/make-dir-3.1.0.tgz"
@@ -2683,6 +3965,23 @@
     "promise-retry" "^1.1.1"
     "socks-proxy-agent" "^4.0.0"
     "ssri" "^6.0.0"
+
+"map-cache@^0.2.2":
+  "integrity" "sha1-wyq9C9ZSXZsFFkW7TyasXcmKDb8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/map-cache/-/map-cache-0.2.2.tgz"
+  "version" "0.2.2"
+
+"map-obj@^1.0.0", "map-obj@^1.0.1":
+  "integrity" "sha1-2TPOuSBdgr3PSIb2dCvcK03qFG0="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/map-obj/-/map-obj-1.0.1.tgz"
+  "version" "1.0.1"
+
+"map-visit@^1.0.0":
+  "integrity" "sha1-7Nyo8TFE5mDxtb1B8S80edmN+48="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/map-visit/-/map-visit-1.0.0.tgz"
+  "version" "1.0.0"
+  dependencies:
+    "object-visit" "^1.0.0"
 
 "markdown-it-anchor@^5.2.7":
   "integrity" "sha512-/V1MnLL/rgJ3jkMWo84UR+K+jF1cxNG1a+KwqeXqTIJ+jtA8aWSHuigx8lTzauiIjBDbwF3NcWQMotd0Dm39jA=="
@@ -2720,12 +4019,28 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/memorystream/-/memorystream-0.3.1.tgz"
   "version" "0.3.1"
 
+"meow@^3.3.0":
+  "integrity" "sha1-cstmi0JSKCkKu/qFaJJYcwioAfs="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/meow/-/meow-3.7.0.tgz"
+  "version" "3.7.0"
+  dependencies:
+    "camelcase-keys" "^2.0.0"
+    "decamelize" "^1.1.2"
+    "loud-rejection" "^1.0.0"
+    "map-obj" "^1.0.1"
+    "minimist" "^1.1.3"
+    "normalize-package-data" "^2.3.4"
+    "object-assign" "^4.0.1"
+    "read-pkg-up" "^1.0.1"
+    "redent" "^1.0.0"
+    "trim-newlines" "^1.0.0"
+
 "merge-descriptors@1.0.1":
   "integrity" "sha1-sAqqVW3YtEVoFQ7J0blT8/kMu2E="
   "resolved" "https://registry.npmjs.org/merge-descriptors/-/merge-descriptors-1.0.1.tgz"
   "version" "1.0.1"
 
-"merge2@^1.3.0":
+"merge2@^1.2.3", "merge2@^1.3.0":
   "integrity" "sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg=="
   "resolved" "https://registry.npmjs.org/merge2/-/merge2-1.4.1.tgz"
   "version" "1.4.1"
@@ -2734,6 +4049,25 @@
   "integrity" "sha1-VSmk1nZUE07cxSZmVoNbD4Ua/O4="
   "resolved" "https://registry.npmjs.org/methods/-/methods-1.1.2.tgz"
   "version" "1.1.2"
+
+"micromatch@^3.1.4":
+  "integrity" "sha512-MWikgl9n9M3w+bpsY3He8L+w9eF9338xRl8IAO5viDizwSzziFEyUzo2xrrloB64ADbTf8uA8vRqqttDTOmccg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/micromatch/-/micromatch-3.1.10.tgz"
+  "version" "3.1.10"
+  dependencies:
+    "arr-diff" "^4.0.0"
+    "array-unique" "^0.3.2"
+    "braces" "^2.3.1"
+    "define-property" "^2.0.2"
+    "extend-shallow" "^3.0.2"
+    "extglob" "^2.0.4"
+    "fragment-cache" "^0.2.1"
+    "kind-of" "^6.0.2"
+    "nanomatch" "^1.2.9"
+    "object.pick" "^1.3.0"
+    "regex-not" "^1.0.0"
+    "snapdragon" "^0.8.1"
+    "to-regex" "^3.0.2"
 
 "micromatch@^4.0.2", "micromatch@^4.0.4":
   "integrity" "sha512-pRmzw/XUcwXGpD9aI9q/0XOwLNygjETJ8y0ao0wdqprrzDa4YnxLcz7fQRZr8voh8V10kGhABbNcHVk5wHgWwg=="
@@ -2765,24 +4099,34 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/mime/-/mime-2.5.2.tgz"
   "version" "2.5.2"
 
+"mimic-fn@^1.0.0":
+  "integrity" "sha512-jf84uxzwiuiIVKiOLpfYk7N46TSy8ubTonmneY9vrpHNAnp0QBt2BxWV9dO3/j+BoVAb+a5G6YDPW3M5HOdMWQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/mimic-fn/-/mimic-fn-1.2.0.tgz"
+  "version" "1.2.0"
+
 "mimic-response@^1.0.0", "mimic-response@^1.0.1":
   "integrity" "sha512-j5EctnkH7amfV/q5Hgmoal1g2QHFJRraOtmx0JpIqkxhBhI/lJSl1nMpQ45hVarwNETOoWEimndZ4QK0RHxuxQ=="
-  "resolved" "https://registry.npmjs.org/mimic-response/-/mimic-response-1.0.1.tgz"
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/mimic-response/-/mimic-response-1.0.1.tgz"
   "version" "1.0.1"
+
+"mimic-response@^2.0.0":
+  "integrity" "sha512-wXqjST+SLt7R009ySCglWBCFpjUygmCIfD790/kVbiGmUgfYGuB14PiTd5DwVxSV4NcYHjzMkoj5LjQZwTQLEA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/mimic-response/-/mimic-response-2.1.0.tgz"
+  "version" "2.1.0"
 
 "minimalistic-assert@^1.0.0":
   "integrity" "sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A=="
   "resolved" "https://registry.npmjs.org/minimalistic-assert/-/minimalistic-assert-1.0.1.tgz"
   "version" "1.0.1"
 
-"minimatch@^3.0.3", "minimatch@^3.0.4":
+"minimatch@^3.0.2", "minimatch@^3.0.3", "minimatch@^3.0.4", "minimatch@~3.0.2", "minimatch@2 || 3":
   "integrity" "sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA=="
   "resolved" "https://registry.npmjs.org/minimatch/-/minimatch-3.0.4.tgz"
   "version" "3.0.4"
   dependencies:
     "brace-expansion" "^1.1.7"
 
-"minimist@^1.2.0", "minimist@^1.2.3", "minimist@^1.2.5":
+"minimist@^1.1.3", "minimist@^1.2.0", "minimist@^1.2.3", "minimist@^1.2.5":
   "integrity" "sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw=="
   "resolved" "https://registry.npmjs.org/minimist/-/minimist-1.2.5.tgz"
   "version" "1.2.5"
@@ -2818,6 +4162,19 @@
     "stream-each" "^1.1.0"
     "through2" "^2.0.0"
 
+"mixin-deep@^1.2.0":
+  "integrity" "sha512-WRoDn//mXBiJ1H40rqa3vH0toePwSsGb45iInWlTySa+Uu4k3tYUSxa2v1KqAiLtvlrSzaExqS1gtk96A9zvEA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/mixin-deep/-/mixin-deep-1.3.2.tgz"
+  "version" "1.3.2"
+  dependencies:
+    "for-in" "^1.0.2"
+    "is-extendable" "^1.0.1"
+
+"mkdirp-classic@^0.5.2", "mkdirp-classic@^0.5.3":
+  "integrity" "sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz"
+  "version" "0.5.3"
+
 "mkdirp@^0.5.1":
   "integrity" "sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ=="
   "resolved" "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.5.tgz"
@@ -2836,6 +4193,21 @@
   "integrity" "sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw=="
   "resolved" "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz"
   "version" "1.0.4"
+
+"mkdirp@~0.5.1":
+  "integrity" "sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/mkdirp/-/mkdirp-0.5.5.tgz"
+  "version" "0.5.5"
+  dependencies:
+    "minimist" "^1.2.5"
+
+"mock-require@^3.0.3":
+  "integrity" "sha512-lLzfLHcyc10MKQnNUCv7dMcoY/2Qxd6wJfbqCcVk3LDb8An4hF6ohk5AztrvgKhJCqj36uyzi/p5se+tvyD+Wg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/mock-require/-/mock-require-3.0.3.tgz"
+  "version" "3.0.3"
+  dependencies:
+    "get-caller-file" "^1.0.2"
+    "normalize-path" "^2.1.1"
 
 "move-concurrently@^1.0.1":
   "integrity" "sha1-viwAX9oy4LKa8fBdfEszIUxwH5I="
@@ -2869,6 +4241,38 @@
   "resolved" "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
   "version" "2.1.2"
 
+"mute-stream@0.0.7":
+  "integrity" "sha1-MHXOk7whuPq0PhvE2n6BFe0ee6s="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/mute-stream/-/mute-stream-0.0.7.tgz"
+  "version" "0.0.7"
+
+"nanomatch@^1.2.9":
+  "integrity" "sha512-fpoe2T0RbHwBTBUOftAfBPaDEi06ufaUai0mE6Yn1kacc3SnTErfb/h+X94VXzI64rKFHYImXSvdwGGCmwOqCA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/nanomatch/-/nanomatch-1.2.13.tgz"
+  "version" "1.2.13"
+  dependencies:
+    "arr-diff" "^4.0.0"
+    "array-unique" "^0.3.2"
+    "define-property" "^2.0.2"
+    "extend-shallow" "^3.0.2"
+    "fragment-cache" "^0.2.1"
+    "is-windows" "^1.0.2"
+    "kind-of" "^6.0.2"
+    "object.pick" "^1.3.0"
+    "regex-not" "^1.0.0"
+    "snapdragon" "^0.8.1"
+    "to-regex" "^3.0.1"
+
+"napi-build-utils@^1.0.1":
+  "integrity" "sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/napi-build-utils/-/napi-build-utils-1.0.2.tgz"
+  "version" "1.0.2"
+
+"natural-compare@^1.4.0":
+  "integrity" "sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/natural-compare/-/natural-compare-1.4.0.tgz"
+  "version" "1.4.0"
+
 "negotiator@0.6.2":
   "integrity" "sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw=="
   "resolved" "https://registry.npmjs.org/negotiator/-/negotiator-0.6.2.tgz"
@@ -2884,6 +4288,18 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/nice-try/-/nice-try-1.0.5.tgz"
   "version" "1.0.5"
 
+"node-abi@^2.21.0":
+  "integrity" "sha512-/2D0wOQPgaUWzVSVgRMx+trKJRC2UG4SUc4oCJoXx9Uxjtp0Vy3/kt7zcbxHF8+Z/pK3UloLWzBISg72brfy1w=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/node-abi/-/node-abi-2.30.1.tgz"
+  "version" "2.30.1"
+  dependencies:
+    "semver" "^5.4.1"
+
+"node-addon-api@^3.0.0":
+  "integrity" "sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/node-addon-api/-/node-addon-api-3.2.1.tgz"
+  "version" "3.2.1"
+
 "node-fetch-npm@^2.0.2":
   "integrity" "sha512-iOuIQDWDyjhv9qSDrj9aq/klt6F9z1p2otB3AV7v3zBDcL/x+OfGsvGQZZCcMZbUf4Ujw1xGNQkjvGnVT22cKg=="
   "resolved" "https://registry.npmjs.org/node-fetch-npm/-/node-fetch-npm-2.0.4.tgz"
@@ -2898,7 +4314,14 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/node-releases/-/node-releases-1.1.75.tgz"
   "version" "1.1.75"
 
-"normalize-package-data@^2.3.2", "normalize-package-data@^2.4.0", "normalize-package-data@^2.5.0":
+"nopt@~3.0.6":
+  "integrity" "sha1-xkZdvwirzU2zWTF/eaxopkayj/k="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/nopt/-/nopt-3.0.6.tgz"
+  "version" "3.0.6"
+  dependencies:
+    "abbrev" "1"
+
+"normalize-package-data@^2.3.2", "normalize-package-data@^2.3.4", "normalize-package-data@^2.4.0", "normalize-package-data@^2.5.0":
   "integrity" "sha512-/5CMN3T0R4XTj4DcGaexo+roZSdSFW/0AOOTROrjxzCG1wrWXEsGbRKevjlIL+ZDE4sZlJr5ED4YW0yqmkK+eA=="
   "resolved" "https://registry.npmjs.org/normalize-package-data/-/normalize-package-data-2.5.0.tgz"
   "version" "2.5.0"
@@ -2907,6 +4330,13 @@
     "resolve" "^1.10.0"
     "semver" "2 || 3 || 4 || 5"
     "validate-npm-package-license" "^3.0.1"
+
+"normalize-path@^2.1.1":
+  "integrity" "sha1-GrKLVW4Zg2Oowab35vogE3/mrtk="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/normalize-path/-/normalize-path-2.1.1.tgz"
+  "version" "2.1.1"
+  dependencies:
+    "remove-trailing-separator" "^1.0.1"
 
 "normalize-path@^3.0.0", "normalize-path@~3.0.0":
   "integrity" "sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA=="
@@ -2986,7 +4416,7 @@
     "shell-quote" "^1.6.1"
     "string.prototype.padend" "^3.0.0"
 
-"npmlog@^4.1.2":
+"npmlog@^4.0.1", "npmlog@^4.1.2":
   "integrity" "sha512-2uUqazuKlTaSI/dC8AzicUck7+IrEaOnN/e0jd3Xtt1KcGpwx30v50mL7oPyr/h9bL3E4aZccVwpwP+5W9Vjkg=="
   "resolved" "https://registry.npmjs.org/npmlog/-/npmlog-4.1.2.tgz"
   "version" "4.1.2"
@@ -3013,6 +4443,15 @@
   "resolved" "https://registry.npmjs.org/object-assign/-/object-assign-4.1.1.tgz"
   "version" "4.1.1"
 
+"object-copy@^0.1.0":
+  "integrity" "sha1-fn2Fi3gb18mRpBupde04EnVOmYw="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/object-copy/-/object-copy-0.1.0.tgz"
+  "version" "0.1.0"
+  dependencies:
+    "copy-descriptor" "^0.1.0"
+    "define-property" "^0.2.5"
+    "kind-of" "^3.0.3"
+
 "object-inspect@^1.11.0", "object-inspect@^1.9.0":
   "integrity" "sha512-jp7ikS6Sd3GxQfZJPyH3cjcbJF6GZPClgdV+EFygjFLQ5FmW/dRUnTd9PQ9k0JhoNDabWFbpF1yCdSWCC6gexg=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/object-inspect/-/object-inspect-1.11.0.tgz"
@@ -3023,6 +4462,13 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/object-keys/-/object-keys-1.1.1.tgz"
   "version" "1.1.1"
 
+"object-visit@^1.0.0":
+  "integrity" "sha1-95xEk68MU3e1n+OdOV5BBC3QRbs="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/object-visit/-/object-visit-1.0.1.tgz"
+  "version" "1.0.1"
+  dependencies:
+    "isobject" "^3.0.0"
+
 "object.assign@^4.1.2":
   "integrity" "sha512-ixT2L5THXsApyiUPYKmW+2EHpXXe5Ii3M+f4e+aJFAHao5amFRW6J0OO6c/LU8Be47utCx2GL89hxGB6XSmKuQ=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/object.assign/-/object.assign-4.1.2.tgz"
@@ -3032,6 +4478,13 @@
     "define-properties" "^1.1.3"
     "has-symbols" "^1.0.1"
     "object-keys" "^1.1.1"
+
+"object.pick@^1.3.0":
+  "integrity" "sha1-h6EKxMFpS9Lhy/U1kaZhQftd10c="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/object.pick/-/object.pick-1.3.0.tgz"
+  "version" "1.3.0"
+  dependencies:
+    "isobject" "^3.0.1"
 
 "obuf@^1.0.0", "obuf@^1.1.2":
   "integrity" "sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg=="
@@ -3057,6 +4510,13 @@
   dependencies:
     "wrappy" "1"
 
+"onetime@^2.0.0":
+  "integrity" "sha1-BnQoIw/WdEOyeUsiu6UotoZ5YtQ="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/onetime/-/onetime-2.0.1.tgz"
+  "version" "2.0.1"
+  dependencies:
+    "mimic-fn" "^1.0.0"
+
 "open@^7.4.2":
   "integrity" "sha512-MVHddDVweXZF3awtlAS+6pgKLlm/JgxZ90+/NBurBoQctVOOB/zDdVjcyPzQ+0laDGbsWgrRkflI65sQeOgT9Q=="
   "resolved" "https://registry.npmjs.org/open/-/open-7.4.2.tgz"
@@ -3064,6 +4524,30 @@
   dependencies:
     "is-docker" "^2.0.0"
     "is-wsl" "^2.1.1"
+
+"optionator@^0.8.2":
+  "integrity" "sha512-+IW9pACdk3XWmmTXG8m3upGUJst5XRGzxMRjXzAuJ1XnIFNvfhjjIuYkDvysnPQ7qzqVzLt78BCruntqRhWQbA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/optionator/-/optionator-0.8.3.tgz"
+  "version" "0.8.3"
+  dependencies:
+    "deep-is" "~0.1.3"
+    "fast-levenshtein" "~2.0.6"
+    "levn" "~0.3.0"
+    "prelude-ls" "~1.1.2"
+    "type-check" "~0.3.2"
+    "word-wrap" "~1.2.3"
+
+"optionator@0.8.1":
+  "integrity" "sha1-4xtJMs3V+4Yqiw0QvGPT7h7H14s="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/optionator/-/optionator-0.8.1.tgz"
+  "version" "0.8.1"
+  dependencies:
+    "deep-is" "~0.1.3"
+    "fast-levenshtein" "^1.1.0"
+    "levn" "~0.3.0"
+    "prelude-ls" "~1.1.2"
+    "type-check" "~0.3.2"
+    "wordwrap" "~1.0.0"
 
 "opts@>= 1.2.0":
   "integrity" "sha512-k41FwbcLnlgnFh69f4qdUfvDQ+5vaSDnVPFI/y5XuhKRq97EnVVneO9F1ESVCdiVu4fCS2L8usX3mU331hB7pg=="
@@ -3075,7 +4559,7 @@
   "resolved" "https://registry.npmjs.org/os-homedir/-/os-homedir-1.0.2.tgz"
   "version" "1.0.2"
 
-"os-tmpdir@^1.0.0":
+"os-tmpdir@^1.0.0", "os-tmpdir@~1.0.2":
   "integrity" "sha1-u+Z0BseaqFxc/sdm/lc0VV36EnQ="
   "resolved" "https://registry.npmjs.org/os-tmpdir/-/os-tmpdir-1.0.2.tgz"
   "version" "1.0.2"
@@ -3174,6 +4658,13 @@
     "inherits" "^2.0.3"
     "readable-stream" "^2.1.5"
 
+"parse-json@^2.2.0":
+  "integrity" "sha1-9ID0BDTvgHQfhGkJn43qGPVaTck="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/parse-json/-/parse-json-2.2.0.tgz"
+  "version" "2.2.0"
+  dependencies:
+    "error-ex" "^1.2.0"
+
 "parse-json@^4.0.0":
   "integrity" "sha1-vjX1Qlvh9/bHRxhPmKeIy5lHfuA="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/parse-json/-/parse-json-4.0.0.tgz"
@@ -3209,6 +4700,18 @@
   "resolved" "https://registry.npmjs.org/parseurl/-/parseurl-1.3.3.tgz"
   "version" "1.3.3"
 
+"pascalcase@^0.1.1":
+  "integrity" "sha1-s2PlXoAGym/iF4TS2yK9FdeRfxQ="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/pascalcase/-/pascalcase-0.1.1.tgz"
+  "version" "0.1.1"
+
+"path-exists@^2.0.0":
+  "integrity" "sha1-D+tsZPD8UY2adU3V77YscCJ2H0s="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/path-exists/-/path-exists-2.1.0.tgz"
+  "version" "2.1.0"
+  dependencies:
+    "pinkie-promise" "^2.0.0"
+
 "path-exists@^3.0.0":
   "integrity" "sha1-zg6+ql94yxiSXqfYENe1mwEP1RU="
   "resolved" "https://registry.npmjs.org/path-exists/-/path-exists-3.0.0.tgz"
@@ -3219,10 +4722,15 @@
   "resolved" "https://registry.npmjs.org/path-exists/-/path-exists-4.0.0.tgz"
   "version" "4.0.0"
 
-"path-is-absolute@^1.0.0":
+"path-is-absolute@^1.0.0", "path-is-absolute@~1.0.0":
   "integrity" "sha1-F0uSaHNVNP+8es5r9TpanhtcX18="
   "resolved" "https://registry.npmjs.org/path-is-absolute/-/path-is-absolute-1.0.1.tgz"
   "version" "1.0.1"
+
+"path-is-inside@^1.0.2":
+  "integrity" "sha1-NlQX3t5EQw0cEa9hAn+s8HS9/FM="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/path-is-inside/-/path-is-inside-1.0.2.tgz"
+  "version" "1.0.2"
 
 "path-key@^2.0.1":
   "integrity" "sha1-QRyttXTFoUDTpLGRDUDYDMn0C0A="
@@ -3238,6 +4746,15 @@
   "integrity" "sha1-32BBeABfUi8V60SQ5yR6G/qmf4w="
   "resolved" "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-0.1.7.tgz"
   "version" "0.1.7"
+
+"path-type@^1.0.0":
+  "integrity" "sha1-WcRPfuSR2nBNpBXaWkBwuk+P5EE="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/path-type/-/path-type-1.1.0.tgz"
+  "version" "1.1.0"
+  dependencies:
+    "graceful-fs" "^4.1.2"
+    "pify" "^2.0.0"
+    "pinkie-promise" "^2.0.0"
 
 "path-type@^3.0.0":
   "integrity" "sha512-T2ZUsdZFHgA3u4e5PfPbjd7HDDpxPnQb5jN0SrDsjNSuVXHJqtwTnWqG0B1jZrgmJ/7lj1EmVIByWt1gxGkWvg=="
@@ -3261,10 +4778,32 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/pidtree/-/pidtree-0.3.1.tgz"
   "version" "0.3.1"
 
+"pify@^2.0.0":
+  "integrity" "sha1-7RQaasBDqEnqWISY59yosVMw6Qw="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/pify/-/pify-2.3.0.tgz"
+  "version" "2.3.0"
+
 "pify@^3.0.0":
   "integrity" "sha1-5aSs0sEB/fPZpNB/DbxNtJ3SgXY="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/pify/-/pify-3.0.0.tgz"
   "version" "3.0.0"
+
+"pify@^4.0.1":
+  "integrity" "sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/pify/-/pify-4.0.1.tgz"
+  "version" "4.0.1"
+
+"pinkie-promise@^2.0.0":
+  "integrity" "sha1-ITXW36ejWMBprJsXh3YogihFD/o="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/pinkie-promise/-/pinkie-promise-2.0.1.tgz"
+  "version" "2.0.1"
+  dependencies:
+    "pinkie" "^2.0.0"
+
+"pinkie@^2.0.0":
+  "integrity" "sha1-clVrgM+g1IqXToDnckjoDtT3+HA="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/pinkie/-/pinkie-2.0.4.tgz"
+  "version" "2.0.4"
 
 "pkg-dir@^4.2.0":
   "integrity" "sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ=="
@@ -3272,6 +4811,11 @@
   "version" "4.2.0"
   dependencies:
     "find-up" "^4.0.0"
+
+"pluralize@^4.0.0":
+  "integrity" "sha1-WbcIwcAZCi9pLxx2GMRGsFL9F2I="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/pluralize/-/pluralize-4.0.0.tgz"
+  "version" "4.0.0"
 
 "portfinder@^1.0.28":
   "integrity" "sha512-Se+2isanIcEqf2XMHjyUKskczxbPH7dQnlMjXX6+dybayyHvAf/TCgyMRlzf/B6QDhAEFOGes0pzRo3by4AbMA=="
@@ -3289,6 +4833,35 @@
   dependencies:
     "async" "^2.6.0"
     "is-number-like" "^1.0.3"
+
+"posix-character-classes@^0.1.0":
+  "integrity" "sha1-AerA/jta9xoqbAL+q7jB/vfgDqs="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/posix-character-classes/-/posix-character-classes-0.1.1.tgz"
+  "version" "0.1.1"
+
+"prebuild-install@^6.0.0":
+  "integrity" "sha512-Z4vpywnK1lBg+zdPCVCsKq0xO66eEV9rWo2zrROGGiRS4JtueBOdlB1FnY8lcy7JsUud/Q3ijUxyWN26Ika0vQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/prebuild-install/-/prebuild-install-6.1.4.tgz"
+  "version" "6.1.4"
+  dependencies:
+    "detect-libc" "^1.0.3"
+    "expand-template" "^2.0.3"
+    "github-from-package" "0.0.0"
+    "minimist" "^1.2.3"
+    "mkdirp-classic" "^0.5.3"
+    "napi-build-utils" "^1.0.1"
+    "node-abi" "^2.21.0"
+    "npmlog" "^4.0.1"
+    "pump" "^3.0.0"
+    "rc" "^1.2.7"
+    "simple-get" "^3.0.3"
+    "tar-fs" "^2.0.0"
+    "tunnel-agent" "^0.6.0"
+
+"prelude-ls@~1.1.2":
+  "integrity" "sha1-IZMqVJ9eUv/ZqCf1cOBL5iqX2lQ="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/prelude-ls/-/prelude-ls-1.1.2.tgz"
+  "version" "1.1.2"
 
 "prepend-http@^2.0.0":
   "integrity" "sha1-6SQ0v6XqjBn0HN/UAddBo8gZ2Jc="
@@ -3314,6 +4887,11 @@
   "integrity" "sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag=="
   "resolved" "https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-2.0.1.tgz"
   "version" "2.0.1"
+
+"progress@^2.0.0":
+  "integrity" "sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/progress/-/progress-2.0.3.tgz"
+  "version" "2.0.3"
 
 "promise-inflight@^1.0.1":
   "integrity" "sha1-mEcocL8igTL8vdhoEputEsPAKeM="
@@ -3380,6 +4958,10 @@
   dependencies:
     "escape-goat" "^2.0.0"
 
+"q@1.5.1":
+  "integrity" "sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc="
+  "version" "1.5.1"
+
 "qjobs@^1.2.0":
   "integrity" "sha512-8YOJEHtxpySA3fFDyCRxA+UUV+fA+rTWnuWvylOK/NCjhY+b4ocCtmu8TtsWb+mYeU+GCHf/S66KZF/AsteKHg=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/qjobs/-/qjobs-1.2.0.tgz"
@@ -3395,7 +4977,12 @@
   "resolved" "https://registry.npmjs.org/queue-microtask/-/queue-microtask-1.2.3.tgz"
   "version" "1.2.3"
 
-"random-int@^2.0.1":
+"random-int@^1.0.0":
+  "integrity" "sha1-5qLtNEisnGZGoGV0Q7HBUhWS7Qg="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/random-int/-/random-int-1.0.0.tgz"
+  "version" "1.0.0"
+
+"random-int@^2.0.0", "random-int@^2.0.1":
   "integrity" "sha512-YALjWK2Rt9EMIv9BF/3mvlzFWQathsvb5UZmN1QmhfIOfcQYXc/UcLzg0ablqesSBpBVLt2Tlwv/eTuBh4LXUQ=="
   "resolved" "https://registry.npmjs.org/random-int/-/random-int-2.0.1.tgz"
   "version" "2.0.1"
@@ -3415,7 +5002,7 @@
     "iconv-lite" "0.4.24"
     "unpipe" "1.0.0"
 
-"rc@^1.2.8":
+"rc@^1.2.7", "rc@^1.2.8":
   "integrity" "sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw=="
   "resolved" "https://registry.npmjs.org/rc/-/rc-1.2.8.tgz"
   "version" "1.2.8"
@@ -3425,6 +5012,14 @@
     "minimist" "^1.2.0"
     "strip-json-comments" "~2.0.1"
 
+"read-pkg-up@^1.0.1":
+  "integrity" "sha1-nWPBMnbAZZGNV/ACpX9AobZD+wI="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/read-pkg-up/-/read-pkg-up-1.0.1.tgz"
+  "version" "1.0.1"
+  dependencies:
+    "find-up" "^1.0.0"
+    "read-pkg" "^1.0.0"
+
 "read-pkg-up@^7.0.1":
   "integrity" "sha512-zK0TB7Xd6JpCLmlLmufqykGE+/TlOePD6qKClNW7hHDKFh/J7/7gCWGR7joEQEW1bKq3a3yUZSObOoWLFQ4ohg=="
   "resolved" "https://registry.npmjs.org/read-pkg-up/-/read-pkg-up-7.0.1.tgz"
@@ -3433,6 +5028,15 @@
     "find-up" "^4.1.0"
     "read-pkg" "^5.2.0"
     "type-fest" "^0.8.1"
+
+"read-pkg@^1.0.0":
+  "integrity" "sha1-9f+qXs0pyzHAR0vKfXVra7KePyg="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/read-pkg/-/read-pkg-1.1.0.tgz"
+  "version" "1.1.0"
+  dependencies:
+    "load-json-file" "^1.0.0"
+    "normalize-package-data" "^2.3.2"
+    "path-type" "^1.0.0"
 
 "read-pkg@^3.0.0":
   "integrity" "sha1-nLxoaXj+5l0WwA4rGcI3/Pbjg4k="
@@ -3475,6 +5079,24 @@
     "string_decoder" "^1.1.1"
     "util-deprecate" "^1.0.1"
 
+"readable-stream@^3.1.1":
+  "integrity" "sha512-BViHy7LKeTz4oNnkcLJ+lVSL6vpiFeX6/d3oSH8zCW7UxP2onchk+vTGB143xuFjHS3deTgkKoXXymXqymiIdA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/readable-stream/-/readable-stream-3.6.0.tgz"
+  "version" "3.6.0"
+  dependencies:
+    "inherits" "^2.0.3"
+    "string_decoder" "^1.1.1"
+    "util-deprecate" "^1.0.1"
+
+"readable-stream@^3.4.0":
+  "integrity" "sha512-BViHy7LKeTz4oNnkcLJ+lVSL6vpiFeX6/d3oSH8zCW7UxP2onchk+vTGB143xuFjHS3deTgkKoXXymXqymiIdA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/readable-stream/-/readable-stream-3.6.0.tgz"
+  "version" "3.6.0"
+  dependencies:
+    "inherits" "^2.0.3"
+    "string_decoder" "^1.1.1"
+    "util-deprecate" "^1.0.1"
+
 "readdirp@~3.6.0":
   "integrity" "sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/readdirp/-/readdirp-3.6.0.tgz"
@@ -3488,6 +5110,22 @@
   "version" "0.6.2"
   dependencies:
     "resolve" "^1.1.6"
+
+"redent@^1.0.0":
+  "integrity" "sha1-z5Fqsf1fHxbfsggi3W7H9zDCr94="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/redent/-/redent-1.0.0.tgz"
+  "version" "1.0.0"
+  dependencies:
+    "indent-string" "^2.1.0"
+    "strip-indent" "^1.0.1"
+
+"regex-not@^1.0.0", "regex-not@^1.0.2":
+  "integrity" "sha512-J6SDjUgDxQj5NusnOtdFxDwN/+HWykR8GELwctJ7mdqhcyy1xEc4SRFHUXvxTp661YaVKAjfRLZ9cCqS6tn32A=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/regex-not/-/regex-not-1.0.2.tgz"
+  "version" "1.0.2"
+  dependencies:
+    "extend-shallow" "^3.0.2"
+    "safe-regex" "^1.1.0"
 
 "registry-auth-token@^4.0.0":
   "integrity" "sha512-6gkSb4U6aWJB4SF2ZvLb76yCBjcvufXBqvvEx1HbmKPkutswjW1xNVRY0+daljIYRbogN7O0etYSlbiaEQyMyw=="
@@ -3503,6 +5141,28 @@
   dependencies:
     "rc" "^1.2.8"
 
+"remove-trailing-separator@^1.0.1":
+  "integrity" "sha1-wkvOKig62tW8P1jg1IJJuSN52O8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/remove-trailing-separator/-/remove-trailing-separator-1.1.0.tgz"
+  "version" "1.1.0"
+
+"repeat-element@^1.1.2":
+  "integrity" "sha512-LFiNfRcSu7KK3evMyYOuCzv3L10TW7yC1G2/+StMjK8Y6Vqd2MG7r/Qjw4ghtuCOjFvlnms/iMmLqpvW/ES/WQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/repeat-element/-/repeat-element-1.1.4.tgz"
+  "version" "1.1.4"
+
+"repeat-string@^1.6.1":
+  "integrity" "sha1-jcrkcOHIirwtYA//Sndihtp15jc="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/repeat-string/-/repeat-string-1.6.1.tgz"
+  "version" "1.6.1"
+
+"repeating@^2.0.0":
+  "integrity" "sha1-UhTFOpJtNVJwdSf7q0FdvAjQbdo="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/repeating/-/repeating-2.0.1.tgz"
+  "version" "2.0.1"
+  dependencies:
+    "is-finite" "^1.0.0"
+
 "replacestream@^4.0.3":
   "integrity" "sha512-AC0FiLS352pBBiZhd4VXB1Ab/lh0lEgpP+GGvZqbQh8a5cmXVoTe5EX/YeTFArnp4SRGTHh1qCHu9lGs1qG8sA=="
   "resolved" "https://registry.npmjs.org/replacestream/-/replacestream-4.0.3.tgz"
@@ -3516,6 +5176,14 @@
   "integrity" "sha1-jGStX9MNqxyXbiNE/+f3kqam30I="
   "resolved" "https://registry.npmjs.org/require-directory/-/require-directory-2.1.1.tgz"
   "version" "2.1.1"
+
+"require-uncached@^1.0.3":
+  "integrity" "sha1-Tg1W1slmL9MeQwEcS5WqSZVUIdM="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/require-uncached/-/require-uncached-1.0.3.tgz"
+  "version" "1.0.3"
+  dependencies:
+    "caller-path" "^0.1.0"
+    "resolve-from" "^1.0.0"
 
 "requires-port@^1.0.0":
   "integrity" "sha1-kl0mAdOaxIXgkc8NpcbmlNw9yv8="
@@ -3536,10 +5204,20 @@
   dependencies:
     "resolve-from" "^5.0.0"
 
+"resolve-from@^1.0.0":
+  "integrity" "sha1-Jsv+k10a7uq7Kbw/5a6wHpPUQiY="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/resolve-from/-/resolve-from-1.0.1.tgz"
+  "version" "1.0.1"
+
 "resolve-from@^5.0.0":
   "integrity" "sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw=="
   "resolved" "https://registry.npmjs.org/resolve-from/-/resolve-from-5.0.0.tgz"
   "version" "5.0.0"
+
+"resolve-url@^0.2.1":
+  "integrity" "sha1-LGN/53yJOv0qZj/iGqkIAGjiBSo="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/resolve-url/-/resolve-url-0.2.1.tgz"
+  "version" "0.2.1"
 
 "resolve@^1.1.6", "resolve@^1.10.0", "resolve@^1.20.0":
   "integrity" "sha512-wENBPt4ySzg4ybFQW2TT1zMQucPK95HSh/nq2CFTZVOGut2+pQvSsgtda4d26YrYcr067wjbmzOG8byDPBX63A=="
@@ -3549,6 +5227,11 @@
     "is-core-module" "^2.2.0"
     "path-parse" "^1.0.6"
 
+"resolve@~1.1.0":
+  "integrity" "sha1-IDEU2CrSxe2ejgQRs5ModeiJ6Xs="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/resolve/-/resolve-1.1.7.tgz"
+  "version" "1.1.7"
+
 "responselike@^1.0.2":
   "integrity" "sha1-kYcg7ztjHFZCvgaPFa3lpG9Loec="
   "resolved" "https://registry.npmjs.org/responselike/-/responselike-1.0.2.tgz"
@@ -3556,10 +5239,28 @@
   dependencies:
     "lowercase-keys" "^1.0.0"
 
+"restore-cursor@^2.0.0":
+  "integrity" "sha1-n37ih/gv0ybU/RYpI9YhKe7g368="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/restore-cursor/-/restore-cursor-2.0.0.tgz"
+  "version" "2.0.0"
+  dependencies:
+    "onetime" "^2.0.0"
+    "signal-exit" "^3.0.2"
+
+"ret@~0.1.10":
+  "integrity" "sha512-TTlYpa+OL+vMMNG24xSlQGEJ3B/RzEfUlLct7b5G/ytav+wPrplCpVMFuwzXbkecJrb6IYo1iFb0S9v37754mg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ret/-/ret-0.1.15.tgz"
+  "version" "0.1.15"
+
 "retry@^0.10.0":
   "integrity" "sha1-52OI0heZLCUnUCQdPTlW/tmNj/Q="
   "resolved" "https://registry.npmjs.org/retry/-/retry-0.10.1.tgz"
   "version" "0.10.1"
+
+"retry@0.12.0":
+  "integrity" "sha1-G0KmJmoh8HQh0bC1S33BZ7AcATs="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/retry/-/retry-0.12.0.tgz"
+  "version" "0.12.0"
 
 "reusify@^1.0.4":
   "integrity" "sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw=="
@@ -3599,6 +5300,13 @@
   dependencies:
     "glob" "^7.1.3"
 
+"rimraf@~2.6.2":
+  "integrity" "sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/rimraf/-/rimraf-2.6.3.tgz"
+  "version" "2.6.3"
+  dependencies:
+    "glob" "^7.1.3"
+
 "router@^1.3.5":
   "integrity" "sha512-kozCJZUhuSJ5VcLhSb3F8fsmGXy+8HaDbKCAerR1G6tq3mnMZFMuSohbFvGv1c5oMFipijDjRZuuN/Sq5nMf3g=="
   "resolved" "https://registry.npmjs.org/router/-/router-1.3.5.tgz"
@@ -3611,6 +5319,11 @@
     "path-to-regexp" "0.1.7"
     "setprototypeof" "1.2.0"
     "utils-merge" "1.0.1"
+
+"run-async@^2.2.0":
+  "integrity" "sha512-tvVnVv01b8c1RrA6Ep7JkStj85Guv/YrMcwqYQnwjsAS2cTmmPGBBjAjpCW7RrSodNSoE2/qg9O4bceNvUuDgQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/run-async/-/run-async-2.4.1.tgz"
+  "version" "2.4.1"
 
 "run-parallel@^1.1.9":
   "integrity" "sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA=="
@@ -3626,7 +5339,19 @@
   dependencies:
     "aproba" "^1.1.1"
 
-"safe-buffer@^5.1.1", "safe-buffer@^5.1.2", "safe-buffer@~5.1.0", "safe-buffer@~5.1.1", "safe-buffer@5.1.2":
+"rx-lite-aggregates@^4.0.8":
+  "integrity" "sha1-dTuHqJoRyVRnxKwWJsTvxOBcZ74="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/rx-lite-aggregates/-/rx-lite-aggregates-4.0.8.tgz"
+  "version" "4.0.8"
+  dependencies:
+    "rx-lite" "*"
+
+"rx-lite@*", "rx-lite@^4.0.8":
+  "integrity" "sha1-Cx4Rr4vESDbwSmQH6S2kJGe3lEQ="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/rx-lite/-/rx-lite-4.0.8.tgz"
+  "version" "4.0.8"
+
+"safe-buffer@^5.0.1", "safe-buffer@^5.1.1", "safe-buffer@^5.1.2", "safe-buffer@~5.1.0", "safe-buffer@~5.1.1", "safe-buffer@5.1.2":
   "integrity" "sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g=="
   "resolved" "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz"
   "version" "5.1.2"
@@ -3641,12 +5366,19 @@
   "resolved" "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.2.1.tgz"
   "version" "5.2.1"
 
+"safe-regex@^1.1.0":
+  "integrity" "sha1-QKNmnzsHfR6UPURinhV91IAjvy4="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/safe-regex/-/safe-regex-1.1.0.tgz"
+  "version" "1.1.0"
+  dependencies:
+    "ret" "~0.1.10"
+
 "safer-buffer@>= 2.1.2 < 3", "safer-buffer@>= 2.1.2 < 3.0.0":
   "integrity" "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg=="
   "resolved" "https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz"
   "version" "2.1.2"
 
-"sax@>=0.6.0":
+"sax@>=0.6.0", "sax@1.2.4":
   "integrity" "sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw=="
   "resolved" "https://registry.npmjs.org/sax/-/sax-1.2.4.tgz"
   "version" "1.2.4"
@@ -3678,15 +5410,17 @@
   "resolved" "https://registry.npmjs.org/semver/-/semver-5.7.1.tgz"
   "version" "5.7.1"
 
-"semver@^6.0.0", "semver@^6.3.0":
+"semver@^6.0.0", "semver@^6.2.0", "semver@^6.3.0":
   "integrity" "sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw=="
   "resolved" "https://registry.npmjs.org/semver/-/semver-6.3.0.tgz"
   "version" "6.3.0"
 
-"semver@^6.2.0":
-  "integrity" "sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw=="
-  "resolved" "https://registry.npmjs.org/semver/-/semver-6.3.0.tgz"
-  "version" "6.3.0"
+"semver@^7.3.2":
+  "integrity" "sha512-PoeGJYh8HK4BTO/a9Tf6ZG3veo/A7ZVsYrSA6J8ny9nb3B1VrpkuN+z9OE5wfE5p6H4LchYZsegiQgbJD94ZFQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/semver/-/semver-7.3.5.tgz"
+  "version" "7.3.5"
+  dependencies:
+    "lru-cache" "^6.0.0"
 
 "semver@^7.3.4", "semver@^7.3.5":
   "integrity" "sha512-PoeGJYh8HK4BTO/a9Tf6ZG3veo/A7ZVsYrSA6J8ny9nb3B1VrpkuN+z9OE5wfE5p6H4LchYZsegiQgbJD94ZFQ=="
@@ -3738,6 +5472,16 @@
   "integrity" "sha512-edRH8mBKEWNVIVMKejNnuJxleqYE/ZSdcT8/Nem9/mmosx12pctd80s2Oy00KNZzrogMZS5mauK2/ymL1bvlvg=="
   "resolved" "https://registry.npmjs.org/set-cookie-parser/-/set-cookie-parser-2.4.8.tgz"
   "version" "2.4.8"
+
+"set-value@^2.0.0", "set-value@^2.0.1":
+  "integrity" "sha512-JxHc1weCN68wRY0fhCoXpyK55m/XPHafOmK4UWD7m2CI14GMcFypt4w/0+NV5f/ZMby2F6S2wwA7fgynh9gWSw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/set-value/-/set-value-2.0.1.tgz"
+  "version" "2.0.1"
+  dependencies:
+    "extend-shallow" "^2.0.1"
+    "is-extendable" "^0.1.1"
+    "is-plain-object" "^2.0.3"
+    "split-string" "^3.0.1"
 
 "setprototypeof@1.1.1":
   "integrity" "sha512-JvdAWfbXeIGaZ9cILp38HntZSFSo3mWg6xGcJJsd+d4aRMOqauag1C63dJfDw7OaMYwEbHMOxEZ1lqVRYP2OAw=="
@@ -3797,15 +5541,71 @@
   "resolved" "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.3.tgz"
   "version" "3.0.3"
 
+"simple-concat@^1.0.0":
+  "integrity" "sha512-cSFtAPtRhljv69IK0hTVZQ+OfE9nePi/rtJmw5UjHeVyVroEqJXP1sFztKUy1qU+xvz3u/sfYJLa947b7nAN2Q=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/simple-concat/-/simple-concat-1.0.1.tgz"
+  "version" "1.0.1"
+
+"simple-get@^3.0.3":
+  "integrity" "sha512-bCR6cP+aTdScaQCnQKbPKtJOKDp/hj9EDLJo3Nw4y1QksqaovlW/bnptB6/c1e+qmNIDHRK+oXFDdEqBT8WzUA=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/simple-get/-/simple-get-3.1.0.tgz"
+  "version" "3.1.0"
+  dependencies:
+    "decompress-response" "^4.2.0"
+    "once" "^1.3.1"
+    "simple-concat" "^1.0.0"
+
+"slash@^1.0.0":
+  "integrity" "sha1-xB8vbDn8FtHNF61LXYlhFK5HDVU="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/slash/-/slash-1.0.0.tgz"
+  "version" "1.0.0"
+
 "slash@^3.0.0":
   "integrity" "sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q=="
   "resolved" "https://registry.npmjs.org/slash/-/slash-3.0.0.tgz"
   "version" "3.0.0"
 
+"slice-ansi@1.0.0":
+  "integrity" "sha512-POqxBK6Lb3q6s047D/XsDVNPnF9Dl8JSaqe9h9lURl0OdNqy/ujDrOiIHtsqXMGbWWTIomRzAMaTyawAU//Reg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/slice-ansi/-/slice-ansi-1.0.0.tgz"
+  "version" "1.0.0"
+  dependencies:
+    "is-fullwidth-code-point" "^2.0.0"
+
 "smart-buffer@^4.1.0":
   "integrity" "sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg=="
   "resolved" "https://registry.npmjs.org/smart-buffer/-/smart-buffer-4.2.0.tgz"
   "version" "4.2.0"
+
+"snapdragon-node@^2.0.1":
+  "integrity" "sha512-O27l4xaMYt/RSQ5TR3vpWCAB5Kb/czIcqUFOM/C4fYcLnbZUc1PkjTAMjof2pBWaSTwOUd6qUHcFGVGj7aIwnw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/snapdragon-node/-/snapdragon-node-2.1.1.tgz"
+  "version" "2.1.1"
+  dependencies:
+    "define-property" "^1.0.0"
+    "isobject" "^3.0.0"
+    "snapdragon-util" "^3.0.1"
+
+"snapdragon-util@^3.0.1":
+  "integrity" "sha512-mbKkMdQKsjX4BAL4bRYTj21edOf8cN7XHdYUJEe+Zn99hVEYcMvKPct1IqNe7+AZPirn8BCDOQBHQZknqmKlZQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/snapdragon-util/-/snapdragon-util-3.0.1.tgz"
+  "version" "3.0.1"
+  dependencies:
+    "kind-of" "^3.2.0"
+
+"snapdragon@^0.8.1":
+  "integrity" "sha512-FtyOnWN/wCHTVXOMwvSv26d+ko5vWlIDD6zoUJ7LW8vh+ZBC8QdljveRP+crNrtBwioEUWy/4dMtbBjA4ioNlg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/snapdragon/-/snapdragon-0.8.2.tgz"
+  "version" "0.8.2"
+  dependencies:
+    "base" "^0.11.1"
+    "debug" "^2.2.0"
+    "define-property" "^0.2.5"
+    "extend-shallow" "^2.0.1"
+    "map-cache" "^0.2.2"
+    "source-map" "^0.5.6"
+    "source-map-resolve" "^0.5.0"
+    "use" "^3.1.0"
 
 "socket.io-adapter@~2.1.0":
   "integrity" "sha512-+vDov/aTsLjViYTwS9fPy5pEtTkrbEKsw2M+oVSoFGw6OD1IpvlV1VPhUzNbofCQ8oyMbdYJqDtGdmHQK6TdPg=="
@@ -3852,6 +5652,17 @@
     "ip" "1.1.5"
     "smart-buffer" "^4.1.0"
 
+"source-map-resolve@^0.5.0":
+  "integrity" "sha512-Htz+RnsXWk5+P2slx5Jh3Q66vhQj1Cllm0zvnaY98+NFx+Dv2CF/f5O/t8x+KaNdrdIAsruNzoh/KpialbqAnw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/source-map-resolve/-/source-map-resolve-0.5.3.tgz"
+  "version" "0.5.3"
+  dependencies:
+    "atob" "^2.1.2"
+    "decode-uri-component" "^0.2.0"
+    "resolve-url" "^0.2.1"
+    "source-map-url" "^0.4.0"
+    "urix" "^0.1.0"
+
 "source-map-resolve@^0.6.0":
   "integrity" "sha512-KXBr9d/fO/bWo97NXsPIAW1bFSBOuCnjbNTBMO7N59hsv5i9yzRDfcYwwt0l04+VqnKC+EwzvJZIP/qkuMgR/w=="
   "resolved" "https://registry.npmjs.org/source-map-resolve/-/source-map-resolve-0.6.0.tgz"
@@ -3868,7 +5679,17 @@
     "buffer-from" "^1.0.0"
     "source-map" "^0.6.0"
 
+"source-map-url@^0.4.0":
+  "integrity" "sha512-cPiFOTLUKvJFIg4SKVScy4ilPPW6rFgMgfuZJPNoDuMs3nC1HbMUycBoJw77xFIp6z1UJQJOfx6C9GMH80DiTw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/source-map-url/-/source-map-url-0.4.1.tgz"
+  "version" "0.4.1"
+
 "source-map@^0.5.0":
+  "integrity" "sha1-igOdLRAh0i0eoUyA2OpGi6LvP8w="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/source-map/-/source-map-0.5.7.tgz"
+  "version" "0.5.7"
+
+"source-map@^0.5.6":
   "integrity" "sha1-igOdLRAh0i0eoUyA2OpGi6LvP8w="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/source-map/-/source-map-0.5.7.tgz"
   "version" "0.5.7"
@@ -3932,7 +5753,14 @@
     "select-hose" "^2.0.0"
     "spdy-transport" "^3.0.0"
 
-"sprintf-js@~1.0.2":
+"split-string@^3.0.1", "split-string@^3.0.2":
+  "integrity" "sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/split-string/-/split-string-3.1.0.tgz"
+  "version" "3.1.0"
+  dependencies:
+    "extend-shallow" "^3.0.0"
+
+"sprintf-js@^1.0.3", "sprintf-js@~1.0.2":
   "integrity" "sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw="
   "resolved" "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.0.3.tgz"
   "version" "1.0.3"
@@ -3943,6 +5771,14 @@
   "version" "6.0.2"
   dependencies:
     "figgy-pudding" "^3.5.1"
+
+"static-extend@^0.1.1":
+  "integrity" "sha1-YICcOcv/VTNyJv1eC1IPNB8ftcY="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/static-extend/-/static-extend-0.1.2.tgz"
+  "version" "0.1.2"
+  dependencies:
+    "define-property" "^0.2.5"
+    "object-copy" "^0.1.0"
 
 "statuses@>= 1.5.0 < 2", "statuses@~1.5.0":
   "integrity" "sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow="
@@ -3987,6 +5823,22 @@
     "is-fullwidth-code-point" "^1.0.0"
     "strip-ansi" "^3.0.0"
 
+"string-width@^2.1.0":
+  "integrity" "sha512-nOqH59deCq9SRHlxq1Aw85Jnt4w6KvLKqWVik6oA9ZklXLNIOlqg4F2yrT1MVaTjAqvVwdfeZ7w7aCvJD7ugkw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/string-width/-/string-width-2.1.1.tgz"
+  "version" "2.1.1"
+  dependencies:
+    "is-fullwidth-code-point" "^2.0.0"
+    "strip-ansi" "^4.0.0"
+
+"string-width@^2.1.1":
+  "integrity" "sha512-nOqH59deCq9SRHlxq1Aw85Jnt4w6KvLKqWVik6oA9ZklXLNIOlqg4F2yrT1MVaTjAqvVwdfeZ7w7aCvJD7ugkw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/string-width/-/string-width-2.1.1.tgz"
+  "version" "2.1.1"
+  dependencies:
+    "is-fullwidth-code-point" "^2.0.0"
+    "strip-ansi" "^4.0.0"
+
 "string-width@^3.0.0":
   "integrity" "sha512-vafcv6KjVZKSgz06oM/H6GDBrAtz8vdhQakGjFIvNrHA6y3HCF1CInLy+QLq8dTJPQ1b+KDUqDFctkdRW44e1w=="
   "resolved" "https://registry.npmjs.org/string-width/-/string-width-3.1.0.tgz"
@@ -3997,22 +5849,22 @@
     "strip-ansi" "^5.1.0"
 
 "string-width@^4.0.0":
-  "integrity" "sha512-XBJbT3N4JhVumXE0eoLU9DCjcaF92KLNqTmFCnG1pf8duUxFGwtP6AD6nkjw9a3IdiRtL3E2w3JDiE/xi3vOeA=="
-  "resolved" "https://registry.npmjs.org/string-width/-/string-width-4.2.2.tgz"
-  "version" "4.2.2"
+  "integrity" "sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/string-width/-/string-width-4.2.3.tgz"
+  "version" "4.2.3"
   dependencies:
     "emoji-regex" "^8.0.0"
     "is-fullwidth-code-point" "^3.0.0"
-    "strip-ansi" "^6.0.0"
+    "strip-ansi" "^6.0.1"
 
 "string-width@^4.1.0":
-  "integrity" "sha512-XBJbT3N4JhVumXE0eoLU9DCjcaF92KLNqTmFCnG1pf8duUxFGwtP6AD6nkjw9a3IdiRtL3E2w3JDiE/xi3vOeA=="
-  "resolved" "https://registry.npmjs.org/string-width/-/string-width-4.2.2.tgz"
-  "version" "4.2.2"
+  "integrity" "sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/string-width/-/string-width-4.2.3.tgz"
+  "version" "4.2.3"
   dependencies:
     "emoji-regex" "^8.0.0"
     "is-fullwidth-code-point" "^3.0.0"
-    "strip-ansi" "^6.0.0"
+    "strip-ansi" "^6.0.1"
 
 "string-width@^4.2.0":
   "integrity" "sha512-XBJbT3N4JhVumXE0eoLU9DCjcaF92KLNqTmFCnG1pf8duUxFGwtP6AD6nkjw9a3IdiRtL3E2w3JDiE/xi3vOeA=="
@@ -4055,6 +5907,13 @@
   dependencies:
     "ansi-regex" "^2.0.0"
 
+"strip-ansi@^4.0.0":
+  "integrity" "sha1-qEeQIusaw2iocTibY1JixQXuNo8="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/strip-ansi/-/strip-ansi-4.0.0.tgz"
+  "version" "4.0.0"
+  dependencies:
+    "ansi-regex" "^3.0.0"
+
 "strip-ansi@^5.1.0":
   "integrity" "sha512-DuRs1gKbBqsMKIZlrffwlug8MHkcnpjs5VPmL1PAh+mA30U0DTotfDZ0d2UUsXpPmPmMMJ6W773MaA3J+lbiWA=="
   "resolved" "https://registry.npmjs.org/strip-ansi/-/strip-ansi-5.2.0.tgz"
@@ -4069,10 +5928,31 @@
   dependencies:
     "ansi-regex" "^5.0.0"
 
+"strip-ansi@^6.0.1":
+  "integrity" "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/strip-ansi/-/strip-ansi-6.0.1.tgz"
+  "version" "6.0.1"
+  dependencies:
+    "ansi-regex" "^5.0.1"
+
+"strip-bom@^2.0.0":
+  "integrity" "sha1-YhmoVhZSBJHzV4i9vxRHqZx+aw4="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/strip-bom/-/strip-bom-2.0.0.tgz"
+  "version" "2.0.0"
+  dependencies:
+    "is-utf8" "^0.2.0"
+
 "strip-bom@^3.0.0":
   "integrity" "sha1-IzTBjpx1n3vdVv3vfprj1YjmjtM="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/strip-bom/-/strip-bom-3.0.0.tgz"
   "version" "3.0.0"
+
+"strip-indent@^1.0.1":
+  "integrity" "sha1-DHlipq3vp7vUrDZkYKY4VSrhoKI="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/strip-indent/-/strip-indent-1.0.1.tgz"
+  "version" "1.0.1"
+  dependencies:
+    "get-stdin" "^4.0.1"
 
 "strip-json-comments@^3.1.0":
   "integrity" "sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig=="
@@ -4083,6 +5963,11 @@
   "integrity" "sha1-PFMZQukIwml8DsNEhYwobHygpgo="
   "resolved" "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz"
   "version" "2.0.1"
+
+"supports-color@^2.0.0":
+  "integrity" "sha1-U10EXOa2Nj+kARcIRimZXp3zJMc="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/supports-color/-/supports-color-2.0.0.tgz"
+  "version" "2.0.0"
 
 "supports-color@^5.3.0":
   "integrity" "sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow=="
@@ -4098,10 +5983,43 @@
   dependencies:
     "has-flag" "^4.0.0"
 
+"table@^4.0.1":
+  "integrity" "sha512-S7rnFITmBH1EnyKcvxBh1LjYeQMmnZtCXSEbHcH6S0NoKit24ZuFO/T1vDcLdYsLQkM188PVVhQmzKIuThNkKg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/table/-/table-4.0.3.tgz"
+  "version" "4.0.3"
+  dependencies:
+    "ajv" "^6.0.1"
+    "ajv-keywords" "^3.0.0"
+    "chalk" "^2.1.0"
+    "lodash" "^4.17.4"
+    "slice-ansi" "1.0.0"
+    "string-width" "^2.1.1"
+
 "taffydb@2.6.2":
   "integrity" "sha1-fLy2S1oUG2ou/CxdLGe04VCyomg="
   "resolved" "https://registry.npmjs.org/taffydb/-/taffydb-2.6.2.tgz"
   "version" "2.6.2"
+
+"tar-fs@^2.0.0":
+  "integrity" "sha512-V0r2Y9scmbDRLCNex/+hYzvp/zyYjvFbHPNgVTKfQvVrb6guiE/fxP+XblDNR011utopbkex2nM4dHNV6GDsng=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/tar-fs/-/tar-fs-2.1.1.tgz"
+  "version" "2.1.1"
+  dependencies:
+    "chownr" "^1.1.1"
+    "mkdirp-classic" "^0.5.2"
+    "pump" "^3.0.0"
+    "tar-stream" "^2.1.4"
+
+"tar-stream@^2.1.4":
+  "integrity" "sha512-ujeqbceABgwMZxEJnk2HDY2DlnUZ+9oEcb1KzTVfYHio0UE6dG71n60d8D2I4qNvleWrrXpmjpt7vZeF1LnMZQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/tar-stream/-/tar-stream-2.2.0.tgz"
+  "version" "2.2.0"
+  dependencies:
+    "bl" "^4.0.3"
+    "end-of-stream" "^1.4.1"
+    "fs-constants" "^1.0.0"
+    "inherits" "^2.0.3"
+    "readable-stream" "^3.1.1"
 
 "tar@^4.4.10":
   "integrity" "sha512-a20gEsvHnWe0ygBY8JbxoM4w3SJdhc7ZAuxkLqh+nvNQN2IOt0B5lLgM490X5Hl8FF0dl0tOf2ewFYAlIFgzVA=="
@@ -4116,6 +6034,11 @@
     "safe-buffer" "^5.2.1"
     "yallist" "^3.1.1"
 
+"term-size@^2.1.0":
+  "integrity" "sha512-wK0Ri4fOGjv/XPy8SBHZChl8CM7uMc5VML7SqiQ0zG7+J5Vr+RMQDoHa2CNT6KHUnTGIXH34UDMkPzAUyapBZg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/term-size/-/term-size-2.2.1.tgz"
+  "version" "2.2.1"
+
 "terser@^5.7.1":
   "integrity" "sha512-0Omye+RD4X7X69O0eql3lC4Heh/5iLj3ggxR/B5ketZLOtLiOqukUgjw3q4PDnNQbsrkKr3UMypqStQG3XKRvw=="
   "resolved" "https://registry.npmjs.org/terser/-/terser-5.7.2.tgz"
@@ -4125,7 +6048,12 @@
     "source-map" "~0.7.2"
     "source-map-support" "~0.5.19"
 
-"through@>=2.2.7 <3":
+"text-table@~0.2.0":
+  "integrity" "sha1-f17oI66AUgfACvLfSoTsP8+lcLQ="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/text-table/-/text-table-0.2.0.tgz"
+  "version" "0.2.0"
+
+"through@^2.3.6", "through@>=2.2.7 <3":
   "integrity" "sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU="
   "resolved" "https://registry.npmjs.org/through/-/through-2.3.8.tgz"
   "version" "2.3.8"
@@ -4137,6 +6065,13 @@
   dependencies:
     "readable-stream" "~2.3.6"
     "xtend" "~4.0.1"
+
+"tmp@^0.0.33":
+  "integrity" "sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/tmp/-/tmp-0.0.33.tgz"
+  "version" "0.0.33"
+  dependencies:
+    "os-tmpdir" "~1.0.2"
 
 "tmp@^0.2.1":
   "integrity" "sha512-76SUhtfqR2Ijn+xllcI5P1oyannHNHByD80W1q447gU3mp9G9PSpGdWmjUOHRDPiHYacIk66W7ubDTuPF3BEtQ=="
@@ -4150,10 +6085,25 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/to-fast-properties/-/to-fast-properties-2.0.0.tgz"
   "version" "2.0.0"
 
+"to-object-path@^0.3.0":
+  "integrity" "sha1-KXWIt7Dn4KwI4E5nL4XB9JmeF68="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/to-object-path/-/to-object-path-0.3.0.tgz"
+  "version" "0.3.0"
+  dependencies:
+    "kind-of" "^3.0.2"
+
 "to-readable-stream@^1.0.0":
   "integrity" "sha512-Iq25XBt6zD5npPhlLVXGFN3/gyR2/qODcKNNyTMd4vbm39HUaOiAM4PMq0eMVC/Tkxz+Zjdsc55g9yyz+Yq00Q=="
   "resolved" "https://registry.npmjs.org/to-readable-stream/-/to-readable-stream-1.0.0.tgz"
   "version" "1.0.0"
+
+"to-regex-range@^2.1.0":
+  "integrity" "sha1-fIDBe53+vlmeJzZ+DU3VWQFB2zg="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/to-regex-range/-/to-regex-range-2.1.1.tgz"
+  "version" "2.1.1"
+  dependencies:
+    "is-number" "^3.0.0"
+    "repeat-string" "^1.6.1"
 
 "to-regex-range@^5.0.1":
   "integrity" "sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ=="
@@ -4161,6 +6111,16 @@
   "version" "5.0.1"
   dependencies:
     "is-number" "^7.0.0"
+
+"to-regex@^3.0.1", "to-regex@^3.0.2":
+  "integrity" "sha512-FWtleNAtZ/Ki2qtqej2CXTOayOH9bHDQF+Q48VpWyDXjbYxA4Yz8iDB31zXOBUlOHHKidDbqGVrTUvQMPmBGBw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/to-regex/-/to-regex-3.0.2.tgz"
+  "version" "3.0.2"
+  dependencies:
+    "define-property" "^2.0.2"
+    "extend-shallow" "^3.0.2"
+    "regex-not" "^1.0.2"
+    "safe-regex" "^1.1.0"
 
 "toidentifier@1.0.0":
   "integrity" "sha512-yaOH/Pk/VEhBWWTlhI+qXxDFXlejDGcQipMlyxda9nthulaxLZUNcUqFxokp0vcYnvteJln5FNQDRrxj3YcbVw=="
@@ -4172,10 +6132,29 @@
   "resolved" "https://registry.npmjs.org/treeify/-/treeify-1.1.0.tgz"
   "version" "1.1.0"
 
+"trim-newlines@^1.0.0":
+  "integrity" "sha1-WIeWa7WCpFA6QetST301ARgVphM="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/trim-newlines/-/trim-newlines-1.0.0.tgz"
+  "version" "1.0.0"
+
 "tslib@^2.2.0":
   "integrity" "sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw=="
   "resolved" "https://registry.npmjs.org/tslib/-/tslib-2.3.1.tgz"
   "version" "2.3.1"
+
+"tunnel-agent@^0.6.0":
+  "integrity" "sha1-J6XeoGs2sEoKmWZ3SykIaPD8QP0="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/tunnel-agent/-/tunnel-agent-0.6.0.tgz"
+  "version" "0.6.0"
+  dependencies:
+    "safe-buffer" "^5.0.1"
+
+"type-check@~0.3.2":
+  "integrity" "sha1-WITKtRLPHTVeP7eE8wgEsrUg23I="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/type-check/-/type-check-0.3.2.tgz"
+  "version" "0.3.2"
+  dependencies:
+    "prelude-ls" "~1.1.2"
 
 "type-fest@^0.20.2":
   "integrity" "sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ=="
@@ -4243,6 +6222,15 @@
     "portfinder" "^1.0.28"
     "yargs" "^17.1.0"
 
+"ui5-task-zipper@^0.3.1":
+  "integrity" "sha512-sUEOaVk8yPSbYDfQmM41N53CCMEqmcD4nOYjqijaFLMSog1oJ/dPhEPB4UVBhFVQRBqWTwWkRhs3OIWE1kMSpQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ui5-task-zipper/-/ui5-task-zipper-0.3.2.tgz"
+  "version" "0.3.2"
+  dependencies:
+    "@ui5/fs" "^1.1.2"
+    "@ui5/logger" "^2.0.0"
+    "yazl" "^2.5.1"
+
 "unbox-primitive@^1.0.1":
   "integrity" "sha512-tZU/3NqK3dA5gpE1KtyiJUrEB0lxnGkMFHptJ7q6ewdZ8s12QrODwNbhIJStmJkd1QDXa1NRA8aF2A1zk/Ypyw=="
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/unbox-primitive/-/unbox-primitive-1.0.1.tgz"
@@ -4253,10 +6241,28 @@
     "has-symbols" "^1.0.2"
     "which-boxed-primitive" "^1.0.2"
 
+"underscore.string@~3.3.4":
+  "integrity" "sha512-g+dpmgn+XBneLmXXo+sGlW5xQEt4ErkS3mgeN2GFbremYeMBSJKr9Wf2KJplQVaiPY/f7FN6atosWYNm9ovrYg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/underscore.string/-/underscore.string-3.3.5.tgz"
+  "version" "3.3.5"
+  dependencies:
+    "sprintf-js" "^1.0.3"
+    "util-deprecate" "^1.0.2"
+
 "underscore@~1.13.1":
   "integrity" "sha512-hzSoAVtJF+3ZtiFX0VgfFPHEDRm7Y/QPjGyNo4TVdnDTdft3tr8hEkD25a1jC+TjTuE7tkHGKkhwCgs9dgBB2g=="
   "resolved" "https://registry.npmjs.org/underscore/-/underscore-1.13.1.tgz"
   "version" "1.13.1"
+
+"union-value@^1.0.0":
+  "integrity" "sha512-tJfXmxMeWYnczCVs7XAEvIV7ieppALdyepWMkHkwciRpZraG/xwT+s2JN8+pr1+8jCRf80FFzvr+MpQeeoF4Xg=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/union-value/-/union-value-1.0.1.tgz"
+  "version" "1.0.1"
+  dependencies:
+    "arr-union" "^3.1.0"
+    "get-value" "^2.0.6"
+    "is-extendable" "^0.1.1"
+    "set-value" "^2.0.1"
 
 "unique-filename@^1.1.1":
   "integrity" "sha512-Vmp0jIp2ln35UTXuryvjzkjGdRyf9b2lTXuSYUiPmzRcl3FDtYqAwOnTJkAngD9SWhnoJzDbTKwaOrZ+STtxNQ=="
@@ -4289,6 +6295,34 @@
   "resolved" "https://registry.npmjs.org/unpipe/-/unpipe-1.0.0.tgz"
   "version" "1.0.0"
 
+"unset-value@^1.0.0":
+  "integrity" "sha1-g3aHP30jNRef+x5vw6jtDfyKtVk="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/unset-value/-/unset-value-1.0.0.tgz"
+  "version" "1.0.0"
+  dependencies:
+    "has-value" "^0.3.1"
+    "isobject" "^3.0.0"
+
+"update-notifier-webpack@5.0.1":
+  "integrity" "sha512-iY6tz2ta/guoBwa9C+qVu5nasD2Nj5GUOW3LBKCV9eWxbRNvGaauPjJOcMuwTMeJJUkYz5LA5pFr5bCmDPKE9Q=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/update-notifier-webpack/-/update-notifier-webpack-5.0.1.tgz"
+  "version" "5.0.1"
+  dependencies:
+    "boxen" "^4.2.0"
+    "chalk" "^4.1.0"
+    "configstore" "^5.0.1"
+    "has-yarn" "^2.1.0"
+    "import-lazy" "^2.1.0"
+    "is-ci" "^2.0.0"
+    "is-installed-globally" "^0.3.2"
+    "is-npm" "^5.0.0"
+    "is-yarn-global" "^0.3.0"
+    "latest-version" "^5.1.0"
+    "pupa" "^2.1.1"
+    "semver" "^7.3.2"
+    "semver-diff" "^3.1.1"
+    "xdg-basedir" "^4.0.0"
+
 "update-notifier@^5.1.0":
   "integrity" "sha512-ItnICHbeMh9GqUy31hFPrD1kcuZ3rpxDZbf4KUDavXwS0bW5m7SLbDQpGX3UYr072cbrF5hFUs3r5tUsPwjfHw=="
   "resolved" "https://registry.npmjs.org/update-notifier/-/update-notifier-5.1.0.tgz"
@@ -4316,6 +6350,11 @@
   dependencies:
     "punycode" "^2.1.0"
 
+"urix@^0.1.0":
+  "integrity" "sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/urix/-/urix-0.1.0.tgz"
+  "version" "0.1.0"
+
 "url-parse-lax@^3.0.0":
   "integrity" "sha1-FrXK/Afb42dsGxmZF3gj1lA6yww="
   "resolved" "https://registry.npmjs.org/url-parse-lax/-/url-parse-lax-3.0.0.tgz"
@@ -4323,7 +6362,12 @@
   dependencies:
     "prepend-http" "^2.0.0"
 
-"util-deprecate@^1.0.1", "util-deprecate@~1.0.1":
+"use@^3.1.0":
+  "integrity" "sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/use/-/use-3.1.1.tgz"
+  "version" "3.1.1"
+
+"util-deprecate@^1.0.1", "util-deprecate@^1.0.2", "util-deprecate@~1.0.1":
   "integrity" "sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8="
   "resolved" "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz"
   "version" "1.0.2"
@@ -4358,6 +6402,38 @@
   "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/void-elements/-/void-elements-2.0.1.tgz"
   "version" "2.0.1"
 
+"vscode-json-languageservice@3.0.4":
+  "integrity" "sha512-W2glP/qBFGwiYcjJyW79hSHaBKyPDYWV9jnUgXHaWRsaDst1wqVEWkJI2le5CUDSmbuv4k71TJFU1pgYHyDZNA=="
+  "version" "3.0.4"
+  dependencies:
+    "jsonc-parser" "1.0.3"
+    "vscode-languageserver-types" "3.14.0"
+    "vscode-nls" "2.0.2"
+    "vscode-uri" "1.0.8"
+
+"vscode-jsonrpc@3.6.2":
+  "integrity" "sha512-T24Jb5V48e4VgYliUXMnZ379ItbrXgOimweKaJshD84z+8q7ZOZjJan0MeDe+Ugb+uqERDVV8SBmemaGMSMugA=="
+  "version" "3.6.2"
+
+"vscode-languageserver-protocol@3.5.0":
+  "integrity" "sha1-Bnxcvidwl5U5jRGWksl+u6FFIgk="
+  "version" "3.5.0"
+  dependencies:
+    "vscode-jsonrpc" "3.6.2"
+    "vscode-languageserver-types" "3.14.0"
+
+"vscode-languageserver-types@3.14.0":
+  "integrity" "sha512-lTmS6AlAlMHOvPQemVwo3CezxBp0sNB95KNPkqp3Nxd5VFEnuG1ByM0zlRWos0zjO3ZWtkvhal0COgiV1xIA4A=="
+  "version" "3.14.0"
+
+"vscode-nls@2.0.2":
+  "integrity" "sha1-gIUiOAhEuK0VNJmvXDsDkhrqAto="
+  "version" "2.0.2"
+
+"vscode-uri@1.0.8":
+  "integrity" "sha512-obtSWTlbJ+a+TFRYGaUumtVwb+InIUVI0Lu0VBUAPmj2cU5JutEXg3xUE0c2J5Tcy7h2DEKVJBFi+Y9ZSFzzPQ=="
+  "version" "1.0.8"
+
 "wbuf@^1.1.0", "wbuf@^1.7.3":
   "integrity" "sha512-O84QOnr0icsbFGLS0O3bI5FswxzRr8/gHwWkDlQFskhSPryQXvrTMxjxGP4+iWYoauLoBvfDpkrOauZ+0iZpDA=="
   "resolved" "https://registry.npmjs.org/wbuf/-/wbuf-1.7.3.tgz"
@@ -4376,7 +6452,7 @@
     "is-string" "^1.0.5"
     "is-symbol" "^1.0.3"
 
-"which@^1.2.1", "which@^1.2.9", "which@^1.3.1":
+"which@^1.2.1", "which@^1.2.9", "which@^1.3.1", "which@~1.3.0":
   "integrity" "sha512-HxJdYWq1MTIQbJ3nw0cqssHoTNU267KlrDuGZ1WYlxDStUtKUhOaJmh112/TZmHxxUfuJqPXSOm7tDyas0OSIQ=="
   "resolved" "https://registry.npmjs.org/which/-/which-1.3.1.tgz"
   "version" "1.3.1"
@@ -4396,6 +6472,16 @@
   "version" "3.1.0"
   dependencies:
     "string-width" "^4.0.0"
+
+"word-wrap@~1.2.3":
+  "integrity" "sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/word-wrap/-/word-wrap-1.2.3.tgz"
+  "version" "1.2.3"
+
+"wordwrap@~1.0.0":
+  "integrity" "sha1-J1hIEIkUVqQXHI0CJkQa3pDLyus="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/wordwrap/-/wordwrap-1.0.0.tgz"
+  "version" "1.0.0"
 
 "wrap-ansi@^7.0.0":
   "integrity" "sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q=="
@@ -4420,6 +6506,20 @@
     "is-typedarray" "^1.0.0"
     "signal-exit" "^3.0.2"
     "typedarray-to-buffer" "^3.1.5"
+
+"write@^0.2.1":
+  "integrity" "sha1-X8A4KOJkzqP+kUVUdvejxWbLB1c="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/write/-/write-0.2.1.tgz"
+  "version" "0.2.1"
+  dependencies:
+    "mkdirp" "^0.5.1"
+
+"ws@^6.2.1":
+  "integrity" "sha512-zmhltoSR8u1cnDsD43TX59mzoMZsLKqUweyYBAIvTngR3shc0W6aOZylZmq/7hqyVxPdi+5Ud2QInblgyE72fw=="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/ws/-/ws-6.2.2.tgz"
+  "version" "6.2.2"
+  dependencies:
+    "async-limiter" "~1.0.0"
 
 "ws@^7.4.3", "ws@~7.4.2":
   "integrity" "sha512-YmhHDO4MzaDLB+M9ym/mDA5z0naX8j7SIlT8f8z+I0VtzsRbekxEutHSme7NPS2qE8StCYQNUnfWdXta/Yu85A=="
@@ -4449,7 +6549,12 @@
   "resolved" "https://registry.npmjs.org/xmlcreate/-/xmlcreate-2.0.3.tgz"
   "version" "2.0.3"
 
-"xtend@~4.0.1":
+"xmldom@0.1.27":
+  "integrity" "sha1-1QH5ezvbQDr4757MIFcxh6rawOk="
+  "resolved" "http://nginx-redirector.repo-cache.svc.cluster.local/repository/appstudio-npm-group/xmldom/-/xmldom-0.1.27.tgz"
+  "version" "0.1.27"
+
+"xtend@^4.0.0", "xtend@~4.0.1":
   "integrity" "sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ=="
   "resolved" "https://registry.npmjs.org/xtend/-/xtend-4.0.2.tgz"
   "version" "4.0.2"
