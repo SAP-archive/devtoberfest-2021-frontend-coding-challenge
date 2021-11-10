@@ -3,13 +3,15 @@ sap.ui.define(
         "sap/ui/core/mvc/Controller",
         "sap/ui/core/routing/History",
         "sap/ui/core/UIComponent",
+        "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/model/formatter",
     ],
-    function (Controller, History, UIComponent) {
+    function (Controller, History, UIComponent, formatter) {
         "use strict";
 
         return Controller.extend(
             "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.BaseController",
             {
+                formatter: formatter,
 
                 /**
                  * Convenience method for getting the view model by name in every controller of the application.

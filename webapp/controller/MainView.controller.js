@@ -2,15 +2,16 @@ sap.ui.define(
     [
         "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/controller/BaseController",
         "sap/ui/model/json/JSONModel",
-        "sap/ui/model/Filter",
-        "sap/ui/model/FilterOperator",
+        "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/model/formatter",
     ],
-    function (Controller, JSONModel, Filter, FilterOperator) {
+    function (Controller, JSONModel, formatter) {
         "use strict";
 
         return Controller.extend(
             "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.MainView",
             {
+                formatter,
+
                 onInit: function () {
                     const useDarkTheme =
                         window.matchMedia &&
@@ -25,27 +26,28 @@ sap.ui.define(
                     });
                     this.getView().setModel(settingsModel, "settings");
                 },
+
                 liveSearch: function (oEvent) {
                     const value = oEvent.getParameter("newValue");
                     const list = this.getView().byId("all-list");
                     const listBinding = list.getBinding("items");
-                    const nameFilter = new Filter({
+                    const nameFilter = new sap.ui.model.Filter({
                         path: "name",
-                        operator: FilterOperator.Contains,
+                        operator: sap.ui.model.FilterOperator.Contains,
                         value1: value,
                     });
-                    const descFilter = new Filter({
+                    const descFilter = new sap.ui.model.Filter({
                         path: "description",
-                        operator: FilterOperator.Contains,
+                        operator: sap.ui.model.FilterOperator.Contains,
                         value1: value,
                     });
-                    const stateFilter = new Filter({
+                    const stateFilter = new sap.ui.model.Filter({
                         path: "category",
-                        operator: FilterOperator.Contains,
+                        operator: sap.ui.model.FilterOperator.Contains,
                         value1: value,
                     });
                     listBinding.filter(
-                        new Filter({
+                        new sap.ui.model.Filter({
                             filters: [nameFilter, descFilter, stateFilter],
                             and: false,
                         })
