@@ -1,11 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
-	"sap/ui/core/Control"
-], function (Control) {
+	"sap/ui/core/Control",
+	"sap/ui/core/Core"
+], function (Control, Core) {
 	"use strict";
 
 	/**
@@ -18,7 +19,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.95.0
 	 *
 	 * @constructor
 	 * @private
@@ -43,60 +44,83 @@ sap.ui.define([
 				 */
 				item: {
 					type: "any"
+				},
+
+				itemHeight: {
+					type: "sap.ui.core.CSSSize"
 				}
 			}
 		},
-		renderer: function (oRm, oControl) {
-			var iMaxItems = oControl.getMaxItems(),
-				oItem = oControl.getItem();
-			oRm.write("<div");
-            oRm.addClass("sapFCardContentPlaceholder");
-			oRm.addClass("sapFCardContentListPlaceholder");
-			oRm.attr("tabindex", "0");
-			oRm.writeClasses();
-			oRm.writeElementData(oControl);
-			oRm.write(">");
+		renderer: {
+			apiVersion: 2,
+			render: function (oRm, oControl) {
+				var iMaxItems = oControl.getMaxItems(),
+					oItem = oControl.getItem(),
+					// set title for screen reader
+					oResBundle = Core.getLibraryResourceBundle("sap.ui.core"),
+					sTitle = oResBundle.getText("BUSY_TEXT");
 
-			for (var i = 0; i < iMaxItems; i++) {
-				oRm.write("<div");
-				oRm.addClass("sapFCardContentShimmerPlaceholderItem");
-				if (oItem && !oItem.icon && !oItem.description) {
-					oRm.addClass("sapFCardContentShimmerPlaceholderNoIcon");
+				oRm.openStart("div", oControl)
+					.class("sapFCardContentPlaceholder")
+					.class("sapFCardContentListPlaceholder")
+					.attr("tabindex", "0")
+					.attr("title", sTitle);
+
+				oRm.accessibilityState(oControl, {
+					role: "progressbar",
+					valuemin: "0",
+					valuemax: "100"
+				});
+
+				oRm.openEnd();
+
+				for (var i = 0; i < iMaxItems; i++) {
+					oRm.openStart("div")
+						.class("sapFCardContentShimmerPlaceholderItem")
+						.style("height", oControl.getItemHeight())
+						.openEnd();
+
+					if (oItem && oItem.icon) {
+						oRm.openStart("div")
+							.class("sapFCardContentShimmerPlaceholderImg")
+							.class("sapFCardLoadingShimmer")
+							.openEnd()
+							.close("div");
+					}
+
+					oRm.openStart("div")
+						.class("sapFCardContentShimmerPlaceholderRows")
+						.openEnd();
+
+					if (oItem && oItem.title) {
+						this.renderRow(oRm);
+					}
+
+					if (oItem && oItem.description) {
+						this.renderRow(oRm);
+					}
+
+					if (oItem && oItem.chart) {
+						this.renderRow(oRm);
+					}
+
+					if (oItem && oItem.actionsStrip) {
+						this.renderRow(oRm);
+					}
+
+					oRm.close("div");
+					oRm.close("div");
 				}
-				oRm.writeClasses();
-				oRm.write(">");
-				if (oItem && oItem.icon) {
-					oRm.write("<div");
-					oRm.addClass("sapFCardContentShimmerPlaceholderImg");
-					oRm.addClass("sapFCardLoadingShimmer");
-					oRm.writeClasses();
-					oRm.write(">");
-					oRm.write("</div>");
-				}
-				oRm.write("<div");
-				oRm.addClass("sapFCardContentShimmerPlaceholderRows");
-				oRm.writeClasses();
-				oRm.write(">");
-				if (oItem && oItem.title) {
-					oRm.write("<div");
-					oRm.addClass("sapFCardContentShimmerPlaceholderItemText");
-					oRm.addClass("sapFCardLoadingShimmer");
-					oRm.writeClasses();
-					oRm.write(">");
-					oRm.write("</div>");
-				}
-				if (oItem && oItem.description) {
-					oRm.write("<div");
-					oRm.addClass("sapFCardContentShimmerPlaceholderItemText");
-					oRm.addClass("sapFCardLoadingShimmer");
-					oRm.writeClasses();
-					oRm.write(">");
-					oRm.write("</div>");
-				}
-				oRm.write("</div>");
-				oRm.write("</div>");
+				oRm.close("div");
+			},
+
+			renderRow: function (oRm) {
+				oRm.openStart("div")
+					.class("sapFCardContentShimmerPlaceholderRow")
+					.class("sapFCardLoadingShimmer")
+					.openEnd()
+					.close("div");
 			}
-			oRm.write("</div>");
 		}
 	});
 

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -59,7 +59,7 @@ sap.ui.define([
 	 * @implements sap.ui.core.IContextMenu
 	 *
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.95.0
 	 * @since 1.21.0
 	 *
 	 * @constructor
@@ -84,7 +84,7 @@ sap.ui.define([
 			 * Accessible label / description of the menu for assistive technologies like screenreaders.
 			 * @deprecated as of version 1.27.0, replaced by <code>ariaLabelledBy</code> association
 			 */
-			ariaDescription : {type : "string", group : "Accessibility", defaultValue : null},
+			ariaDescription : {type : "string", group : "Accessibility", defaultValue : null, deprecated: true},
 
 			/**
 			 * The maximum number of items which are displayed before an overflow mechanism takes effect.
@@ -187,12 +187,19 @@ sap.ui.define([
 	 * Enables any consumer of the menu to enhance its accessibility state by calling
 	 * back its custom provided function Menu#_setCustomEnhanceAccStateFunction.
 	 *
+	 * @param {sap.ui.core.Element} oElement
+	 *   The Control/Element for which ARIA properties are collected
+	 * @param {object} mAriaProps
+	 *   Map of ARIA properties keyed by their name (without prefix "aria-"); the method
+	 *   implementation can enhance this map in any way (add or remove properties, modify values)
 	 * @overrides sap.ui.core.Element.prototype.enhanceAccessibilityState
 	 */
 	Menu.prototype.enhanceAccessibilityState = function(oElement, mAriaProps) {
 		var bIsAccFunctionValid = typeof this._fnCustomEnhanceAccStateFunction === "function";
 
-		return bIsAccFunctionValid ? this._fnCustomEnhanceAccStateFunction(oElement, mAriaProps) : mAriaProps;
+		if (bIsAccFunctionValid) {
+			this._fnCustomEnhanceAccStateFunction(oElement, mAriaProps);
+		}
 	};
 
 	/**
@@ -209,7 +216,7 @@ sap.ui.define([
 
 		ControlEvents.unbindAnyEvent(this.fAnyEventHandlerProxy);
 		if (this._bOrientationChangeBound) {
-			jQuery(window).unbind("orientationchange", this.fOrientationChangeHandler);
+			jQuery(window).off("orientationchange", this.fOrientationChangeHandler);
 			this._bOrientationChangeBound = false;
 		}
 
@@ -237,7 +244,7 @@ sap.ui.define([
 	 */
 	Menu.prototype.onBeforeRendering = function() {
 		this._resetDelayedRerenderItems();
-		this.$().unbind("mousemove");
+		this.$().off("mousemove");
 	};
 
 	/**
@@ -264,7 +271,7 @@ sap.ui.define([
 		}
 
 		checkAndLimitHeight(this);
-		this.$().bind("mousemove", this._focusMenuItem.bind(this));
+		this.$().on("mousemove", this._focusMenuItem.bind(this));
 	};
 
 	/**
@@ -440,7 +447,7 @@ sap.ui.define([
 
 		ControlEvents.bindAnyEvent(this.fAnyEventHandlerProxy);
 		if (Device.support.orientation && this.getRootMenu() === this) {
-			jQuery(window).bind("orientationchange", this.fOrientationChangeHandler);
+			jQuery(window).on("orientationchange", this.fOrientationChangeHandler);
 			this._bOrientationChangeBound = true;
 		}
 	};
@@ -552,7 +559,7 @@ sap.ui.define([
 
 		ControlEvents.unbindAnyEvent(this.fAnyEventHandlerProxy);
 		if (this._bOrientationChangeBound) {
-			jQuery(window).unbind("orientationchange", this.fOrientationChangeHandler);
+			jQuery(window).off("orientationchange", this.fOrientationChangeHandler);
 			this._bOrientationChangeBound = false;
 		}
 
@@ -750,7 +757,7 @@ sap.ui.define([
 		// focus menuItems
 		if (this.oHoveredItem && (jQuery(oEvent.target).prop("tagName") != "INPUT")) {
 			var oDomRef = this.oHoveredItem.getDomRef();
-			jQuery(oDomRef).focus();
+			jQuery(oDomRef).trigger("focus");
 		}
 
 		//like sapselect but on keyup:
@@ -760,7 +767,7 @@ sap.ui.define([
 		//The attribute _sapSelectOnKeyDown is used to avoid the problem the other way round (Space is pressed
 		//on Button which opens the menu and the space keyup immediately selects the first item)
 		//The device checks are made, because of the new functionality of iOS13, that brings desktop view on tablet
-		if (!this._sapSelectOnKeyDown && ( oEvent.key !== KeyCodes.Space || (!sap.ui.Device.os.macintosh && window.navigator.maxTouchPoints <= 1))) {
+		if (!this._sapSelectOnKeyDown && ( oEvent.key !== KeyCodes.Space || (!Device.os.macintosh && window.navigator.maxTouchPoints <= 1))) {
 			return;
 		} else {
 			this._sapSelectOnKeyDown = false;
@@ -824,6 +831,7 @@ sap.ui.define([
 		}
 
 		if (checkMouseEnterOrLeave(oEvent, this.getDomRef())) {
+			this.setHoveredItem(null);
 			if (!this.oOpenedSubMenu || !(this.oOpenedSubMenu.getParent() === this.oHoveredItem)) {
 				this.setHoveredItem(this.oHoveredItem);
 
@@ -916,10 +924,11 @@ sap.ui.define([
 		}
 
 		var oSubMenu = oItem.getSubmenu();
-
 		if (!oSubMenu) {
 			// This is a normal item -> Close all menus and fire event.
-			this.getRootMenu().close();
+			// Call Menu.prototype.close with argument value equal to "true"
+			// in order not to ignore the opener DOM reference
+			this.getRootMenu().close(true);
 		} else {
 			if (!Device.system.desktop && this.oOpenedSubMenu === oSubMenu) {
 				this.closeSubmenu();

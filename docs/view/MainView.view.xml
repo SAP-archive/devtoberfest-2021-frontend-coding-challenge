@@ -45,14 +45,14 @@
         <List id="all-list" items="{sample>/}">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
-              <Title id="all-bar-info" text="{i18n>SAP BTP Services}" level="H4" />
+              <Title id="all-bar-info" text="{i18n>all-bar-info-text}" level="H4" />
               <ToolbarSpacer id="all-bar-spacer" />
-              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>Search for the name or description}"
+              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>all-bar-search-placeholder}"
                 liveChange=".liveSearch" />
             </OverflowToolbar>
           </headerToolbar>
           <StandardListItem title="{sample>name}" description="{sample>description}" infoState="Information"
-            icon="{sample>icon}" info="{sample>category}" />
+            icon="{sample>icon}" info="{sample>category}" iconDensityAware = "false" />
         </List>
       </ScrollContainer>
     </tnt:mainContents>

@@ -14,14 +14,13 @@ This is the [Devtoberfest 2021 Coding Challenge of week 6](https://github.com/SA
 Unfortunately, this app doesn't have the best loading performance. The [Lighthouse performance score](https://web.dev/performance-scoring/) is way below the achievable 100 points. Luckily, this is not the fault of the framework used but happened due to a bad implementation and disregard of [common best practices](https://www.youtube.com/watch?v=CBF_8eOjuc8). It’s up to you to fix this web application and to push the performance score above 70.
 
 Possible areas where you can achieve performance boosts are:
-- [Optimize Media Files](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=551s)
-- [Avoid or Minimize Blocking JS and CSS / On-demand Loading of Assets](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=675s)
-- [Reduce the Network Load](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=859s)
-- [Reduce the Perceived Loading Time](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=970s)
 
+-   [Optimize Media Files](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=551s)
+-   [Avoid or Minimize Blocking JS and CSS / On-demand Loading of Assets](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=675s)
+-   [Reduce the Network Load](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=859s)
+-   [Reduce the Perceived Loading Time](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=970s)
 
 For more details, watch [this video](https://www.youtube.com/watch?v=CBF_8eOjuc8):
-
 
 [![Video Preview](https://img.youtube.com/vi/CBF_8eOjuc8/0.jpg)](https://www.youtube.com/watch?v=CBF_8eOjuc8)
 
@@ -35,7 +34,7 @@ You can submit your solution as follows:
 
 1. Fork and clone this repository
 
-1. Turn GitHub Actions on for this repository to allow the included workflows, e.g.,  to build the web app on every push.
+1. Turn GitHub Actions on for this repository to allow the included workflows, e.g., to build the web app on every push.
 
 1. Turn GitHub Pages on as well to host the improved web app there.
 
