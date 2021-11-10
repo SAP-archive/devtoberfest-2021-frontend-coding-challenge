@@ -1,1 +1,0 @@
-sap.ui.define(["sap/ui/core/mvc/Controller","sap/ui/core/UIComponent"],function(e,t){"use strict";return e.extend("com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.BaseController",{getModel:function(e){return this.getView().getModel(e)},setModel:function(e,t){return this.getView().setModel(e,t)}})});

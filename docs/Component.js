@@ -1,1 +1,0 @@
-sap.ui.define(["sap/ui/core/UIComponent","com/devtoberfest/devtoberfest2021FrontendCodingChallenge/model/models"],function(e,t){"use strict";return e.extend("com.devtoberfest.devtoberfest2021FrontendCodingChallenge.Component",{metadata:{manifest:"json"},init:function(){e.prototype.init.apply(this,arguments);this.setModel(t.createDeviceModel(),"device")}})});
