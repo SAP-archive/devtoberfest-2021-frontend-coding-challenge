@@ -24,6 +24,10 @@ sap.ui.define(
                         search: "",
                         lightTheme: !useDarkTheme,
                     });
+
+                  var image = document.images[0];
+                  var downloadingImage = new Image();
+
                     this.getView().setModel(settingsModel, "settings");
                 },
 

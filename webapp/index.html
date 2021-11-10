@@ -18,13 +18,13 @@
             data-sap-ui-resourceroots='{
         "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./"
       }'
-            data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
             data-sap-ui-compatVersion="edge"
-            data-sap-ui-frameOptions="trusted"
+            data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
             data-sap-ui-async="true"
-			      data-sap-ui-preload="async"
+			data-sap-ui-preload="async"
+            data-sap-ui-frameOptions="trusted"
         ></script>
-
+<!--
         <script>
             sap.ui.getCore().attachInit(function () {
                 sap.ui.require(
@@ -44,4 +44,12 @@
     <body class="sapUiBody" role="application">
         <div id="content"></div>
     </body>
+-->
+    <body class="sapUiBody">
+        <div
+            data-sap-ui-component
+            data-name="com.devtoberfest.devtoberfest2021FrontendCodingChallenge"
+            data-id="container"
+            data-settings='{"id" : "devtoberfest2021FrontendCodingChallenge"}'
+        ></div>
 </html>
