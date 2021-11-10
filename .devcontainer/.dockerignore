@@ -1,0 +1,38 @@
+# Ignore a file or directory in the context root named "modules"
+modules
+
+# Ignore any files or directories within the subdirectory named "modules"
+# in the context root
+modules/*
+
+# Ignore any files or directories in the context root beginning with "modules"
+modules*
+
+# Ignore any files or directories one level down from the context root named
+# "modules"
+*/modules
+
+# Ignore any files or directories at any level, including the context root,
+# named modules
+**/modules
+
+# myProjects
+myMTAapp/*
+com.myorg.myUI5App/*
+myMTA-Project/*
+t3e/*
+Installation/*
+install.txt
+testing.txt
+test.txt
+test-cap-kyma.txt
+test-sap-tech-bytes.txt
+default-env*
+dr-cf-build-sap-overview-page/*
+build-sap-overview-page/*
+dr-cf-build-sap-overview-page-2/*
+cap-media-master/*
+dr-cap-media/*
+using-UI5-uploadset-with-CAP/*
+com.myorg.myUI5App/*
+cpapp*
