@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -12,6 +12,7 @@ sap.ui.define([
 	'sap/ui/core/Core',
 	'sap/ui/core/Control',
 	'sap/ui/core/EnabledPropagator',
+	'sap/ui/core/LabelEnablement',
 	'sap/ui/core/Icon',
 	'sap/ui/core/IconPool',
 	'./Button',
@@ -27,7 +28,10 @@ sap.ui.define([
 	"sap/ui/dom/containsOrEquals",
 	"sap/ui/events/KeyCodes",
 	'./Text',
-	'sap/m/SimpleFixFlex'
+	'sap/m/SimpleFixFlex',
+	'sap/base/Log',
+	'sap/ui/core/ValueStateSupport',
+	"sap/ui/core/InvisibleMessage"
 ],
 function(
 	Dialog,
@@ -37,6 +41,7 @@ function(
 	Core,
 	Control,
 	EnabledPropagator,
+	LabelEnablement,
 	Icon,
 	IconPool,
 	Button,
@@ -52,7 +57,10 @@ function(
 	containsOrEquals,
 	KeyCodes,
 	Text,
-	SimpleFixFlex
+	SimpleFixFlex,
+	Log,
+	ValueStateSupport,
+	InvisibleMessage
 ) {
 		"use strict";
 
@@ -74,6 +82,9 @@ function(
 		// shortcut for sap.m.SelectType
 		var SelectType = library.SelectType;
 
+		// shortcut for sap.ui.core.InvisibleMessageMode
+		var InvisibleMessageMode = coreLibrary.InvisibleMessageMode;
+
 		/**
 		 * Constructor for a new <code>sap.m.Select</code>.
 		 *
@@ -86,10 +97,10 @@ function(
 		 * @see {@link fiori:https://experience.sap.com/fiori-design-web/select/ Select}
 		 *
 		 * @extends sap.ui.core.Control
-		 * @implements sap.ui.core.IFormContent
+		 * @implements sap.ui.core.IFormContent, sap.ui.core.ISemanticFormContent
 		 *
 		 * @author SAP SE
-		 * @version 1.76.0
+		 * @version 1.95.0
 		 *
 		 * @constructor
 		 * @public
@@ -101,7 +112,8 @@ function(
 				interfaces: [
 					"sap.ui.core.IFormContent",
 					"sap.m.IOverflowToolbarContent",
-					"sap.f.IShellBar"
+					"sap.f.IShellBar",
+					"sap.ui.core.ISemanticFormContent"
 				],
 				library: "sap.m",
 				properties: {
@@ -291,6 +303,17 @@ function(
 					},
 
 					/**
+					 * Modifies the behavior of the <code>setSelectedKey</code> method so that
+					 * the selected item is cleared when a provided selected key is missing.
+					 * @since 1.77
+					 */
+					resetOnMissingKey: {
+						type: "boolean",
+						group: "Behavior",
+						defaultValue: false
+					},
+
+					/**
 					 * Indicates whether the selection is restricted to one of the items in the list.
 					 * <b>Note:</b> We strongly recommend that you always set this property to <code>false</code> and bind
 					 * the <code>selectedKey</code> property to the desired value for better interoperability with data binding.
@@ -303,12 +326,27 @@ function(
 					},
 					/**
 					 * Determines whether the text in the items wraps on multiple lines when the available width is not enough.
+					 * When the text is truncated (<code>wrapItemsText</code> property is set to <code>false</code>),
+ 					 * the max width of the <code>SelectList</code> is 600px. When <code>wrapItemsText</code> is set to
+ 					 * <code>true</code>, <code>SelectList</code> takes all of the available width.
 					 * @since 1.69
 					 */
 					wrapItemsText: {
 						type: "boolean",
 						group: "Behavior",
 						defaultValue: false
+					},
+					/**
+					 * Determines the ratio between the first and the second column when secondary values are displayed.
+					 *
+					 * <b>Note:</b> This property takes effect only when the <code>showSecondaryValues</code> property is set to <code>true</code>.
+					 * @since 1.86
+					 * @experimental As of version 1.86
+					 */
+					columnRatio: {
+						type: "sap.m.SelectColumnRatio",
+						group: "Appearance",
+						defaultValue: "3:2"
 					},
 					/**
 					 * Indicates that user input is required. This property is only needed for accessibility purposes when a single relationship between
@@ -418,6 +456,15 @@ function(
 							 */
 							selectedItem: {
 								type: "sap.ui.core.Item"
+							},
+
+
+							/**
+							 * The previous selected item.
+							 * @since 1.95
+							 */
+							 previousSelectedItem: {
+								type: "sap.ui.core.Item"
 							}
 						}
 					}
@@ -440,12 +487,84 @@ function(
 		/* ----------------------------------------------------------- */
 
 		function fnHandleKeyboardNavigation(oItem) {
+			if (this._isIconOnly() && !this.isOpen()) {
+				return;
+			}
+
 			if (oItem) {
 				this.setSelection(oItem);
 				this.setValue(oItem.getText());
 				this.scrollToItem(oItem);
 			}
 		}
+
+		Select.prototype._attachHiddenSelectHandlers = function () {
+			var oSelect = this._getHiddenSelect();
+
+			oSelect.on("focus", this._addFocusClass.bind(this));
+			oSelect.on("blur", this._removeFocusClass.bind(this));
+		};
+
+		Select.prototype.focus = function() {
+			this._getHiddenSelect().focus();
+			Control.prototype.focus.call(this, arguments);
+		};
+
+		Select.prototype._addFocusClass = function () {
+			this.$().addClass("sapMSltFocused");
+		};
+
+		Select.prototype._removeFocusClass = function () {
+			this.$().removeClass("sapMSltFocused");
+		};
+
+		Select.prototype._detachHiddenSelectHandlers = function () {
+			var oSelect = this._getHiddenSelect();
+
+			if (oSelect) {
+				oSelect.off("focus");
+				oSelect.off("blur");
+			}
+		};
+
+		Select.prototype._getHiddenSelect = function () {
+			return this.$("hiddenSelect");
+		};
+
+		Select.prototype._getHiddenInput = function () {
+			return this.$("hiddenInput");
+		};
+
+		Select.prototype._announceValueStateText = function() {
+			var	sValueStateText = this._getValueStateText();
+
+			if (this._oInvisibleMessage) {
+				this._oInvisibleMessage.announce(sValueStateText, InvisibleMessageMode.Assertive);
+			}
+		};
+
+		Select.prototype._getValueStateText = function() {
+			var sValueState = this.getValueState(),
+				sValueStateTypeText,
+				sValueStateText;
+
+				if (sValueState === ValueState.None) {
+					return "";
+				}
+
+				sValueStateTypeText = Core.getLibraryResourceBundle("sap.m").getText("INPUTBASE_VALUE_STATE_" + sValueState.toUpperCase());
+				sValueStateText = sValueStateTypeText + " " + (this.getValueStateText() || ValueStateSupport.getAdditionalText(this));
+
+			return sValueStateText;
+		};
+
+		Select.prototype._isFocused = function () {
+			return this.getFocusDomRef() === document.activeElement;
+		};
+
+		Select.prototype._isIconOnly = function () {
+			return this.getType() === SelectType.IconOnly;
+		};
 
 		Select.prototype._handleFocusout = function(oEvent) {
 			this._bFocusoutDueRendering = this.bRenderingPhase;
@@ -474,7 +593,7 @@ function(
 			var oItem = this.getSelectedItem();
 
 			if (this._oSelectionOnFocus !== oItem) {
-				this.fireChange({ selectedItem: oItem });
+				this.fireChange({ selectedItem: oItem, previousSelectedItem: this._oSelectionOnFocus });
 			}
 		};
 
@@ -561,7 +680,7 @@ function(
 		 * @since 1.22.0
 		 */
 		Select.prototype.getList = function() {
-			if (this.bIsDestroyed) {
+			if (this._bIsBeingDestroyed) {
 				return null;
 			}
 
@@ -654,18 +773,35 @@ function(
 		 */
 		Select.prototype.setValue = function(sValue) {
 			var oDomRef = this.getDomRef(),
-				oTextPlaceholder = oDomRef && oDomRef.querySelector(".sapMSelectListItemText");
+				oTextPlaceholder = oDomRef && oDomRef.querySelector(".sapMSelectListItemText"),
+				bForceAnnounce = !this.isOpen() && this._isFocused() && this._oInvisibleMessage;
 
 			if (oTextPlaceholder) {
 				oTextPlaceholder.textContent = sValue;
 			}
 
+			this._setHiddenSelectValue();
 			this._getValueIcon();
+
+			if (bForceAnnounce) {
+				// InvisibleMessage is used in case the popover is closed.
+				// (aria-activedescendant is announcing the new selection when popover is opened).
+				this._oInvisibleMessage.announce(sValue, InvisibleMessageMode.Assertive);
+			}
 		};
 
+		Select.prototype._setHiddenSelectValue = function () {
+			var oSelect = this._getHiddenSelect(),
+				oInput = this._getHiddenInput(),
+				oSelectedKey = this.getSelectedKey(),
+				sSelectedItemText = this._getSelectedItemText();
+
+			oInput.attr("value", oSelectedKey || "");
+			oSelect.text(sSelectedItemText);
+		};
 
 		Select.prototype._getValueIcon = function() {
-			if (this.bIsDestroyed) {
+			if (this._bIsBeingDestroyed) {
 				return null;
 			}
 
@@ -716,7 +852,7 @@ function(
 		 * @since 1.30
 		 */
 		Select.prototype._handleAriaActiveDescendant = function(vItem) {
-			var oDomRef = this.getDomRef(),
+			var oDomRef = this.getFocusDomRef(),
 				oItemDomRef = vItem && vItem.getDomRef(),
 				sActivedescendant = "aria-activedescendant";
 
@@ -786,8 +922,7 @@ function(
 		 */
 		Select.prototype.onAfterOpen = function(oControlEvent) {
 			var oDomRef = this.getFocusDomRef(),
-				oItem = null,
-				$oLabel = this.$("label");
+				oItem = null;
 
 			if (!oDomRef) {
 				return;
@@ -796,9 +931,6 @@ function(
 			oItem = this.getSelectedItem();
 			oDomRef.setAttribute("aria-expanded", "true");
 
-			// Needs to be removed while popover is opened. Otherwise when going through the items, the currently
-			// selected item would be read out for a second time due to this label's update.
-			$oLabel.attr("aria-live", null);
 
 			// expose a parent/child contextual relationship to assistive technologies
 			// note: the "aria-controls" attribute is set when the list is visible and in view
@@ -847,15 +979,11 @@ function(
 		Select.prototype.onAfterClose = function(oControlEvent) {
 			var oDomRef = this.getFocusDomRef(),
 				CSS_CLASS = this.getRenderer().CSS_CLASS,
-				sPressedCSSClass = CSS_CLASS + "Pressed",
-				$oLabel = this.$("label");
+				sPressedCSSClass = CSS_CLASS + "Pressed";
 
 			if (oDomRef) {
 				oDomRef.setAttribute("aria-expanded", "false");
 				oDomRef.removeAttribute("aria-activedescendant");
-
-				// Add it back, because we want to hear updates when going through the items, while the popover is closed
-				$oLabel.attr("aria-live", "polite");
 			}
 
 			// Remove the active state
@@ -869,7 +997,7 @@ function(
 		 * @private
 		 */
 		Select.prototype.getPicker = function() {
-			if (this.bIsDestroyed) {
+			if (this._bIsBeingDestroyed) {
 				return null;
 			}
 
@@ -877,8 +1005,27 @@ function(
 			return this.createPicker(this.getPickerType());
 		};
 
+		/**
+		 * Gets the InvisibleText instance for the <code>valueStateText</code> property.
+		 *
+		 * @returns {sap.ui.core.InvisibleText | null} The <code>InvisibleText</code> instance, used to reference the text in aria-labelledby of interested controls.
+		 * @private
+		 */
+		Select.prototype.getValueStateTextInvisibleText = function() {
+			if (this._bIsBeingDestroyed) {
+				return null;
+			}
+
+			if (!this._oValueStateTextInvisibleText) {
+				this._oValueStateTextInvisibleText = new InvisibleText({ id: this.getId() + "-valueStateText-InvisibleText" });
+				this._oValueStateTextInvisibleText.toStatic();
+			}
+
+			return this._oValueStateTextInvisibleText;
+		};
+
 		Select.prototype.getSimpleFixFlex = function() {
-			if (this.bIsDestroyed) {
+			if (this._bIsBeingDestroyed) {
 				return null;
 			} else if (this.oSimpleFixFlex) {
 				return this.oSimpleFixFlex;
@@ -937,7 +1084,8 @@ function(
 		 * @private
 		 */
 		Select.prototype._updatePickerValueStateContentText = function() {
-			var oPickerValueStateContent = this.getPicker().getContent()[0].getFixContent(),
+			var oPicker = this.getPicker(),
+				oPickerValueStateContent = oPicker && oPicker.getContent()[0].getFixContent(),
 				sText;
 
 			if (oPickerValueStateContent) {
@@ -996,7 +1144,7 @@ function(
 				sCssClass = PICKER_CSS_CLASS + sValueState + "State",
 				sPickerWithSubHeader = PICKER_CSS_CLASS + "WithSubHeader",
 				oPicker = this.getPicker(),
-				oCustomHeader = oPicker.getContent()[0].getFixContent();
+				oCustomHeader = oPicker && oPicker.getContent()[0].getFixContent();
 
 			if (oCustomHeader) {
 				this._removeValueStateClassesForPickerValueStateContent(oPicker);
@@ -1049,7 +1197,7 @@ function(
 				offsetY: 0,
 				initialFocus: this,
 				bounce: false,
-				ariaLabelledBy: [this.getPickerValueStateContentId(), this._getPickerHiddenLabelId()]
+				ariaLabelledBy: this._getPickerHiddenLabelId()
 			});
 
 			// detect when the scrollbar or an item is pressed
@@ -1106,15 +1254,17 @@ function(
 		 * @private
 		 */
 		Select.prototype._createDialog = function() {
-			var that = this;
-			return new Dialog({
-				stretch: true,
-				ariaLabelledBy: [this.getPickerValueStateContentId(), this._getPickerHiddenLabelId()],
-				customHeader: this._getPickerHeader(),
-				beforeOpen: function() {
-					that.updatePickerHeaderTitle();
-				}
-			});
+			var that = this,
+				oHeader = this._getPickerHeader(),
+				oDialog = new Dialog({
+					stretch: true,
+					ariaLabelledBy: this._getPickerHiddenLabelId(),
+					customHeader: oHeader,
+					beforeOpen: function() {
+						that.updatePickerHeaderTitle();
+					}
+				});
+			return oDialog;
 		};
 
 		/**
@@ -1149,6 +1299,7 @@ function(
 			if (!this.getAggregation("_pickerHeader")) {
 				oResourceBundle = Core.getLibraryResourceBundle("sap.m");
 				this.setAggregation("_pickerHeader", new Bar({
+					titleAlignment: library.TitleAlignment.Auto,
 					contentMiddle: new Title({
 						text: oResourceBundle.getText("SELECT_PICKER_TITLE_TEXT")
 					}),
@@ -1228,9 +1379,16 @@ function(
 			this._oValueStateMessage = new ValueStateMessage(this);
 
 			this._bValueStateMessageOpened = false;
+
+			this._sAriaRoleDescription = Core.getLibraryResourceBundle("sap.m").getText("SELECT_ROLE_DESCRIPTION");
+
+			this._oInvisibleMessage = null;
 		};
 
 		Select.prototype.onBeforeRendering = function() {
+			if (!this._oInvisibleMessage) {
+				this._oInvisibleMessage = InvisibleMessage.getInstance();
+			}
 
 			// rendering phase is started
 			this.bRenderingPhase = true;
@@ -1241,18 +1399,32 @@ function(
 
 			this._updatePickerValueStateContentText();
 			this._updatePickerValueStateContentStyles();
+			this._detachHiddenSelectHandlers();
+
+			if (this._isIconOnly()) {
+				this.setAutoAdjustWidth(true);
+			}
+
 		};
 
 		Select.prototype.onAfterRendering = function() {
 
 			// rendering phase is finished
 			this.bRenderingPhase = false;
+
+			this._setHiddenSelectValue();
+			this._attachHiddenSelectHandlers();
 		};
 
 		Select.prototype.exit = function() {
 			var oValueStateMessage = this.getValueStateMessage(),
 				oValueIcon = this._getValueIcon();
 			this._oSelectionOnFocus = null;
+
+			if (this._oValueStateTextInvisibleText) {
+				this._oValueStateTextInvisibleText.destroy();
+				this._oValueStateTextInvisibleText = null;
+			}
 
 			if (oValueStateMessage) {
 				this.closeValueStateMessage();
@@ -1278,14 +1450,14 @@ function(
 		 * @private
 		 */
 		Select.prototype.ontouchstart = function(oEvent) {
-
 			// mark the event for components that needs to know if the event was handled
 			oEvent.setMarked();
 
-			if (this.getEnabled() && this.getEditable() && this.isOpenArea(oEvent.target)) {
+			if (this.getEnabled() && this.getEditable()) {
 
 				// add the active state to the Select's field
 				this.addStyleClass(this.getRenderer().CSS_CLASS + "Pressed");
+				this.focus();
 			}
 		};
 
@@ -1332,6 +1504,8 @@ function(
 				}
 
 				if (Device.system.phone) {
+					// focus has to be set to the native select DOM element in order to restore the focus back to it
+					// after the select dialog is closed
 					this.focus();
 				}
 
@@ -1352,10 +1526,12 @@ function(
 		 * @private
 		 */
 		Select.prototype.onSelectionChange = function(oControlEvent) {
-			var oItem = oControlEvent.getParameter("selectedItem");
+			var oItem = oControlEvent.getParameter("selectedItem"),
+				oPreviousSelectedItem = this.getSelectedItem();
+
 			this.close();
 			this.setSelection(oItem);
-			this.fireChange({ selectedItem: oItem });
+			this.fireChange({ selectedItem: oItem, previousSelectedItem: oPreviousSelectedItem });
 			// check and update icon
 			this.setValue(this._getSelectedItemText());
 		};
@@ -1372,9 +1548,8 @@ function(
 		 */
 		Select.prototype.onkeypress = function(oEvent) {
 
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled() || !this.getEditable()) {
+			// prevents actions from occurring when the control is non-editable
+			if (!this.getEditable()) {
 				return;
 			}
 
@@ -1409,9 +1584,8 @@ function(
 		 */
 		Select.prototype.onsapshow = function(oEvent) {
 
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled() || !this.getEditable()) {
+			// prevents actions from occurring when the control is non-editable
+			if (!this.getEditable()) {
 				return;
 			}
 
@@ -1436,6 +1610,21 @@ function(
 		Select.prototype.onsaphide = Select.prototype.onsapshow;
 
 		/**
+		 * Handle when mousedown event is fired on the select.
+		 *
+		 * Call preventDefault function on oEvent object to suppress
+		 * the default browser behavior of opening a native dropdown
+		 *
+		 * @param {jQuery.Event} oEvent The event object.
+		 * @private
+		 * @function
+		 */
+		Select.prototype.onmousedown = function (oEvent) {
+			oEvent.preventDefault();
+			this._getHiddenSelect().focus();
+		};
+
+		/**
 		 * Handle when escape is pressed.
 		 *
 		 * @param {jQuery.Event} oEvent The event object.
@@ -1443,9 +1632,8 @@ function(
 		 */
 		Select.prototype.onsapescape = function(oEvent) {
 
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled() || !this.getEditable() || this._bSpaceDown) {
+			// prevents actions from occurring when the control is non-editable
+			if (!this.getEditable() || this._bSpaceDown) {
 				return;
 			}
 
@@ -1466,15 +1654,18 @@ function(
 		 * @private
 		 */
 		Select.prototype.onsapenter = function(oEvent) {
+			// Prevent the opening of the native select with options
+			oEvent.preventDefault();
 
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled() || !this.getEditable()) {
+			// prevents actions from occurring when the control is non-editable
+			if (!this.getEditable()) {
 				return;
 			}
 
 			// mark the event for components that needs to know if the event was handled
-			oEvent.setMarked();
+			if (this.isOpen()) {
+				oEvent.setMarked();
+			}
 
 			this.close();
 			this._checkSelectionChange();
@@ -1488,9 +1679,13 @@ function(
 		 */
 		Select.prototype.onkeydown = function(oEvent) {
 			if (oEvent.which === KeyCodes.SPACE) {
-				// note: prevent document scrolling when the spacebar key is pressed
-				oEvent.preventDefault();
 				this._bSpaceDown = true;
+			}
+
+			if ([KeyCodes.ARROW_DOWN, KeyCodes.ARROW_UP, KeyCodes.SPACE].indexOf(oEvent.which) > -1) {
+				// note: [KeyCodes.ARROW_DOWN, KeyCodes.ARROW_UP] prevent native dropdown to open when ALT/CMD and ARROW DOWN/UP keys are pressed
+				// note: [KeyCodes.SPACE] prevent document scrolling when the spacebar key is pressed
+				oEvent.preventDefault();
 			}
 
 			if (oEvent.which === KeyCodes.SHIFT || oEvent.which === KeyCodes.ESCAPE) {
@@ -1505,9 +1700,8 @@ function(
 		 * @private
 		 */
 		Select.prototype.onkeyup = function(oEvent) {
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled() || !this.getEditable()) {
+			// prevents actions from occurring when the control is non-editable
+			if (!this.getEditable()) {
 				return;
 			}
 
@@ -1536,9 +1730,8 @@ function(
 		 */
 		Select.prototype.onsapdown = function(oEvent) {
 
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled() || !this.getEditable()) {
+			// prevents actions from occurring when the control is non-editable
+			if (!this.getEditable()) {
 				return;
 			}
 
@@ -1563,9 +1756,8 @@ function(
 		 */
 		Select.prototype.onsapup = function(oEvent) {
 
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled() || !this.getEditable()) {
+			// prevents actions from occurring when the control is non-editable
+			if (!this.getEditable()) {
 				return;
 			}
 
@@ -1591,9 +1783,8 @@ function(
 		 */
 		Select.prototype.onsaphome = function(oEvent) {
 
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled() || !this.getEditable()) {
+			// prevents actions from occurring when the control is non-editable
+			if (!this.getEditable()) {
 				return;
 			}
 
@@ -1616,9 +1807,8 @@ function(
 		 */
 		Select.prototype.onsapend = function(oEvent) {
 
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled() || !this.getEditable()) {
+			// prevents actions from occurring when the control is non-editable
+			if (!this.getEditable()) {
 				return;
 			}
 
@@ -1640,9 +1830,8 @@ function(
 		 */
 		Select.prototype.onsappagedown = function(oEvent) {
 
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled() || !this.getEditable()) {
+			// prevents actions from occurring when the control is non-editable
+			if (!this.getEditable()) {
 				return;
 			}
 
@@ -1673,9 +1862,8 @@ function(
 		 */
 		Select.prototype.onsappageup = function(oEvent) {
 
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled() || !this.getEditable()) {
+			// prevents actions from occurring when the control is non-editable
+			if (!this.getEditable()) {
 				return;
 			}
 
@@ -1705,11 +1893,6 @@ function(
 		 * @private
 		 */
 		Select.prototype.onsaptabnext = function (oEvent) {
-			// prevents actions from occurring when the control is non-editable or disabled,
-			// IE11 browser focus non-focusable elements
-			if (!this.getEnabled()) {
-				return;
-			}
 
 			if (this.isOpen()) {
 				this.close();
@@ -1745,13 +1928,6 @@ function(
 					this.openValueStateMessage();
 				}
 			}.bind(this), 100);
-
-			// note: in some circumstances IE browsers focus non-focusable elements
-			if (oEvent.target !== this.getFocusDomRef()) {	// whether an inner element is receiving the focus
-
-				// force the focus to leave the inner element and set it back to the control's root element
-				this.focus();
-			}
 		};
 
 		/**
@@ -1799,8 +1975,32 @@ function(
 		/* =========================================================== */
 
 		/* ----------------------------------------------------------- */
+		/* overrides                                                   */
+		/* ----------------------------------------------------------- */
+
+		/**
+		 * Returns the DOM Element that should get the focus.
+		 *
+		 * @return {Element} Returns the DOM Element that should get the focus
+		 * @protected
+		 * @override
+		 */
+		Select.prototype.getFocusDomRef = function () {
+			return this._getHiddenSelect()[0];
+		};
+
+		/* ----------------------------------------------------------- */
 		/* protected methods                                           */
 		/* ----------------------------------------------------------- */
+
+		/**
+		 * Gets the DOM reference the popup should be docked to.
+		 *
+		 * @return {Element} The DOM reference
+		 */
+		Select.prototype.getPopupAnchorDomRef = function() {
+			return this.getDomRef();
+		};
 
 		/**
 		 * Updates and synchronizes <code>selectedItem</code> association, <code>selectedItemId</code> and <code>selectedKey</code> properties.
@@ -1825,6 +2025,18 @@ function(
 			sKey = vItem ? vItem.getKey() : "";
 			this.setProperty("selectedKey", sKey, true);
 			this._handleAriaActiveDescendant(vItem);
+		};
+
+		Select.prototype.setColumnRatio = function(sRatio) {
+			var oList = this.getList();
+
+			this.setProperty("columnRatio", sRatio, true);
+
+			if (oList && this.getShowSecondaryValues()) {
+				oList.setProperty("_columnRatio", this.getColumnRatio());
+			}
+
+			return this;
 		};
 
 		/**
@@ -1878,6 +2090,7 @@ function(
 
 			// configuration
 			oPicker.setHorizontalScrolling(false)
+					.setVerticalScrolling(false)
 					.addStyleClass(CSS_CLASS + "Picker")
 					.addStyleClass(CSS_CLASS + "Picker-CTX")
 					.addStyleClass("sapUiNoContentPadding")
@@ -1891,7 +2104,7 @@ function(
 					}, this)
 					.addContent(this.getSimpleFixFlex());
 
-			return oPicker;
+					return oPicker;
 		};
 
 		/**
@@ -1932,18 +2145,23 @@ function(
 
 			this._oList = new SelectList({
 				width: "100%",
-				maxWidth: Device.system.phone ? "100%" : "600px",
-				keyboardNavigationMode: sKeyboardNavigationMode
+				keyboardNavigationMode: sKeyboardNavigationMode,
+				hideDisabledItems: true
 			}).addStyleClass(this.getRenderer().CSS_CLASS + "List-CTX")
 			.addEventDelegate({
 				ontap: function(oEvent) {
-					this._checkSelectionChange();
-					this.close();
+					var oItem = oEvent.srcControl;
+
+					if (oItem.getEnabled()) {
+						this._checkSelectionChange();
+						this.close();
+					}
 				}
 			}, this)
 			.attachSelectionChange(this.onSelectionChange, this);
 
-			this._oList.toggleStyleClass("sapMSelectListWrappedItems", this.getWrapItemsText());
+			 this._oList.setProperty("_tabIndex", "-1");
+			 this._oList.toggleStyleClass("sapMSelectListWrappedItems", this.getWrapItemsText());
 
 			return this._oList;
 		};
@@ -1952,13 +2170,19 @@ function(
 		 * Sets the <code>wrapItemsText</code> property.
 		 *
 		 * @param {boolean} bWrap
-		 * @returns {sap.m.Select} <code>this</code> to allow method chaining
+		 * @returns {this} <code>this</code> to allow method chaining
 		 * @since 1.69
 		 * @public
 		 */
 		Select.prototype.setWrapItemsText = function (bWrap) {
+			var oPicker = this.getPicker();
+
 			if (this._oList) {
 				this._oList.toggleStyleClass("sapMSelectListWrappedItems", bWrap);
+			}
+
+			if (oPicker && this.getPickerType() === "Popover") {
+				oPicker.toggleStyleClass("sapMPickerWrappedItems", bWrap);
 			}
 
 			return this.setProperty("wrapItemsText", bWrap, true);
@@ -1994,12 +2218,17 @@ function(
 		/**
 		 * Open the control's picker popup.
 		 *
-		 * @returns {sap.m.Select} <code>this</code> to allow method chaining.
+		 * @returns {this} <code>this</code> to allow method chaining.
 		 * @protected
 		 * @since 1.16
 		 */
 		Select.prototype.open = function() {
 			var oPicker = this.getPicker();
+
+			//We need to force focus on the select before opening the popup,
+			//because it doesn`t receive it automatically.
+			//Also popup will point the focus on the last focused element.
+			this.focus();
 
 			if (oPicker) {
 				oPicker.open();
@@ -2011,7 +2240,7 @@ function(
 		/**
 		 * Toggle the open state of the control's picker popup.
 		 *
-		 * @returns {sap.m.Select} <code>this</code> to allow method chaining.
+		 * @returns {this} <code>this</code> to allow method chaining.
 		 * @since 1.26
 		 */
 		Select.prototype.toggleOpenState = function() {
@@ -2075,7 +2304,12 @@ function(
 		 */
 		Select.prototype.getSelectableItems = function() {
 			var oList = this.getList();
-			return oList ? oList.getSelectableItems() : [];
+
+			if (!oList) {
+				return [];
+			}
+
+			return oList.getSelectableItems();
 		};
 
 		/**
@@ -2098,6 +2332,16 @@ function(
 		Select.prototype.isOpenArea = function(oDomRef) {
 			var oOpenAreaDomRef = this.getOpenArea();
 			return oOpenAreaDomRef && oOpenAreaDomRef.contains(oDomRef);
+		};
+
+		Select.prototype.getFormFormattedValue = function() {
+			var oItem = this.getSelectedItem();
+
+			return oItem ? oItem.getText() : "";
+		};
+
+		Select.prototype.getFormValueProperty = function () {
+			return "selectedKey";
 		};
 
 		/**
@@ -2237,7 +2481,15 @@ function(
 				oList && SelectList.prototype.setProperty.apply(oList, arguments);
 			}
 
-			return Control.prototype.setProperty.apply(this, arguments);
+			try {
+				Control.prototype.setProperty.apply(this, arguments);
+			} catch (e) {
+				Log.warning('Update failed due to exception. Loggable in support mode log', null, null, function () {
+					return { exception: e };
+				});
+			}
+
+			return this;
 		};
 
 		Select.prototype.removeAllAssociation = function(sAssociationName, bSuppressInvalidate) {
@@ -2267,50 +2519,22 @@ function(
 			return oSelectClone;
 		};
 
-		Select.prototype.updateValueStateClasses = function(sValueState, sOldValueState) {
-			var $This = this.$(),
-				$Label = this.$("label"),
-				$Arrow = this.$("arrow"),
-				mValueState = ValueState,
-				CSS_CLASS = this.getRenderer().CSS_CLASS;
+		Select.prototype._updatePickerAriaLabelledBy = function (sValueState) {
+			var oPicker = this.getPicker(),
+				sPickerValueStateContentId;
 
-			if (sOldValueState !== mValueState.None) {
-				$This.removeClass(CSS_CLASS + "State");
-				$This.removeClass(CSS_CLASS + sOldValueState);
-
-				$Label.removeClass(CSS_CLASS + "LabelState");
-				$Label.removeClass(CSS_CLASS + "Label" + sOldValueState);
-
-				$Arrow.removeClass(CSS_CLASS + "ArrowState");
+			if (!oPicker) {
+				return;
 			}
+			// to avoid double speech output, referenced element should not be nested inside picker
+			// so we set aria-labelledby to element which is in the static area
+			sPickerValueStateContentId = this.getValueStateTextInvisibleText().getId();
 
-			if (sValueState !== mValueState.None) {
-				$This.addClass(CSS_CLASS + "State");
-				$This.addClass(CSS_CLASS + sValueState);
-
-				$Label.addClass(CSS_CLASS + "LabelState");
-				$Label.addClass(CSS_CLASS + "Label" + sValueState);
-
-				$Arrow.addClass(CSS_CLASS + "ArrowState");
+			if (sValueState === ValueState.None) {
+				oPicker.removeAriaLabelledBy(sPickerValueStateContentId);
+			} else {
+				oPicker.addAriaLabelledBy(sPickerValueStateContentId);
 			}
-		};
-
-		Select.prototype.updateAriaLabelledBy = function(sValueState, sOldValueState) {
-			var $this = this.$(),
-				sAttr = $this.attr("aria-labelledby"),
-				aIDs = sAttr ? sAttr.split(" ") : [],
-				sNewIDs;
-
-			if (sOldValueState !== ValueState.None && sOldValueState !== ValueState.Error) {
-				aIDs.pop();
-			}
-
-			if (sValueState !== ValueState.None && sValueState !== ValueState.Error) {
-				aIDs.push(InvisibleText.getStaticId("sap.ui.core", "VALUE_STATE_" + sValueState.toUpperCase()));
-			}
-
-			sNewIDs = aIDs.join(" ");
-			$this.attr("aria-labelledby", sNewIDs);
 		};
 
 		/**
@@ -2321,17 +2545,15 @@ function(
 		 * @since 1.40.5
 		 */
 		Select.prototype.getLabels = function() {
-			var aLabelIDs = this.getAriaLabelledBy().map(function(sLabelID) {
+			var aLabelIDs = this.getAriaLabelledBy()
+				.concat(LabelEnablement.getReferencingLabels(this));
+
+			aLabelIDs = aLabelIDs.filter(function(sId, iIndex) {
+				return aLabelIDs.indexOf(sId) === iIndex;
+			})
+			.map(function(sLabelID) {
 				return Core.byId(sLabelID);
 			});
-
-			var oLabelEnablement = sap.ui.require("sap/ui/core/LabelEnablement");
-
-			if (oLabelEnablement) {
-				aLabelIDs = aLabelIDs.concat(oLabelEnablement.getReferencingLabels(this).map(function(sLabelID) {
-					return Core.byId(sLabelID);
-				}));
-			}
 
 			return aLabelIDs;
 		};
@@ -2343,7 +2565,7 @@ function(
 		 * @since 1.40.5
 		 */
 		Select.prototype.getDomRefForValueStateMessage = function() {
-			return this.getDomRef();
+			return this.getFocusDomRef();
 		};
 
 		/**
@@ -2397,12 +2619,12 @@ function(
 		/**
 		 * Whether or not the value state message should be opened.
 		 *
-		 * @returns {boolean} <code>false</code> if the field is disabled, read-only or the default value state is set,
+		 * @returns {boolean} <code>false</code> if the field is disabled, read-only, icon-only or the default value state is set,
 		 * otherwise it returns <code>true</code>.
 		 * @since 1.40.5
 		 */
 		Select.prototype.shouldValueStateMessageBeOpened = function() {
-			return (this.getValueState() !== ValueState.None) && this.getEnabled()
+			return !this._isIconOnly() && (this.getValueState() !== ValueState.None) && this.getEnabled()
 				&& this.getEditable() && !this._bValueStateMessageOpened;
 		};
 
@@ -2416,10 +2638,13 @@ function(
 			// otherwise invalidate only the dropdown list
 			var bSuppressInvalidate = !this._isShadowListRequired();
 			this.setProperty("showSecondaryValues", bAdditionalText, bSuppressInvalidate);
-			var oList = this.getList();
+			var oList = this.getList(),
+				sColumnRatio = bAdditionalText ? this.getColumnRatio() : null;
 
 			if (oList) {
 				oList.setShowSecondaryValues(bAdditionalText);
+
+				oList.setProperty("_columnRatio", sColumnRatio);
 			}
 
 			return this;
@@ -2429,7 +2654,7 @@ function(
 		 * Adds an item to the aggregation named <code>items</code>.
 		 *
 		 * @param {sap.ui.core.Item} oItem The item to be added; if empty, nothing is added.
-		 * @returns {sap.m.Select} <code>this</code> to allow method chaining.
+		 * @returns {this} <code>this</code> to allow method chaining.
 		 * @public
 		 */
 		Select.prototype.addItem = function(oItem) {
@@ -2449,7 +2674,7 @@ function(
 		 * @param {int} iIndex The <code>0</code>-based index the item should be inserted at; for
 		 *             a negative value of <code>iIndex</code>, the item is inserted at position 0; for a value
 		 *             greater than the current size of the aggregation, the item is inserted at the last position.
-		 * @returns {sap.m.Select} <code>this</code> to allow method chaining.
+		 * @returns {this} <code>this</code> to allow method chaining.
 		 * @public
 		 */
 		Select.prototype.insertItem = function(oItem, iIndex) {
@@ -2496,7 +2721,7 @@ function(
 		 * Alternatively, a <code>sap.ui.core.Item</code> instance may be given or <code>null</code>.
 		 * If the value of <code>null</code> is provided, the first enabled item will be selected (if any items exist).
 		 *
-		 * @returns {sap.m.Select} <code>this</code> to allow method chaining.
+		 * @returns {this} <code>this</code> to allow method chaining.
 		 * @public
 		 */
 		Select.prototype.setSelectedItem = function(vItem) {
@@ -2525,10 +2750,10 @@ function(
 		 *
 		 * Default value is an empty string <code>""</code> or <code>undefined</code>.
 		 *
-		 * @param {string | undefined} vItem New value for property <code>selectedItemId</code>.
+		 * @param {string} [vItem] New value for property <code>selectedItemId</code>.
 		 * If the provided <code>vItem</code> has a default value, the first enabled item will be selected (if any items exist).
 		 *
-		 * @returns {sap.m.Select} <code>this</code> to allow method chaining.
+		 * @returns {this} <code>this</code> to allow method chaining.
 		 * @public
 		 * @since 1.12
 		 */
@@ -2546,6 +2771,20 @@ function(
 		};
 
 		/**
+		 * Return true if sKey has a corresponding item in the list
+		 *
+		 * @param {string} sKey selectedKey value
+		 * @returns {boolean} result of check for this key in the items collection
+		 */
+		Select.prototype._isKeyAvailable = function (sKey) {
+			var aAvailableKeys = this._oList.getItems().map(function (item) {
+				return item.getKey();
+			});
+
+			return aAvailableKeys.indexOf(sKey) > -1;
+		};
+
+		/**
 		 * Sets property <code>selectedKey</code>.
 		 *
 		 * Default value is an empty string <code>""</code> or <code>undefined</code>.
@@ -2558,7 +2797,7 @@ function(
 		 * In the case that an item has the default key value, it is selected instead.
 		 * If duplicate keys exist, the first item matching the key is selected.
 		 *
-		 * @returns {sap.m.Select} <code>this</code> to allow method chaining.
+		 * @returns {this} <code>this</code> to allow method chaining.
 		 * @public
 		 * @since 1.11
 		 */
@@ -2566,10 +2805,14 @@ function(
 			sKey = this.validateProperty("selectedKey", sKey);
 			var bDefaultKey = (sKey === "");
 
+			if (!bDefaultKey && !this._isKeyAvailable(sKey) && this.getResetOnMissingKey()) {
+				bDefaultKey = true;
+			}
+
 			if (!this.getForceSelection() && bDefaultKey) {
 				this.setSelection(null);
 				this.setValue("");
-				return this;
+				return this.setProperty("selectedKey", sKey);
 			}
 
 			var oItem = this.getItemByKey(sKey);
@@ -2594,11 +2837,16 @@ function(
 		Select.prototype.setValueState = function(sValueState) {
 			var sOldValueState = this.getValueState();
 
-			this.setProperty("valueState", sValueState, true);
-			sValueState = this.getValueState();
-
 			if (sValueState === sOldValueState) {
 				return this;
+			}
+
+			this.setProperty("valueState", sValueState);
+
+			this._updatePickerAriaLabelledBy(sValueState);
+
+			if (this._isFocused()) {
+				this._announceValueStateText();
 			}
 
 			var oDomRef = this.getDomRefForValueState();
@@ -2607,34 +2855,33 @@ function(
 				return this;
 			}
 
-			var mValueState = ValueState;
-
-			if (sValueState === mValueState.Error) {
-				oDomRef.setAttribute("aria-invalid", true);
-			} else {
-				oDomRef.removeAttribute("aria-invalid");
-			}
-
 			if (!this.isOpen() && this.shouldValueStateMessageBeOpened() && document.activeElement === oDomRef) {
 				this.openValueStateMessage();
 			} else {
 				this.closeValueStateMessage();
 			}
 
-			this.updateValueStateClasses(sValueState, sOldValueState);
-			this.updateAriaLabelledBy(sValueState, sOldValueState);
 			this._updatePickerValueStateContentText();
 			this._updatePickerValueStateContentStyles();
 			return this;
 		};
 
 		Select.prototype.setValueStateText = function(sValueStateText) {
+			var oInvisibleText = this.getValueStateTextInvisibleText();
 
-			this.setProperty("valueStateText", sValueStateText, true);
+			this.setProperty("valueStateText", sValueStateText);
+
+			if (oInvisibleText) {
+				oInvisibleText.setText(sValueStateText);
+			}
 
 			if (this.getDomRefForValueState()) {
 				this._updatePickerValueStateContentText();
 				this._updatePickerValueStateContentStyles();
+			}
+
+			if (this._isFocused()) {
+				this._announceValueStateText();
 			}
 
 			return this;
@@ -2771,7 +3018,7 @@ function(
 		/**
 		 * Destroys all the items in the aggregation named <code>items</code>.
 		 *
-		 * @returns {sap.m.Select} <code>this</code> to allow method chaining.
+		 * @returns {this} <code>this</code> to allow method chaining.
 		 * @public
 		 */
 		Select.prototype.destroyItems = function() {
@@ -2801,7 +3048,7 @@ function(
 		/**
 		 * Closes the control's picker popup.
 		 *
-		 * @returns {sap.m.Select} <code>this</code> to allow method chaining.
+		 * @returns {this} <code>this</code> to allow method chaining.
 		 * @public
 		 * @since 1.16
 		 */
@@ -2822,7 +3069,11 @@ function(
 		 * @return {object}
 		 */
 		Select.prototype.getDomRefForValueState = function() {
-			return this.getDomRef();
+			return this.getFocusDomRef();
+		};
+
+		Select.prototype._isRequired = function () {
+			return this.getRequired() || LabelEnablement.isRequired(this);
 		};
 
 		/**
@@ -2830,10 +3081,10 @@ function(
 		 *
 		 * @see sap.ui.core.Control#getAccessibilityInfo
 		 * @protected
-		 * @returns {Object} The <code>sap.m.Select</code> accessibility information
+		 * @returns {object} The <code>sap.m.Select</code> accessibility information
 		 */
 		Select.prototype.getAccessibilityInfo = function() {
-			var bIconOnly = this.getType() === "IconOnly",
+			var bIconOnly = this._isIconOnly(),
 				oInfo = {
 					role: this.getRenderer().getAriaRole(this),
 					focusable: this.getEnabled(),
@@ -2851,7 +3102,7 @@ function(
 				oInfo.type = Core.getLibraryResourceBundle("sap.m").getText("ACC_CTR_TYPE_BUTTON");
 				oInfo.description = sDesc;
 			} else if (this.getType() === "Default") {
-				oInfo.type = Core.getLibraryResourceBundle("sap.m").getText("ACC_CTR_TYPE_COMBO");
+				oInfo.type = Core.getLibraryResourceBundle("sap.m").getText("SELECT_ROLE_DESCRIPTION");
 				oInfo.description = this._getSelectedItemText();
 			}
 
@@ -2867,7 +3118,7 @@ function(
 		 * @public
 		 */
 		Select.prototype.getIdForLabel = function () {
-			return this.getId() + "-hiddenInput";
+			return this.getId() + "-hiddenSelect";
 		};
 
 		return Select;
