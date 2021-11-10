@@ -1,10 +1,14 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define(['sap/ui/test/matchers/Matcher', "sap/base/strings/capitalize"], function(Matcher, capitalize) {
+sap.ui.define([
+	"sap/ui/base/ManagedObject",
+	'sap/ui/test/matchers/Matcher',
+	"sap/base/strings/capitalize"
+], function (ManagedObject, Matcher, capitalize) {
 	"use strict";
 
 	/**
@@ -29,22 +33,29 @@ sap.ui.define(['sap/ui/test/matchers/Matcher', "sap/base/strings/capitalize"], f
 	 */
 	return Matcher.extend("sap.ui.test.matchers.PropertyStrictEquals", /** @lends sap.ui.test.matchers.PropertyStrictEquals.prototype */ {
 
-		metadata : {
-			publicMethods : [ "isMatching" ],
-			properties : {
+		metadata: {
+			publicMethods: ["isMatching"],
+			properties: {
 				/**
 				 * The Name of the property that is used for matching.
 				 */
-				name : {
-					type : "string"
+				name: {
+					type: "string"
 				},
 				/**
 				 * The value of the property that is used for matching.
 				 */
-				value : {
-					type : "any"
+				value: {
+					type: "any"
 				}
 			}
+		},
+
+		constructor: function (mSettings) {
+			if (mSettings && mSettings.value) {
+				mSettings.value = ManagedObject.escapeSettingsValue(mSettings.value);
+			}
+			Matcher.prototype.constructor.call(this, mSettings);
 		},
 
 		/**
@@ -54,7 +65,7 @@ sap.ui.define(['sap/ui/test/matchers/Matcher', "sap/base/strings/capitalize"], f
 		 * @return {boolean} true if the property has a strictly matching value.
 		 * @public
 		 */
-		isMatching : function (oControl) {
+		isMatching: function (oControl) {
 			var sPropertyName = this.getName(),
 				fnProperty = oControl["get" + capitalize(sPropertyName, 0)];
 

@@ -964,7 +964,11 @@ var decodeCss;
   // FUNCTION  ::=  ident '('
   // Diff: We exclude url explicitly.
   // TODO: should we be tolerant of "fn ("?
-  var FUNCTION = '(?!url[(])' + IDENT + '[(]';
+  // ##### BEGIN: MODIFIED BY SAP
+  // Avoid risk of 'catastrophic backtracking' when unicode escapes are used
+  // var FUNCTION = '(?!url[(])' + IDENT + '[(]';
+  var FUNCTION = '(?!url[(])(?=(' + IDENT + '))\\1[(]';
+  // ##### END: MODIFIED BY SAP
   // INCLUDES  ::=  "~="
   var INCLUDES = '~=';
   // DASHMATCH  ::=  "|="
@@ -1985,7 +1989,7 @@ if (typeof window !== 'undefined') {
 }
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 // Based on coding from the HTML4 Sanitizer by Google Inc.
@@ -2734,7 +2738,7 @@ var html = (function(html4) {
     'lt': '<',
     'gt': '>',
     'amp': '&',
-    'nbsp': '\240',
+    'nbsp': '\xA0',
     'quot': '"',
     'apos': '\''
   };

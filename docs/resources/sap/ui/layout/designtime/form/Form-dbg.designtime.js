@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,6 +11,10 @@ sap.ui.define([
 	Form
 ) {
 	"use strict";
+
+	function isChildOfFormElement(oElement) {
+		return oElement.getParent() && oElement.getParent().isA("sap.ui.layout.form.FormElement");
+	}
 
 	function fnIsLayoutSupported(oForm){
 		if ((oForm instanceof Form) &&
@@ -41,6 +45,14 @@ sap.ui.define([
 				}
 			},
 			formContainers : {
+				propagateRelevantContainer: true,
+				propagateMetadata: function (oElement) {
+					if (isChildOfFormElement(oElement)) {
+						return {
+							actions: "not-adaptable"
+						};
+					}
+				},
 				childNames : {
 					singular : "GROUP_CONTROL_NAME",
 					plural : "GROUP_CONTROL_NAME_PLURAL"
@@ -70,6 +82,9 @@ sap.ui.define([
 				}
 
 			}
+		},
+		actions: {
+			localReset: "localReset"
 		}
 	};
 
