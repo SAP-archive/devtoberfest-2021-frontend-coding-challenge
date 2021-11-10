@@ -76,7 +76,7 @@ sap.ui.define([
 		 * @type string
 		 */
 		version: "1.95.0",
-		buildinfo : { lastchange : "${lastchange}", buildtime : "20211110-2235" }
+		buildinfo : { lastchange : "${lastchange}", buildtime : "20211110-2237" }
 	});
 
 	var oCfgData = window["sap-ui-config"] || {};
