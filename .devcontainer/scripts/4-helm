@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# ADD ADDITIONAL FEATURES
+# =========================
+# HELM
+wget -q https://get.helm.sh/helm-v3.6.3-linux-amd64.tar.gz -O - | tar -xzO linux-amd64/helm > /usr/local/bin/helm \
+  && chmod +x /usr/local/bin/helm \
+  && chmod g+rwx /root \
+  && helm repo add "stable" "https://charts.helm.sh/stable" --force-update

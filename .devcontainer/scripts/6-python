@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# ADD ADDITIONAL FEATURES
+# =========================
+# PYTHON
+  sudo -s apt-get update -y \
+  && sudo -s apt-get install python3-pip idle3 -y \
+  && sudo -s pip3 install --no-cache-dir --upgrade pip \
+  && sudo -s pip3 --disable-pip-version-check --no-cache-dir install -r ./python/requirements.txt

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# ADD ADDITIONAL FEATURES
+# =========================
+# kube-devcontainer
+cd /usr/local/share && sudo -s mkdir kube-devcontainer \
+  && sudo -s chmod 700 ./kube-devcontainer/ \
+  && sudo -s chown --recursive "${USERNAME}":"${USERNAME}" ./kube-devcontainer/

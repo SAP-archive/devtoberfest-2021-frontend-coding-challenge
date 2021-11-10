@@ -1,0 +1,138 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
+{
+  "name": "devtoberfest-2021-frontend-coding-challenge for node.js 14.x",
+  "dockerFile": "Dockerfile",
+  // \\wsl$\Ubuntu-20.04\home\user\.kube
+  "mounts": [
+    "source=${env:HOME}${env:USERPROFILE}/.kube,target=/usr/local/share/kube-devcontainer,type=bind"
+  ],
+  "settings": {
+    "workbench.colorTheme": "codeSTACKr Theme",
+    // "workbench.colorTheme": "Night Owl",
+    "workbench.iconTheme": "vscode-icons",
+    "files.eol": "\n",
+    "shellformat.flag": "-i=2 -bn -ci -sr",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[html]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[sql]": {
+      "editor.defaultFormatter": "mtxr.sqltools"
+    },
+    "[gitignore]": {
+      "editor.defaultFormatter": "codezombiech.gitignore"
+    }
+  },
+  "extensions": [
+    "alexcvzz.vscode-sqlite",
+    "bengreenier.vscode-node-readme",
+    "christian-kohler.npm-intellisense",
+    "christian-kohler.path-intellisense",
+    "codestackr.codestackr-theme",
+    "coenraads.bracket-pair-colorizer-2",
+    "cschleiden.vscode-github-actions",
+    "davidanson.vscode-markdownlint",
+    "dbaeumer.vscode-eslint",
+    "donjayamanne.githistory",
+    "dotjoshjohnson.xml",
+    "eamodio.gitlens-insiders",
+    "eg2.vscode-npm-script",
+    "esbenp.prettier-vscode",
+    "fivepointseven.node-version",
+    "foxundermoon.shell-format",
+    "github.remotehub",
+    "github.vscode-pull-request-github",
+    "grapecity.gc-excelviewer",
+    "gruntfuggly.todo-tree",
+    "hbenl.vscode-mocha-test-adapter",
+    "hbenl.vscode-test-explorer",
+    "hookyqr.beautify",
+    "humao.rest-client",
+    "iljapostnovs.ui5plugin",
+    "jakebathman.mysql-syntax",
+    "jhodel.blue-phoenix",
+    "jvalecillos.gpg",
+    "kenhowardpdx.vscode-gist",
+    "leizongmin.node-module-intellisense",
+    "mccarter.start-git-bash",
+    "mechatroner.rainbow-csv",
+    "mhutchie.git-graph",
+    "mindaro-dev.file-downloader",
+    "mindaro.mindaro",
+    "ms-ceintl.vscode-language-pack-de",
+    "ms-vscode.cpptools",
+    "ms-vscode.js-debug-nightly",
+    "ms-vscode.test-adapter-converter",
+    "ms-vscode.vscode-github-issue-notebooks",
+    "msjsdiag.debugger-for-chrome",
+    "mtxr.sqltools-driver-sqlite",
+    "mtxr.sqltools",
+    "mutantdino.resourcemonitor",
+    "pflannery.vscode-versionlens",
+    "rangav.vscode-thunder-client",
+    "redhat.vscode-commons",
+    "redhat.vscode-yaml",
+    "sapos.yeoman-ui",
+    "saposs.sap-hana-driver-for-sqltools",
+    "saposs.vscode-ui5-language-assistant",
+    "saposs.xml-toolkit",
+    "sapse.sap-ux-annotation-modeler-extension",
+    "sapse.sap-ux-application-modeler-extension",
+    "sapse.sap-ux-fiori-tools-extension-pack",
+    "sapse.sap-ux-help-extension",
+    "sapse.sap-ux-service-modeler-extension",
+    "sapse.vsc-extension-sa",
+    "sapse.vscode-cds",
+    "sdras.night-owl",
+    "solarliner.linux-themes",
+    "theosun.sap-json-schemas",
+    "thomascsd.vscode-readme-pattern",
+    "timonwong.shellcheck",
+    "visualstudioexptteam.vscodeintellicode",
+    "vscode-icons-team.vscode-icons",
+    "vsls-contrib.codetour",
+    "waderyan.gitblame",
+    "wmaurer.change-case",
+    "yzhang.markdown-all-in-one",
+    "ms-mssql.mssql",
+    "ms-azuretools.vscode-docker",
+    // Activate additional features
+    // ===============================
+    // "ms-vscode-remote.remote-containers",
+    // "ms-vscode-remote.remote-ssh-edit",
+    // "ms-vscode-remote.remote-ssh",
+    // "ms-vscode-remote.remote-wsl",
+    // "ms-vscode-remote.vscode-remote-extensionpack",
+    // "ms-kubernetes-tools.vscode-kubernetes-tools",
+    // "ipedrazas.kubernetes-snippets",
+    // Python
+    // ======
+    // "ms-python.python",
+    // "ms-python.vscode-pylance",
+    // "ms-toolsai.jupyter"
+    // GitHub Copilot is an AI pair programmer
+    // ==========================================
+    "github.copilot"
+  ],
+  // Ensure that Docker socket is mapped into the development container
+  "runArgs": [
+    "-v",
+    "/var/run/docker.sock:/var/run/docker.sock"
+  ],
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [
+    3000,
+    4000,
+    4004,
+    5000,
+    8000,
+    8080
+  ],
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": "npm install && npm audit fix && npm install --prefix /workspaces/yourAppName/db && npm install --prefix /workspaces/yourAppName/js && npm start --prefix /workspaces/yourAppName/js && npm audit fix --prefix /workspaces/yourAppName/js && npm install --prefix /workspaces/yourAppName/web &&  npm start --prefix /workspaces/yourAppName/db",
+  // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+  "remoteUser": "node"
+}
