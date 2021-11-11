@@ -34,13 +34,14 @@
     },
     "sap.ui5": {
         "flexEnabled": true,
+        "async": true,
         "rootView": {
             "viewName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view.MainView",
             "type": "XML",
             "id": "idAppControl"
         },
         "dependencies": {
-            "minUI5Version": "1.60.0",
+            "minUI5Version": "1.96.0",
             "libs": {
                 "sap.ui.core": {},
                 "sap.m": {},
@@ -55,12 +56,15 @@
             "i18n": {
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": {
-                    "bundleName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.i18n.i18n"
+                    "bundleName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.i18n.i18n",
+                    "supportedLocales": ["en"],
+                    "fallbackLocale": "en"
                 }
             },
             "sample": {
                 "type": "sap.ui.model.json.JSONModel",
-                "dataSource": "dataSource"
+                "dataSource": "dataSource",
+                "preload": true
             }
         },
         "resources": {
@@ -76,7 +80,8 @@
                 "viewType": "XML",
                 "viewPath": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view",
                 "controlId": "idAppControl",
-                "controlAggregation": "pages"
+                "controlAggregation": "pages",
+                "async": true
             },
             "routes": [
                 {
