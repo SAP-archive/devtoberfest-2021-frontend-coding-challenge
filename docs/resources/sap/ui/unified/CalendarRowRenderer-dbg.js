@@ -4,9 +4,25 @@
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define(['sap/ui/core/date/UniversalDate', 'sap/ui/unified/CalendarAppointment', 'sap/ui/unified/CalendarLegendRenderer',
-		'sap/ui/Device', 'sap/ui/unified/library', 'sap/ui/core/InvisibleText', "sap/base/Log"],
-	function (UniversalDate, CalendarAppointment, CalendarLegendRenderer, Device, library, InvisibleText, Log) {
+sap.ui.define([
+	'sap/ui/core/date/UniversalDate',
+	'sap/ui/unified/CalendarAppointment',
+	'sap/ui/unified/CalendarLegendRenderer',
+	'sap/ui/Device',
+	'sap/ui/unified/library',
+	'sap/ui/core/IconPool',
+	'sap/ui/core/InvisibleText',
+	"sap/base/Log"
+	],
+	function (
+		UniversalDate,
+		CalendarAppointment,
+		CalendarLegendRenderer,
+		Device,
+		library,
+		IconPool,
+		InvisibleText,
+		Log) {
 		"use strict";
 
 
@@ -147,6 +163,7 @@ sap.ui.define(['sap/ui/core/date/UniversalDate', 'sap/ui/unified/CalendarAppoint
 			case CalendarIntervalType.Day:
 			case CalendarIntervalType.Week:
 			case CalendarIntervalType.OneMonth:
+			case "OneMonth":
 				aNonWorkingItems = oRow._getNonWorkingDays();
 				iStartOffset = oStartDate.getUTCDay();
 				iNonWorkingMax = 7;
@@ -187,6 +204,7 @@ sap.ui.define(['sap/ui/core/date/UniversalDate', 'sap/ui/unified/CalendarAppoint
 					case CalendarIntervalType.Day:
 					case CalendarIntervalType.Week:
 					case CalendarIntervalType.OneMonth:
+					case "OneMonth":
 						oIntervalNextStartDate.setUTCDate(oIntervalNextStartDate.getUTCDate() + 1);
 						if (oIntervalNextStartDate.getUTCDate() == 1) {
 							bLastOfType = true;
@@ -253,7 +271,7 @@ sap.ui.define(['sap/ui/core/date/UniversalDate', 'sap/ui/unified/CalendarAppoint
 		}
 		oRm.style("width", iWidth + "%");
 
-		if (iInterval >= iDaysLength && oRow.getIntervalType() === CalendarIntervalType.OneMonth){
+		if (iInterval >= iDaysLength && (oRow.getIntervalType() === CalendarIntervalType.OneMonth || oRow.getIntervalType() === "OneMonth")){
 			oRm.class("sapUiCalItemOtherMonth");
 		}
 		for (i = 0; i < aNonWorkingItems.length; i++) {
@@ -297,6 +315,7 @@ sap.ui.define(['sap/ui/core/date/UniversalDate', 'sap/ui/unified/CalendarAppoint
 			case CalendarIntervalType.Day:
 			case CalendarIntervalType.Week:
 			case CalendarIntervalType.OneMonth:
+			case "OneMonth":
 				iSubIntervals = 24;
 				break;
 
@@ -681,7 +700,7 @@ sap.ui.define(['sap/ui/core/date/UniversalDate', 'sap/ui/unified/CalendarAppoint
 		oRm.class("sapUiCalendarMonthRowAppsS");
 		oRm.style("width", iWidth + "%");
 
-		if (iInterval >= iDaysLength && oRow.getIntervalType() === CalendarIntervalType.OneMonth){
+		if (iInterval >= iDaysLength && (oRow.getIntervalType() === CalendarIntervalType.OneMonth || oRow.getIntervalType() === "OneMonth")){
 			oRm.class("sapUiCalItemOtherMonth");
 		}
 
@@ -796,6 +815,7 @@ sap.ui.define(['sap/ui/core/date/UniversalDate', 'sap/ui/unified/CalendarAppoint
 				case CalendarIntervalType.Day:
 				case CalendarIntervalType.Week:
 				case CalendarIntervalType.OneMonth:
+				case "OneMonth":
 					iSubIntervals = 24;
 					break;
 

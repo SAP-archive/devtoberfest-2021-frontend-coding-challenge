@@ -17,7 +17,7 @@ sap.ui.define(['sap/ui/base/Object', "sap/ui/thirdparty/jquery", "sap/base/util/
 	 *
 	 * @abstract
 	 * @extends sap.ui.base.Object
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @private
 	 * @ui5-restricted
 	 * @alias sap.ui.core.support.Plugin

@@ -118,7 +118,7 @@ sap.ui.define([
 		 * is opened. The dialog is closed via a date time period value selection or by pressing the "Cancel" button.
 		 *
 		 * @author SAP SE
-		 * @version 1.95.0
+		 * @version 1.96.0
 		 *
 		 * @constructor
 		 * @public
@@ -403,6 +403,10 @@ sap.ui.define([
 			this.setOptions(aOptions);
 		};
 
+		DynamicDateRange.prototype.getFocusDomRef = function(){
+			return this.getAggregation("_input") && this.getAggregation("_input").getFocusDomRef();
+		};
+
 		DynamicDateRange.prototype._updateInputValue = function(oValue) {
 			var sInputValue;
 
@@ -613,7 +617,6 @@ sap.ui.define([
 				this._oPopup.attachAfterClose(function() {
 					this._setFooterVisibility(false);
 					this.invalidate();
-					this.getAggregation("_input").focus();
 				}, this);
 
 				this._oPopup.setBeginButton(new Button({
@@ -964,7 +967,7 @@ sap.ui.define([
 				// There is a custom initial focus handling logic for both options list page and option details page
 				this._applyNavContainerPageFocus(oToPage);
 			} else {
-				this.getAggregation("_input").focus();
+				this.focus();
 			}
 		};
 
@@ -1044,7 +1047,7 @@ sap.ui.define([
 		};
 
 		DynamicDateRange.prototype._parseValue = function(sInputValue) {
-			var aResults = DynamicDateUtil.parse(sInputValue, this._getFormatter()).filter(function(oResult) {
+			var aResults = DynamicDateUtil.parse(sInputValue, this._getFormatter(), this.getOptions()).filter(function(oResult) {
 				return this.getOptions().indexOf(oResult.operator) !== -1;
 			}, this);
 

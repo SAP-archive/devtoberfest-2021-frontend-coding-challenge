@@ -48,7 +48,7 @@ sap.ui.define([
 	 * Applies a sap.ui.layout.cssgrid.GridSettings to a provided DOM element or Control.
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @extends sap.ui.layout.cssgrid.GridLayoutBase
 	 *
@@ -124,6 +124,8 @@ sap.ui.define([
 	/**
 	 * Hook function for the Grid's onAfterRendering
 	 * @param {sap.ui.layout.cssgrid.IGridConfigurable} oGrid The grid
+	 * @override
+	 * @protected
 	 */
 	GridBoxLayout.prototype.onGridAfterRendering = function (oGrid) {
 		// Add a specific class to each grid item
@@ -169,7 +171,8 @@ sap.ui.define([
 	 * - Manually flatten the height of the boxes.
 	 *
 	 * @param {object} oEvent - The event from a resize
-	 * @private
+	 * @override
+	 * @protected
 	 */
 	GridBoxLayout.prototype.onGridResize = function (oEvent) {
 		if (oEvent.control && oEvent.control.isA("sap.f.GridList") && oEvent.control.isGrouped()) {

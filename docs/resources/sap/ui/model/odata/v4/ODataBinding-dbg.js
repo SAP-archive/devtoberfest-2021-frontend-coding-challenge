@@ -155,9 +155,9 @@ sap.ui.define([
 						throw new Error("Unsupported binding parameter $$inheritExpandSelect: "
 							+ "binding is not an operation binding");
 					}
-					if (mParameters.$expand || mParameters.$select) {
+					if (mParameters.$expand) {
 						throw new Error("Must not set parameter $$inheritExpandSelect on a binding "
-							+ "which has a $expand or $select binding parameter");
+							+ "which has a $expand binding parameter");
 					}
 					break;
 				case "$$operationMode":
@@ -291,7 +291,6 @@ sap.ui.define([
 				}
 				oCache.$deepResourcePath = sDeepResourcePath;
 				oCache.$generation = iGeneration;
-				oCache.$resourcePath = sResourcePath;
 			}
 		} else { // absolute binding
 			oCache = this.doCreateCache(sResourcePath, this.mCacheQueryOptions);

@@ -61,7 +61,7 @@ sap.ui.define([
 	 * @extends sap.ui.model.type.Currency
 	 * @public
 	 * @since 1.63.0
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 */
 	var Currency = BaseCurrency.extend("sap.ui.model.odata.type.Currency", {
 		constructor : function (oFormatOptions, oConstraints) {

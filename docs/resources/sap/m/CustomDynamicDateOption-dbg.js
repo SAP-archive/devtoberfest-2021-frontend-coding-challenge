@@ -20,7 +20,7 @@ sap.ui.define(['sap/m/DynamicDateOption'],
 		 * @extends sap.m.DynamicDateOption
 		 *
 		 * @author SAP SE
-		 * @version 1.95.0
+		 * @version 1.96.0
 		 *
 		 * @public
 		 * @since 1.92
@@ -98,6 +98,14 @@ sap.ui.define(['sap/m/DynamicDateOption'],
 						: DynamicDateOption.prototype[sFnName].apply(this, arguments);
 				};
 			});
+
+		CustomDynamicDateOption.prototype.getGroupHeader = function() {
+			if ((this.getGroup() < 7 && this.getGroup() > -1) || !this.getGetGroupHeader()) {
+				return DynamicDateOption.prototype.getGroupHeader.apply(this, arguments);
+			} else {
+				return this.getGetGroupHeader().apply(this, arguments);
+			}
+		};
 
 		return CustomDynamicDateOption;
 	});

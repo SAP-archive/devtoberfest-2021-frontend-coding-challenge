@@ -159,7 +159,7 @@ function(
 	 *
 	 * @extends sap.m.InputBase
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public
@@ -631,7 +631,7 @@ function(
 	Input.prototype.onBeforeRendering = function() {
 		var sSelectedKey = this.getSelectedKey(),
 			bShowValueHelpIcon = this.getShowValueHelp() && this.getEnabled() && this.getEditable(),
-			bShowClearIcon = this.getShowClearIcon(),
+			bShowClearIcon = this.getProperty("effectiveShowClearIcon") && this.getEnabled() && this.getEditable(),
 			oIcon = this._oValueHelpIcon,
 			oSuggestionsPopover = this._getSuggestionsPopover(),
 			bSuggestionsPopoverIsOpen = oSuggestionsPopover && this._isSuggestionsPopoverOpen(),
@@ -641,15 +641,15 @@ function(
 
 		InputBase.prototype.onBeforeRendering.call(this);
 
-		if (bShowClearIcon) {
-			this._getClearIcon().setProperty("visible", this.getProperty("effectiveShowClearIcon"));
+		if (this.getShowClearIcon()) {
+			this._getClearIcon().setProperty("visible", bShowClearIcon);
 		} else if (this._oClearButton) {
 			this._getClearIcon().setProperty("visible", false);
 		}
 
 		this._deregisterEvents();
 
-		if (sSelectedKey) {
+		if (sSelectedKey && !this.getSelectedItem() && this.getSuggestionItemByKey(sSelectedKey)) {
 			this.setSelectedKey(sSelectedKey);
 		}
 
@@ -1744,8 +1744,6 @@ function(
 		// always focus input field when typing in it
 		this.addStyleClass("sapMFocus");
 
-		this.setProperty("effectiveShowClearIcon", !!sValue);
-
 		// No need to fire suggest event when suggestion feature isn't enabled or runs on the phone.
 		// Because suggest event should only be fired by the input in dialog when runs on the phone.
 		if (this.getShowSuggestion() && !this.isMobileDevice()) {
@@ -1769,6 +1767,18 @@ function(
 	Input.prototype.onkeydown = function (oEvent) {
 		// disable the typeahead feature for android devices due to an issue on android soft keyboard, which always returns keyCode 229
 		this._bDoTypeAhead = !Device.os.android && this.getAutocomplete() && (oEvent.which !== KeyCodes.BACKSPACE) && (oEvent.which !== KeyCodes.DELETE);
+	};
+
+	Input.prototype.onkeyup = function (oEvent) {
+		var sValue = this.getValue();
+		var sLastValue = this.getLastValue();
+
+		if ([KeyCodes.BACKSPACE, KeyCodes.DELETE].indexOf(oEvent.which) !== -1 && !sValue) {
+			this.setSelectedKey(null);
+			(sLastValue !== sValue) && this.setLastValue(sLastValue);
+		}
+
+		this.getShowClearIcon() && this.setProperty("effectiveShowClearIcon", !!sValue);
 	};
 
 	/**

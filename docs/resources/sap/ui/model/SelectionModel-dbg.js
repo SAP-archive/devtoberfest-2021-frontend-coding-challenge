@@ -3,7 +3,7 @@
  * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-
+/*eslint-disable max-len */
 // Provides class sap.ui.model.SelectionModel
 sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	function(EventProvider, assert) {
@@ -20,7 +20,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 * @extends sap.ui.base.EventProvider
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @param {int} iSelectionMode <code>sap.ui.model.SelectionModel.SINGLE_SELECTION</code> or <code>sap.ui.model.SelectionModel.MULTI_SELECTION</code>
 	 *

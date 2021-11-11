@@ -228,7 +228,7 @@ sap.ui.define([
 	 * @extends sap.ui.base.ManagedObject
 	 * @abstract
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @alias sap.ui.core.Component
 	 * @since 1.9.2
 	 */
@@ -1371,8 +1371,7 @@ sap.ui.define([
 			if (mConfig.async === true) {
 				return Component.create(mConfig);
 			} else {
-				// use deprecated factory for sync use case only
-				return sap.ui.component(mConfig);
+				return sap.ui.component(mConfig); // legacy-relevant: use deprecated factory for sync use case only
 			}
 		}
 

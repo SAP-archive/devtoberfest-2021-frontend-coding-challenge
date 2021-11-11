@@ -38,7 +38,7 @@ sap.ui.define(['sap/ui/base/Object', 'sap/base/assert', './CalendarType'],
 		 *
 		 * @extends sap.ui.base.Object
 		 * @author SAP SE
-		 * @version 1.95.0
+		 * @version 1.96.0
 		 * @public
 		 * @alias sap.ui.core.Locale
 		 */

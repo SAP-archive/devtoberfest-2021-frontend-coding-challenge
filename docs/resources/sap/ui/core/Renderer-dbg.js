@@ -18,7 +18,7 @@ sap.ui.define([
 	 * @classdesc Base Class for a Renderer.
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @namespace
 	 * @public
 	 * @alias sap.ui.core.Renderer

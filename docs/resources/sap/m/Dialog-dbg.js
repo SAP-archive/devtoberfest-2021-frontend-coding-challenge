@@ -175,7 +175,7 @@ function(
 		*
 		* @implements sap.ui.core.PopupInterface
 		* @author SAP SE
-		* @version 1.95.0
+		* @version 1.96.0
 		*
 		* @constructor
 		* @public
@@ -225,7 +225,7 @@ function(
 					 * Determines whether the Dialog will be displayed on full screen on a phone.
 					 * @since 1.11.2
 					 * @deprecated Since version 1.13.1.
-					 * Please use the new stretch property instead. This enables a stretched Dialog even on tablet and desktop. If you want to achieve the same effect as <code>stretchOnPhone</code>, please set the stretch with jQuery.device.is.phone, then the Dialog is only stretched when it runs on a phone.
+					 * Please use the new stretch property instead. This enables a stretched Dialog even on tablet and desktop. If you want to achieve the same effect as <code>stretchOnPhone</code>, please set the stretch with <code>Device.system.phone</code>, then the Dialog is only stretched when it runs on a phone.
 					 */
 					stretchOnPhone: {type: "boolean", group: "Appearance", defaultValue: false, deprecated: true},
 
@@ -1934,16 +1934,11 @@ function(
 				var oBoundingClientRect = this.getDomRef().getBoundingClientRect();
 
 				var initial = {
-					x: e.pageX,
-					y: e.pageY,
+					x: e.clientX,
+					y: e.clientY,
 					width: that._$dialog.width(),
 					height: that._$dialog.height(),
 					outerHeight : that._$dialog.outerHeight(),
-					offset: {
-						//use e.originalEvent.layerX/Y for Firefox
-						x: e.offsetX ? e.offsetX : e.originalEvent.layerX,
-						y: e.offsetY ? e.offsetY : e.originalEvent.layerY
-					},
 					position: {
 						x: oBoundingClientRect.x,
 						y: oBoundingClientRect.y
@@ -1972,22 +1967,9 @@ function(
 					}
 				}
 
-				if ((isHeaderClicked(e.target) && this.getDraggable()) || bResize) {
+				if (isHeaderClicked(e.target) && this.getDraggable() || bResize) {
 					that._bDisableRepositioning = true;
-
 					that._$dialog.addClass('sapDialogDisableTransition');
-
-					that._oManuallySetPosition = {
-						x: initial.position.x,
-						y: initial.position.y
-					};
-
-					//set the new position of the dialog on mouse down when the transform is disabled by the class
-					that._$dialog.css({
-						left: Math.min(Math.max(oAreaDimensions.left, that._oManuallySetPosition.x), oAreaDimensions.right - initial.width),
-						top: Math.min(Math.max(oAreaDimensions.top, that._oManuallySetPosition.y), oAreaDimensions.bottom - initial.height),
-						width: initial.width
-					});
 				}
 
 				if (isHeaderClicked(e.target) && this.getDraggable()) {
@@ -2004,8 +1986,8 @@ function(
 							that._bDisableRepositioning = true;
 
 							that._oManuallySetPosition = {
-								x: Math.max(oAreaDimensions.left, Math.min(event.pageX - e.pageX + initial.position.x, oAreaDimensions.right - initial.width)), // deltaX + initial dialog position
-								y: Math.max(oAreaDimensions.top, Math.min(event.pageY - e.pageY + initial.position.y, oAreaDimensions.bottom - initial.outerHeight)) // deltaY + initial dialog position
+								x: Math.max(oAreaDimensions.left, Math.min(event.clientX - e.clientX + initial.position.x, oAreaDimensions.right - initial.width)), // deltaX + initial dialog position
+								y: Math.max(oAreaDimensions.top, Math.min(event.clientY - e.clientY + initial.position.y, oAreaDimensions.bottom - initial.outerHeight)) // deltaY + initial dialog position
 							};
 
 							//move the dialog
@@ -2016,8 +1998,6 @@ function(
 							});
 						});
 					};
-
-					$w.on("mousemove", mouseMoveHandler);
 				} else if (bResize) {
 					that._$dialog.addClass('sapMDialogResizing');
 
@@ -2034,22 +2014,22 @@ function(
 							// BCP: 1680048166 remove inline set height and width so that the content resizes together with the mouse pointer
 							that.$('cont').height('').width('');
 
-							if (event.pageY + handleOffsetY > oAreaDimensions.bottom) {
-								event.pageY = oAreaDimensions.bottom - handleOffsetY;
+							if (event.clientY + handleOffsetY > oAreaDimensions.bottom) {
+								event.clientY = oAreaDimensions.bottom - handleOffsetY;
 							}
 
-							if (event.pageX + handleOffsetX > oAreaDimensions.right) {
-								event.pageX = oAreaDimensions.right - handleOffsetX;
+							if (event.clientX + handleOffsetX > oAreaDimensions.right) {
+								event.clientX = oAreaDimensions.right - handleOffsetX;
 							}
 
 							that._oManuallySetSize = {
-								width: initial.width + event.pageX - initial.x,
-								height: initial.height + event.pageY - initial.y
+								width: initial.width + event.clientX - initial.x,
+								height: initial.height + event.clientY - initial.y
 							};
 
 							if (that._bRTL) {
-								styles.left = Math.min(Math.max(event.pageX, 0), maxLeftOffset);
-								that._oManuallySetSize.width = initial.width + initial.x - Math.max(event.pageX, 0);
+								styles.left = Math.min(Math.max(event.clientX, 0), maxLeftOffset);
+								that._oManuallySetSize.width = initial.width + initial.x - Math.max(event.clientX, 0);
 							}
 
 							styles.width = that._oManuallySetSize.width;
@@ -2058,12 +2038,11 @@ function(
 							that._$dialog.css(styles);
 						});
 					};
-
-					$w.on("mousemove", mouseMoveHandler);
 				} else {
 					return;
 				}
 
+				$w.on("mousemove", mouseMoveHandler);
 				$w.on("mouseup", mouseUpHandler);
 
 				e.stopPropagation();

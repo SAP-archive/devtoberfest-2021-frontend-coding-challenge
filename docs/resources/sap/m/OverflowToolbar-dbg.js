@@ -131,7 +131,7 @@ sap.ui.define([
 	 * @implements sap.ui.core.Toolbar,sap.m.IBar
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public
@@ -372,16 +372,14 @@ sap.ui.define([
 
 	OverflowToolbar.prototype._applyFocus = function () {
 		var oFocusedChildControl,
-			$FocusedChildControl,
 			$LastFocusableChildControl = this.$().lastFocusableDomRef();
 
 		if (this.sFocusedChildControlId) {
 			oFocusedChildControl = sap.ui.getCore().byId(this.sFocusedChildControlId);
-			$FocusedChildControl = oFocusedChildControl && oFocusedChildControl.$();
 		}
 
-		if ($FocusedChildControl && $FocusedChildControl.length){
-			$FocusedChildControl.trigger("focus");
+		if (oFocusedChildControl && oFocusedChildControl.getDomRef()){
+			oFocusedChildControl.focus();
 
 		} else if (this._bControlWasFocused) {
 			// If a control of the toolbar was focused, and we're here, then the focused control overflowed, so set the focus to the overflow button

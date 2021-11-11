@@ -5,7 +5,9 @@
  */
 
 // Provides in-place rendering module for the RenderManager
-sap.ui.define([], function() {
+sap.ui.define([
+	"sap/ui/Device"
+], function(Device) {
 	"use strict";
 
 	// points a dummy CSSStyleDeclaration for style validation purposes
@@ -42,6 +44,22 @@ sap.ui.define([], function() {
 			}
 		}
 	};
+
+	if (Device.browser.safari) {
+		/*
+		 * Safari 14ff reports calls to Element.prototype.removeAttribute("style") as CSP violations,
+		 * if 'inline-style's are not allowed, see https://bugs.webkit.org/show_bug.cgi?id=227349#c3
+		 *
+		 * Assigning the empty string as style cleans up the CSS, but not the DOM, therefore we apply
+		 * this fallback to Safari only.
+		 */
+		AttributeMutators.style = function(oElement, sNewValue) {
+			if ( sNewValue == null ) {
+				oElement.style = "";
+				return true; // skip removeAttribute
+			}
+		};
+	}
 
 	/**
 	 * Creates an HTML element from the given tag name and parent namespace
@@ -291,6 +309,11 @@ sap.ui.define([], function() {
 	 * @return {this} Reference to <code>this</code> in order to allow method chaining
 	 */
 	Patcher.prototype.attr = function(sAttr, vValue) {
+		if (sAttr === "style") {
+			this._sStyles = vValue;
+			return this;
+		}
+
 		if (this._iTagOpenState == 1 /* Tag is Open and Created */) {
 			this._oCurrent.setAttribute(sAttr, vValue);
 			return this;
@@ -399,8 +422,9 @@ sap.ui.define([], function() {
 
 		for (var sAttribute in this._mAttributes) {
 			var fnMutator = AttributeMutators[sAttribute];
-			fnMutator && fnMutator(this._oCurrent, null);
-			this._oCurrent.removeAttribute(sAttribute);
+			if (!fnMutator || !fnMutator(this._oCurrent, null)) {
+				this._oCurrent.removeAttribute(sAttribute);
+			}
 			delete this._mAttributes[sAttribute];
 		}
 

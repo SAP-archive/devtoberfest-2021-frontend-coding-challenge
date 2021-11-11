@@ -36,7 +36,7 @@ sap.ui.define([
 	 * @class Item that represents one file to be uploaded using the {@link sap.m.upload.UploadSet} control.
 	 * @extends sap.ui.core.Element
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @constructor
 	 * @public
 	 * @since 1.63
@@ -668,7 +668,12 @@ sap.ui.define([
 		var oResult = {};
 		var oRegex = /(?:\.([^.]+))?$/;
 		var aFileExtension = oRegex.exec(sFileName);
-		oResult.name = sFileName.slice(0, sFileName.indexOf(aFileExtension[0]));
+		if (!aFileExtension[0]) {
+			aFileExtension[0] = "";
+			oResult.name = sFileName;
+		} else {
+			oResult.name = sFileName ? sFileName.slice(0, sFileName.indexOf(aFileExtension[0])) : "";
+		}
 		if (bWithDot) {
 			oResult.extension = aFileExtension[0];
 		} else {

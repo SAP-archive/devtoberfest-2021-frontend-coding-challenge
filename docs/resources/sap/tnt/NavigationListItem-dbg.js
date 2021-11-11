@@ -5,11 +5,11 @@
  */
 
 // Provides control sap.tnt.NavigationListItem.
-sap.ui.define(["./library", 'sap/ui/core/Core', "sap/ui/core/Item", 'sap/ui/core/Icon',
+sap.ui.define(["sap/ui/thirdparty/jquery", "./library", 'sap/ui/core/Core', "sap/ui/core/Item", 'sap/ui/core/Icon',
 		'./NavigationList', 'sap/ui/core/InvisibleText', 'sap/ui/core/Renderer', 'sap/ui/core/IconPool', "sap/ui/events/KeyCodes", "sap/ui/core/library",
 		// jQuery Plugin "addAriaLabelledBy"
 		"sap/ui/util/openWindow", "sap/ui/util/defaultLinkTypes", "sap/ui/dom/jquery/Aria"],
-	function(library, Core, Item, Icon,
+	function(jQuery, library, Core, Item, Icon,
 			 NavigationList, InvisibleText, Renderer, IconPool, KeyCodes, coreLibrary, openWindow, defaultLinkTypes) {
 		"use strict";
 
@@ -32,7 +32,7 @@ sap.ui.define(["./library", 'sap/ui/core/Core', "sap/ui/core/Item", 'sap/ui/core
 		 * @extends sap.ui.core.Item
 		 *
 		 * @author SAP SE
-		 * @version 1.95.0
+		 * @version 1.96.0
 		 *
 		 * @constructor
 		 * @public
@@ -436,7 +436,7 @@ sap.ui.define(["./library", 'sap/ui/core/Core', "sap/ui/core/Item", 'sap/ui/core
 		NavigationListItem.prototype.ontap = function (event) {
 
 			var navList = this.getNavigationList(),
-				source = Core.byId(event.target.id),
+				$icon = jQuery(event.target).closest(".sapUiIcon"),
 				level = this.getLevel(),
 				parent,
 				list;
@@ -466,7 +466,7 @@ sap.ui.define(["./library", 'sap/ui/core/Core', "sap/ui/core/Item", 'sap/ui/core
 			// first navigation level
 			if (navList.getExpanded() || !this.getItems().length) {
 
-				if (!source || source.getMetadata().getName() !== 'sap.ui.core.Icon' || !source.$().hasClass('sapTntNavLIExpandIcon')) {
+				if (!$icon.length || !$icon.hasClass('sapTntNavLIExpandIcon')) {
 					this._selectItem(event);
 					return;
 				}

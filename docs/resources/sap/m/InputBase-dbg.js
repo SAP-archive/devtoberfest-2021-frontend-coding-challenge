@@ -62,7 +62,7 @@ function(
 	 * @implements sap.ui.core.IFormContent
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public
@@ -1016,12 +1016,14 @@ function(
 		var oEndIcon = this.getAggregation("_endIcon") || [],
 			oBeginIcon = this.getAggregation("_beginIcon") || [],
 			aIcons = oEndIcon.concat(oBeginIcon),
+			iIconMargin,
 			iIconWidth;
 
 		return aIcons.reduce(function(iAcc, oIcon){
+			iIconMargin = oIcon && oIcon.getDomRef() ? parseFloat(window.getComputedStyle(oIcon.getDomRef()).marginRight) : 0;
 			iIconWidth = oIcon && oIcon.getDomRef() ? oIcon.getDomRef().offsetWidth : 0;
 
-			return iAcc + iIconWidth;
+			return iAcc + iIconWidth + iIconMargin;
 		}, 0);
 	};
 

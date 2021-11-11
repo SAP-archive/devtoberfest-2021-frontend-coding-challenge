@@ -54,7 +54,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Component
 	 * @abstract
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @alias sap.ui.core.UIComponent
 	 * @since 1.9.2
 	 * @ui5-metamodel This control/element also will be described in the UI5 (legacy) designtime metamodel
@@ -665,7 +665,7 @@ sap.ui.define([
 	 *
 	 * A <code>sap.ui.core.UIComponent</code> subclass can additionally implement the {@link sap.ui.core.IAsyncContentCreation} interface.
 	 * When implementing this interface the loading and processing of an asynchronous <code>rootView</code> will be chained into
-	 * the result Promise of the {@link sap.ui.core.Component.create Component.create} factory.
+	 * the result Promise of the {@link sap.ui.core.Component.create Component.create} factory. An additional async flag can be omitted.
 	 * See Sample 1 below.
 	 *
 	 * Samples 2 and 3 show how subclasses can overwrite the <code>createContent</code> function
@@ -680,8 +680,7 @@ sap.ui.define([
 	 *             rootView: {
 	 *                 viewName: "my.sample.views.Main",
 	 *                 type: "XML",
-	 *                 id: "sampleMainView",
-	 *                 async: true
+	 *                 id: "sampleMainView"
 	 *             },
 	 *             interfaces: ["sap.ui.core.IAsyncContentCreation"]
 	 *         }

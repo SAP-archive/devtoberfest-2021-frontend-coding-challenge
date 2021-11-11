@@ -3,7 +3,7 @@
  * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-
+/*eslint-disable max-len */
 // Provides the JSON model implementation of a list binding
 sap.ui.define([
 	"sap/base/strings/hash",
@@ -135,16 +135,18 @@ sap.ui.define([
 	 * inform interested parties about this.
 	 *
 	 * @param {boolean} bForceupdate
+	 *   Whether interested parties should be informed regardless of the bindings state
 	 *
 	 */
 	MessageListBinding.prototype.checkUpdate = function(bForceupdate){
+		var oList;
 
 		if (this.bSuspended && !this.bIgnoreSuspend) {
 			return;
 		}
 
 		if (!this.bUseExtendedChangeDetection) {
-			var oList = this.oModel._getObject(this.sPath, this.oContext);
+			oList = this.oModel._getObject(this.sPath, this.oContext);
 			if (!deepEqual(this.oList, oList) || bForceupdate) {
 				this.update();
 				this._fireChange({reason: ChangeReason.Change});
@@ -154,7 +156,7 @@ sap.ui.define([
 			var that = this;
 
 			//If the list has changed we need to update the indices first.
-			var oList = this.oModel._getObject(this.sPath, this.oContext);
+			oList = this.oModel._getObject(this.sPath, this.oContext);
 			if (!deepEqual(this.oList, oList)) {
 				this.update();
 			}
@@ -170,6 +172,7 @@ sap.ui.define([
 							bChangeDetected = true;
 							return false;
 						}
+						return true;
 					});
 				}
 			} else {

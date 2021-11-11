@@ -17,9 +17,9 @@ sap.ui.define(['sap/ui/model/ClientTreeBinding', "sap/base/util/each"],
 	 *
 	 * @param {sap.ui.model.xml.XMLModel} [oModel]
 	 * @param {string} Path pointing to the tree or array that should be bound
-	 * @param {object} [oContext=null] Context object for this binding
-	 * @param {array} [aFilters=null] Predefined filters contained in an array
-	 * @param {object} [mParameters=null] Additional model-specific parameters
+	 * @param {object} [oContext] Context object for this binding
+	 * @param {array} [aFilters] Predefined filters contained in an array
+	 * @param {object} [mParameters] Additional model-specific parameters
 	 * @protected
 	 * @alias sap.ui.model.xml.XMLTreeBinding
 	 * @extends sap.ui.model.ClientTreeBinding
@@ -68,7 +68,8 @@ sap.ui.define(['sap/ui/model/ClientTreeBinding', "sap/base/util/each"],
 				oChildContext = that.oModel.getContext(sChildPath);
 				// check if there is a filter on this level applied
 				if (that.oCombinedFilter && !that.bIsFiltering) {
-					if (that.filterInfo.aFilteredContexts && that.filterInfo.aFilteredContexts.indexOf(oChildContext) != -1) {
+					if (that.filterInfo.aFilteredContexts
+							&& that.filterInfo.aFilteredContexts.indexOf(oChildContext) != -1) {
 						aContexts.push(oChildContext);
 					}
 				} else {

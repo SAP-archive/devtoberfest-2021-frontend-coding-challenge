@@ -100,7 +100,7 @@ function(
 		 * @implements sap.ui.core.IFormContent, sap.ui.core.ISemanticFormContent
 		 *
 		 * @author SAP SE
-		 * @version 1.95.0
+		 * @version 1.96.0
 		 *
 		 * @constructor
 		 * @public
@@ -506,7 +506,7 @@ function(
 		};
 
 		Select.prototype.focus = function() {
-			this._getHiddenSelect().focus();
+			this._getHiddenSelect().trigger("focus");
 			Control.prototype.focus.call(this, arguments);
 		};
 
@@ -1196,7 +1196,6 @@ function(
 				offsetX: 0,
 				offsetY: 0,
 				initialFocus: this,
-				bounce: false,
 				ariaLabelledBy: this._getPickerHiddenLabelId()
 			});
 
@@ -1621,7 +1620,7 @@ function(
 		 */
 		Select.prototype.onmousedown = function (oEvent) {
 			oEvent.preventDefault();
-			this._getHiddenSelect().focus();
+			this._getHiddenSelect().trigger("focus");
 		};
 
 		/**

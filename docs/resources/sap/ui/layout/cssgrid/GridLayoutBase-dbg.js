@@ -36,7 +36,7 @@ sap.ui.define([
 	 * Applies a sap.ui.layout.cssgrid.GridSettings to a provided DOM element or Control.
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @extends sap.ui.base.ManagedObject
 	 *
@@ -213,6 +213,7 @@ sap.ui.define([
 	/**
 	 * Hook function for the Grid's onAfterRendering
 	 * @virtual
+	 * @protected
 	 * @param {sap.ui.layout.cssgrid.IGridConfigurable} oGrid The grid
 	 */
 	GridLayoutBase.prototype.onGridAfterRendering = function (oGrid) { };
@@ -220,6 +221,7 @@ sap.ui.define([
 	/**
 	 * Hook function for the Grid's resize. Will be called if the grid layout is responsive.
 	 * @virtual
+	 * @protected
 	 * @param {jQuery.Event} oEvent The event passed by the resize handler
 	 */
 	GridLayoutBase.prototype.onGridResize = function (oEvent) { };

@@ -73,7 +73,7 @@ function(
 	 *
 	 *
 	 * @author Frank Weigel
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @since 0.8.6
 	 * @alias sap.ui.base.ManagedObjectMetadata
 	 * @extends sap.ui.base.Metadata
@@ -602,7 +602,7 @@ function(
 	 * @protected
 	 */
 	ManagedObjectMetadata.addAPIParentInfoEnd = function(oAggregatedObject) {
-		oAggregatedObject && oAggregatedObject.aAPIParentInfos.forwardingCounter--;
+		oAggregatedObject && oAggregatedObject.aAPIParentInfos && oAggregatedObject.aAPIParentInfos.forwardingCounter--;
 	};
 
 	AggregationForwarder.prototype.remove = function(oInstance, vAggregatedObject) {

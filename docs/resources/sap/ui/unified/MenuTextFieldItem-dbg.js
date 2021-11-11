@@ -9,6 +9,7 @@ sap.ui.define([
 	'sap/ui/core/ValueStateSupport',
 	'./MenuItemBase',
 	'./library',
+	'sap/ui/core/IconPool',
 	'sap/ui/core/library',
 	'sap/ui/Device',
 	'sap/base/Log',
@@ -19,6 +20,7 @@ sap.ui.define([
 		ValueStateSupport,
 		MenuItemBase,
 		library,
+		IconPool,
 		coreLibrary,
 		Device,
 		Log,
@@ -45,7 +47,7 @@ sap.ui.define([
 	 * @extends sap.ui.unified.MenuItemBase
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @since 1.21.0
 	 *
 	 * @constructor

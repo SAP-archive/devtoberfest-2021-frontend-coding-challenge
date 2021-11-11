@@ -38,7 +38,7 @@ sap.ui.define([
 	 * @class The <code>P13nColumnsPanel</code> control is used to define column-specific settings for table personalization.
 	 * @extends sap.m.P13nPanel
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @constructor
 	 * @public
 	 * @since 1.26.0
@@ -762,7 +762,7 @@ sap.ui.define([
 		if (iIndex < 0) {
 			return null;
 		}
-		return this._oTable.getBinding("items").getContexts()[iIndex].getObject().columnKey;
+		return this._oTable.getBinding("items").getContexts(undefined, undefined, undefined, true)[iIndex].getObject().columnKey;
 	};
 
 	P13nColumnsPanel.prototype._getModelItemIndexByColumnKey = function(sColumnKey) {
@@ -790,7 +790,7 @@ sap.ui.define([
 	};
 
 	P13nColumnsPanel.prototype._getTableItemByColumnKey = function(sColumnKey) {
-		var aContext = this._oTable.getBinding("items").getContexts();
+		var aContext = this._oTable.getBinding("items").getContexts(undefined, undefined, undefined, true);
 		var aTableItems = this._oTable.getItems().filter(function(oTableItem, iIndex) {
 			return aContext[iIndex].getObject().columnKey === sColumnKey;
 		});

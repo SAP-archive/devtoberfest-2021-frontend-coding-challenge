@@ -143,6 +143,11 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/c
 				});
 
 				oRM.openEnd();
+
+				oRM.openStart("div");
+				oRM.class("sapMSegBBtnInnerWrapper");
+				oRM.openEnd();
+
 				oRM.openStart("div");
 				oRM.class("sapMSegBBtnInner");
 				oRM.openEnd();
@@ -155,6 +160,7 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/c
 				if (sButtonText !== '') {
 					oRM.text(sButtonText);
 				}
+				oRM.close("div");
 				oRM.close("div");
 				oRM.close("li");
 			} else {

@@ -143,7 +143,7 @@ sap.ui.define([
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
-		 * @version 1.95.0
+		 * @version 1.96.0
 		 * @since 1.56.0
 		 * @alias sap.ui.core.XMLComposite
 		 * @see {@link topic:b83a4dcb7d0e46969027345b8d32fd44 XML Composite Controls}
@@ -519,7 +519,7 @@ sap.ui.define([
 			var sFragment = oFragmentContent ? (new XMLSerializer()).serializeToString(oFragmentContent) : undefined;
 			this.bUsesI18n = sFragment ? (sFragment.indexOf("$" + this.alias + ".i18n") != -1) : true;
 
-			this._setCompositeAggregation(sap.ui.xmlfragment({
+			this._setCompositeAggregation(sap.ui.xmlfragment({ // legacy-relevant: can lead to follow-up sync XHRs for controls
 				sId: this.getId(),
 				fragmentContent: oFragmentContent,
 				oController: this

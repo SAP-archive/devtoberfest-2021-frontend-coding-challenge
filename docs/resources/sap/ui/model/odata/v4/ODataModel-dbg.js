@@ -210,7 +210,7 @@ sap.ui.define([
 	 * @extends sap.ui.model.Model
 	 * @public
 	 * @since 1.37.0
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 */
 	var ODataModel = Model.extend("sap.ui.model.odata.v4.ODataModel",
 			/** @lends sap.ui.model.odata.v4.ODataModel.prototype */
@@ -540,8 +540,8 @@ sap.ui.define([
 	 * @param {boolean} [mParameters.$$inheritExpandSelect]
 	 *   For operation bindings only: Whether $expand and $select from the parent binding are used
 	 *   in the request sent on {@link #execute}. If set to <code>true</code>, the binding must not
-	 *   set the $expand or $select parameter itself, the operation must be bound, and the return
-	 *   value and the binding parameter must belong to the same entity set.
+	 *   set the $expand itself, the operation must be bound, and the return value and the binding
+	 *   parameter must belong to the same entity set.
 	 * @param {boolean} [mParameters.$$ownRequest]
 	 *   Whether the binding always uses an own service request to read its data; only the value
 	 *   <code>true</code> is allowed.
@@ -561,7 +561,7 @@ sap.ui.define([
 	 * @throws {Error}
 	 *   If disallowed binding parameters are provided, for example if the binding parameter
 	 *   $$inheritExpandSelect is set to <code>true</code> and the binding is no operation binding
-	 *   or the binding has one of the parameters $expand or $select.
+	 *   or the binding has the parameter $expand.
 	 *
 	 * @public
 	 * @see sap.ui.model.Model#bindContext

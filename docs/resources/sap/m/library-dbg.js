@@ -28,6 +28,8 @@ sap.ui.define([
 	"./AvatarColor",
 	"./AvatarImageFitType",
 	"./upload/UploaderHttpRequestMethod",
+	"sap/ui/core/theming/Parameters",
+	"sap/ui/core/LocaleData",
 	// referenced here to enable the Support feature
 	"./Support"
 ],
@@ -50,7 +52,9 @@ sap.ui.define([
 	AvatarType,
 	AvatarColor,
 	AvatarImageFitType,
-	UploaderHttpRequestMethod
+	UploaderHttpRequestMethod,
+	Parameters,
+	LocaleData
 ) {
 
 	"use strict";
@@ -59,7 +63,7 @@ sap.ui.define([
 	// delegate further initialization of this library to the Core
 	sap.ui.getCore().initLibrary({
 		name : "sap.m",
-		version: "1.95.0",
+		version: "1.96.0",
 		dependencies : ["sap.ui.core"],
 		designtime: "sap/m/designtime/library.designtime",
 		types: [
@@ -353,7 +357,14 @@ sap.ui.define([
 			"sap.m.semantic.SemanticPage",
 			"sap.m.semantic.ShareMenuPage",
 			"sap.m.semantic.FullscreenPage",
-			"sap.m.semantic.MasterPage"
+			"sap.m.semantic.MasterPage",
+			"sap.m.p13n.AbstractContainer",
+			"sap.m.p13n.BasePanel",
+			"sap.m.p13n.Container",
+			"sap.m.p13n.GroupPanel",
+			"sap.m.p13n.QueryPanel",
+			"sap.m.p13n.SelectionPanel",
+			"sap.m.p13n.SortPanel"
 		],
 		elements: [
 			"sap.m.BadgeCustomData",
@@ -412,6 +423,7 @@ sap.ui.define([
 			"sap.m.plugins.DataStateIndicator",
 			"sap.m.plugins.PasteProvider",
 			"sap.m.plugins.PluginBase",
+			"sap.m.p13n.AbstractContainerItem",
 			"sap.m.semantic.AddAction",
 			"sap.m.semantic.CancelAction",
 			"sap.m.semantic.DeleteAction",
@@ -570,7 +582,7 @@ sap.ui.define([
 	 * @namespace
 	 * @alias sap.m
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @since 1.4
 	 * @public
 	 */
@@ -1622,7 +1634,14 @@ sap.ui.define([
 		 * @public
 		 * @since 1.83
 		 */
-		OneByHalf: "OneByHalf"
+		OneByHalf: "OneByHalf",
+
+		/**
+		 * The Stretch frame type adjusts the size of the control to the parent.
+		 * @since 1.96
+		 * @experimental
+		 */
+		 Stretch: "Stretch"
 
 	};
 
@@ -1756,6 +1775,24 @@ sap.ui.define([
 		HeaderMode : "HeaderMode",
 
 		/**
+		 * Action Mode (Two lines for the header).
+		 *
+		 * Generic Tile renders buttons that are specified under 'actionButtons' aggregation
+		 * @public
+		 * @experimental since 1.96
+		 */
+		ActionMode: "ActionMode",
+
+		/**
+		 * Article Mode (Two lines for the header and one line for the subtitle).
+		 *
+		 * Enables Article Mode.
+		 * @public
+		 * @experimental since 1.96
+		 */
+		 ArticleMode: "ArticleMode",
+
+		/**
 		 * Line mode (Implemented for both, cozy and compact densities).
 		 *
 		 * Generic Tile is displayed as in-line element, header and subheader are displayed in one line.
@@ -1765,7 +1802,15 @@ sap.ui.define([
 		 * @since 1.44.0
 		 * @public
 		 */
-		LineMode : "LineMode"
+		LineMode : "LineMode",
+		/**
+		 * Icon mode.
+		 *
+		 * GenericTile displays a combination of icon and header title. It is applicable only for the OneByOne FrameType and TwoByHalf FrameType.
+		 * @public 1.96
+		 * @experimental Since 1.96
+		*/
+		IconMode : "IconMode"
 	};
 
 	/**
@@ -2410,7 +2455,6 @@ sap.ui.define([
 				if (bResult) {
 					return bResult;
 				} else {
-					var Parameters = sap.ui.requireSync("sap/ui/core/theming/Parameters");
 					return CoreLibrary.CSSColor.isValid(Parameters.get(vValue));
 				}
 			}
@@ -4285,7 +4329,7 @@ sap.ui.define([
 		Start : "Start",
 
 		/**
-		 * Explicitly sets the alignment to the start (left or right depending on LTR/RTL)
+		 * Explicitly sets the alignment to the center
 		 * @public
 		 */
 		Center : "Center"
@@ -4392,7 +4436,7 @@ sap.ui.define([
 
 	sap.ui.lazyRequire("sap.m.DynamicDate");
 
-		//lazy imports for MessageToast
+	//lazy imports for MessageToast
 	sap.ui.lazyRequire("sap.m.MessageToast", "show");
 
 	// requires for routing
@@ -4401,11 +4445,6 @@ sap.ui.define([
 	sap.ui.lazyRequire("sap.m.routing.Target");
 	sap.ui.lazyRequire("sap.m.routing.TargetHandler");
 	sap.ui.lazyRequire("sap.m.routing.Targets");
-
-	//enable ios7 support
-	if (Device.os.ios && Device.os.version >= 7 && Device.os.version < 8 && Device.browser.name === "sf") {
-		sap.ui.requireSync("sap/m/ios7");
-	}
 
 	//Internal: test the whole page with compact design
 	if (/sap-ui-xx-formfactor=compact/.test(location.search)) {
@@ -4463,7 +4502,7 @@ sap.ui.define([
 	 * @since 1.10
 	 */
 	thisLib.getLocaleData = function() {
-		var oLocaleData = sap.ui.requireSync("sap/ui/core/LocaleData").getInstance(thisLib.getLocale());
+		var oLocaleData = LocaleData.getInstance(thisLib.getLocale());
 
 		thisLib.getLocaleData = function() {
 			return oLocaleData;
@@ -4928,7 +4967,6 @@ sap.ui.define([
 		 */
 		/* currently not needed
 		isThemeBackgroundImageModified: function() {
-			var Parameters = sap.ui.requireSync("sap/ui/core/theming/Parameters");
 			var sBgImgUrl = Parameters.get('sapUiGlobalBackgroundImage'); // the global background image from the theme
 			if (sBgImgUrl && sBgImgUrl !== "''") {
 				var sBgImgUrlDefault = Parameters.get('sapUiGlobalBackgroundImageDefault');
@@ -5054,10 +5092,9 @@ sap.ui.define([
 						checkAndSetProperty(oImage, key,  mProperties[key]);
 					}
 				} else {
-					var Image = sap.ui.require("sap/m/Image") || sap.ui.requireSync("sap/m/Image");
 					//add 'id' to properties. This is required by utility method 'createControlByURI'
 					var mSettings = Object.assign({}, mProperties, {id: sImgId});
-					oImage = sap.ui.core.IconPool.createControlByURI(mSettings, Image);
+					oImage = sap.ui.core.IconPool.createControlByURI(mSettings, sap.m.Image);
 					//Set the parent so the image gets re-rendered, when the parent is
 					oImage.setParent(oParent, null, true);
 				}
@@ -5360,19 +5397,9 @@ sap.ui.define([
 			return new sap.m.Label(sId, {text: sText});
 		},
 		createButton: function(sId, fnPressFunction, fnCallback){
-			var that = this;
-			var _createButton = function(Button){
-				var oButton = new Button(sId, {type: thisLib.ButtonType.Transparent});
-				oButton.attachEvent("press", fnPressFunction, that); // attach event this way to have the right this-reference in handler
-				fnCallback.call(that, oButton);
-			};
-			var fnButtonClass = sap.ui.require("sap/m/Button");
-			if (fnButtonClass) {
-				// already loaded -> execute synchronously
-				_createButton(fnButtonClass);
-			} else {
-				sap.ui.require(["sap/m/Button"], _createButton);
-			}
+			var oButton = new sap.m.Button(sId, {type: thisLib.ButtonType.Transparent});
+			oButton.attachEvent("press", fnPressFunction, this); // attach event this way to have the right this-reference in handler
+			fnCallback.call(this, oButton);
 		},
 		setButtonContent: function(oButton, sText, sTooltip, sIcon, sIconHovered){
 			oButton.setText(sText);

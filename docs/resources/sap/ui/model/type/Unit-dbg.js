@@ -3,7 +3,7 @@
  * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-
+/*eslint-disable max-len */
 // Provides the base implementation for all model implementations
 sap.ui.define([
 	"sap/base/strings/hash",
@@ -47,7 +47,7 @@ sap.ui.define([
 	 *
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @public
 	 * @param {object} [oFormatOptions]
@@ -97,8 +97,10 @@ sap.ui.define([
 	 * If a Unit is already known during formatting, we also pass it along to construct
 	 * an optimal NumberFormat instance.
 	 *
-	 * @param {*} aArgs an array containing the parsed dynamic format options
-	 * @param {*} sUnitToBeFormatted
+	 * @param {any[]} aArgs An array containing the parsed dynamic format options
+	 * @param {string} sUnitToBeFormatted The name of the unit to be formatted
+	 *
+	 * @return {sap.ui.core.format.NumberFormat} The new NumberFormat instance
 	 */
 	Unit.prototype._getInstance = function(aArgs, sUnitToBeFormatted) {
 		var oFormatArgs = this.createFormatOptions(aArgs);
@@ -180,9 +182,13 @@ sap.ui.define([
 	};
 
 	/**
-	 * Extracts arguments from the given value
-	 * @param vValue
-	 * @returns {Array}
+	 * Extracts arguments from the given value.
+	 *
+	 * @param {any} vValue
+	 *   The value to extract parameters from
+	 * @returns {any[]}
+	 *   Returns a copy of the given value starting with the third entry if the given value is an
+	 *   array; returns an empty array otherwise
 	 */
 	Unit.prototype.extractArguments = function(vValue) {
 		return Array.isArray(vValue) && vValue.length > 2 ? vValue.slice(2) : [];
@@ -308,6 +314,7 @@ sap.ui.define([
 							aMessages.push(oBundle.getText("Unit.Decimals", [oContent]));
 						}
 						break;
+					default: break;
 				}
 			});
 			if (aViolatedConstraints.length > 0) {

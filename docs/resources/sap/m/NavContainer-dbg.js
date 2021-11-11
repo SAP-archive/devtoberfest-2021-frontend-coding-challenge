@@ -43,7 +43,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public
@@ -1815,21 +1815,28 @@ sap.ui.define([
 	 * Shows the placeholder if NavContainer is rendered.
 	 * Otherwise, registers the 'onAfterRendering' delegate which shows the placeholder.
 	 *
-	 * @param {object} mSettings Object containing the placeholder instance
+	 * @param {object} [mSettings] Object containing the placeholder instance.
+	 *                             Can be omitted if a placeholder instance is already created by <code>sap.ui.core.routing.async.Target</code>.
+	 * @param {object} [mSettings.placeholder] The placeholder instance
 	 * @param {sap.ui.core.Placeholder} mSettings.placeholder The placeholder instance
 	 * @return {Promise} Promise that resolves with the placeholder
 	 *
-	 * @public
+	 * @private
+	 * @ui5-restricted SAPUI5 Distribution libraries only
 	 * @since 1.91
 	 */
 	NavContainer.prototype.showPlaceholder = function(mSettings) {
 		var pLoaded;
 
+		if (!sap.ui.getCore().getConfiguration().getPlaceholder()) {
+			return;
+		}
+
 		if (this._placeholder) {
 			this.hidePlaceholder();
 		}
 
-		if (mSettings.placeholder) {
+		if (mSettings && mSettings.placeholder) {
 			this._placeholder = mSettings.placeholder;
 			pLoaded = this._placeholder._load();
 		} else {
@@ -1848,7 +1855,8 @@ sap.ui.define([
 	/**
 	 * Hides the placeholder and removes the 'onAfterRendering' placeholder delegate.
 	 *
-	 * @public
+	 * @private
+	 * @ui5-restricted SAP internal apps
 	 * @since 1.91
 	 */
 	NavContainer.prototype.hidePlaceholder = function() {

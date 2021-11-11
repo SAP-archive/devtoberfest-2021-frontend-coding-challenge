@@ -32,7 +32,7 @@ sap.ui.define([
 		 * @extends sap.ui.core.Element
 		 *
 		 * @author SAP SE
-		 * @version 1.95.0
+		 * @version 1.96.0
 		 *
 		 * @public
 		 * @since 1.92
@@ -231,7 +231,8 @@ sap.ui.define([
 		 * @public
 		 */
 		DynamicDateOption.prototype.getGroupHeader = function() {
-			return sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("DDR_OPTIONS_GROUP_0");
+			var iGroup = (this.getGroup() > -1 && this.getGroup() < 7) ? this.getGroup() : 0;
+			return sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("DDR_OPTIONS_GROUP_" + iGroup);
 		};
 
 		/**

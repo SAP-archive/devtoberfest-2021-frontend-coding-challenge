@@ -121,7 +121,7 @@ function(
 	* @implements sap.ui.core.ISemanticFormContent
 	*
 	* @author SAP SE
-	* @version 1.95.0
+	* @version 1.96.0
 	*
 	* @constructor
 	* @public
@@ -992,7 +992,7 @@ function(
 			this._validateCurrentText();
 		}
 
-		if (oEvent && oEvent.setMarked && this._bTokenIsValidated) {
+		if (oEvent && oEvent.setMarked && (this._bTokenIsValidated || this.getDOMValue())) {
 			oEvent.setMarked();
 		}
 
@@ -1660,7 +1660,7 @@ function(
 		}
 
 		iSummedIconsWidth = this._calculateIconsSpace();
-		iTokenizerWidth = Math.ceil(oTokenizer.getDomRef().getBoundingClientRect().width);
+		iTokenizerWidth = oTokenizer.getDomRef().scrollWidth;
 		oFocusDomRef.style.width = 'calc(100% - ' + Math.floor(iSummedIconsWidth + iTokenizerWidth) + "px";
 	};
 

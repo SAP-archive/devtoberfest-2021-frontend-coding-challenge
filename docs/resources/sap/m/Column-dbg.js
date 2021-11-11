@@ -46,7 +46,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Element
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public
@@ -297,6 +297,11 @@ sap.ui.define([
 		// keep media info
 		this._media = oMedia;
 		this._media.matches = !!oMedia.from;
+
+		// make sure that the column is visible
+		if (!this.getVisible()) {
+			return;
+		}
 
 		// inform parent delayed
 		setTimeout(function() {

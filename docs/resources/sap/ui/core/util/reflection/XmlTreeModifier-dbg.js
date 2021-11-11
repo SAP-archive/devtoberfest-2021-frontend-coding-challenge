@@ -16,7 +16,6 @@ sap.ui.define([
 	"sap/base/util/includes",
 	"sap/base/util/ObjectPath",
 	"sap/base/util/isPlainObject",
-	// needed to have sap.ui.xmlfragment
 	"sap/ui/core/Fragment"
 ], function(
 	BaseTreeModifier,
@@ -27,7 +26,8 @@ sap.ui.define([
 	EventHandlerResolver,
 	includes,
 	ObjectPath,
-	isPlainObject
+	isPlainObject,
+	Fragment
 ) {
 
 	"use strict";
@@ -745,7 +745,10 @@ sap.ui.define([
 					if (mAggregationMetadata.multiple === false && oAggregation && oAggregation.length > 0) {
 						return false;
 					}
-					var aControls = sap.ui.xmlfragment({fragmentContent: sFragment});
+					return Fragment.load({
+						definition: sFragment
+					});
+				}).then(function(aControls) {
 					if (!Array.isArray(aControls)) {
 						aControls = [aControls];
 					}

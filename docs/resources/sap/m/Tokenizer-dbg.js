@@ -78,7 +78,7 @@ sap.ui.define([
 	 *
 	 * @extends sap.ui.core.Control
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public
@@ -484,6 +484,7 @@ sap.ui.define([
 
 		this.addDependent(this._oPopup);
 		this._oPopup.addStyleClass(CSS_CLASS_NO_CONTENT_PADDING);
+		this._oPopup.addStyleClass("sapMTokenizerTokensPopup");
 
 		if (Device.system.phone) {
 			this._oPopup.setEndButton(new Button({

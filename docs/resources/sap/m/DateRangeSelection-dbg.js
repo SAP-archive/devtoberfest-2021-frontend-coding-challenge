@@ -4,11 +4,6 @@
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-// Ensure that sap.ui.unified is loaded before the module dependencies will be required.
-// Loading it synchronously is the only compatible option and doesn't harm when sap.ui.unified
-// already has been loaded asynchronously (e.g. via a dependency declared in the manifest)
-sap.ui.getCore().loadLibrary("sap.ui.unified");
-
 // Provides control sap.m.DateRangeSelection.
 sap.ui.define([
 	'sap/ui/Device',
@@ -59,14 +54,16 @@ sap.ui.define([
 	 * <b>Note:</b>
 	 * The control is not UTC aware and the selected date range starts from 00:00:00:000 of the first date and ends in 23:59:59:999 on the second date.
 	 *
+	 * The application developer should add dependency to <code>sap.ui.unified</code> library
+	 * on application level to ensure that the library is loaded before the module dependencies will be required.
 	 * The {@link sap.ui.unified.Calendar} is used internally only if the
 	 * <code>DateRangeSelection</code> is opened (not used for the initial rendering).
 	 * If the <code>sap.ui.unified</code> library is not loaded before the
 	 * <code>DateRangeSelection</code> is opened, it will be loaded upon opening.
-	 * This could lead to a waiting time when the <code>DateRangeSelection</code> is
+	 * This could lead to CSP compliance issues and adds an additional waiting time when the <code>DateRangeSelection</code> is
 	 * opened for the first time. To prevent this, apps using the
 	 * <code>DateRangeSelection</code> should also load the <code>sap.ui.unified</code>
-	 * library.
+	 * library in advance.
 	 *
 	 * <h3>Usage</h3>
 	 *
@@ -129,8 +126,8 @@ sap.ui.define([
 	 * compact mode and provides a touch-friendly size in cozy mode.
 	 *
 	 * @extends sap.m.DatePicker
-	 * @version 1.95.0
-	 * @version 1.95.0
+	 * @version 1.96.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public

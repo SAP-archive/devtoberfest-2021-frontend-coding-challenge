@@ -26,7 +26,7 @@ sap.ui.define(['./Element', './library', "sap/base/Log"],
 	 * @extends sap.ui.core.Element
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @public
 	 * @alias sap.ui.core.Message

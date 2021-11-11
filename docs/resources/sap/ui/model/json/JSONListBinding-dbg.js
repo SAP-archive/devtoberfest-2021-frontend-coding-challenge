@@ -3,7 +3,7 @@
  * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-
+/*eslint-disable max-len */
 // Provides the JSON model implementation of a list binding
 sap.ui.define([
 	"sap/base/Log",
@@ -142,20 +142,22 @@ sap.ui.define([
 	};
 
 	/**
-	 * Check whether this Binding would provide new values and in case it changed,
-	 * inform interested parties about this.
+	 * Check whether this Binding would provide new values and in case it changed, fire a change
+	 * event with change reason <code>sap.ui.model.ChangeReason.Change</code>.
 	 *
 	 * @param {boolean} bForceupdate
+	 *   Whether the change event will be fired regardless of the bindings state
 	 *
 	 */
 	JSONListBinding.prototype.checkUpdate = function(bForceupdate){
+		var oList;
 
 		if (this.bSuspended && !this.bIgnoreSuspend && !bForceupdate) {
 			return;
 		}
 
 		if (!this.bUseExtendedChangeDetection) {
-			var oList = this.oModel._getObject(this.sPath, this.oContext) || [];
+			oList = this.oModel._getObject(this.sPath, this.oContext) || [];
 			if (!deepEqual(this.oList, oList) || bForceupdate) {
 				this.update();
 				this._fireChange({reason: ChangeReason.Change});
@@ -165,7 +167,7 @@ sap.ui.define([
 			var that = this;
 
 			//If the list has changed we need to update the indices first
-			var oList = this.oModel._getObject(this.sPath, this.oContext) || [];
+			oList = this.oModel._getObject(this.sPath, this.oContext) || [];
 			if (this.oList.length != oList.length) {
 				bChangeDetected = true;
 			}
@@ -185,6 +187,7 @@ sap.ui.define([
 							bChangeDetected = true;
 							return false;
 						}
+						return true;
 					});
 				}
 			} else {

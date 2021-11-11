@@ -8,12 +8,18 @@
             rel="shortcut icon"
             type="image/x-icon"
         />
+        <link
+            id="animation"
+            rel="stylesheet"
+            type="text/css"
+            href="css/progress-animation.css"
+        />
 
         <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
 
         <script
             id="sap-ui-bootstrap"
-            src="resources/sap-ui-core.js"
+            src="https://sapui5.hana.ondemand.com/1.96.0/resources/sap-ui-core.js"
             data-sap-ui-async="true"
             data-sap-ui-theme="sap_fiori_3"
             data-sap-ui-resourceroots='{ "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./" }'
@@ -38,7 +44,38 @@
         </script>
     </head>
 
-    <body class="sapUiBody" role="application">
-        <div id="content"></div>
+    <body class="sapUiBody" id="content">
+        <!-- Loading splash screen -->
+        <div
+            id="busyIndicator"
+            style="text-align: center; font-family: Sans, Arial"
+        >
+            <!-- static header text -->
+            <h3>My UI5 App is loading</h3>
+
+            <!-- static image of the ui5logo  -->
+            <img
+                src="images/B_UI5_H_noBG.png"
+                width="855px"
+                height="494"
+                class="logo"
+            />
+
+            <!-- 
+               loader animation 
+               CC0 licensed code used with permission from 
+               https://loading.io/css/
+          -->
+            <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <!-- end of loader animation -->
+
+            <!-- static footer text  -->
+            <center><h5>This may take a few moments...</h5></center>
+        </div>
     </body>
 </html>

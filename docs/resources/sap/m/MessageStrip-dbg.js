@@ -83,7 +83,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public
@@ -249,8 +249,12 @@ sap.ui.define([
 
 	MessageStrip.prototype.setAggregation = function (sName, oControl, bSupressInvalidate) {
 		if (sName === "link" && oControl instanceof Link) {
-			var sId = this.getId() + "-info" + " " + this.getId() + "-content";
-			oControl.addAriaDescribedBy(sId);
+			var sId = this.getId() + "-info" + " " + this.getId() + "-content",
+				aAriaDescribedBy = oControl.getAriaDescribedBy();
+
+			if (!aAriaDescribedBy.includes(sId)) {
+				oControl.addAriaDescribedBy(sId);
+			}
 		}
 
 		Control.prototype.setAggregation.call(this, sName, oControl, bSupressInvalidate);

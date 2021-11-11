@@ -76,7 +76,7 @@ sap.ui.define([
 	 * @mixes sap.ui.model.odata.v4.ODataParentBinding
 	 * @public
 	 * @since 1.37.0
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @borrows sap.ui.model.odata.v4.ODataBinding#getGroupId as #getGroupId
 	 * @borrows sap.ui.model.odata.v4.ODataBinding#getRootBinding as #getRootBinding
 	 * @borrows sap.ui.model.odata.v4.ODataBinding#getUpdateGroupId as #getUpdateGroupId
@@ -1511,6 +1511,22 @@ sap.ui.define([
 	 * <code>false</code>. This property has to be set on each filter, it is not inherited from a
 	 * multi-filter.
 	 *
+	 * <h4>Application and Control Filters</h4>
+	 * Each list binding maintains two separate lists of filters, one for filters defined by the
+	 * control that owns the binding, and another list for filters that an application can define in
+	 * addition. When executing the filter operation, both sets of filters are combined.
+	 *
+	 * By using the <code>sFilterType</code> parameter of the <code>filter</code> method, the
+	 * caller can control which set of filters is modified.
+	 *
+	 * <h4>Auto-Grouping of Filters</h4>
+	 * Filters are first grouped according to their binding path. All filters belonging to the same
+	 * path are ORed, and after that the results of all paths are ANDed. Usually this means that all
+	 * filters applied to the same property are ORed, while filters on different properties are
+	 * ANDed.
+	 * Please use either the automatic grouping of filters (where applicable) or explicit
+	 * AND/OR filters, as a mixture of both is not supported.
+	 *
 	 * @param {sap.ui.model.Filter|sap.ui.model.Filter[]} [vFilters]
 	 *   The dynamic filters to be used; replaces the dynamic filters given in
 	 *   {@link sap.ui.model.odata.v4.ODataModel#bindList}.
@@ -2351,7 +2367,7 @@ sap.ui.define([
 							throw oError;
 						}
 						return that.fetchResourcePath(that.oContext).then(function (sResourcePath) {
-							if (!that.bRelative || oCache.$resourcePath === sResourcePath) {
+							if (!that.bRelative || oCache.getResourcePath() === sResourcePath) {
 								that.oCache = oCache;
 								that.oCachePromise = SyncPromise.resolve(oCache);
 								that.iCreatedContexts = iCreatedContexts;
@@ -2626,7 +2642,7 @@ sap.ui.define([
 			return Promise.resolve(null);
 		}
 
-		sMetaPath = oMetaModel.getMetaPath(sResolvedPath);
+		sMetaPath = _Helper.getMetaPath(sResolvedPath);
 		return oMetaModel.requestObject(sMetaPath + "/").then(function (oEntityType) {
 			var aFilters,
 				mPredicates = {};
@@ -2661,8 +2677,7 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#requestSideEffects
 	 */
 	ODataListBinding.prototype.requestSideEffects = function (sGroupId, aPaths, oContext) {
-		var bAllContextsTransient,
-			aContexts,
+		var aContexts,
 			bMissingPredicate,
 			oModel = this.oModel,
 			// Hash set of collection-valued navigation property meta paths (relative to the cache's
@@ -2743,13 +2758,8 @@ sap.ui.define([
 		if (bSingle) {
 			return this.refreshSingle(oContext, this.lockGroup(sGroupId), false);
 		}
-		if (this.aContexts.length) {
-			bAllContextsTransient = this.aContexts.every(function (oContext) {
-				return oContext.isTransient();
-			});
-			if (bAllContextsTransient) {
-				return SyncPromise.resolve();
-			}
+		if (this.iCurrentEnd === 0) {
+			return SyncPromise.resolve();
 		}
 		return this.refreshInternal("", sGroupId, false, true);
 	};

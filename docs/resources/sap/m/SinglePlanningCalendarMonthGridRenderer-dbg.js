@@ -4,25 +4,23 @@
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-// Ensure that sap.ui.unified is loaded before the module dependencies will be required.
-// Loading it synchronously is the only compatible option and doesn't harm when sap.ui.unified
-// already has been loaded asynchronously (e.g. via a dependency declared in the manifest)
-sap.ui.getCore().loadLibrary("sap.ui.unified");
-
 sap.ui.define([
 	'sap/ui/unified/calendar/CalendarDate',
 	'sap/ui/unified/calendar/CalendarUtils',
 	'sap/ui/unified/calendar/Month',
 	'sap/ui/core/date/UniversalDate',
+	'sap/ui/core/IconPool',
 	'./PlanningCalendarLegend',
 	'sap/ui/core/InvisibleText',
 	'sap/ui/core/Core',
-	'sap/ui/unified/library'],
+	'sap/ui/unified/library'
+	],
 	function(
 		CalendarDate,
 		CalendarUtils,
 		Month,
 		UniversalDate,
+		IconPool,
 		PlanningCalendarLegend,
 		InvisibleText,
 		Core,

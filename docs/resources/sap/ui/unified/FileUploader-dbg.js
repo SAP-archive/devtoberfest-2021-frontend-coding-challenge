@@ -63,7 +63,7 @@ sap.ui.define([
 	 * @implements sap.ui.core.IFormContent, sap.ui.unified.IProcessableBlobs
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public
@@ -893,8 +893,17 @@ sap.ui.define([
 			sap.ui.getCore().getStaticAreaRef().removeChild(this.oIFrameRef);
 			this.oIFrameRef = null;
 		}
+
 		if (this.oFileUpload) {
 			this._clearInputField();
+		}
+
+		if (this.FUEl) {
+			this.FUEl = null;
+		}
+
+		if (this.FUDataEl) {
+			this.FUDataEl = null;
 		}
 	};
 

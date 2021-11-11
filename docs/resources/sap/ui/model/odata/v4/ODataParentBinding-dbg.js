@@ -434,7 +434,7 @@ sap.ui.define([
 		return this.oCachePromise.then(function (oCache) {
 			if (oCache && that.bRelative) {
 				return that.fetchResourcePath(that.oContext).then(function (sResourcePath) {
-					if (oCache.$resourcePath === sResourcePath) {
+					if (oCache.getResourcePath() === sResourcePath) {
 						return updateDependents();
 					}
 					return that.refreshInternal(""); // entity of context changed
@@ -481,10 +481,10 @@ sap.ui.define([
 				return oCache.create(oUpdateGroupLock, vCreatePath, sPathInCache,
 					sTransientPredicate, oInitialData, fnErrorCallback, fnSubmitCallback
 				).then(function (oCreatedEntity) {
-					if (oCache.$resourcePath) {
+					if (that.mCacheByResourcePath) {
 						// Ensure that cache containing non-transient created entity is recreated
 						// when the parent binding changes to another row and back again.
-						delete that.mCacheByResourcePath[oCache.$resourcePath];
+						delete that.mCacheByResourcePath[oCache.getResourcePath()];
 					}
 					return oCreatedEntity;
 				});
@@ -653,17 +653,16 @@ sap.ui.define([
 		// getBaseForPathReduction must be called early, because the (virtual) parent context may be
 		// lost again when the path is needed
 		var sBaseForPathReduction = this.getBaseForPathReduction(),
-			sBaseMetaPath,
+			sBaseMetaPath = _Helper.getMetaPath(oContext.getPath()),
 			bCacheImmutable,
 			oCanUseCachePromise,
-			sFullMetaPath,
+			// whether this binding is an operation or depends on one
+			bDependsOnOperation = oContext.getPath().includes("(...)"),
 			iIndex = oContext.getIndex(),
 			bIsAdvertisement = sChildPath[0] === "#",
 			oMetaModel = this.oModel.getMetaModel(),
 			aPromises,
 			sResolvedChildPath = this.oModel.resolve(sChildPath, oContext),
-			// whether this binding is an operation or depends on one
-			bDependsOnOperation = oContext.getPath().includes("(...)"),
 			that = this;
 
 		/*
@@ -677,12 +676,27 @@ sap.ui.define([
 			if (bIsAdvertisement) {
 				// Ensure entity type metadata is loaded even for advertisement so that sync access
 				// to key properties is possible
-				return oMetaModel.fetchObject(sFullMetaPath.slice(0,
-					sFullMetaPath.lastIndexOf("/") + 1));
+				return oMetaModel.fetchObject(sBaseMetaPath + "/");
 			}
 
 			return _Helper.fetchPropertyAndType(that.oModel.oInterface.fetchMetadata,
-				sFullMetaPath);
+				getStrippedMetaPath(sResolvedChildPath));
+		}
+
+		/*
+		 * Returns the meta path corresponding to the given path, with its annotation part stripped
+		 * off.
+		 *
+		 * @param {string} sPath - A path
+		 * @returns {string} The meta path with its annotation part stripped off
+		 */
+		function getStrippedMetaPath(sPath) {
+			var iIndex;
+
+			sPath = _Helper.getMetaPath(sPath);
+			iIndex = sPath.indexOf("@"); // Note: sPath[0] !== "@"
+
+			return iIndex > 0 ? sPath.slice(0, iIndex) : sPath;
 		}
 
 		if (bDependsOnOperation && !sResolvedChildPath.includes("/$Parameter/")
@@ -701,8 +715,6 @@ sap.ui.define([
 			|| oContext.isKeepAlive() // kept-alive contexts have no index when not in aContexts
 			|| this.oCache === null
 			|| this.oCache && this.oCache.hasSentRequest();
-		sBaseMetaPath = oMetaModel.getMetaPath(oContext.getPath());
-		sFullMetaPath = oMetaModel.getMetaPath(sResolvedChildPath);
 		aPromises = [
 			this.doFetchQueryOptions(this.oContext),
 			// After access to complete meta path of property, the metadata of all prefix paths
@@ -712,11 +724,11 @@ sap.ui.define([
 			vChildQueryOptions
 		];
 		oCanUseCachePromise = SyncPromise.all(aPromises).then(function (aResult) {
-			var sChildMetaPath,
-				mChildQueryOptions = aResult[2],
+			var mChildQueryOptions = aResult[2],
 				mWrappedChildQueryOptions,
 				mLocalQueryOptions = aResult[0],
 				oProperty = aResult[1],
+				sReducedChildMetaPath,
 				sReducedPath;
 
 			if (Array.isArray(oProperty)) { // Arrays are only used for functions and actions
@@ -725,15 +737,10 @@ sap.ui.define([
 			}
 
 			sReducedPath = oMetaModel.getReducedPath(sResolvedChildPath, sBaseForPathReduction);
-
-			if (sChildPath === "$count" || sChildPath.endsWith("/$count")
-					|| sChildPath[0] === "@") {
-				return sReducedPath;
-			}
-
-			sChildMetaPath = _Helper.getRelativePath(_Helper.getMetaPath(sReducedPath),
+			sReducedChildMetaPath = _Helper.getRelativePath(getStrippedMetaPath(sReducedPath),
 				sBaseMetaPath);
-			if (sChildMetaPath === undefined) {
+
+			if (sReducedChildMetaPath === undefined) {
 				// the child's data does not fit into this bindings's cache, try the parent
 				that.bHasPathReductionToParent = true;
 				return that.oContext.getBinding().fetchIfChildCanUseCache(that.oContext,
@@ -741,7 +748,8 @@ sap.ui.define([
 					vChildQueryOptions);
 			}
 
-			if (bDependsOnOperation) {
+			if (bDependsOnOperation || sReducedChildMetaPath === "$count"
+					|| sReducedChildMetaPath.endsWith("/$count")) {
 				return sReducedPath;
 			}
 
@@ -751,17 +759,18 @@ sap.ui.define([
 				that.bAggregatedQueryOptionsInitial = false;
 			}
 			if (bIsAdvertisement) {
-				mWrappedChildQueryOptions = {"$select" : [sChildMetaPath.slice(1)]};
+				mWrappedChildQueryOptions = {"$select" : [sReducedChildMetaPath.slice(1)]};
 				return that.aggregateQueryOptions(mWrappedChildQueryOptions, sBaseMetaPath,
 						bCacheImmutable)
 					? sReducedPath
 					: undefined;
 			}
-			if (sChildMetaPath === ""
+			if (sReducedChildMetaPath === ""
 				|| oProperty
 				&& (oProperty.$kind === "Property" || oProperty.$kind === "NavigationProperty")) {
 				mWrappedChildQueryOptions = _Helper.wrapChildQueryOptions(sBaseMetaPath,
-					sChildMetaPath, mChildQueryOptions, that.oModel.oInterface.fetchMetadata);
+					sReducedChildMetaPath, mChildQueryOptions,
+					that.oModel.oInterface.fetchMetadata);
 				if (mWrappedChildQueryOptions) {
 					return that.aggregateQueryOptions(mWrappedChildQueryOptions, sBaseMetaPath,
 							bCacheImmutable)
@@ -770,14 +779,14 @@ sap.ui.define([
 				}
 				return undefined;
 			}
-			if (sChildMetaPath === "value") { // symbolic name for operation result
+			if (sReducedChildMetaPath === "value") { // symbolic name for operation result
 				return that.aggregateQueryOptions(mChildQueryOptions, sBaseMetaPath,
 						bCacheImmutable)
 					? sReducedPath
 					: undefined;
 			}
 			Log.error("Failed to enhance query options for auto-$expand/$select as the path '"
-					+ sFullMetaPath + "' does not point to a property",
+					+ sResolvedChildPath + "' does not point to a property",
 				JSON.stringify(oProperty), sClassName);
 			return undefined;
 		}).then(function (sReducedPath) {

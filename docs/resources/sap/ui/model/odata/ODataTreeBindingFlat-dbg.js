@@ -3,7 +3,7 @@
  * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-
+/*eslint-disable max-len */
 // Provides class sap.ui.model.odata.ODataTreeBindingFlat
 sap.ui.define([
 	"sap/base/assert",
@@ -3902,7 +3902,7 @@ sap.ui.define([
 		if (oContext) {
 			// set unique node ID if the context was created and we did not assign an ID yet
 			var sNewlyGeneratedID = oContext.getProperty(this.oTreeProperties["hierarchy-node-for"]);
-			if (oContext.bCreated && !sNewlyGeneratedID) {
+			if (oContext.isTransient() && !sNewlyGeneratedID) {
 				this.oModel.setProperty(this.oTreeProperties["hierarchy-node-for"], uid(), oContext);
 			}
 		}

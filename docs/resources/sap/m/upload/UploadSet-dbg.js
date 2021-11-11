@@ -4,11 +4,6 @@
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-// Ensure that sap.ui.unified is loaded before the module dependencies will be required.
-// Loading it synchronously is the only compatible option and doesn't harm when sap.ui.unified
-// already has been loaded asynchronously (e.g. via a dependency declared in the manifest)
-sap.ui.getCore().loadLibrary("sap.ui.unified");
-
 sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/core/Icon",
@@ -44,7 +39,7 @@ sap.ui.define([
 	 * and requests, unified behavior of instant and deferred uploads, as well as improved progress indication.
 	 * @extends sap.ui.core.Control
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @constructor
 	 * @public
 	 * @since 1.63
@@ -495,17 +490,18 @@ sap.ui.define([
 	};
 
 	UploadSet.prototype.removeAggregation = function (sAggregationName, oObject, bSuppressInvalidate) {
-		var oListItem;
-		Control.prototype.removeAggregation.call(this, sAggregationName, oObject, bSuppressInvalidate);
-		if (oObject && (sAggregationName === "items" || sAggregationName === "incompleteItems")) {
-			oListItem = oObject._getListItem();
-			var oItem = this.getList().removeAggregation("items", oListItem, bSuppressInvalidate);
-			if (oItem) {
-				oItem.destroy();
-			}
-			this._refreshInnerListStyle();
-		}
-	};
+        var oListItem;
+        Control.prototype.removeAggregation.call(this, sAggregationName, oObject, bSuppressInvalidate);
+        if (oObject && (sAggregationName === "items" || sAggregationName === "incompleteItems")) {
+            oListItem = oObject._getListItem();
+            var oItem = this.getList().removeAggregation("items", oListItem, bSuppressInvalidate);
+            if (oItem && oObject) {
+                oObject.destroy();
+                oItem.destroy();
+            }
+            this._refreshInnerListStyle();
+        }
+    };
 
 	UploadSet.prototype.removeAllAggregation = function (sAggregationName, bSuppressInvalidate) {
 		if (sAggregationName === "items") {
@@ -780,7 +776,7 @@ sap.ui.define([
 		}
 
 		if (oFile.name !== sNewFileName) {
-			sNewFullName = sNewFileName + "." + oFile.extension;
+			sNewFullName = oFile.extension ? sNewFileName + "." + oFile.extension : sNewFileName;
 			oItem.setFileName(sNewFullName);
 		}
 		oItem._setContainsError(false);

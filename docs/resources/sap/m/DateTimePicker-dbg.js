@@ -4,11 +4,6 @@
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-// Ensure that sap.ui.unified is loaded before the module dependencies will be required.
-// Loading it synchronously is the only compatible option and doesn't harm when sap.ui.unified
-// already has been loaded asynchronously (e.g. via a dependency declared in the manifest)
-sap.ui.getCore().loadLibrary("sap.ui.unified");
-
 //Provides control sap.m.DateTimePicker.
 sap.ui.define([
 	"sap/ui/thirdparty/jquery",
@@ -71,13 +66,15 @@ sap.ui.define([
 	 * The <code>DateTimePicker</code> control consists of two parts: the input field and the
 	 * date/time picker.
 	 *
-	 * <b>Note:</b> The {@link sap.ui.unified.Calendar} is used internally only if the
+	 * <b>Note:</b> The application developer should add dependency to <code>sap.ui.unified</code> library
+	 * on application level to ensure that the library is loaded before the module dependencies will be required.
+	 * The {@link sap.ui.unified.Calendar} is used internally only if the
 	 * <code>DateTimePicker</code> is opened (not used for the initial rendering). If
 	 * the <code>sap.ui.unified</code> library is not loaded before the
 	 * <code>DateTimePicker</code> is opened, it will be loaded upon opening. This
-	 * could lead to a waiting time when the <code>DateTimePicker</code> is opened for
+	 * could lead to CSP compliance issues and adds an additional waiting time when the <code>DateTimePicker</code> is opened for
 	 * the first time. To prevent this, apps using the <code>DateTimePicker</code>
-	 * should also load the <code>sap.ui.unified</code> library.
+	 * should also load the <code>sap.ui.unified</code> library in advance.
 	 *
 	 * <h3>Usage</h3>
 	 *
@@ -139,7 +136,7 @@ sap.ui.define([
 	 * mobile devices, it opens in full screen.
 	 *
 	 * @extends sap.m.DatePicker
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public

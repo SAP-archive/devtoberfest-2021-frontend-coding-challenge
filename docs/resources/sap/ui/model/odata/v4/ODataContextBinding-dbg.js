@@ -106,7 +106,7 @@ sap.ui.define([
 	 * @mixes sap.ui.model.odata.v4.ODataParentBinding
 	 * @public
 	 * @since 1.37.0
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @borrows sap.ui.model.odata.v4.ODataBinding#getGroupId as #getGroupId
 	 * @borrows sap.ui.model.odata.v4.ODataBinding#getRootBinding as #getRootBinding
@@ -296,7 +296,7 @@ sap.ui.define([
 			return that.refreshDependentBindings("", oGroupLock.getGroupId(), true);
 		}
 
-		oPromise = oMetaModel.fetchObject(oMetaModel.getMetaPath(sResolvedPath) + "/@$ui5.overload")
+		oPromise = oMetaModel.fetchObject(_Helper.getMetaPath(sResolvedPath) + "/@$ui5.overload")
 			.then(function (aOperationMetadata) {
 				var fnGetEntity, iIndex, sPath;
 
@@ -403,7 +403,9 @@ sap.ui.define([
 		this.mParameters = mParameters; // store mParameters at binding after validation
 
 		if (this.isRootBindingSuspended()) {
-			this.sResumeChangeReason = ChangeReason.Change;
+			if (!this.oOperation) {
+				this.sResumeChangeReason = ChangeReason.Change;
+			}
 		} else if (!this.oOperation) {
 			this.fetchCache(this.oContext);
 			if (sChangeReason) {
@@ -601,7 +603,7 @@ sap.ui.define([
 			oCache,
 			vEntity = fnGetEntity,
 			oModel = this.oModel,
-			sMetaPath = oModel.getMetaModel().getMetaPath(sPath) + "/@$ui5.overload/0/$ReturnType",
+			sMetaPath = _Helper.getMetaPath(sPath) + "/@$ui5.overload/0/$ReturnType",
 			sOriginalResourcePath = sPath.slice(1),
 			oRequestor = oModel.oRequestor,
 			that = this;
@@ -714,7 +716,6 @@ sap.ui.define([
 			this.oReturnValueContext = undefined;
 		}
 		this.oModel.bindingDestroyed(this);
-		this.mCacheByResourcePath = undefined;
 		this.oOperation = undefined;
 		this.mParameters = undefined;
 		this.mQueryOptions = undefined;
@@ -778,7 +779,7 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#doSuspend
 	 */
 	ODataContextBinding.prototype.doSuspend = function () {
-		if (this.bInitial) {
+		if (this.bInitial && !this.oOperation) {
 			// if the binding is still initial, it must fire an event in resume
 			this.sResumeChangeReason = ChangeReason.Change;
 		}
@@ -1031,7 +1032,9 @@ sap.ui.define([
 			mQueryOptions = Object.assign({}, mQueryOptions);
 			// keep $select before $expand
 			if ("$select" in mInheritableQueryOptions) {
-				mQueryOptions.$select = mInheritableQueryOptions.$select;
+				// avoid that this.mQueryOptions.$select is modified
+				mQueryOptions.$select = mQueryOptions.$select && mQueryOptions.$select.slice();
+				_Helper.addToSelect(mQueryOptions, mInheritableQueryOptions.$select);
 			}
 			if ("$expand" in mInheritableQueryOptions) {
 				mQueryOptions.$expand = mInheritableQueryOptions.$expand;
@@ -1099,17 +1102,17 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataContextBinding.prototype.hasReturnValueContext = function (oMetadata) {
-		var oMetaModel = this.oModel.getMetaModel(),
-			aMetaSegments;
+		var aMetaSegments;
 
 		if (!this.isReturnValueLikeBindingParameter(oMetadata)) {
 			return false;
 		}
 
-		aMetaSegments = oMetaModel.getMetaPath(this.getResolvedPath()).split("/");
+		aMetaSegments = _Helper.getMetaPath(this.getResolvedPath()).split("/");
 
+		// case 4b
 		return aMetaSegments.length === 3
-			&& oMetaModel.getObject("/" + aMetaSegments[1]).$kind === "EntitySet"; // case 4b
+			&& this.oModel.getMetaModel().getObject("/" + aMetaSegments[1]).$kind === "EntitySet";
 	};
 
 	/**
@@ -1249,7 +1252,7 @@ sap.ui.define([
 				if (bKeepCacheOnError && oPromise) {
 					oPromise = oPromise.catch(function (oError) {
 						return that.fetchResourcePath(that.oContext).then(function (sResourcePath) {
-							if (!that.bRelative || oCache.$resourcePath === sResourcePath) {
+							if (!that.bRelative || oCache.getResourcePath() === sResourcePath) {
 								that.oCache = oCache;
 								that.oCachePromise = SyncPromise.resolve(oCache);
 								oCache.setActive(true);
@@ -1394,23 +1397,31 @@ sap.ui.define([
 	 * @see sap.ui.model.odata.v4.ODataParentBinding#resumeInternal
 	 */
 	ODataContextBinding.prototype.resumeInternal = function (bCheckUpdate, bParentHasChanges) {
-		var sResumeChangeReason = this.sResumeChangeReason;
+		var sResumeChangeReason = this.sResumeChangeReason,
+			that = this;
+
+		function resumeDependents() {
+			that.getDependentBindings().forEach(function (oDependentBinding) {
+				oDependentBinding.resumeInternal(bCheckUpdate, !!sResumeChangeReason);
+			});
+		}
 
 		this.sResumeChangeReason = undefined;
 
-		if (!this.oOperation) {
-			if (bParentHasChanges || sResumeChangeReason) {
-				this.mAggregatedQueryOptions = {};
-				this.bAggregatedQueryOptionsInitial = true;
-				this.removeCachesAndMessages("");
-				this.fetchCache(this.oContext);
-			}
-			this.getDependentBindings().forEach(function (oDependentBinding) {
-				oDependentBinding.resumeInternal(bCheckUpdate, !!sResumeChangeReason);
-			});
-			if (sResumeChangeReason) {
-				this._fireChange({reason : sResumeChangeReason});
-			}
+		if (this.oOperation) {
+			resumeDependents();
+			return;
+		}
+
+		if (bParentHasChanges || sResumeChangeReason) {
+			this.mAggregatedQueryOptions = {};
+			this.bAggregatedQueryOptionsInitial = true;
+			this.removeCachesAndMessages("");
+			this.fetchCache(this.oContext);
+		}
+		resumeDependents();
+		if (sResumeChangeReason) {
+			this._fireChange({reason : sResumeChangeReason});
 		}
 	};
 

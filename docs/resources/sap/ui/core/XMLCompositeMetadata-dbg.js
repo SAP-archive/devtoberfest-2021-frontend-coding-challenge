@@ -30,7 +30,7 @@ sap.ui.define([
 	 * @param {object} oClassInfo static info to construct the metadata from
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 * @since 1.50.0
 	 * @alias sap.ui.core.XMLCompositeMetadata
 	 * @extends sap.ui.core.ElementMetadata
@@ -170,7 +170,7 @@ sap.ui.define([
 	XMLCompositeMetadata.prototype._loadFragment = function (sFragmentName, sExtension) {
 		var sFragmentKey = sExtension + "$" + sFragmentName;
 		if (!mFragmentCache[sFragmentKey]) {
-			mFragmentCache[sFragmentKey] = XMLTemplateProcessor.loadTemplate(sFragmentName, sExtension);
+			mFragmentCache[sFragmentKey] = XMLTemplateProcessor.loadTemplate(sFragmentName, sExtension); // legacy-relevant: sync loading of XML resource
 		}
 
 		return mFragmentCache[sFragmentKey];

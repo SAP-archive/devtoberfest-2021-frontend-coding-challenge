@@ -3,7 +3,7 @@
  * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-
+/*eslint-disable max-len */
 // Provides an abstraction for model bindings
 sap.ui.define(['sap/ui/base/Object', "sap/base/util/isPlainObject"],
 	function(BaseObject, isPlainObject) {
@@ -203,7 +203,9 @@ sap.ui.define(['sap/ui/base/Object', "sap/base/util/isPlainObject"],
 	};
 
 	/**
-	 * toString method returns path for compatibility
+	 * Returns the path of this Context instance.
+	 *
+	 * @returns {string} The path
 	 */
 	Context.prototype.toString = function() {
 		return this.sPath;

@@ -94,7 +94,7 @@ sap.ui.define([
 	 * @implements sap.m.ObjectHeaderContainer, sap.f.IDynamicPageStickyContent
 	 *
 	 * @author SAP SE
-	 * @version 1.95.0
+	 * @version 1.96.0
 	 *
 	 * @public
 	 * @alias sap.m.IconTabBar
@@ -288,6 +288,12 @@ sap.ui.define([
 					 * @since 1.15.0
 					 */
 					key : {type : "string"},
+
+					/**
+					 * The key of the previous selected item
+					 * @since 1.96
+					 */
+					previousKey : {type : "string"},
 
 					/**
 					 * The selected item

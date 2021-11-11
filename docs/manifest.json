@@ -45,11 +45,12 @@
             "async": true
         },
         "dependencies": {
-            "minUI5Version": "1.95.0",
+            "minUI5Version": "1.96.0",
             "libs": {
-                "sap.ui.core": {},
-                "sap.m": {},
-                "sap.ui.layout": {}
+                "sap.ui.core": { "lazy": true },
+                "sap.m": { "lazy": true },
+                "sap.tnt": { "lazy": true },
+                "sap.ui.layout": { "lazy": true }
             }
         },
         "contentDensities": {

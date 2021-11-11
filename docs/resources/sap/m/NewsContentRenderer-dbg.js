@@ -23,7 +23,6 @@ sap.ui.define([],
 	 * @param {sap.m.GenericTile} oControl the control to be rendered
 	 */
 	NewsContentRenderer.render = function(oRm, oControl) {
-		var sSubheader = oControl.getSubheader();
 		var sTooltip = oControl.getTooltip_AsString();
 		if (typeof sTooltip !== "string") {
 			sTooltip = "";
@@ -49,7 +48,7 @@ sap.ui.define([],
 		oRm.openStart("div", oControl.getId() + "-subheader");
 		oRm.class("sapMNwCSbh");
 		oRm.openEnd();
-		oRm.text(sSubheader);
+		oRm.renderControl(oControl._oSubHeaderText);
 		oRm.close("div");
 		oRm.close("div");
 	};
