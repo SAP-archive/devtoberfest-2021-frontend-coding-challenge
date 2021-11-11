@@ -37,9 +37,9 @@
         <List id="all-list" items="{sample>/}">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
-              <Title id="all-bar-info" text="{i18n>SAP_BTP_Services}" level="H4" />
+              <Title id="all-bar-info" text="{i18n>btpservices}" level="H4" />
               <ToolbarSpacer id="all-bar-spacer" />
-              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>Search}"
+              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>search}"
                 liveChange=".liveSearch" />
             </OverflowToolbar>
           </headerToolbar>
