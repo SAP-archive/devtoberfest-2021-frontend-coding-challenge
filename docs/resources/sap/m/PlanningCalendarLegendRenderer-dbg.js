@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -56,6 +56,8 @@ sap.ui.define(['sap/ui/unified/CalendarLegendRenderer', 'sap/ui/core/Renderer'],
 		PlanningCalendarLegendRenderer._renderItemsHeader = function(oRm, sHeaderText) {
 			oRm.openStart("div");
 			oRm.class("sapMPlanCalLegendHeader");
+			oRm.attr("role", "heading");
+			oRm.attr("aria-level", "3");
 			oRm.openEnd();
 			oRm.text(sHeaderText);
 			oRm.close("div");

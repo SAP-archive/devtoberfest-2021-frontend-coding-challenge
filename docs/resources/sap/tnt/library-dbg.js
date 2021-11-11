@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -17,15 +17,17 @@ sap.ui.define(["sap/ui/core/library", "sap/m/library"],
 	 * @namespace
 	 * @name sap.tnt
 	 * @author SAP SE
-	 * @version 1.76.0
+	 * @version 1.96.0
+	 * @since 1.36
 	 * @public
 	 */
 
 	// delegate further initialization of this library to the Core
 	sap.ui.getCore().initLibrary({
 		name : "sap.tnt",
-		version: "1.76.0",
+		version: "1.96.0",
 		dependencies : ["sap.ui.core", "sap.m"],
+		designtime: "sap/tnt/designtime/library.designtime",
 		types: [
 			"sap.tnt.RenderMode"
 		],
@@ -42,7 +44,12 @@ sap.ui.define(["sap/ui/core/library", "sap/m/library"],
 		],
 		elements: [
 			"sap.tnt.NavigationListItem"
-		]
+		],
+		extensions: {
+			flChangeHandlers: {
+				"sap.tnt.NavigationListItem": "sap/tnt/flexibility/NavigationListItem"
+			}
+		}
 	});
 
 	/**

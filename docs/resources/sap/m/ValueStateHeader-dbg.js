@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -23,7 +23,7 @@ sap.ui.define(
 		 *
 		 * @extends sap.ui.core.Control
 		 * @author SAP SE
-		 * @version 1.76.0
+		 * @version 1.96.0
 		 *
 		 * @constructor
 		 * @private
@@ -38,7 +38,6 @@ sap.ui.define(
 					 * Text to be displayed in the value state
 					 */
 					text: { type: "string", defaultValue: "" },
-
 					/**
 					 * Visualizes the validation state of the control, e.g. <code>Error</code>, <code>Warning</code>, <code>Success</code>.
 					 */
@@ -47,7 +46,13 @@ sap.ui.define(
 						defaultValue: ValueState.None
 					}
 				},
-
+				aggregations: {
+					/**
+					 * <code>sap.m.FormattedText</code> text, can contain links. If this aggregation and
+					 * the text property are both set the formatted text will be displayed.
+					 */
+					formattedText: { type: "sap.m.FormattedText", multiple: false }
+				},
 				associations: {
 					/**
 					 * Associated Popup to the ValueStateHeader.
@@ -67,16 +72,20 @@ sap.ui.define(
 						Information: "sapMValueStateHeaderInformation"
 					};
 
-					oRM.openStart("div", oControl);
-					oRM.class("sapMValueStateHeaderRoot");
-					oRM.class(
-						mapValueStateToClass[oControl.getValueState()]
-					);
-					oRM.openEnd();
-					oRM.openStart("span", oControl.getId() + "-inner");
-					oRM.class("sapMValueStateHeaderText");
-					oRM.openEnd();
-					oRM.text(oControl.getText());
+					oRM.openStart("div", oControl)
+						.class("sapMValueStateHeaderRoot")
+						.class(mapValueStateToClass[oControl.getValueState()])
+						.openEnd();
+
+					oRM.openStart("span", oControl.getId() + "-inner")
+						.class("sapMValueStateHeaderText")
+						.openEnd();
+					if (oControl.getFormattedText()) {
+						oRM.renderControl(oControl.getFormattedText());
+					} else {
+						oRM.text(oControl.getText());
+					}
+
 					oRM.close("span");
 					oRM.close("div");
 				}
@@ -143,8 +152,6 @@ sap.ui.define(
 			var oPopup = this._getAssociatedPopupObject();
 
 			if (oPopup) {
-				this.getDomRef().style.width = oPopup.getDomRef().getBoundingClientRect().width + "px";
-
 				// schedule reposition after header rendering
 				if (oPopup.isA("sap.m.Popover")) {
 					setTimeout(function () {

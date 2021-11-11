@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-sap.ui.define(["sap/ui/core/Renderer","sap/m/OverflowToolbarRenderer","sap/m/BarInPageEnabler"],function(e,r,t){"use strict";var n=e.extend(r);n.renderBarContent=function(e,r){var a=false;var o;r._getVisibleContent().forEach(function(d){o=d.getMetadata().getName()=="sap.tnt.ToolHeaderUtilitySeparator";if(!a&&o&&r._getOverflowButtonNeeded()){n.renderOverflowButton(e,r);a=true}t.addChildClassTo(d,r);e.renderControl(d)});if(!a&&r._getOverflowButtonNeeded()){n.renderOverflowButton(e,r)}};return n},true);
+sap.ui.define(["sap/ui/core/Renderer","sap/m/OverflowToolbarRenderer","sap/m/BarInPageEnabler"],function(e,r,t){"use strict";var n=e.extend(r);n.apiVersion=2;n.renderBarContent=function(e,r){var o=false,a;r._getVisibleContent().forEach(function(i){a=i.isA("sap.tnt.ToolHeaderUtilitySeparator");if(!o&&a&&r._getOverflowButtonNeeded()){n.renderOverflowButton(e,r);o=true}t.addChildClassTo(i,r);e.renderControl(i)});if(!o&&r._getOverflowButtonNeeded()){n.renderOverflowButton(e,r)}};return n},true);
