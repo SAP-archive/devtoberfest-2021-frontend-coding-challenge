@@ -3,50 +3,73 @@
 /* Quartz High Contrast White theme           */
 /* ========================================== */
 
-.sapUxAPObjectChildPage {
-	width: 0.25rem;
+.sapUxAPObjectPageNavigation {
+	background: @sapUiObjectHeaderBackground;
+
+	&.sapUxAPObjectPageNavigationTransparent {
+		background: transparent;
+	}
+
+	&.sapUxAPObjectPageNavigationTranslucent {
+		background: lighten(@sapUiObjectHeaderBackground, 10);
+	}
 }
 
-.sapUxAPObjectPageNavigation .sapUxAPObjectChildPage {
-	height: 3rem;
+.sapUxAPObjectPageHeaderDetails {
+	.sapMOHTitle .sapMText {
+		color: @sapUiContentLabelColor;
+	}
+	.sapMLabel {
+		color: @sapUiContentLabelColor;
+	}
 }
-
-.sapUiSizeCompact .sapUxAPObjectPageNavigation .sapUxAPObjectChildPage {
-	height: 2rem;
+.sapUiSizeCompact .sapUxAPObjectPageNavigation,
+.sapUxAPObjectPageNavigation {
+	.sapUxAPObjectChildPage {
+		height: @sapElement_LineHeight;
+	}
 }
 
 .sapUxAPObjectPageNavigation .sapUxAPITBar.sapUxAPObjectChildPage {
-	height: 3.125rem;
+	height: 2.9375rem;
 }
 
 .sapUiSizeCompact .sapUxAPObjectPageNavigation .sapUxAPITBar.sapUxAPObjectChildPage {
-	height: 2.125rem;
+	height: 1.9375rem;
 }
 
-/* Overriding the width inherited from BrowserScrollbar.less */
-.sap-desktop .sapUxAPObjectPageWrapper ::-webkit-scrollbar {
-	width: auto;
-}
-
-// toggle header visual indicator
+/* ======================================== */
+/* Title and Toggle Header Visual Indicator */
+/* ======================================== */
 .sapUxAPObjectPageLayout {
   &.sapUxAPObjectPageLayoutTitleClickEnabled {
+
     &.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitle {
-      background: @sapUiHighlight;
-      box-shadow: @sapUiShadowHeader;
-    }
-    &.sapUxAPObjectPageLayoutTitleForceHovered {
-      .sapFDynamicPageToggleHeaderIndicator {
-        .sapMBtnInner {
-          background-color: @sapUiHighlight;
-        }
-      }
-    }
+      .title-hover(@sapUiObjectHeaderHoverBackground);
+	}
+
+	&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitleTranslucent {
+		.title-hover(lighten(@sapUiObjectHeaderBackground, 10));
+	}
+
+	&.sapUxAPObjectPageLayoutTitleForceHovered .sapFDynamicPageTitleTransparent {
+		.title-hover(transparent);
+	}
   }
 }
 
+.sapUxAPObjectPageLayout:not(.sapUxAPObjectPageLayoutNoAnchorBar) > .sapUxAPObjectPageHeaderStickied > .sapFDynamicPageTitle {
+		box-shadow: none;
+}
+
 // footer
-.sapUxAPObjectPageFooter .sapUxAPObjectPageFloatingFooter {
-	border: 1px solid @sapUiGroupTitleBorderColor;
-	box-shadow: @sapUiShadowLevel2;
+.sapUxAPObjectPageLayout .sapUxAPObjectPageFooter .sapUxAPObjectPageFloatingFooter {
+	background: @sapUiPageFooterBackground;
+	color: @sapUiPageFooterTextColor;
+	box-shadow: @sapUiShadowLevel1;
+	border: none;
+}
+
+.title-hover(@backgroundColor) {
+	background-color: darken(@backgroundColor, 3);
 }
