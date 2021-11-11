@@ -45,7 +45,7 @@
             "libs": {
                 "sap.ui.core": {},
                 "sap.m": {},
-                "sap.ui.layout": {}
+                "sap.ui.layout": { "lazy": true }
             }
         },
         "contentDensities": {
