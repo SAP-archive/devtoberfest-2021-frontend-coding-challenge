@@ -6,7 +6,7 @@
     <tnt:header>
       
       <tnt:ToolHeader>
-        <Image src="resources/img/favicon.ico">
+        <Image src="resources/img/favicon.ico" height="48px" width="48px">
           <layoutData>
             <OverflowToolbarLayoutData priority="Disappear" />
           </layoutData>
@@ -17,7 +17,7 @@
           </layoutData>
         </Text>
         <ToolbarSpacer />
-        <Image src="resources/img/github.png" height="50%" press="goToRepo" />
+        <Image src="resources/img/github.png" height="33px" width="40px" press="goToRepo" />
         <Link text="{i18n>forkMe}" target="_blank"
           href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge"
           visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }" class="sapUiMediumMarginEnd" />
@@ -42,12 +42,12 @@
             href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge" />
           </link>
         </MessageStrip>
-        <List id="all-list" items="{sample>/}">
+        <List id="all-list" items="{sample>/}" growing="true" growingScrollToLoad="true" growingThreshold="12">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
-              <Title id="all-bar-info" text="{i18n>SAP BTP Services}" level="H4" />
+              <Title id="all-bar-info" text="{i18n>btpTxt}" level="H4" />
               <ToolbarSpacer id="all-bar-spacer" />
-              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>Search for the name or description}"
+              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>searchTxt}"
                 liveChange=".liveSearch" />
             </OverflowToolbar>
           </headerToolbar>

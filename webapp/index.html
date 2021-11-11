@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
+        <meta name="description" content="This is a sample Fiori app to illustrate how we can have a good score with lighthouse scenario">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link
             href="resources/img/favicon.ico"
@@ -13,11 +14,14 @@
 
         <script
             id="sap-ui-bootstrap"
-            src="resources/sap-ui-core.js"
+            src="https://ui5.sap.com/resources/sap-ui-core.js"
+            data-sap-ui-libs="sap.m"
+            data-sap-ui-async="true"
+            data-sap-ui-preload="true"
             data-sap-ui-theme="sap_fiori_3"
             data-sap-ui-resourceroots='{
-        "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./"
-      }'
+                "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./"
+            }'
             data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
             data-sap-ui-compatVersion="edge"
             data-sap-ui-frameOptions="trusted"
