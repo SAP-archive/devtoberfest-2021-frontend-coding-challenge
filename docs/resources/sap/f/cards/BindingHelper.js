@@ -1,6 +1,0 @@
-/*!
- * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
- * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
- */
-sap.ui.define(["sap/ui/base/ManagedObject","sap/base/util/extend","./formatters/DateTimeFormatter","./formatters/NumberFormatter","./bindingFeatures/DateRange"],function(e,r,t,n,a){"use strict";var i=/\{\{([^}]+)\}\}/g;var f={};var o={date:t.date,dateTime:t.dateTime,currency:n.currency,float:n.float,integer:n.integer,percent:n.percent,unit:n.unit};f.mLocals={format:o,dateRange:a};f.extractBindingInfo=function(r){r=f.escapeCardPlaceholders(r);return e.bindingParser(r,undefined,true,undefined,undefined,undefined,f.mLocals)};f.createBindingInfos=function(e){if(!e){return e}if(Array.isArray(e)){return e.map(f.createBindingInfos)}if(typeof e==="object"){var r={};for(var t in e){r[t]=f.createBindingInfos(e[t])}return r}return f.extractBindingInfo(e)||e};f.formattedProperty=function(e,t){var n={};if(Array.isArray(e)){n.parts=e.map(function(e){return typeof e==="object"?r({},e):e});n.formatter=t}else if(typeof e==="object"){n=r({},e);if(e.formatter){var a=n.formatter;n.formatter=function(){var e=a.apply(this,arguments);return t(e)}}else{n.formatter=t}}else{n=t(e)}return n};f.escapeCardPlaceholders=function(e){if(typeof e!=="string"){return e}return e.replace(i,"\\{\\{$1\\}\\}")};return f});

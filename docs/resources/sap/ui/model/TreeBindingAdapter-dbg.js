@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -148,7 +148,7 @@ sap.ui.define([
 		};
 
 		/**
-		 * @override
+		 * @see sap.ui.model.ListBinding#getLength
 		 */
 		TreeBindingAdapter.prototype.getLength = function() {
 			if (!this._oRootNode) {
@@ -159,9 +159,6 @@ sap.ui.define([
 			return this._oRootNode.magnitude;
 		};
 
-		/**
-		 * @override
-		 */
 		TreeBindingAdapter.prototype.getContextByIndex = function (iIndex) {
 			//step out if the binding is initial (as long as the metadata is not yet loaded)
 			if (this.isInitial()) {
@@ -172,9 +169,6 @@ sap.ui.define([
 			return oNode ? oNode.context : undefined;
 		};
 
-		/**
-		 * @override
-		 */
 		TreeBindingAdapter.prototype.getNodeByIndex = function(iIndex) {
 			//step out if the binding is initial (as long as the metadata is not yet loaded)
 			if (this.isInitial()) {
@@ -398,12 +392,44 @@ sap.ui.define([
 		};
 
 		/**
-		 * Retrieves the requested part from the tree.
+		 * Gets an array of contexts for the requested part of the tree.
+		 *
+		 * @param {number} [iStartIndex=0]
+		 *   The index of the first requested context
+		 * @param {number} [iLength]
+		 *   The maximum number of returned contexts; if not given the model's size limit is used;
+		 *   see {@link sap.ui.model.Model#setSizeLimit}
+		 * @param {number} [iThreshold=0]
+		 *   The maximum number of contexts to read to read additionally as buffer
+		 * @return {sap.ui.model.Context[]}
+		 *   The requested tree contexts
+		 *
+		 * @protected
 		 */
-		TreeBindingAdapter.prototype.getContexts = function(iStartIndex, iLength, iThreshold, bReturnNodes) {
+		TreeBindingAdapter.prototype.getContexts = function (iStartIndex, iLength, iThreshold) {
+			return this._getContextsOrNodes(false, iStartIndex, iLength, iThreshold);
+		};
 
-			//step out if the binding is initial (as long as the metadata is not yet loaded)
-			if (this.isInitial()) {
+		/**
+		 * Gets an array of either node objects or contexts for the requested part of the tree.
+		 *
+		 * @param {boolean} bReturnNodes
+		 *   Whether to return node objects or contexts
+		 * @param {number} [iStartIndex=0]
+		 *   The index of the first requested node or context
+		 * @param {number} [iLength]
+		 *   The maximum number of returned nodes or contexts; if not given the model's size limit
+		 *   is used; see {@link sap.ui.model.Model#setSizeLimit}
+		 * @param {number} [iThreshold=0]
+		 *   The maximum number of nodes or contexts to read additionally as buffer
+		 * @return {object[]|sap.ui.model.Context[]}
+		 *   The requested tree nodes or contexts
+		 *
+		 * @private
+		 */
+		TreeBindingAdapter.prototype._getContextsOrNodes = function (bReturnNodes, iStartIndex,
+				iLength, iThreshold) {
+			if (!this.isResolved() || this.isInitial()) {
 				return [];
 			}
 
@@ -485,15 +511,22 @@ sap.ui.define([
 		};
 
 		/**
-		 * Retrieves the requested part from the tree and returns node objects.
-		 * @param {int} iStartIndex
-		 * @param {int} iLength
-		 * @param {int} iThreshold
-		 * @return {Object} Tree Node
+		 * Gets an array of nodes for the requested part of the tree.
+		 *
+		 * @param {number} iStartIndex
+		 *   The index of the first requested node
+		 * @param {number} iLength
+		 *   The maximum number of returned nodes; if not given the model's size limit is used; see
+		 *   {@link sap.ui.model.Model#setSizeLimit}
+		 * @param {number} [iThreshold=0]
+		 *   The maximum number of nodes to read additionally as buffer
+		 * @return {object[]}
+		 *   The requested tree nodes
+		 *
 		 * @protected
 		 */
 		TreeBindingAdapter.prototype.getNodes = function (iStartIndex, iLength, iThreshold) {
-			return this.getContexts(iStartIndex, iLength, iThreshold, true);
+			return this._getContextsOrNodes(true, iStartIndex, iLength, iThreshold);
 		};
 
 		/**
@@ -545,6 +578,11 @@ sap.ui.define([
 			return aNodes;
 		};
 
+		/**
+		 * Builds the tree from start index with the specified number of nodes
+		 * @param {int} iStartIndex Index from which the tree shall be built
+		 * @param {int} iLength Number of Nodes
+		 */
 		TreeBindingAdapter.prototype._buildTree = function(iStartIndex, iLength) {
 			//throw away our tree
 			this._oRootNode = undefined;
@@ -953,6 +991,10 @@ sap.ui.define([
 				}
 			});
 
+			if (this.bCollapseRecursive) {
+				this.setNumberOfExpandedLevels(iLevel);
+			}
+
 			this._fireChange({reason: ChangeReason.Collapse});
 		};
 
@@ -1048,7 +1090,6 @@ sap.ui.define([
 
 		/**
 		 * A group ID starts and ends with a "/".
-		 * @override
 		 */
 		TreeBindingAdapter.prototype._getGroupIdLevel = function (sGroupID) {
 			if (sGroupID == null) {
@@ -1060,7 +1101,6 @@ sap.ui.define([
 
 		/**
 		 * Determines the size of a group
-		 * @override
 		 */
 		TreeBindingAdapter.prototype._getGroupSize = function (oNode) {
 			return this.getChildCount(oNode.context);
@@ -1166,6 +1206,7 @@ sap.ui.define([
 
 			// find the first selected entry -> this is our lead selection index
 			var iNodeCounter = -1;
+			var nodeFound = false;
 			var fnMatchFunction = function (oNode) {
 				if (!oNode || !oNode.isArtificial) {
 					iNodeCounter++;
@@ -1173,13 +1214,21 @@ sap.ui.define([
 
 				if (oNode) {
 					if (oNode.groupID === this._sLeadSelectionGroupID) {
+						nodeFound = true;
 						return true;
 					}
 				}
 			};
 			this._match(this._oRootNode, [], 1, fnMatchFunction);
 
-			return iNodeCounter;
+			if (nodeFound) {
+				return iNodeCounter;
+			}
+			// If a parent of the lead selected node has been collapsed,
+			//	we might not be able to find it in the current tree.
+			// This can only happen if recursive collapse is not active
+			//	(recursive collapse always removes the selection of a collapsed nodes' children)
+			return -1;
 		};
 
 		/**
@@ -1681,7 +1730,7 @@ sap.ui.define([
 		 *            [oListener] Context object to call the event handler with. Defaults to this
 		 *            <code>TreeBindingAdapter</code> itself
 		 *
-		 * @returns {sap.ui.model.TreeBindingAdapter} Reference to <code>this</code> in order to allow method chaining
+		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 */
 		TreeBindingAdapter.prototype.attachSelectionChanged = function(oData, fnFunction, oListener) {
@@ -1699,7 +1748,7 @@ sap.ui.define([
 		 *            fnFunction The function to be called, when the event occurs
 		 * @param {object}
 		 *            [oListener] Context object on which the given function had to be called
-		 * @returns {sap.ui.model.TreeBindingAdapter} Reference to <code>this</code> in order to allow method chaining
+		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 */
 		TreeBindingAdapter.prototype.detachSelectionChanged = function(fnFunction, oListener) {
@@ -1719,7 +1768,7 @@ sap.ui.define([
 		 * @param {object} oParameters Parameters to pass along with the event.
 		 * @param {int} oParameters.leadIndex Lead selection index
 		 * @param {int[]} [oParameters.rowIndices] Other selected indices (if available)
-		 * @returns {sap.ui.model.TreeBindingAdapter} Reference to <code>this</code> in order to allow method chaining
+		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 		 * @protected
 		 */
 		TreeBindingAdapter.prototype.fireSelectionChanged = function(oParameters) {
