@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -79,7 +79,6 @@ sap.ui.define(["sap/base/assert", "sap/base/Log", "sap/ui/thirdparty/jquery"],
 		assert(oInstance instanceof Object, "In sap.m.InstanceManager.removeInstance method, the parameter oInstance should be an object");
 
 		if (!aCategory) {
-			Log.warning("Can't remove control from a non-managed category id: " + sCategoryId);
 			return null;
 		}
 

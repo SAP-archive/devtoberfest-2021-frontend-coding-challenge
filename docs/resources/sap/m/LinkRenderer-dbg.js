@@ -1,17 +1,24 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
- sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/library'],
-	function(Renderer, coreLibrary) {
+ sap.ui.define([
+	 "sap/ui/core/Renderer",
+	 "sap/ui/core/library",
+	 "sap/ui/util/defaultLinkTypes",
+	 './library',
+	 'sap/ui/core/Core'
+	],
+	function(Renderer, coreLibrary, defaultLinkTypes, mobileLibrary, Core) {
 	"use strict";
-
 
 	// shortcut for sap.ui.core.TextDirection
 	var TextDirection = coreLibrary.TextDirection;
 
+	// shortcut for sap.ui.core.aria.HasPopup
+	var AriaHasPopup = coreLibrary.aria.HasPopup;
 
 	/**
 	 * Link renderer
@@ -20,6 +27,12 @@
 	var LinkRenderer = {
 			apiVersion: 2
 	};
+
+	// shortcut for sap.m.EmptyIndicator
+	var EmptyIndicatorMode = mobileLibrary.EmptyIndicatorMode;
+
+	// shortcut for library resource bundle
+	var oRb = Core.getLibraryResourceBundle("sap.m");
 
 
 	/**
@@ -32,9 +45,12 @@
 		var sTextDir = oControl.getTextDirection(),
 			sTextAlign = Renderer.getTextAlign(oControl.getTextAlign(), sTextDir),
 			bShouldHaveOwnLabelledBy = oControl._determineSelfReferencePresence(),
+			sHasPopupType = oControl.getAriaHasPopup(),
 			sHref = oControl.getHref(),
+			sRel = defaultLinkTypes(oControl.getRel(), oControl.getTarget()),
 			oAccAttributes =  {
-				labelledby: bShouldHaveOwnLabelledBy ? {value: oControl.getId(), append: true } : undefined
+				labelledby: bShouldHaveOwnLabelledBy ? {value: oControl.getId(), append: true } : undefined,
+				haspopup: (sHasPopupType === AriaHasPopup.None) ? null : sHasPopupType.toLowerCase()
 			},
 			bIsValid = sHref && oControl._isHrefValid(sHref),
 			bEnabled = oControl.getEnabled(),
@@ -73,12 +89,17 @@
 		/* set href only if link is enabled - BCP incident 1570020625 */
 		if (bIsValid && bEnabled) {
 			oRm.attr("href", sHref);
-		} else {
+		} else if (oControl.getText()) {
+			// Add href only if there's text. Otherwise virtual cursor would stop on the empty link. BCP 2070055617
 			oRm.attr("href", "");
 		}
 
 		if (oControl.getTarget()) {
 			oRm.attr("target", oControl.getTarget());
+		}
+
+		if (sRel) {
+			oRm.attr("rel", sRel);
 		}
 
 		if (oControl.getWidth()) {
@@ -122,7 +143,41 @@
 	 * @param {sap.m.Link} oControl An object representation of the control that should be rendered.
 	 */
 	LinkRenderer.renderText = function(oRm, oControl) {
-		oRm.text(oControl.getText());
+		var sText = oControl.getText();
+
+		if (oControl.getEmptyIndicatorMode() !== EmptyIndicatorMode.Off && !oControl.getText()) {
+			this.renderEmptyIndicator(oRm, oControl);
+		} else {
+			oRm.text(sText);
+		}
+	};
+
+	/**
+	 * Renders the empty text indicator.
+	 *
+	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
+	 * @param {sap.m.Link} oLink An object representation of the control that should be rendered.
+	 */
+	LinkRenderer.renderEmptyIndicator = function(oRm, oLink) {
+		oRm.openStart("span");
+			oRm.class("sapMEmptyIndicator");
+			oRm.class("sapMLnkDsbl");
+			if (oLink.getEmptyIndicatorMode() === EmptyIndicatorMode.Auto) {
+				oRm.class("sapMEmptyIndicatorAuto");
+			}
+			oRm.openEnd();
+			oRm.openStart("span");
+			oRm.attr("aria-hidden", true);
+			oRm.openEnd();
+				oRm.text(oRb.getText("EMPTY_INDICATOR"));
+			oRm.close("span");
+			//Empty space text to be announced by screen readers
+			oRm.openStart("span");
+			oRm.class("sapUiPseudoInvisibleText");
+			oRm.openEnd();
+				oRm.text(oRb.getText("EMPTY_INDICATOR_TEXT"));
+			oRm.close("span");
+		oRm.close("span");
 	};
 
 	return LinkRenderer;

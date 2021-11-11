@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -29,7 +29,7 @@ sap.ui.define([
          * @private
          */
         constructor: function (oValidationRoot, bMultiple) {
-            this.оValidationRoot = oValidationRoot;
+            this.oValidationRoot = oValidationRoot;
             this.bMultiple = bMultiple;
             this._oLogger = _OpaLogger.getLogger("sap.ui.test.selectors._ControlSelectorValidator");
         },
@@ -47,10 +47,10 @@ sap.ui.define([
                 // use a deep copy because _findControls will manipulate the selector object (by changing controlType and adding sOrignalControlType)
                 var aLocatedControls = _ControlFinder._findControls($.extend(true, {}, mSelector));
 
-                if (this.оValidationRoot && aLocatedControls.length > 1) {
+                if (this.oValidationRoot && aLocatedControls.length > 1) {
                     // the control should be unique among siblings
                     aLocatedControls = aLocatedControls.filter(function (oControl) {
-                        return this._hasAncestor(oControl, this.оValidationRoot);
+                        return this._hasAncestor(oControl, this.oValidationRoot);
                     }.bind(this));
                 }
 

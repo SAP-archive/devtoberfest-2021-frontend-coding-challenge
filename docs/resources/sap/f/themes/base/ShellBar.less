@@ -1,8 +1,8 @@
 @_sap_f_ShellBar_PaddingDesktop: 3rem;
 @_sap_f_ShellBar_PaddingTablet: 2rem;
 @_sap_f_ShellBar_PaddingPhone: 1rem;
-@_sap_f_ShellBar_ChildMargin: 4;
-@_sap_f_ShellBar_CoPilotWidth: 48;
+@_sap_f_ShellBar_CoPilotWidth: 3rem;
+@_sap_f_ShellBar_CoPilotHalfWidth: 1.5rem;
 
 @_sap_f_ShellBar_PrimaryTitle_FontSize: @sapMFontMediumSize;
 @_sap_f_ShellBar_SecondTitle_FontSize: @sapMFontSmallSize;
@@ -11,6 +11,59 @@
 	height: 3rem;
 	box-sizing: border-box;
 	overflow: hidden;
+	position: relative;
+	z-index: 1;
+	padding: 0 @_sap_f_ShellBar_PaddingDesktop;
+	display: flex;
+	align-items: center;
+	.sapFShellBarCopilot& {
+		.sapFShellBarORHB {
+			width: 50%;
+			padding-left: ~"calc(@{_sap_f_ShellBar_CoPilotHalfWidth} + 0.5rem)";
+		}
+		.sapFShellBarOLHB {
+			width: 50%;
+			padding-right: ~"calc(@{_sap_f_ShellBar_CoPilotHalfWidth} + 0.5rem)";
+
+		}
+
+	}
+
+	.sapFShellBarOLHB,
+	.sapFShellBarORHB {
+		margin-right: 0;
+		margin-left: 0;
+		display: inline-flex;
+		vertical-align: top;
+		box-sizing: border-box;
+		align-items: center;
+		min-width: 1px;
+		max-width: 100%;
+		height: 100%;
+	}
+
+	.sapFShellBarORHB {
+		padding-left: 0.5rem;
+		flex-grow: 1;
+		flex-shrink: 1;
+	}
+
+	.sapFShellBarOLHB {
+		padding-right: 0.5rem;
+		max-width: 75%;
+		flex-shrink: 0;
+		flex-grow: 0;
+		.sapFShellBarSearchIsOpen& {
+			max-width: 50%;
+		}
+	}
+
+	.sapFShellBarOAHB {
+		flex-shrink: 1;
+		flex-grow: 1;
+		min-width: 1px;
+		max-width: 100%;
+	}
 
 	.sapMBtn.sapFShellBarProfile:focus > .sapMFocusable {
 		outline-offset: -0.125rem;
@@ -22,39 +75,26 @@
 		left: -10000px;
 	}
 
-	.sapFShellBarOTB {
-		height: 3rem;
-		padding: 0 @_sap_f_ShellBar_PaddingDesktop;
-
-		>:first-child {
-			margin-left: 0;
-		}
-
-		:first-child.sapFShellBarHomeIcon {
-			margin-left: 1px;
-		}
-
-		.sapUiHiddenPlaceholder:first-child + * {
-			margin-left: 0;
-		}
-
-		.sapFShellBarOverflowButton {
-			order: 1;
-		}
-
-		.sapFShellBarGridButton {
-			order: 3;
-			margin-right: 0;
-		}
-
-		.sapFShellBarProfile {
-			order: 2;
-		}
-		.sapFShellBarSecondTitle {
-			margin: 0;
-		}
+	.sapMBarChild {
+		flex-shrink: 0;
 	}
 
+	.sapFShellBarItem,
+	.sapMIBar.sapMTB .sapFShellBarItem.sapMBarChild{
+		margin: 0 0 0 0.5rem;
+		flex-shrink: 0;
+		.sapMBtnInner.sapMBtnIconFirst {
+			padding: 0;
+		}
+	}
+	.sapFShellBarOLHB>.sapFShellBarItem:first-child,
+	.sapFShellBarOLHB>.sapFShellBarOAHB:first-child > .sapFShellBarItem:first-child {
+		margin-left: 0;
+	}
+	.sapMIBar.sapMTB .sapMTBSpacer + .sapFShellBarItem.sapMBarChild,
+	.sapFShellBarCopilot + .sapFShellBarItem {
+		margin-left: 0;
+	}
 	.sapMBtn .sapMBtnInner {
 		.sapFAvatar {
 			vertical-align: middle;
@@ -67,14 +107,33 @@
 		}
 	}
 
+	.sapFShellBarOTB.sapMIBar.sapMTB {
+		height: 3rem;
+		padding: 0;
+		flex-shrink: 1;
+		flex-grow: 1;
+		overflow: visible;
+		min-width: 0;
+		>:first-child {
+			margin-left: 0;
+		}
+
+		.sapUiHiddenPlaceholder:first-child + * {
+			margin-left: 0;
+		}
+
+		.sapFShellBarGridButton {
+			margin-right: 0;
+		}
+	}
+
 	.sapFSHMegaMenu {
-		max-width: none;
+		max-width: 100%;
 		display: inline-block;
+		vertical-align: middle;
 		font-weight: bold;
 		overflow: hidden;
 		.sapMBtnInner > img {
-			margin-top: 0.05rem;
-			margin-left: 0.05rem;
 			width: auto !important;
 			max-width: none !important;
 			height: 2rem;
@@ -89,55 +148,65 @@
 
 	.sapFShellBarHomeIcon {
 		height: 2rem;
+		vertical-align: middle;
+		&.sapMNoImg {
+			width: 0;
+		}
 	}
 
 	.sapFShellBarSearch {
-		display: flex;
 		max-width: 28rem; // max width of searchField + button width
-		min-width: 12rem; // min width of searchField + button width
 		width: 100%;
+		flex-grow: 1;
+		flex-shrink: 1;
+		box-sizing: border-box;
 
 		.sapMSF {
 			max-width: 25rem;
-			min-width: 9rem;
 			margin-right: 0.5rem;
+			min-width: auto;
 		}
 
 		.sapFShellBarSearchCancelButton {
 			margin-left: 0.5rem;
+			display: none;
 		}
-		&.sapFShellBarSearchFullWidth {
-			max-width: 100%;
-			margin: 0;
-
-			.sapMSF {
-				max-width: 100%;
-			}
+		.sapFShellBarSearchWrap {
+			display: flex;
+			width: 100%;
 		}
 
+		&.sapFShellBarSearchOpenTick {
+			min-width: 12rem;
+		}
 	}
 
 	.CPImage {
-		width: ~"@{_sap_f_ShellBar_CoPilotWidth}px";
-		height: ~"@{_sap_f_ShellBar_CoPilotWidth}px";
+		width: ~"@{_sap_f_ShellBar_CoPilotWidth}";
+		height: ~"@{_sap_f_ShellBar_CoPilotWidth}";
 		overflow: hidden;
 		cursor: pointer;
 		outline: none;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		margin: 0;
 		html[data-sap-ui-animation='on'] & {
-			&:hover {
+			&:hover svg {
 				transition: transform 0.30s;
 				transform: scale(1.1);
 			}
-			&:active {
+			&:active svg {
 				transition: transform 0.05s;
 				transform: scale(1.2);
 			}
 		}
 		html[data-sap-ui-animation='off'] & {
-			&:hover {
+			&:hover svg {
 				transform: scale(1.1);
 			}
-			&:active {
+			&:active svg {
 				transform: scale(1.2);
 			}
 		}
@@ -156,7 +225,6 @@
 		}
 		html[data-sap-ui-browser^="ie"] &:focus {
 			outline: none;
-			position: relative;
 		}
 		html[data-sap-ui-browser^="ie"] &:focus:before {
 			content: " ";
@@ -173,18 +241,45 @@
 
 	.sapFSHMegaMenu .sapMBtnContent {
 		font-weight: bold;
+		max-width: 100%;
 	}
 
-	&.sapFShellBarSizeTablet .sapFShellBarOTB {
+	&.sapFShellBarSizeTablet{
 		padding: 0 @_sap_f_ShellBar_PaddingTablet;
 	}
 
 	&.sapFShellBarSizePhone {
-		.sapFShellBarOTB {
-			padding: 0 @_sap_f_ShellBar_PaddingPhone;
-		}
+		padding: 0 @_sap_f_ShellBar_PaddingPhone;
 		.sapFShellBarProfile {
 			margin-right: 0;
+		}
+		.sapFShellBarORHB {
+			padding-left: ~"@{_sap_f_ShellBar_CoPilotHalfWidth}";
+		}
+	}
+
+	.sapFShellBarProfile {
+		user-select: none;
+		-ms-user-select: none;
+		margin-left: 0.5rem;
+
+		&::before {
+			content: "";
+			position: absolute;
+			top: -0.125rem;
+			left: -0.125rem;
+			bottom: -0.125rem;
+			right: -0.125rem;
+			z-index: -1;
+			border-radius: @sapUiButtonBorderCornerRadius;
+		}
+
+		&:hover::before {
+			background-color: @sapUiShellHoverBackground;
+		}
+
+		&:active::before {
+			background-color: @sapUiShellActiveBackground;
 		}
 	}
 
@@ -199,7 +294,7 @@
 		background: transparent;
 		color: @sapUiShellTextColor;
 		font-size: @_sap_f_ShellBar_PrimaryTitle_FontSize;
-		line-height: 1rem;
+		line-height: 2.75rem;
 		vertical-align: middle;
 		font-weight: bold;
 	}
@@ -212,37 +307,88 @@
 		vertical-align: middle;
 	}
 
+	.sapFShellBarProfile,
+	.sapFShellBarGridButton,
+	.sapFShellBarSearchWrap .sapMBtn {
+		flex-shrink: 0;
+	}
+
 	.sapUiSizeCompact & {
 		&.sapMPageHeader .sapMIBar {
 			height: 3rem;
 		}
 		.sapFShellBarProfile {
-			padding-top: 0;
-			height: 2.125rem;
-			.sapFAvatar {
-				margin-top: 0;
-			}
-			.sapMBtnInner {
-				height: 2.125rem;
-			}
+			height: 2rem;
 		}
+
 		.sapFShellBarSearch {
 			max-width: 27.5rem; // max width of searchField + button width
-			min-width: 11.5rem; // min width of searchField + button width
+
 			.sapMSF {
 				max-width: 25rem;
-				min-width: 9rem;
+				min-width: auto;
 				margin-right: 0.5rem;
 			}
 
 			&.sapFShellBarSearchFullWidth {
 				max-width: 100%;
-				margin: 0;
-
 				.sapMSF {
 					max-width: 100%;
 				}
 			}
+		}
+		&.sapFShellBarFullSearch {
+			.sapFShellBarSearch,
+			.sapMSF {
+				max-width: 100%;
+			}
+		}
+		.sapMBtnInner {
+			&.sapMBtnIconFirst:not(.sapMBtnText),
+			&.sapMBadgeTopRight.sapMBadge.sapMBtnIconFirst:not(.sapMBtnText){
+				padding: 0;
+			}
+			&.sapMBadgeTopRight.sapMBadge .sapMBadgeIndicator {
+				top: -0.3125rem;
+				right: -0.4375rem;
+				padding-right: 0.125rem;
+				line-height: normal;
+				position: absolute;
+				display: block;
+			}
+		}
+	}
+	&.sapFShellBarFullSearch  {
+		.sapFShellBarOLHB,
+		.sapFShellBarORHB,
+		.sapFShellBarOTB {
+			position: static;
+		}
+		& * {
+			visibility: hidden;
+		}
+		.sapFShellBarSearch,
+		.sapFShellBarSearch * {
+			visibility: visible;
+		}
+		.sapFShellBarSearchWrap {
+			 box-sizing: border-box;
+			 width: 100%;
+			 padding: 0 1.25rem;
+			 position: absolute;
+			 left: 0;
+			 top: 0;
+		 }
+		.sapMSF,
+		.sapFShellBarSearch {
+			max-width: 100%;
+		}
+		.sapFShellBarSearchFullWidth {
+			height: 100%;
+			min-width: 1px;
+		}
+		.sapFShellBarSearchCancelButton {
+			display: block;
 		}
 	}
 }
