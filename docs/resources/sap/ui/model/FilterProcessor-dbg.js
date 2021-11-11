@@ -1,21 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define(['./Filter', 'sap/base/Log', 'sap/ui/Device'],
-	function(Filter, Log, Device) {
+sap.ui.define(['./Filter', 'sap/base/Log'],
+	function(Filter, Log) {
 	"use strict";
-
-	// only use unorm and apply polyfill if needed and when not in a mobile browser
-	// String.prototype.normalize is not available in IE nor in Android webview
-	// As this functionality is used for filtering user input:
-	//  Special characters which require normalization are a rare case for a mobile device keyboard, hence the mobile check
-	if (!String.prototype.normalize && Device.system.desktop) {
-		var NormalizePolyfill = sap.ui.requireSync('sap/base/strings/NormalizePolyfill');
-		NormalizePolyfill.apply();
-	}
 
 	/**
 	 * Helper class for processing of filter objects
@@ -225,29 +216,24 @@ sap.ui.define(['./Filter', 'sap/base/Log', 'sap/ui/Device'],
 	 * @static
 	 */
 	FilterProcessor.normalizeFilterValue = function(oValue, bCaseSensitive){
+		var sResult;
+
 		if (typeof oValue == "string") {
-			var sResult;
 			if (bCaseSensitive === undefined) {
 				bCaseSensitive = false;
 			}
-			sResult = this._normalizeCache[bCaseSensitive][oValue];
-			if (sResult !== undefined) {
-				return sResult;
+			if (this._normalizeCache[bCaseSensitive].hasOwnProperty(oValue)) {
+				return this._normalizeCache[bCaseSensitive][oValue];
 			}
 			sResult = oValue;
 			if (!bCaseSensitive) {
-				// Internet Explorer and Edge cannot uppercase properly on composed characters
-				if (String.prototype.normalize && (Device.browser.msie || Device.browser.edge)) {
-					sResult = sResult.normalize("NFKD");
-				}
 				sResult = sResult.toUpperCase();
 			}
 
 			// use canonical composition as recommended by W3C
 			// http://www.w3.org/TR/2012/WD-charmod-norm-20120501/#sec-ChoiceNFC
-			if (String.prototype.normalize) {
-				sResult = sResult.normalize("NFC");
-			}
+			sResult = sResult.normalize("NFC");
+
 			this._normalizeCache[bCaseSensitive][oValue] = sResult;
 			return sResult;
 		}
