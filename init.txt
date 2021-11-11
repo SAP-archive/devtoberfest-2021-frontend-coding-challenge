@@ -1,0 +1,99 @@
+npm install -g npm 
++ npm@8.1.3
+added 218 packages from 96 contributors in 5.072s
+
+npm outdated
+npm update
+--> nothing changed
+
+node ➜ (1-init ✗) $ npm install -g npm-check-updates
+/usr/local/share/npm-global/bin/ncu -> /usr/local/share/npm-global/lib/node_modules/npm-check-updates/build/src/bin/cli.js
+/usr/local/share/npm-global/bin/npm-check-updates -> /usr/local/share/npm-global/lib/node_modules/npm-check-updates/build/src/bin/cli.js
++ npm-check-updates@12.0.2
+added 270 packages from 153 contributors in 43.99s
+node ➜ (1-init ✗) $ ncu -u
+Using yarn
+Upgrading/package.json
+[====================] 9/9 100%
+
+ @ui5/cli                   ^2.11.2  →  ^2.14.0     
+ karma                       ^6.3.4  →   ^6.3.8     
+ prettier                    ^2.3.2  →   ^2.4.1     
+ ui5-middleware-livereload   ^0.5.4  →   ^0.5.8     
+
+
+npm i
+
+
+ https://sap.github.io/ui5-tooling/pages/CLI/
+
+ node ➜ (1-init ✗) $ ui5 use sapui5@latest
+INFO: Using local @ui5/cli installation
+-->
+Updated configuration written to ui5.yaml
+This project is now using SAPUI5 version 1.96.0
+
+node ➜ (1-init) $ npm install --global @ui5/cli
+-->
++ @ui5/cli@2.14.0
+updated 1 package in 24.062s
+
+
+node ➜ (2-performance ✗) $ ui5 versions
+INFO: Using local @ui5/cli installation
+-->
+@ui5/cli:      2.14.0
+@ui5/builder:  2.11.1
+@ui5/server:   2.4.0
+@ui5/fs:       2.0.6
+@ui5/project:  2.6.0
+@ui5/logger:   2.0.1
+
+
+"2.6" Unsupported "specVersion"
+Your UI5 CLI installation might be outdated.
+Supported specification versions: "2.2", "2.1", "2.0", "1.1", "1.0", "0.1"
+For details see: https://sap.github.io/ui5-tooling/pages/Configuration/#specification-versions
+
+Request URL: https://digitalmarketplace-sapcpprd.s3.eu-central-1.amazonaws.com/a4OooLtN_eA6YFJtJUgx4_CYvcuWIS2_5rRXY_2-QpLqC15nVTGmmAJOYXznoxre@2.svg
+Request method: GET
+Status code: 403 Forbidden
+Remote address: 141.42.5.215:8080
+Referrer policy: strict-origin-when-cross-origin
+
+CORS issue
+ "ui5-middleware-simpleproxy",
+
+        # - name: ui5-middleware-simpleproxy
+        #   mountPath: /resources/
+        #   afterMiddleware: compression
+        #   configuration:
+        #   baseUri: https://sapui5.hana.ondemand.com/resources/
+ui5.yaml
+        "ui5-middleware-livereload": "^0.5.8",
+        "ui5-middleware-simpleproxy": "*"
+    },
+    "ui5": {
+        "dependencies": [
+            "ui5-middleware-livereload",
+            "ui5-middleware-simpleproxy"
+        ]
+    }
+
+issue: manifest.json
+if I set this properties, the text won't translated !?
+					"supportedLocales": ["en", "de"],
+					"fallbackLocale": "en"
+
+ issue:            src="https://sapui5.hana.ondemand.com/1.96.0/resources/sap-ui-core.js"
+setting this url caused a preload-component.js error msg 
+
+info normalizer:translators:ui5Framework Using SAPUI5 version: 1.96.0
+info normalizer:ui5Framework:npm:Installer Installing missing package @sapui5/distribution-metadata...
+info normalizer:ui5Framework:npm:Installer Installing missing package @openui5/sap.ui.core...
+info normalizer:ui5Framework:npm:Installer Installing missing package @openui5/sap.m...
+info normalizer:ui5Framework:npm:Installer Installing missing package @openui5/sap.f...
+info normalizer:ui5Framework:npm:Installer Installing missing package @openui5/sap.tnt...
+info normalizer:ui5Framework:npm:Installer Installing missing package @openui5/sap.ui.layout...
+info normalizer:ui5Framework:npm:Installer Installing missing package @openui5/themelib_sap_fiori_3...
+info normalizer:ui5Framework:npm:Installer Installing missing package @openui5/sap.ui.unified...
