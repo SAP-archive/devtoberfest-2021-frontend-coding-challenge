@@ -3,16 +3,31 @@
 /* Quartz High Contrast Black theme  */
 /* ================================= */
 
-@_sap_f_Card_HeaderHoverColor: @sapUiTileHoverBackground;
-@_sap_f_Card_HeaderActiveColor: @sapUiTileActiveBackground;
-@_sap_f_Card_FocusBorderWidth: 0.125rem;
+@_sap_f_Card_BoxShadow: none;
+@_sap_f_Card_HeaderFocusBorderBottomOffset: 2px;
+@_sap_f_Card_Badge_Background: @sapHighlightColor;
+@_sap_f_Card_Badge_Border: 0.0625rem solid @sapContent_ForegroundBorderColor;
 
-.sapFCard .sapFCardHeader {
-  border-bottom: 1px solid @sapUiTileBorderColor;
-
-  .sapFCardIcon.sapFAvatar{
-	.sapUiIcon {
-	  color: @sapUiContentIconColor;
+.sapFCard .sapFCardHeader.sapFCardClickable {
+	&:hover {
+		.sapFCardHeaderMainIndicator {
+			.sapMNCValue,
+			.sapMNCIndicator,
+			.sapMNCScale,
+			.sapMNCIndIcon {
+				color: @sapUiContentContrastTextColor;
+			}
+		}
 	}
-  }
+
+	&:active {
+		.sapFCardHeaderMainIndicator {
+			.sapMNCValue,
+			.sapMNCIndicator,
+			.sapMNCScale,
+			.sapMNCIndIcon {
+				color: @sapUiContentContrastTextColor;
+			}
+		}
+	}
 }

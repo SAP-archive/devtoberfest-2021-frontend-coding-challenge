@@ -14,7 +14,7 @@
 	box-sizing: border-box;
 	border-radius: 0.375rem;
 	background: @sapUiButtonBackground;
-	border: 0.0625em solid @sapUiButtonBorderColor;
+	border: @sapUiListBorderWidth solid @sapUiButtonBorderColor;
 }
 
 html.sap-desktop .sapMLIBContent > .sapMGrowingListTrigger:hover {
@@ -32,11 +32,6 @@ html.sap-desktop .sapMGrowingList > .sapMCLI {
 
 html.sap-desktop .sapMGrowingList  .sapMCLI.sapMLIB.sapMLIB-CTX:focus{
 	outline:none;
-}
-
-/* avoid double focus borders in IE */
-html.sap-desktop .sapMGrowingList .sapMLIBLegacyOutline:focus::before {
-	border: none;
 }
 
 html.sap-desktop .sapMLIB-CTX:focus .sapMGrowingListTrigger {

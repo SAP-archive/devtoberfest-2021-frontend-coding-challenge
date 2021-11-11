@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -15,6 +15,8 @@ sap.ui.define([
 	function(EventProvider, ChangeReason, DataState, Log, each) {
 	"use strict";
 
+	var timeout;
+	var aDataStateCallbacks = [];
 
 	/**
 	 * Constructor for Binding class.
@@ -48,6 +50,8 @@ sap.ui.define([
 			this.bInitial = false;
 			this.bSuspended = false;
 			this.oDataState = null;
+			// whether this binding does not propagate model messages to the control
+			this.bIgnoreMessages = undefined;
 		},
 
 		metadata : {
@@ -93,17 +97,23 @@ sap.ui.define([
 	 */
 
 	/**
-	 * The <code>change</code> event is fired, when the data of the binding is changed from the model.
-	 * The <code>reason</code> parameter of the event provides a hint where the change came from.
+	 * The <code>change</code> event is fired, when the model data are changed. The optional
+	 * <code>reason</code> parameter of the event provides a hint where the change came from.
 	 *
-	 * Note: Subclasses might add additional parameters to the event object. Optional parameters can be omitted.
+	 * Note: Subclasses might add additional parameters to the event object.
 	 *
 	 * @name sap.ui.model.Binding#change
 	 * @event
-	 * @param {sap.ui.base.Event} oEvent The event object
-	 * @param {sap.ui.base.EventProvider} oEvent.getSource The object on which the event initially occurred
-	 * @param {object} oEvent.getParameters Object containing all event parameters
-	 * @param {string} [oEvent.getParameters.reason] A string stating the reason for the data change. Can be any string and new values can be added in the future.
+	 * @param {sap.ui.base.Event} oEvent
+	 *   The event object
+	 * @param {sap.ui.base.EventProvider} oEvent.getSource
+	 *   The object on which the event initially occurred
+	 * @param {object} oEvent.getParameters
+	 *   Object containing all event parameters
+	 * @param {string} [oEvent.getParameters.reason]
+	 *   A string stating the reason for the data change. Some change reasons can be found in
+	 *   {@link sap.ui.model.ChangeReason}, but there may be additional reasons specified by a
+	 *   specific model implementation.
 	 * @public
 	 */
 
@@ -141,7 +151,7 @@ sap.ui.define([
 	 * Returns the model path to which this binding binds.
 	 *
 	 * Might be a relative or absolute path. If it is relative, it will be resolved relative
-	 * to the context as returned by {@link getContext()}.
+	 * to the context as returned by {@link #getContext}.
 	 *
 	 * @returns {string} Binding path
 	 * @public
@@ -163,15 +173,31 @@ sap.ui.define([
 	};
 
 	/**
-	 * Setter for context
-	 * @param {Object} oContext the new context object
+	 * Setter for a new context.
+	 *
+	 * @param {sap.ui.model.Context} oContext
+	 *   The new context object
+	 * @param {Object<string,any>} [mParameters]
+	 *   Additional map of binding specific parameters
+	 * @param {string} [mParameters.detailedReason]
+	 *   A detailed reason for the {@link #event:change change} event
+	 *
+	 * @private
 	 */
-	Binding.prototype.setContext = function(oContext) {
+	Binding.prototype.setContext = function (oContext, mParameters) {
+		var mChangeParameters;
+
 		if (this.oContext != oContext) {
-			sap.ui.getCore().getMessageManager().removeMessages(this.getDataState().getControlMessages(), true);
+			sap.ui.getCore().getMessageManager()
+				.removeMessages(this.getDataState().getControlMessages(), true);
 			this.oContext = oContext;
-			this.oDataState = null;
-			this._fireChange({reason : ChangeReason.Context});
+			this.getDataState().reset();
+			this.checkDataState();
+			mChangeParameters = {reason : ChangeReason.Context};
+			if (mParameters && mParameters.detailedReason) {
+				mChangeParameters.detailedReason = mParameters.detailedReason;
+			}
+			this._fireChange(mChangeParameters);
 		}
 	};
 
@@ -202,6 +228,76 @@ sap.ui.define([
 	 */
 	Binding.prototype.getModel = function() {
 		return this.oModel;
+	};
+
+	/**
+	 * Provides the resolved path for this binding's path and context and returns it, or
+	 * <code>undefined</code> if the binding is not resolved or has no model.
+	 *
+	 * @returns {string|undefined} The resolved path
+	 *
+	 * @public
+	 * @since 1.88.0
+	 */
+	Binding.prototype.getResolvedPath = function () {
+		return this.oModel ? this.oModel.resolve(this.sPath, this.oContext) : undefined;
+	};
+
+	/**
+	 * Whether this binding does not propagate model messages to the control. By default, all
+	 * bindings propagate messages. If a binding wants to support this feature, it has to override
+	 * {@link #supportsIgnoreMessages}, which returns <code>true</code>.
+	 *
+	 * For example, a binding for a currency code is used in a composite binding for rendering the
+	 * proper number of decimals, but the currency code is not displayed in the attached control. In
+	 * that case, messages for the currency code shall not be displayed at that control, only
+	 * messages for the amount.
+	 *
+	 * @returns {boolean|undefined}
+	 *   Whether this binding does not propagate model messages to the control; returns
+	 *   <code>undefined</code> if the corresponding binding parameter is not set, which means that
+	 *   model messages are propagated to the control
+	 *
+	 * @public
+	 * @since 1.82.0
+	 */
+	Binding.prototype.getIgnoreMessages = function () {
+		if (this.bIgnoreMessages === undefined) {
+			return undefined;
+		}
+		return this.bIgnoreMessages && this.supportsIgnoreMessages();
+	};
+
+	/**
+	 * Sets the indicator whether this binding does not propagate model messages to the control.
+	 *
+	 * @param {boolean} bIgnoreMessages
+	 *   Whether this binding does not propagate model messages to the control
+	 *
+	 * @public
+	 * @see #getIgnoreMessages
+	 * @see #supportsIgnoreMessages
+	 * @since 1.82.0
+	 */
+	Binding.prototype.setIgnoreMessages = function (bIgnoreMessages) {
+		this.bIgnoreMessages = bIgnoreMessages;
+	};
+
+	/**
+	 * Whether this binding supports the feature of not propagating model messages to the control.
+	 * The default implementation returns <code>false</code>.
+	 *
+	 * @returns {boolean}
+	 *   <code>false</code>; subclasses that support this feature need to override this function and
+	 *   need to return <code>true</code>
+	 *
+	 * @public
+	 * @see #getIgnoreMessages
+	 * @see #setIgnoreMessages
+	 * @since 1.82.0
+	 */
+	Binding.prototype.supportsIgnoreMessages = function () {
+		return false;
 	};
 
 	// Eventing and related
@@ -237,16 +333,6 @@ sap.ui.define([
 		if (!this.hasListeners("change")) {
 			this.oModel.removeBinding(this);
 		}
-	};
-
-	/**
-	 * Fires event {@link #event:DataStateChange DataStateChange} to attached listeners.
-	 * @param {object}
-	 *         oParameters Parameters to pass along with the event
-	 * @private
-	 */
-	Binding.prototype._fireDataStateChange = function(oParameters) {
-		this.fireEvent("DataStateChange", oParameters);
 	};
 
 	/**
@@ -469,19 +555,24 @@ sap.ui.define([
 	};
 
 	/**
-	 * Check if the binding can be resolved. This is true if the path is absolute or the path is relative and a context is specified.
-	 * @private
+	 * Returns whether the binding is resolved, which means the binding's path is absolute or the
+	 * binding has a model context.
+	 *
+	 * @returns {boolean} Whether the binding is resolved
+	 *
+	 * @public
+	 * @see #getContext
+	 * @see #getPath
+	 * @see #isRelative
+	 * @since 1.79.0
 	 */
 	Binding.prototype.isResolved = function() {
-		if (this.bRelative && !this.oContext) {
-			return false;
-		}
-		return true;
+		return !this.bRelative || !!this.oContext;
 	};
 
 	/**
 	 * Returns whether the binding is initial, which means it did not get an initial value yet
-	 * @returns {boolean} Whether binding is initial
+	 * @returns {boolean} Whether the binding is initial
 	 * @public
 	 */
 	Binding.prototype.isInitial = function() {
@@ -490,7 +581,7 @@ sap.ui.define([
 
 	/**
 	 * Returns whether the binding is relative, which means its path does not start with a slash ('/')
-	 * @returns {boolean} Whether binding is relative
+	 * @returns {boolean} Whether the binding is relative
 	 * @public
 	 */
 	Binding.prototype.isRelative = function() {
@@ -592,7 +683,7 @@ sap.ui.define([
 	/**
 	 * Returns true if the binding is suspended or false if not.
 	 *
-	 * @returns {boolean} Whether binding is suspended
+	 * @returns {boolean} Whether the binding is suspended
 	 * @public
 	 */
 	Binding.prototype.isSuspended = function() {
@@ -613,17 +704,109 @@ sap.ui.define([
 	};
 
 	/**
-	 * Removes all control messages for this binding from the MessageManager in addition to the standard clean-up tasks.
+	 * Removes all control messages for this binding from the MessageManager in addition to the
+	 * standard clean-up tasks.
 	 * @see sap.ui.base.EventProvider#destroy
 	 *
 	 * @public
 	 */
 	Binding.prototype.destroy = function() {
+		var oDataState = this.oDataState;
+
+		if (this.bIsBeingDestroyed) { // avoid endless recursion
+			return;
+		}
 		this.bIsBeingDestroyed = true;
-		sap.ui.getCore().getMessageManager().removeMessages(this.getDataState().getControlMessages(), true);
+
+		if (oDataState) {
+			sap.ui.getCore().getMessageManager()
+				.removeMessages(oDataState.getControlMessages(), true);
+			oDataState.setModelMessages();
+			if (oDataState.changed()) {
+				// notify controls synchronously that data state changed
+				this.fireEvent("DataStateChange", {dataState : oDataState});
+				this.fireEvent("AggregatedDataStateChange", {dataState : oDataState});
+			}
+			delete this.oDataState;
+		}
 		EventProvider.prototype.destroy.apply(this, arguments);
-		this.bIsBeingDestroyed = false;
 	};
+
+	/**
+	 * Checks whether an update of the data state of this binding is required.
+	 *
+	 * @param {map} mPaths A Map of paths to check if update needed
+	 * @private
+	 */
+	Binding.prototype.checkDataState = function(mPaths) {
+		this._checkDataState(this.getResolvedPath(), mPaths);
+	};
+
+	/**
+	 * Checks whether an update of the data state of this binding is required with the given path.
+	 *
+	 * @param {string} sResolvedPath With help of the connected model resolved path
+	 * @param {map} mPaths A Map of paths to check if update needed
+	 * @private
+	 */
+	Binding.prototype._checkDataState = function(sResolvedPath, mPaths) {
+		if (!mPaths || sResolvedPath && sResolvedPath in mPaths) {
+			var that = this;
+			var oDataState = this.getDataState();
+
+			var fireChange = function() {
+				that.fireEvent("AggregatedDataStateChange", { dataState: oDataState });
+				oDataState.changed(false);
+				that.bFiredAsync = false;
+			};
+
+			if (!this.getIgnoreMessages()) {
+				this._checkDataStateMessages(oDataState, sResolvedPath);
+			}
+
+			if (oDataState && oDataState.changed()) {
+				if (this.mEventRegistry["DataStateChange"]) {
+					this.fireEvent("DataStateChange", { dataState: oDataState });
+				}
+				if (this.bIsBeingDestroyed) {
+					fireChange();
+				} else if (this.mEventRegistry["AggregatedDataStateChange"] && !this.bFiredAsync) {
+					fireDataStateChangeAsync(fireChange);
+					this.bFiredAsync = true;
+				}
+			}
+		}
+	};
+
+	/**
+	 * Sets the given data state's model messages to the messages for the given resolved path in the
+	 * binding's model.
+	 *
+	 * @param {sap.ui.model.DataState} oDataState The binding's data state
+	 * @param {string} [sResolvedPath] The binding's resolved path
+	 * @private
+	 */
+	Binding.prototype._checkDataStateMessages = function(oDataState, sResolvedPath) {
+		if (sResolvedPath) {
+			oDataState.setModelMessages(this.oModel.getMessagesByPath(sResolvedPath));
+		} else {
+			oDataState.setModelMessages([]);
+		}
+	};
+
+	function fireDataStateChangeAsync(callback) {
+		if (!timeout) {
+			timeout = setTimeout(function() {
+				timeout = undefined;
+				var aCallbacksCopy = aDataStateCallbacks;
+				aDataStateCallbacks = [];
+				aCallbacksCopy.forEach(function(cb) {
+					cb();
+				});
+			}, 0);
+		}
+		aDataStateCallbacks.push(callback);
+	}
 
 	return Binding;
 
