@@ -1,58 +1,41 @@
-<mvc:View controllerName="com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.MainView"
-  displayBlock="true" xmlns="sap.m" xmlns:f="sap.f" xmlns:tnt="sap.tnt" xmlns:core="sap.ui.core"
+<mvc:View controllerName="com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.MainView" displayBlock="true"
+  xmlns="sap.m"
+  xmlns:tnt="sap.tnt"
+  xmlns:core="sap.ui.core"
   xmlns:mvc="sap.ui.core.mvc">
-  <!-- xmlns:aow="aow.artifact.control" -->
   <tnt:ToolPage id="toolPage">
     <tnt:header>
-      
-      <tnt:ToolHeader>
-        <Image src="resources/img/favicon.ico">
+
+      <tnt:ToolHeader id="_IDGenToolHeader1">
+        <Image id="_IDGenImage1" src="resources/img/favicon.ico">
           <layoutData>
-            <OverflowToolbarLayoutData priority="Disappear" />
+            <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData1" priority="Disappear" />
           </layoutData>
         </Image>
-        <Text text="{i18n>title}" wrapping="false">
+        <Text id="_IDGenText1" text="{i18n>title}" wrapping="false">
           <layoutData>
-            <OverflowToolbarLayoutData priority="NeverOverflow" />
+            <OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData2" priority="NeverOverflow" />
           </layoutData>
         </Text>
-        <ToolbarSpacer />
-        <Image src="resources/img/github.png" height="50%" press="goToRepo" />
-        <Link text="{i18n>forkMe}" target="_blank"
-          href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge"
-          visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }" class="sapUiMediumMarginEnd" />
-        <core:Icon id="barDarkIcon" visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }"
-          src="sap-icon://energy-saving-lightbulb" color="{= !${settings>/lightTheme} ? '#f9d001' : ''}"
-          tooltip="{i18n>dark}" />
-        <Switch id="barThemeSwitch" visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }"
-          state="{settings>/lightTheme}" customTextOff="{i18n>dark}" customTextOn="{i18n>light}" change="onToggleTheme"
-          tooltip="{= ${settings>/lightTheme} ? ${i18n>dark} : ${i18n>light} }" />
-        <core:Icon id="barLightIcon" visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }"
-          src="sap-icon://circle-task-2" color="{= ${settings>/lightTheme} ? '#f9d001' : ''}" tooltip="{i18n>light}"
-          class="sapUiMediumMarginEnd" />
+        <ToolbarSpacer id="_IDGenToolbarSpacer1" />
+        <Image id="_IDGenImage2" src="resources/img/github.png" height="50%" />
+        <Link id="_IDGenLink1" text="{i18n>forkMe}" target="_blank" href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge" visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }" class="sapUiMediumMarginEnd" />
+        <core:Icon id="barDarkIcon" visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }" src="sap-icon://energy-saving-lightbulb" color="{= !${settings>/lightTheme} ? '#f9d001' : ''}" tooltip="{i18n>dark}" />
+        <Switch id="barThemeSwitch" visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }" state="{settings>/lightTheme}" customTextOff="{i18n>dark}" customTextOn="{i18n>light}" change="onToggleTheme" tooltip="{= ${settings>/lightTheme} ? ${i18n>dark} : ${i18n>light} }" />
+        <core:Icon id="barLightIcon" visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }" src="sap-icon://circle-task-2" color="{= ${settings>/lightTheme} ? '#f9d001' : ''}" tooltip="{i18n>light}" class="sapUiMediumMarginEnd" />
       </tnt:ToolHeader>
     </tnt:header>
     <tnt:mainContents>
       <ScrollContainer id="all-page" horizontal="false" vertical="true" height="100%">
-
-        <MessageStrip text="{i18n>performanceNote}" type="Warning" showIcon="true" showCloseButton="true"
-          class="sapUiSmallMarginTopBottom">
-          <link>
-          <Link text="{i18n>performanceNoteLink}" target="_blank"
-            href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge" />
-          </link>
-        </MessageStrip>
         <List id="all-list" items="{sample>/}">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
-              <Title id="all-bar-info" text="{i18n>SAP BTP Services}" level="H4" />
+              <Title id="all-bar-info" text="{i18n>sapBtpServices}" level="H4" />
               <ToolbarSpacer id="all-bar-spacer" />
-              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>Search for the name or description}"
-                liveChange=".liveSearch" />
+              <SearchField id="all-bar-search" width="60%" placeholder="{i18n>searchForTheNameOrDescription}" liveChange=".liveSearch" />
             </OverflowToolbar>
           </headerToolbar>
-          <StandardListItem title="{sample>name}" description="{sample>description}" infoState="Information"
-            icon="{sample>icon}" info="{sample>category}" />
+          <StandardListItem id="_IDGenStandardListItem1" title="{sample>name}" description="{sample>description}" infoState="Information" icon="{sample>icon}" info="{sample>category}" />
         </List>
       </ScrollContainer>
     </tnt:mainContents>
