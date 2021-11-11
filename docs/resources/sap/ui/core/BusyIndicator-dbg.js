@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -9,7 +9,6 @@ sap.ui.define([
 	'sap/ui/thirdparty/jquery',
 	'../base/EventProvider',
 	'./Popup',
-	'./Core',
 	'./BusyIndicatorUtils',
 	'sap/ui/core/library',
 	"sap/ui/performance/trace/FESR",
@@ -22,7 +21,6 @@ sap.ui.define([
 		jQuery,
 		EventProvider,
 		Popup,
-		Core,
 		BusyIndicatorUtils,
 		library,
 		FESR,
@@ -40,11 +38,11 @@ sap.ui.define([
 	 * Provides methods to show or hide a waiting animation covering the whole
 	 * page and blocking user interaction.
 	 * @namespace
-	 * @version 1.76.0
+	 * @version 1.96.0
 	 * @public
 	 * @alias sap.ui.core.BusyIndicator
 	 */
-	var BusyIndicator = jQuery.extend( new EventProvider(), {
+	var BusyIndicator = Object.assign( new EventProvider(), {
 		oPopup: null,
 		oDomRef: null,
 		bOpenRequested: false,
@@ -103,11 +101,6 @@ sap.ui.define([
 	 * @private
 	 */
 	BusyIndicator._init = function() {
-		// Create the graphics element
-		// inserts 2 divs:
-		// 1. an empty one which will contain the old indicator (used in goldreflection)
-		// 2. a div containing the new standard busy indicator (used in bluecrystal)
-
 		var oRootDomRef = document.createElement("div");
 		oRootDomRef.id = this.sDOM_ID;
 
@@ -127,13 +120,8 @@ sap.ui.define([
 		oBusyElement.setAttribute("title", sTitle);
 		oRootDomRef.appendChild(oBusyElement);
 
-		// Render into invisible area, so the size settings from CSS are applied
-		var oInvisible = sap.ui.getCore().getStaticAreaRef();
-		oInvisible.appendChild(oRootDomRef);
-
 		this.oDomRef = oRootDomRef;
 
-		//TODO how could this be destroyed? Who can/will destroy this?
 		this.oPopup = new Popup(oRootDomRef);
 		this.oPopup.setModal(true, "sapUiBlyBusy");
 		this.oPopup.setShadow(false);
@@ -151,7 +139,7 @@ sap.ui.define([
 	 */
 	BusyIndicator._onOpen = function(oEvent) {
 		// Grab the focus once opened
-		var oDomRef = (BusyIndicator.sDOM_ID ? window.document.getElementById(BusyIndicator.sDOM_ID) : null);
+		var oDomRef = document.getElementById(BusyIndicator.sDOM_ID);
 		oDomRef.style.height = "100%";
 		oDomRef.style.width = "100%";
 
@@ -162,8 +150,6 @@ sap.ui.define([
 		if (oDomRef) {
 			oDomRef.focus();
 		}
-
-		jQuery("body").attr("aria-busy", true);
 
 		// allow an event handler to do something with the indicator
 		// and fire it after everything necessary happened
@@ -287,8 +273,6 @@ sap.ui.define([
 		bi.bOpenRequested = false;
 
 		if (bi.oDomRef) { // only if the BusyIndicator was shown before!
-			jQuery("body").removeAttr("aria-busy");
-
 			// setting the BusyIndicator's DOM to invisible is not
 			// necessary here - it will be done by the Popup in 'oPopup.close(0)'
 
@@ -319,7 +303,7 @@ sap.ui.define([
 	 * @param {object}
 	 *            [oListener] Context object to call the event handler with; defaults to
 	 *            <code>sap.ui.core.BusyIndicator</code>
-	 * @returns {sap.ui.core.BusyIndicator} Reference to <code>this</code> in order to allow method chaining
+	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 	 * @public
 	 */
 	BusyIndicator.attachOpen = function(fnFunction, oListener) {
@@ -334,7 +318,7 @@ sap.ui.define([
 	 *            fnFunction The callback function to unregister
 	 * @param {object}
 	 *            [oListener] Context object on which the given function had to be called
-	 * @returns {sap.ui.core.BusyIndicator} Reference to <code>this</code> in order to allow method chaining
+	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 	 * @public
 	 */
 	BusyIndicator.detachOpen = function(fnFunction, oListener) {
@@ -353,7 +337,7 @@ sap.ui.define([
 	 * @param {object}
 	 *            [oListener] Context object to call the event handler with; defaults to
 	 *            <code>sap.ui.core.BusyIndicator</code>
-	 * @returns {sap.ui.core.BusyIndicator} Reference to <code>this</code> in order to allow method chaining
+	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 	 * @public
 	 */
 	BusyIndicator.attachClose = function(fnFunction, oListener) {
@@ -368,7 +352,7 @@ sap.ui.define([
 	 *            fnFunction The callback function to unregister
 	 * @param {object}
 	 *            [oListener] Context object on which the given function had to be called
-	 * @returns {sap.ui.core.BusyIndicator} Reference to <code>this</code> in order to allow method chaining
+	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 	 * @public
 	 */
 	BusyIndicator.detachClose = function(fnFunction, oListener) {
