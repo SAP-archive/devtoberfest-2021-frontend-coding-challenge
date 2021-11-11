@@ -1,12 +1,12 @@
 <mvc:View controllerName="com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.MainView"
-  displayBlock="true" xmlns="sap.m" xmlns:f="sap.f" xmlns:tnt="sap.tnt" xmlns:core="sap.ui.core"
+  displayBlock="true" xmlns="sap.m" xmlns:tnt="sap.tnt" xmlns:core="sap.ui.core"
   xmlns:mvc="sap.ui.core.mvc">
   <!-- xmlns:aow="aow.artifact.control" -->
   <tnt:ToolPage id="toolPage">
     <tnt:header>
       
       <tnt:ToolHeader>
-        <Image src="resources/img/favicon.ico" width="48px" height="48px">
+        <Image src="resources/img/favicon.ico">
           <layoutData>
             <OverflowToolbarLayoutData priority="Disappear" />
           </layoutData>
@@ -17,7 +17,7 @@
           </layoutData>
         </Text>
         <ToolbarSpacer />
-        <Image src="resources/img/github.png" height="22px" width="22px" press="goToRepo" />
+        <Image src="resources/img/github.png" height="50%" press="goToRepo" />
         <Link text="{i18n>forkMe}" target="_blank"
           href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge"
           visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }" class="sapUiMediumMarginEnd" />
@@ -34,10 +34,10 @@
     </tnt:header>
     <tnt:mainContents>
       <ScrollContainer id="all-page" horizontal="false" vertical="true" height="100%">
-        <List id="all-list" items="{sample>/}">
+        <List id="all-list" items="{sample>/}" growing="true" growingScrollToLoad="true" growingThreshold="15">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
-              <Title id="all-bar-info" text="{i18n>btpservices}" level="H4" />
+              <Title id="all-bar-info" text="{i18n>btpservices}" level="H4" /> 
               <ToolbarSpacer id="all-bar-spacer" />
               <SearchField id="all-bar-search" width="60%" placeholder="{i18n>search}"
                 liveChange=".liveSearch" />
