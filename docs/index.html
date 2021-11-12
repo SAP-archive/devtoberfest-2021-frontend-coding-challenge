@@ -5,28 +5,12 @@
 
         <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
 
-        <script id="sap-ui-bootstrap" src="resources/sap-ui-custom.js" data-sap-ui-theme="sap_fiori_3" data-sap-ui-resourceroots="{
+        <script id="sap-ui-bootstrap" src="resources/sap-ui-custom.js" data-sap-ui-libs="sap.ui.core" data-sap-ui-preload="true" data-sap-ui-theme="sap_fiori_3" data-sap-ui-resourceroots="{
         &quot;com.devtoberfest.devtoberfest2021FrontendCodingChallenge&quot;: &quot;./&quot;
-      }" data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatversion="edge" data-sap-ui-frameoptions="trusted"></script>
-
-        <script>
-            sap.ui.getCore().attachInit(function () {
-                sap.ui.require(
-                    ["sap/ui/core/ComponentContainer"],
-                    function (ComponentContainer) {
-                        new ComponentContainer({
-                            name: "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
-                            manifest: true,
-                            height: "100%",
-                        }).placeAt("content");
-                    }
-                );
-            });
-        </script>
+      }" data-sap-ui-oninit="module:sap/ui/core/ComponentSupport" data-sap-ui-compatversion="edge" data-sap-ui-async="true" data-sap-ui-frameoptions="trusted"></script>
     </head>
-
     <body class="sapUiBody" role="application">
-        <div id="content"></div>
+        <div data-sap-ui-component="" data-name="com.devtoberfest.devtoberfest2021FrontendCodingChallenge" data-id="container" data-settings="{&quot;id&quot; : &quot;devtoberfest&quot;}">
     
 
-</body></html>
+</div></body></html>
