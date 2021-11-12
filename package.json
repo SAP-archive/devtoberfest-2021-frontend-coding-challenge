@@ -5,7 +5,7 @@
     "author": "SAP SE",
     "license": "Apache-2.0",
     "scripts": {
-        "start": "ui5 serve --open index.html",
+        "start": "ui5 serve --open index.html ",
         "serve": "ui5 serve",
         "build": "ui5 build --clean-dest --dest docs self-contained --all ",
         "prettier": "prettier -w .",
