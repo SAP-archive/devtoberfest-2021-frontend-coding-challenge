@@ -1,6 +1,0 @@
-/*!
- * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
- * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
- */
-sap.ui.define(["sap/f/cards/DataProvider","jquery.sap.global","sap/base/Log"],function(e,t,r){"use strict";var i=["no-cors","same-origin","cors"];var s=["GET","POST"];var a=e.extend("sap.f.cards.RequestDataProvider");a.prototype.getData=function(){var e=this.getSettings().request;if(this._oDestinations){return this._oDestinations.process(e).then(this._fetch.bind(this))}return this._fetch(e)};a.prototype._isValidRequest=function(e){if(!e){return false}if(i.indexOf(e.mode)===-1){return false}if(s.indexOf(e.method)===-1){return false}if(typeof e.url!=="string"){return false}return true};a.prototype._fetch=function(e){var i="Invalid request";return new Promise(function(s,a){if(!e){r.error(i);a(i);return}var n={mode:e.mode||"cors",url:e.url,method:e.method&&e.method.toUpperCase()||"GET",data:e.parameters,headers:e.headers,timeout:15e3,xhrFields:{withCredentials:!!e.withCredentials}};if(n.method==="GET"){n.dataType="json"}if(this._isValidRequest(n)){t.ajax(n).done(function(e){s(e)}).fail(function(e,t,r){a(r)})}else{r.error(i);a(i)}}.bind(this))};return a});

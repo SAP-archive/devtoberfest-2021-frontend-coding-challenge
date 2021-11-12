@@ -31,6 +31,21 @@
 	box-sizing: border-box;
 	background: @sapUiObjectHeaderBackground;
 
+	.sapFDynamicPageToggleHeaderIndicator.sapUiHidden {
+		display: none;
+	}
+
+	.sapFDynamicPageTitleMain > .sapFDynamicPageTitleMainInner {
+		.sapFDynamicPageTitleMainContent .sapMTB {
+			padding-left: 0.5rem;
+			padding-right: 0.5rem;
+		}
+
+		.sapFDynamicPageTitleMainActions {
+			padding-left: 0.5rem;
+		}
+	}
+
 	html.sap-desktop & {
 		&.sapFDynamicPageTitleFocus {
 			outline: 0.0625rem dotted @sapUiContentFocusColor;
@@ -108,12 +123,13 @@
 	}
 }
 
-.sapFDynamicPageTitle .sapFDynamicPageTitleMainContent .sapMTB .sapMBarChild {
-	&.sapMBarLastVisibleChild,
-	&.sapMBarFirstVisibleChild {
-	   margin: 0 0.25rem;
-	}
+ .sapFDynamicPageTitleMainNavigationAreaInner .sapMIBar.sapMTB .sapMBarChild:first-child {
+	 margin-left: 0.25rem;
  }
+
+ .sapFDynamicPageTitleMainContent .sapMIBar.sapMTB .sapMBarChild:first-child {
+	margin-left: 0;
+}
 
 /* TODO remove after the end of support for Internet Explorer */
 html[data-sap-ui-browser^="ie"].sap-desktop,
@@ -185,11 +201,10 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 		-webkit-flex-direction: column;
 		justify-content: space-between;
 		-webkit-justify-content: space-between;
-		min-width: 48px;
+		min-width: 0%;
 
 		.sapFDynamicPageTitleMainHeadingInner,
 		.sapFDynamicPageTitleMainHeadingSnappedExpandContent {
-			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
 			box-sizing: border-box;
@@ -200,7 +215,6 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 			min-width: 1px;
 			max-width: 100%;
 			color: @sapUiGroupTitleTextColor;
-			font-size: @sapMFontHeader3Size;
 			margin-top: 0.1875rem;
 
 			/* Override Title styles, required by VD */
@@ -222,13 +236,21 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 	}
 
 	.sapFDynamicPageTitleMainContent {
-		min-width: 48px;
-		padding: 0 0 0.5rem 0.5rem;
+		min-width: 0.0625rem;
+		padding: 0 0 0 0.5rem;
+
+		&.sapFDynamicPageTitleMainContentHasContent {
+			min-width: 3rem;
+		}
 	}
 
 	.sapFDynamicPageTitleMainActions {
 		margin-left: auto;
-		min-width: 48px;
+		min-width: 0.0625rem;
+
+		&.sapFDynamicPageTitleMainActionsHasContent {
+			min-width: 3rem;
+		}
 
 	.sapFDynamicPageTitleActionsBar .sapMLabel.sapMLabelMaxWidth,
 	.sapFDynamicPageTitleActionsBar .sapMLnk.sapMLnkMaxWidth {

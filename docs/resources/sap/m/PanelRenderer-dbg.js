@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/m/library", "sap/ui/Device"],
@@ -37,14 +37,30 @@ sap.ui.define(["sap/m/library", "sap/ui/Device"],
 	};
 
 	PanelRenderer.startPanel = function (oRm, oControl) {
+		var bIsExpandable = oControl.getExpandable(),
+			oAccAttributes = {
+				role: oControl.getAccessibleRole().toLowerCase()
+			};
+
 		oRm.openStart("div", oControl);
 		oRm.class("sapMPanel");
+
+		if (bIsExpandable) {
+			oRm.class("sapMPanelExpandable");
+		}
+
 		oRm.style("width", oControl.getWidth());
 		oRm.style("height", oControl.getHeight());
-		oRm.accessibilityState(oControl, {
-			role: oControl.getAccessibleRole().toLowerCase(),
-			labelledby: oControl._getLabellingElementId()
-		});
+
+		// add an aria-labelledby refence to the header, only when a headerToolbar is provided
+		// or the control is not expandable
+		// since in the default case, the focus is on the header
+		// and the header would be read out twice
+		if (oControl.getHeaderToolbar() || !bIsExpandable) {
+			oAccAttributes.labelledby = oControl._getLabellingElementId();
+		}
+
+		oRm.accessibilityState(oControl, oAccAttributes);
 		oRm.openEnd();
 	};
 
@@ -52,16 +68,18 @@ sap.ui.define(["sap/m/library", "sap/ui/Device"],
 		var bIsExpandable = oControl.getExpandable(),
 			bIsExpanded = oControl.getExpanded(),
 			oHeaderTBar = oControl.getHeaderToolbar(),
-			sHeaderClass;
+			sHeaderClass,
+			sHeaderElement = oHeaderTBar ? "header" : "div";
 
 		if (bIsExpandable) {
 			// we need a wrapping div around button and header
 			// otherwise the border needed for both do not exact align
-			oRm.openStart("header");
+			oRm.openStart(sHeaderElement);
 			if (oHeaderTBar) {
 				sHeaderClass = "sapMPanelWrappingDivTb";
 			} else {
 				sHeaderClass = "sapMPanelWrappingDiv";
+				this.writeHeaderAccessibility(oRm, oControl);
 			}
 
 			oRm.class(sHeaderClass);
@@ -71,11 +89,9 @@ sap.ui.define(["sap/m/library", "sap/ui/Device"],
 
 			oRm.openEnd();
 
-			var oButton = oControl._getButton();
-
-			oControl._toggleButtonIcon(bIsExpanded);
-
-			oRm.renderControl(oButton);
+			if (bIsExpandable) {
+				oRm.renderControl(oControl._oExpandButton);
+			}
 		}
 
 		// render header
@@ -95,7 +111,7 @@ sap.ui.define(["sap/m/library", "sap/ui/Device"],
 		}
 
 		if (bIsExpandable) {
-			oRm.close("header");
+			oRm.close(sHeaderElement);
 		}
 
 		var oInfoTBar = oControl.getInfoToolbar();
@@ -116,6 +132,13 @@ sap.ui.define(["sap/m/library", "sap/ui/Device"],
 				oRm.renderControl(oInfoTBar);
 			}
 		}
+	};
+
+	PanelRenderer.writeHeaderAccessibility = function (oRm, oControl) {
+		oRm.attr('tabindex', 0);
+		oRm.attr('role', 'button');
+		oRm.attr('aria-expanded', oControl.getExpanded());
+		oRm.attr('aria-controls', oControl.getId() + "-content");
 	};
 
 	PanelRenderer.renderContent = function (oRm, oControl) {
