@@ -72,7 +72,6 @@
 					items="{sample>/}"
 					growing="true"
 					growingScrollToLoad="true"
-					growingThreshold="12"
 				>
 					<headerToolbar>
 						<OverflowToolbar id="all-list-bar">
