@@ -1,6 +1,0 @@
-/*!
- * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
- * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
- */
-sap.ui.define(["sap/ui/base/ManagedObject","sap/base/Log","sap/base/util/extend"],function(e,r,n){"use strict";var t=e.extend("sap.f.cards.util.SimpleControl",{metadata:{properties:{resolved:{type:"any"}}}});var i=new t;var a={};function s(e,n,t,i,u){if(i===u){r.warning("BindingResolver maximum level processing reached. Please check for circular dependencies.");return e}if(Array.isArray(e)){return e.map(function(e){return s(e,n,t,i+1,u)})}if(e&&typeof e==="object"&&!a.isBindingInfo(e)){var f={};for(var d in e){f[d]=s(e[d],n,t,i+1,u)}return f}if(typeof e==="string"||typeof e==="object"&&a.isBindingInfo(e)){return o(e,n,t)}return e}function o(r,t,a){if(!r){return r}var s=typeof r==="string"?e.bindingParser(r):n({},r);if(!s){return r}if(!a){a="/"}i.setModel(t);i.bindObject(a);i.bindProperty("resolved",s);var o=i.getResolved();i.unbindProperty("resolved");i.unbindObject();i.setModel(null);return o}a.resolveValue=function(e,r,n){var t=0,i=30;if(r){return s(e,r,n,t,i)}else{return e}};a.isBindingInfo=function(e){if(!e){return false}return e.hasOwnProperty("path")||e.hasOwnProperty("parts")&&e.hasOwnProperty("formatter")};return a});
