@@ -6,7 +6,7 @@
   <copyright>OpenUI5
  * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.</copyright>
-  <version>1.96.0</version>
+  <version>1.95.0</version>
 
   <documentation>The SAPUI5 Core Runtime.
 
@@ -400,7 +400,7 @@
             <copyright>2010-2011, Christian Johansen</copyright>
             <pattern>sap/ui/thirdparty/sinon-qunit.js</pattern>
         </lib>
-        <lib name="urijs" displayName="URI.js" version="1.19.7" homepage="http://medialize.github.com/URI.js/">
+        <lib name="urijs" displayName="URI.js" version="1.19.6" homepage="http://medialize.github.com/URI.js/">
             <license url="http://opensource.org/licenses/mit-license" type="MIT" />
             <copyright>Rodney Rehm</copyright>
             <pattern>sap/ui/thirdparty/URI.js</pattern>

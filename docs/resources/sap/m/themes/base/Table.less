@@ -353,8 +353,8 @@ tr.sapMListTblHeaderNone > .sapMTableTH {
 }
 
 .sapMColumnHeaderActive:focus {
-	outline: @_sap_m_ListItemBase_Focus_Outline;
-	outline-offset: @_sap_m_ListItemBase_Focus_OffsetWithGap;
+	outline: 1px dotted @sapUiContentFocusColor;
+	outline-offset: -2px;
 }
 
 .sapMColumnHeaderActive:active {
@@ -372,8 +372,8 @@ tr.sapMListTblHeaderNone > .sapMTableTH {
 }
 
 .sapMColumnHeaderFocusable:focus {
-	outline: @_sap_m_ListItemBase_Focus_Outline;
-	outline-offset: @_sap_m_ListItemBase_Focus_OffsetWithGap;
+	outline: 1px dotted @sapUiContentFocusColor;
+	outline-offset: -2px;
 }
 
 /* sort icons */
@@ -419,19 +419,18 @@ tr.sapMListTblHeaderNone > .sapMTableTH {
 		pointer-events: none;
 		top: 1px; // mimics outline-offset: -1px
 		bottom: 1px; // mimics outline-offset: -1px
-		border-top: @_sap_m_ListItemBase_Focus_Outline;
-		border-bottom: @_sap_m_ListItemBase_Focus_Outline;
+		border-top: 1px dotted @sapUiContentFocusColor;
+		border-bottom: 1px dotted @sapUiContentFocusColor;
 		margin-right: 1px; // 1px is set so that the focus border is clearly visible on all sides
 	}
 
 	& > .sapMTblFirstVisibleCell::before {
-		border-left: @_sap_m_ListItemBase_Focus_Outline;
+		border-left: 1px dotted @sapUiContentFocusColor;
 		margin-left: 1px; // mimics outline-offset: -1px
 	}
 
 	& > .sapMTblLastVisibleCell::before {
-		border-right: @_sap_m_ListItemBase_Focus_Outline;
-		margin-right: 1px; // 1px is set so that the focus border is clearly visible on all sides
+		border-right: 1px dotted @sapUiContentFocusColor;
 	}
 }
 
