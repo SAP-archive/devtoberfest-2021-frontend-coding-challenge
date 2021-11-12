@@ -10,14 +10,6 @@
     min-width: 0;
 }
 
-.sapMScrollContScroll {
-    height: 100%;
-}
-
 .sapMFT > em {
     background: #826ae2;
-}
-
-.sapMSwtLabel {
-    font-size: 0.6rem;
 }

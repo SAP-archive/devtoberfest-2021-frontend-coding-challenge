@@ -23,9 +23,21 @@
             data-sap-ui-compatVersion="edge"
             data-sap-ui-frameOptions="trusted"
         ></script>
+
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        display: inline-block;
+        background-image: url('resources/img/splash_logo.svg');
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+    </style>
     </head>
 
-    <body class="sapUiBody" role="application">
-        <div data-sap-ui-component data-name="com.devtoberfest.devtoberfest2021FrontendCodingChallenge"></div>
+    <body class="sapUiBody"> 
+      <div data-sap-ui-component data-name="com.devtoberfest.devtoberfest2021FrontendCodingChallenge" data-id="container"></div> 
     </body>
 </html>

@@ -7,6 +7,8 @@
     "scripts": {
         "start": "ui5 serve --open index.html",
         "serve": "ui5 serve",
+        "serve-dist": "serve docs",
+        "lg": "lighthouse http://localhost:8080/index.html --output='json' --preset='perf' --chrome-flags='--headless'",
         "build": "ui5 build --clean-dest --dest docs self-contained --all ",
         "prettier": "prettier -w .",
         "test": "run-s karma",
@@ -29,5 +31,8 @@
         "dependencies": [
             "ui5-middleware-livereload"
         ]
+    },
+    "dependencies": {
+        "serve": "^13.0.2"
     }
 }
