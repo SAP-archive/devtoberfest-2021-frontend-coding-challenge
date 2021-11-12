@@ -6,25 +6,15 @@
 @_sap_m_TabStrip_ItemHoverTextColor: darken(@sapUiGroupTitleTextColor, 10);
 @_sap_m_TabStrip_ItemSelectedTextColor: darken(@sapUiGroupTitleTextColor, 20);
 
-.sapMTabStrip {
+.sapMTabStripContainer .sapMTabStrip {
+	height: 3.25rem;
 	background: @sapUiShellBackground;
 	box-shadow: none;
-}
-
-.sapUiSizeCozy .sapMTabStrip {
-	height: 3.25rem;
 	.sapMBtnBase {
 		width: 2.25rem;
 	}
-	.sapMTSOverflowSelect {
-		width: 2.25rem;
-		height: 2.25rem;
-	}
-}
-
-.sapMTabStrip {
 	.sapMTSRightOverflowButtons {
-		right: 5.0rem;
+		right: 5.8rem;
 		text-align: center;
 		.sapMBtn.sapMBtnBase {
 			margin-left: 0;
@@ -38,6 +28,10 @@
 			.sapMTabStripItem {
 				padding: 0 0 0 0.5rem;
 				border-bottom: 0;
+				margin-right: 0.5rem;
+				&:last-child {
+					margin-right: 0;
+				}
 				&:hover {
 					color: @_sap_m_TabStrip_ItemHoverTextColor;
 					background-color: @sapUiListHoverBackground;
@@ -56,18 +50,22 @@
 						vertical-align: middle;
 					}
 				}
+				.sapMTabContIcon.sapUiIcon{
+					color: @sapUiContentIconColor;
+				}
 			}
 		}
+	}
+	.sapMTSOverflowSelect {
+		width: 2.25rem;
+		height: 2.25rem;
 	}
 	.sapMTSLeftOverflowButtons {
 		margin-left: 0;
 	}
-	.sapMSlt {
-		width: 2rem;
-	}
 }
 
-.sapMTabStribContainer {
+.sapMTabStripContainer {
 	background: @sapUiShellBackground;
 }
 .sapMTSOverflowSelectListItem {
@@ -77,8 +75,15 @@
 	font-size: 1rem;
 }
 
+.sapMTabStrip .sapMTSTabsContainer .sapMTSTabs .sapMTabStripItem:focus::before {
+	top: 0.25rem;
+}
+
 .sapUiSizeCompact {
 	.sapMTabStrip {
+		.sapMTSRightOverflowButtons {
+			right: 5.7rem;
+		}
 		.sapMTSTabsContainer .sapMTSTabs {
 			.sapMTabStripItem {
 				padding: 0 2rem 0 0.5rem;
@@ -104,6 +109,9 @@
 				}
 			}
 		}
+		.sapMTSOverflowSelect {
+			height: 1.625rem;
+		}
 		.sapMTSTouchArea .sapMSlt {
 			margin-top: 0.46rem;
 		}
@@ -113,15 +121,14 @@
 	}
 }
 
-html.sap-phone .sapMTabStrip .sapMTSOverflowSelect {
-	border: none;
-	background: transparent;
-}
-
 .sapMTabStrip .sapMTSTabsContainer .sapMTSTabs .sapMTabStripItem.sapMTabStripItemSelected {
 	box-shadow: inset 0 0.1875rem 0 @sapUiSelected;
 	border-bottom: 0;
 	border-radius: 0.125rem 0.125rem 0 0;
+}
+
+html.sap-phone .sapMTabStripSelectListItemCloseBtn {
+	margin-right: 1rem;
 }
 
 html[dir=ltr] .sapMTabStrip .sapMTSLeftOverflowButtons,
