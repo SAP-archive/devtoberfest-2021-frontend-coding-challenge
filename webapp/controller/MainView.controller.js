@@ -2,9 +2,11 @@ sap.ui.define(
     [
         "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/controller/BaseController",
         "sap/ui/model/json/JSONModel",
+        "sap/ui/model/Filter",
+        "sap/ui/model/FilterOperator",
         "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/model/formatter",
     ],
-    function (Controller, JSONModel, formatter) {
+    function (Controller, JSONModel, Filter, FilterOperator,  formatter) {
         "use strict";
 
         return Controller.extend(
@@ -28,30 +30,28 @@ sap.ui.define(
                 },
 
                 liveSearch: function (oEvent) {
-                    const value = oEvent.getParameter("newValue");
                     const list = this.getView().byId("all-list");
                     const listBinding = list.getBinding("items");
-                    const nameFilter = new sap.ui.model.Filter({
-                        path: "name",
-                        operator: sap.ui.model.FilterOperator.Contains,
-                        value1: value,
-                    });
-                    const descFilter = new sap.ui.model.Filter({
-                        path: "description",
-                        operator: sap.ui.model.FilterOperator.Contains,
-                        value1: value,
-                    });
-                    const stateFilter = new sap.ui.model.Filter({
-                        path: "category",
-                        operator: sap.ui.model.FilterOperator.Contains,
-                        value1: value,
-                    });
-                    listBinding.filter(
-                        new sap.ui.model.Filter({
-                            filters: [nameFilter, descFilter, stateFilter],
-                            and: false,
-                        })
-                    );
+
+                    // add filter for search
+                    var aFilters = [];
+                    var sQuery = oEvent.getSource().getValue();
+                    if (sQuery && sQuery.length > 0) {
+                        aFilters.push(new Filter("name", FilterOperator.Contains, sQuery));
+                        aFilters.push(new Filter("description", FilterOperator.Contains, sQuery));
+                        aFilters.push(new Filter("category", FilterOperator.Contains, sQuery));
+
+                        listBinding.filter(
+                            new Filter({
+                                filters: aFilters,
+                                and: false,
+                            })
+                        );
+                    }
+                    else{
+                        listBinding.filter([]);
+                    }
+
                 },
 
                 onToggleTheme: function (oEvent) {

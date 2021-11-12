@@ -32,7 +32,7 @@ sap.ui.require(["sap/ui/test/Opa5"], function (Opa5) {
                         id: "all-list",
                         success: function (oList) {
                             Opa5.assert.ok(
-                                oList.getItems().length > 20,
+                                oList.getItems().length >= 20,
                                 "The list did contain " +
                                     oList.getItems().length +
                                     " products"
