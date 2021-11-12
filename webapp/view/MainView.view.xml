@@ -42,7 +42,7 @@
             href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge" />
           </link>
         </MessageStrip>
-        <List growing="true" id="all-list" items="{sample>/}">
+        <List growing="true" id="all-list"  growingThreshold="1" items="{sample>/}">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
               <Title id="all-bar-info" text="{i18n>SAP BTP Services}" level="H4" />
