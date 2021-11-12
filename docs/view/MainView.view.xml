@@ -1,5 +1,5 @@
 <mvc:View controllerName="com.devtoberfest.devtoberfest2021FrontendCodingChallenge.controller.MainView"
-  displayBlock="true" xmlns="sap.m" xmlns:tnt="sap.tnt" xmlns:core="sap.ui.core"
+  displayBlock="true" xmlns="sap.m" xmlns:f="sap.f" xmlns:tnt="sap.tnt" xmlns:core="sap.ui.core"
   xmlns:mvc="sap.ui.core.mvc">
   <!-- xmlns:aow="aow.artifact.control" -->
   <tnt:ToolPage id="toolPage">
@@ -34,7 +34,7 @@
     </tnt:header>
     <tnt:mainContents>
       <ScrollContainer id="all-page" horizontal="false" vertical="true" height="100%">
-        <List id="all-list" items="{sample>/}" growing="true" growingScrollToLoad="true" growingThreshold="15">
+        <List id="all-list" items="{sample>/}" >
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
               <Title id="all-bar-info" text="{i18n>btpservices}" level="H4" /> 
