@@ -1,31 +1,13 @@
 {
 	"name": "devtoberfest2021FrontendCodingChallenge",
 	"version": "0.1.0",
-	"buildTimestamp": "202111121038",
+	"buildTimestamp": "202111121051",
 	"scmRevision": "",
 	"libraries": [
 		{
-			"name": "sap.f",
-			"version": "1.96.0",
-			"buildTimestamp": "202111121038",
-			"scmRevision": "",
-			"manifestHints": {
-				"dependencies": {
-					"libs": {
-						"sap.m": {},
-						"sap.ui.core": {},
-						"sap.ui.layout": {},
-						"sap.ui.unified": {
-							"lazy": true
-						}
-					}
-				}
-			}
-		},
-		{
 			"name": "sap.m",
 			"version": "1.96.0",
-			"buildTimestamp": "202111121038",
+			"buildTimestamp": "202111121051",
 			"scmRevision": "",
 			"manifestHints": {
 				"dependencies": {
@@ -44,7 +26,7 @@
 		{
 			"name": "sap.tnt",
 			"version": "1.96.0",
-			"buildTimestamp": "202111121038",
+			"buildTimestamp": "202111121051",
 			"scmRevision": "",
 			"manifestHints": {
 				"dependencies": {
@@ -64,13 +46,13 @@
 		{
 			"name": "sap.ui.core",
 			"version": "1.96.0",
-			"buildTimestamp": "202111121038",
+			"buildTimestamp": "202111121051",
 			"scmRevision": ""
 		},
 		{
 			"name": "sap.ui.layout",
 			"version": "1.96.0",
-			"buildTimestamp": "202111121038",
+			"buildTimestamp": "202111121051",
 			"scmRevision": "",
 			"manifestHints": {
 				"dependencies": {
@@ -83,7 +65,7 @@
 		{
 			"name": "sap.ui.unified",
 			"version": "1.96.0",
-			"buildTimestamp": "202111121038",
+			"buildTimestamp": "202111121051",
 			"scmRevision": "",
 			"manifestHints": {
 				"dependencies": {

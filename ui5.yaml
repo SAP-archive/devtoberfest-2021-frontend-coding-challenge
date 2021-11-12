@@ -12,7 +12,6 @@ framework:
     libraries:
         - name: sap.ui.core
         - name: sap.m
-        - name: sap.f
         - name: sap.tnt
         - name: sap.ui.layout
         - name: themelib_sap_fiori_3
