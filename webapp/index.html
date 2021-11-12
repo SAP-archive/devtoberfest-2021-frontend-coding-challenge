@@ -13,8 +13,10 @@
 
         <script
             id="sap-ui-bootstrap"
-            src="resources/sap-ui-core.js"
+            src="https://sapui5.hana.ondemand.com/1.96.0/resources/sap-ui-core.js"
             data-sap-ui-theme="sap_fiori_3"
+            data-sap-ui-async="true"
+            data-sap-ui-preload="async"
             data-sap-ui-resourceroots='{
         "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./"
       }'
@@ -22,24 +24,14 @@
             data-sap-ui-compatVersion="edge"
             data-sap-ui-frameOptions="trusted"
         ></script>
-
-        <script>
-            sap.ui.getCore().attachInit(function () {
-                sap.ui.require(
-                    ["sap/ui/core/ComponentContainer"],
-                    function (ComponentContainer) {
-                        new ComponentContainer({
-                            name: "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
-                            manifest: true,
-                            height: "100%",
-                        }).placeAt("content");
-                    }
-                );
-            });
-        </script>
     </head>
 
     <body class="sapUiBody" role="application">
-        <div id="content"></div>
+        <div
+            data-sap-ui-component
+            data-name="com.devtoberfest.devtoberfest2021FrontendCodingChallenge"
+            data-id="container"
+            data-settings='{"id" : "lbn"}'
+        ></div>
     </body>
 </html>
