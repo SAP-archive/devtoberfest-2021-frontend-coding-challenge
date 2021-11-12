@@ -1,9 +1,9 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-/*eslint-disable max-len */
+
 // Provides class sap.ui.model.odata.TreeBindingAdapter
 sap.ui.define(["sap/base/util/each"],
 	function(each) {
@@ -15,20 +15,13 @@ sap.ui.define(["sap/base/util/each"],
 		 *
 		 * This module is only for experimental and internal use!
 		 *
-		 * @param {sap.ui.model.TreeBinding} oBinding
-		 *   The binding to add ListBinding functionality to
-		 * @param {object} oControl
-		 *   The tree or tree table control using the given binding; the control is used for
-		 *   selection handling
-		 *
 		 * @alias sap.ui.model.TreeBindingCompatibilityAdapter
 		 * @class
 		 * @protected
-		 *
-		 * @deprecated use {@link sap.ui.model.TreeBindingAdapter} instead
 		 */
-		var TreeBindingCompatibilityAdapter = function (oBinding, oControl) {
+		var TreeBindingCompatibilityAdapter = function (oBinding, oTable) {
 			// Code necessary for ClientTreeBinding
+			var that = oTable;
 			Object.assign(oBinding, {
 				_init: function(bExpandFirstLevel) {
 					this._bExpandFirstLevel = bExpandFirstLevel;
@@ -226,19 +219,19 @@ sap.ui.define(["sap/base/util/each"],
 					this.toggleContext(this.getContextByIndex(iRowIndex));
 				},
 				storeSelection: function() {
-					var aSelectedIndices = oControl.getSelectedIndices();
+					var aSelectedIndices = that.getSelectedIndices();
 					var aSelectedContexts = [];
 					each(aSelectedIndices, function(iIndex, iValue) {
-						aSelectedContexts.push(oControl.getContextByIndex(iValue));
+						aSelectedContexts.push(that.getContextByIndex(iValue));
 					});
 					this._aSelectedContexts = aSelectedContexts;
 				},
 				restoreSelection: function() {
-					oControl.clearSelection();
+					that.clearSelection();
 					var _aSelectedContexts = this._aSelectedContexts;
 					each(this.aContexts, function(iIndex, oContext) {
 						if (((_aSelectedContexts ? _aSelectedContexts.indexOf(oContext) : -1)) >= 0) {
-							oControl.addSelectionInterval(iIndex, iIndex);
+							that.addSelectionInterval(iIndex, iIndex);
 						}
 					});
 					this._aSelectedContexts = undefined;
@@ -247,15 +240,14 @@ sap.ui.define(["sap/base/util/each"],
 					// for compatibility reasons (OData Tree Binding)
 					return undefined;
 				},
-				detachSelectionChanged: function() {}, // for compatibility
 				clearSelection: function () {
-					oControl._oSelection.clearSelection();
+					that._oSelection.clearSelection();
 				},
 				attachSort: function() {},
 				detachSort: function() {}
 			});
 			// initialize the binding
-			oBinding._init(oControl.getExpandFirstLevel());
+			oBinding._init(oTable.getExpandFirstLevel());
 
 		};
 

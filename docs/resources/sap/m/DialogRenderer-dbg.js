@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -85,8 +85,7 @@ sap.ui.define([
 		// No Footer
 		var bNoToolbarAndNoButtons = !oDialog._oToolbar && !oBeginButton && !oEndButton;
 		var bEmptyToolbarAndNoButtons = oDialog._oToolbar && oDialog._isToolbarEmpty() && !oBeginButton && !oEndButton;
-		var bHiddenFooter = oDialog._oToolbar && !oDialog._oToolbar.getVisible();
-		if (bNoToolbarAndNoButtons || bEmptyToolbarAndNoButtons || bHiddenFooter) {
+		if (bNoToolbarAndNoButtons || bEmptyToolbarAndNoButtons) {
 			oRM.class("sapMDialog-NoFooter");
 		}
 
@@ -105,6 +104,10 @@ sap.ui.define([
 			role: sRole,
 			modal: true
 		});
+
+		if (oDialog._forceDisableScrolling) {
+			oRM.class("sapMDialogWithScrollCont");
+		}
 
 		if (oSubHeader && oSubHeader.getVisible()) {
 			oRM.class("sapMDialogWithSubHeader");
@@ -167,18 +170,13 @@ sap.ui.define([
 		if (oHeader) {
 			oHeader._applyContextClassFor("header");
 			oRM.openStart("header")
-				.class("sapMDialogTitle");
-
-			if (oDialog._isDraggableOrResizable()) {
-				oRM.attr("tabindex", 0);
-			}
-
-			oRM.openEnd()
+				.class("sapMDialogTitle")
+				.openEnd()
 				.renderControl(oHeader)
 				.close("header");
 		}
 
-		if (oSubHeader && oSubHeader.getVisible()) {
+		if (oSubHeader) {
 			oSubHeader._applyContextClassFor("subheader");
 			oRM.openStart("header")
 				.class("sapMDialogSubHeader")
@@ -214,7 +212,7 @@ sap.ui.define([
 			.close("div")
 			.close("section");
 
-		if (!bNoToolbarAndNoButtons && !bEmptyToolbarAndNoButtons && !bHiddenFooter) {
+		if (!(bNoToolbarAndNoButtons || bEmptyToolbarAndNoButtons)) {
 			oDialog._oToolbar._applyContextClassFor("footer");
 			oRM.openStart("footer")
 				.class("sapMDialogFooter")

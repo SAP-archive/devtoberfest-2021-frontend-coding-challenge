@@ -1,14 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define(['./library', 'sap/ui/core/library', 'sap/ui/core/Control', './TileContentRenderer'],
-	function(library, Core, Control, TileContentRenderer) {
+sap.ui.define(['./library', 'sap/ui/core/Control', './TileContentRenderer'],
+	function(library, Control, TileContentRenderer) {
 	"use strict";
-
-	var Priority = Core.Priority;
 
 	/**
 	 * Constructor for a new sap.m.TileContent control.
@@ -20,7 +18,7 @@ sap.ui.define(['./library', 'sap/ui/core/library', 'sap/ui/core/Control', './Til
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @since 1.34.0
 	 *
 	 * @public
@@ -44,7 +42,7 @@ sap.ui.define(['./library', 'sap/ui/core/library', 'sap/ui/core/Control', './Til
 				 * Updates the size of the tile. If it is not set, then the default size is applied based on the device tile.
 				 * @deprecated Since version 1.38.0. The TileContent control has now a fixed size, depending on the used media (desktop, tablet or phone).
 				 */
-				"size" : {type : "sap.m.Size", group : "Appearance", defaultValue : "Auto", deprecated: true},
+				"size" : {type : "sap.m.Size", group : "Appearance", defaultValue : "Auto"},
 				/**
 				 * The percent sign, the currency symbol, or the unit of measure.
 				 */
@@ -56,12 +54,7 @@ sap.ui.define(['./library', 'sap/ui/core/library', 'sap/ui/core/Control', './Til
 				/**
 				 * Frame types: 1x1, 2x1, and auto.
 				 */
-				"frameType" : {type : "sap.m.FrameType", group : "Appearance", defaultValue : "Auto"},
-				/**
-				 * Adds a priority badge before the content. Works only in Generic Tile ActionMode.
-				 * @experimental Since 1.96
-				 */
-				"priority" : {type: "sap.ui.core.Priority", group: "Misc", defaultValue: Priority.None}
+				"frameType" : {type : "sap.m.FrameType", group : "Appearance", defaultValue : "Auto"}
 			},
 			defaultAggregation : "content",
 			aggregations : {
@@ -97,40 +90,17 @@ sap.ui.define(['./library', 'sap/ui/core/library', 'sap/ui/core/Control', './Til
 		var oContent = this.getContent();
 		if (oContent) {
 			var thisRef = this.$();
-			var aTooltipEments = thisRef.find("*");
-			// tooltip of the entire tile
-			var sTileToolTip = thisRef.attr("title") || "";
-			// tooltip of the content if any
-			var sCntTooltip = oContent.getTooltip_AsString() || "";
-			// if both the tooltips are same, make tile tooltip as null
-			if (sTileToolTip === sCntTooltip) {
-				sTileToolTip = "";
-			}
-			var sInnerToolTip = '';
-			// looping through all the inner elements to concatenate
-			// their tooltips
-			aTooltipEments.toArray().forEach(function(el){
-				if (el.title) {
-						sInnerToolTip = sInnerToolTip.concat(el.title + " ");
-					}
-				});
-				// if inner tooltips exist, then concatenate with the content tooltip
-				if (sInnerToolTip.trim() !== 0) {
-					sCntTooltip = sCntTooltip + " " + sInnerToolTip;
-				}
+			if (!thisRef.attr("title")) {
+				var sCntTooltip = oContent.getTooltip_AsString();
+				var aTooltipEments = thisRef.find("*");
+				aTooltipEments.removeAttr("title");
 				if (sCntTooltip && sCntTooltip.trim().length !== 0) {
 					if (this._getFooterText().trim() !== 0) {
 						sCntTooltip = sCntTooltip + "\n" + this._getFooterText();
 					}
-					// if tile tooltip exists concatenate tile tooltip
-					// and content tooltip with a newline
-					sTileToolTip.trim().length !== 0 ?
-						thisRef.attr("title", sTileToolTip + "\n" + sCntTooltip) :
-						thisRef.attr("title",  sCntTooltip);
+					thisRef.attr("title", sCntTooltip);
 				}
-
-			// removing all inner elements tooltip om every mouse enter
-			aTooltipEments.removeAttr("title").off("mouseenter");
+			}
 		}
 	};
 
@@ -217,7 +187,7 @@ sap.ui.define(['./library', 'sap/ui/core/library', 'sap/ui/core/Control', './Til
 	/**
 	 * Setter for protected property to enable or disable footer rendering. This function does not invalidate the control.
 	 * @param {boolean} value Determines whether the control's footer is rendered or not
-	 * @returns {this} this to allow method chaining
+	 * @returns {sap.m.TileContent} this to allow method chaining
 	 * @protected
 	 */
 	TileContent.prototype.setRenderFooter = function(value) {
@@ -228,23 +198,12 @@ sap.ui.define(['./library', 'sap/ui/core/library', 'sap/ui/core/Control', './Til
 	/**
 	 * Setter for protected property to enable or disable content rendering. This function does not invalidate the control.
 	 * @param {boolean} value Determines whether the control's content is rendered or not
-	 * @returns {this} this To allow method chaining
+	 * @returns {sap.m.TileContent} this To allow method chaining
 	 * @protected
 	 */
 	TileContent.prototype.setRenderContent = function(value) {
 		this._bRenderContent = value;
 		return this;
-	};
-
-	/**
-	 * Returns priority text from resource bundle
-	 * @param {string} sPriority The priority value
-	 * @returns {string} The priority text
-	 * @private
-	 */
-	TileContent.prototype._getPriorityText = function(sPriority) {
-		var oResourceBundle = sap.ui.getCore().getLibraryResourceBundle('sap.m');
-		return oResourceBundle.getText('ACTION_PRIORITY_' + sPriority.toUpperCase());
 	};
 
 	return TileContent;

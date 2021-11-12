@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -79,6 +79,14 @@ sap.ui.define([
 		 * @public
 		 * @deprecated since 1.20 use {@link sap.ui.Device.os.ios} instead
 		 * @name jQuery.os.ios
+		 */
+
+		/**
+		 * Whether the current operating system is Windows Phone
+		 * @type {boolean}
+		 * @public
+		 * @deprecated since 1.20 use {@link sap.ui.Device.os.windows_phone} instead
+		 * @name jQuery.os.winphone
 		 */
 
 		/**
@@ -268,8 +276,8 @@ sap.ui.define([
 	 *
 	 * The home icons must be in PNG format and given in different sizes for iPad/iPhone with and without retina
 	 * display. The favicon is used in the browser and for desktop shortcuts and should optimally be in ICO format:
-	 * ICO files can contain different image sizes for different usage locations. E.g. a 16x16px version is used
-	 * inside browsers.
+	 * PNG does not seem to be supported by Internet Explorer and ICO files can contain different image sizes for
+	 * different usage locations. E.g. a 16x16px version is used inside browsers.
 	 *
 	 * All icons are given in an an object holding icon URLs and other settings. The properties of this object are:
 	 * <ul>

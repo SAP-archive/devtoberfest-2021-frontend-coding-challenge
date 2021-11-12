@@ -1,10 +1,10 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 /*global Blob*/
-sap.ui.define([], function () {
+sap.ui.define(["sap/base/Log"], function (Log) {
 	"use strict";
 
 	/**
@@ -45,7 +45,7 @@ sap.ui.define([], function () {
 		/**
 		 * Ensure that the date is sent if the "visibilitychange" event was not fired.
 		 */
-		window.addEventListener("beforeunload", function () {
+		window.addEventListener("unload", function () {
 			this.send();
 		}.bind(this));
 	};

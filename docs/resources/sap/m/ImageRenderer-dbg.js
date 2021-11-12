@@ -1,19 +1,16 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides default renderer for control sap.m.Image
-sap.ui.define(['sap/m/library', "sap/base/security/encodeCSS", "sap/ui/core/library"],
-	function(library, encodeCSS, coreLibrary) {
+sap.ui.define(['sap/m/library', "sap/base/security/encodeCSS"],
+	function(library, encodeCSS) {
 	"use strict";
 
 	// shortcut for sap.m.ImageMode
 	var ImageMode = library.ImageMode;
-
-	// shortcut for sap.ui.core.aria.HasPopup
-	var AriaHasPopup = coreLibrary.aria.HasPopup;
 
 	/**
 	 * Image renderer.
@@ -40,10 +37,7 @@ sap.ui.define(['sap/m/library', "sap/base/security/encodeCSS", "sap/ui/core/libr
 			sUseMap = oImage.getUseMap(),
 			aLabelledBy = oImage.getAriaLabelledBy(),
 			aDescribedBy = oImage.getAriaDescribedBy(),
-			aDetails = oImage.getAriaDetails(),
-			bIsImageMode = sMode === ImageMode.Image,
-			bLazyLoading = oImage.getLazyLoading(),
-			sAriaHasPopup = oImage.getAriaHasPopup();
+			bIsImageMode = sMode === ImageMode.Image;
 
 		// Additional element for Image with LightBox
 		if (oLightBox) {
@@ -57,29 +51,18 @@ sap.ui.define(['sap/m/library', "sap/base/security/encodeCSS", "sap/ui/core/libr
 
 		if (bIsImageMode) {
 			oRm.voidStart("img", !oLightBox ? oImage : oImage.getId() + "-inner");
-			if (bLazyLoading) {
-				oRm.attr("loading", "lazy");
-			}
-
 		} else {
 			oRm.openStart("span", !oLightBox ? oImage : oImage.getId() + "-inner");
 		}
 
-		if (!oImage.getDecorative()) {
-			// aria-labelledby references
-			if (aLabelledBy && aLabelledBy.length > 0) {
-				oRm.attr("aria-labelledby", aLabelledBy.join(" "));
-			}
+		// aria-labelledby references
+		if (!oImage.getDecorative() && aLabelledBy && aLabelledBy.length > 0) {
+			oRm.attr("aria-labelledby", aLabelledBy.join(" "));
+		}
 
-			// aria-describedby references
-			if (aDescribedBy && aDescribedBy.length > 0) {
-				oRm.attr("aria-describedby", aDescribedBy.join(" "));
-			}
-
-			// aria-details references
-			if (aDetails && aDetails.length > 0) {
-				oRm.attr("aria-details", aDetails.join(" "));
-			}
+		// aria-describedby references
+		if (!oImage.getDecorative() && aDescribedBy && aDescribedBy.length > 0) {
+			oRm.attr("aria-describedby", aDescribedBy.join(" "));
 		}
 
 		if (bIsImageMode) {
@@ -127,10 +110,6 @@ sap.ui.define(['sap/m/library', "sap/base/security/encodeCSS", "sap/ui/core/libr
 
 		if (tooltip) {
 			oRm.attr("title", tooltip);
-		}
-
-		if (sAriaHasPopup !== AriaHasPopup.None) {
-			oRm.attr("aria-haspopup", sAriaHasPopup.toLowerCase());
 		}
 
 		if (bHasPressHandlers) {

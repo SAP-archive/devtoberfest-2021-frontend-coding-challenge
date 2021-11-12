@@ -1,17 +1,15 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/core/InvisibleText"],
-	function(coreLibrary, InvisibleRenderer, InvisibleText) {
+sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer"],
+	function(coreLibrary, InvisibleRenderer) {
 	"use strict";
 
 	// shortcut for sap.ui.core.TextDirection
 	var TextDirection = coreLibrary.TextDirection;
-
-	var oResourceBundle = sap.ui.getCore().getLibraryResourceBundle("sap.m");
 
 	/**
 	 * Segmented renderer.
@@ -37,6 +35,10 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/c
 			sButtonWidth,
 			sButtonTextDirection;
 
+		if (aVisibleButtons.length) {
+			aVisibleButtons[aVisibleButtons.length - 1].addStyleClass("sapMSegBtnLastVisibleButton");
+		}
+
 		// Select representation mockup
 		if (oControl._bInOverflow) {
 			oRM.openStart("div", oControl);
@@ -60,12 +62,9 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/c
 			oRM.attr("title", sTooltip);
 		}
 
-		// Root's ARIA
+		// ARIA
 		oRM.accessibilityState(oControl, {
-			role : "listbox",
-			multiselectable: true,	// Still, only one item at a time can be selected. Set to 'true', as JAWS won't announce selection and root's descriptions otherwise.
-			roledescription: oResourceBundle.getText("SEGMENTEDBUTTON_NAME"),
-			describedby: { value: InvisibleText.getStaticId("sap.m", "SEGMENTEDBUTTON_SELECTION"), append: true }
+			role : "radiogroup"
 		});
 
 		oRM.openEnd();
@@ -76,27 +75,26 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/c
 			if (oButton.getVisible()) {
 				var sButtonText = oButton.getText(),
 					oButtonIcon = oButton.getIcon(),
-					sButtonTooltip = oButton.getTooltip_AsString(),
 					sIconAriaLabel = "",
 					oImage;
 
 				++iVisibleButtonPos;
+
 				if (oButtonIcon) {
 					oImage = oButton._getImage((oButton.getId() + "-img"), oButtonIcon);
-
 					if (oImage instanceof sap.m.Image) {
 						oControl._overwriteImageOnload(oImage);
+					} else if (!oButton.getTooltip()) { //BCP: 1670076777- Put aria-label only for icon or icon+text
+						sIconAriaLabel = oControl._getIconAriaLabel(oImage);
 					}
 				}
 
 				// instead of the button API we render a li element but with the id of the button
 				// only the button properties enabled, width, icon, text, and tooltip are evaluated here
 				oRM.openStart("li", oButton);
+				oRM.attr("aria-posinset", iVisibleButtonPos);
+				oRM.attr("aria-setsize", aVisibleButtons.length);
 				oRM.class("sapMSegBBtn");
-
-				if (oButton.getId() === aVisibleButtons[aVisibleButtons.length - 1].getId()) {
-					oRM.class("sapMSegBtnLastVisibleButton");
-				}
 				if (oButton.aCustomStyleClasses !== undefined && oButton.aCustomStyleClasses instanceof Array) {
 					for (var j = 0; j < oButton.aCustomStyleClasses.length; j++) {
 						oRM.class(oButton.aCustomStyleClasses[j]);
@@ -116,6 +114,10 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/c
 				sButtonWidth = oButton.getWidth();
 				oRM.style('width', sButtonWidth);
 
+				sTooltip = oButton.getTooltip_AsString();
+				if (sTooltip) {
+					oRM.attr("title", sTooltip);
+				}
 				oRM.attr("tabindex", oButton.getEnabled() ? "0" : "-1");
 
 				sButtonTextDirection = oButton.getTextDirection();
@@ -123,31 +125,25 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/c
 					oRM.attr("dir", sButtonTextDirection.toLowerCase());
 				}
 
-				if (oImage && !sButtonText) {
-					sIconAriaLabel = oControl._getIconAriaLabel(oImage);
-					sButtonTooltip = sButtonTooltip || sIconAriaLabel; // Prefer user-provided tooltips, as they bring better semantics
-				}
-
-				if (sButtonTooltip) {
-					oRM.attr("title", sButtonTooltip);
-				}
-
-				// Inner buttons' ARIA
+				// ARIA
 				oRM.accessibilityState(oButton, {
-					role : "option",
-					roledescription: oResourceBundle.getText("SEGMENTEDBUTTON_BUTTONS_NAME"),
-					label: sButtonText ? "" : sButtonTooltip,
-					posinset: iVisibleButtonPos,
-					setsize: aVisibleButtons.length,
-					selected: sSelectedButton === oButton.getId()
+					role : "radio",
+					checked : sSelectedButton === oButton.getId()
 				});
 
-				oRM.openEnd();
+				// BCP:1570027826 If button has an icon add ARIA label containing the generic icon name
+				if (oImage && sIconAriaLabel !== "") {
+					// If there is text inside the button add it in the aria-label
+					if (sButtonText !== "") {
+						sIconAriaLabel += " " + sButtonText;
+					} else {
+						// if we have no text for the button set tooltip the name of the Icon
+						oRM.attr("title", sIconAriaLabel);
+					}
+					oRM.attr("aria-label", sIconAriaLabel);
+				}
 
-				oRM.openStart("div");
-				oRM.class("sapMSegBBtnInnerWrapper");
 				oRM.openEnd();
-
 				oRM.openStart("div");
 				oRM.class("sapMSegBBtnInner");
 				oRM.openEnd();
@@ -160,7 +156,6 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleRenderer", "sap/ui/c
 				if (sButtonText !== '') {
 					oRM.text(sButtonText);
 				}
-				oRM.close("div");
 				oRM.close("div");
 				oRM.close("li");
 			} else {

@@ -1,35 +1,25 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.m.LightBoxItem
 sap.ui.define([
-	"./library",
-	"sap/ui/core/library",
-	"sap/ui/core/Element",
-	"sap/m/Image",
-	"sap/m/Title",
-	"sap/m/Label"
-], function (
-	library,
-	coreLibrary,
-	Element,
-	Image,
-	Title,
-	Label
-) {
+	'./library',
+	'sap/ui/core/library',
+	'sap/ui/core/Element',
+	'sap/m/Image',
+	'sap/m/Title',
+	'sap/m/Label'
+], function (library, coreLibrary, Element, Image, Title, Label) {
 	"use strict";
-
-	// shortcut for sap.m.LightBoxLoadingStates
-	var LightBoxLoadingStates = library.LightBoxLoadingStates;
 
 	// shortcut for sap.ui.core.OpenState
 	var OpenState = coreLibrary.OpenState;
 
-	// shortcut for sap.ui.core.TitleLevel
-	var TitleLevel = coreLibrary.TitleLevel;
+	// shortcut for sap.m.LightBoxLoadingStates
+	var LightBoxLoadingStates = library.LightBoxLoadingStates;
 
 	/**
 	 * Constructor for a new LightBoxItem.
@@ -43,7 +33,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Element
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -53,47 +43,42 @@ sap.ui.define([
 	 */
 	var LightBoxItem = Element.extend("sap.m.LightBoxItem", /** @lends sap.m.LightBoxItem.prototype */ {
 		metadata: {
+
 			library: "sap.m",
 			properties: {
 				/**
-				 * Source for the image. This property is mandatory. If not set the popup will not open.
+				 * Source for the image. This property is mandatory. If not set the popup will not open
 				 */
-				imageSrc: { type: "sap.ui.core.URI", group: "Appearance", multiple: false, defaultValue: "" },
-
+				imageSrc: { type: 'sap.ui.core.URI', group: 'Appearance', multiple: false, defaultValue: '' },
 				/**
-				 * Alt value for the image.
+				 * Alt value for the image
 				 */
-				alt: { type: "string", group: "Appearance", multiple: false, defaultValue: "" },
-
+				alt: { type: 'string', group: 'Appearance', multiple: false, defaultValue: '' },
 				/**
 				 * Title text for the image. This property is mandatory.
 				 */
-				title: { type: "string", group: "Appearance", multiple: false, defaultValue: "" },
-
+				title: { type: 'string', group: 'Appearance', multiple: false, defaultValue: '' },
 				/**
-				 * Subtitle text for the image.
+				 * Subtitle text for the image
 				 */
-				subtitle: { type: "string", group: "Appearance", multiple: false, defaultValue: "" }
+				subtitle: { type: 'string', group: 'Appearance', multiple: false, defaultValue: '' }
 			},
-
 			aggregations: {
 				/**
 				 * The image aggregation inside the LightBoxItem control.
 				 * @private
 				 */
-				_image: { type: "sap.m.Image", multiple: false, visibility: "hidden" },
-
+				_image: { type: 'sap.m.Image', multiple: false, visibility: 'hidden' },
 				/**
 				 * The title aggregation inside the LightBoxItem control.
 				 * @private
 				 */
-				_title: { type: "sap.m.Title", multiple: false, visibility: "hidden" },
-
+				_title: { type: 'sap.m.Title', multiple: false, visibility: 'hidden' },
 				/**
 				 * The subtitle aggregation inside the LightBoxItem control.
 				 * @private
 				 */
-				_subtitle: { type: "sap.m.Label", multiple: false, visibility: "hidden" }
+				_subtitle: { type: 'sap.m.Label', multiple: false, visibility: 'hidden' }
 			}
 		}
 	});
@@ -101,17 +86,15 @@ sap.ui.define([
 	LightBoxItem.prototype.init = function () {
 		this._createNativeImage();
 
-		this.setAggregation("_image", new Image({
+		this.setAggregation('_image', new Image({
 			decorative: false,
 			densityAware: false
 		}), true);
-
-		this.setAggregation("_title", new Title({
-			level: TitleLevel.H2,
+		this.setAggregation('_title', new Title({
+			level: coreLibrary.TitleLevel.H5,
 			wrapping: false
 		}), true);
-
-		this.setAggregation("_subtitle", new Label({
+		this.setAggregation('_subtitle', new Label({
 			wrapping: false
 		}), true);
 	};
@@ -123,10 +106,10 @@ sap.ui.define([
 	LightBoxItem.prototype._createNativeImage = function () {
 		var that = this;
 
-		this._sImageState = LightBoxLoadingStates.Loading;
+		this._imageState = LightBoxLoadingStates.Loading;
 		this._oImage = new window.Image();
 		this._oImage.onload = function () {
-			if (this.complete && that._sImageState === LightBoxLoadingStates.Loading) {
+			if (this.complete && that._imageState === LightBoxLoadingStates.Loading) {
 				that._setImageState(LightBoxLoadingStates.Loaded);
 			}
 		};
@@ -146,8 +129,8 @@ sap.ui.define([
 	 * @param {sap.m.LightBoxLoadingStates} sImageState Current image state
 	 */
 	LightBoxItem.prototype._setImageState = function (sImageState) {
-		if (sImageState !== this._sImageState) {
-			this._sImageState = sImageState;
+		if (sImageState !== this._imageState) {
+			this._imageState = sImageState;
 			if (this.getParent()) {
 				this.getParent()._imageStateChanged(sImageState);
 			}
@@ -155,16 +138,16 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the state of the image.
+	 * Gets the state of the image.
 	 * @private
 	 * @returns {string} State of the image
 	 */
 	LightBoxItem.prototype._getImageState = function () {
-		return this._sImageState;
+		return this._imageState;
 	};
 
 	/**
-	 * Returns the native JavaScript Image object.
+	 * Gets the native JavaScript Image object.
 	 * @private
 	 * @method
 	 * @returns {window.Image} The native window.Image object
@@ -177,7 +160,7 @@ sap.ui.define([
 	 * Sets the source of the image.
 	 * @public
 	 * @param {sap.ui.core.URI} sImageSrc The image URI
-	 * @returns {this} Pointer to the control instance for chaining.
+	 * @returns {sap.m.LightBoxItem} Pointer to the control instance for chaining.
 	 */
 	LightBoxItem.prototype.setImageSrc = function (sImageSrc) {
 		var oImage = this.getAggregation("_image"),
@@ -187,7 +170,7 @@ sap.ui.define([
 			return this;
 		}
 
-		this._sImageState = LightBoxLoadingStates.Loading;
+		this._imageState = LightBoxLoadingStates.Loading;
 
 		if (oLightBox && oLightBox._oPopup.getOpenState() === OpenState.OPEN) {
 			this._oImage.src = sImageSrc;
@@ -204,7 +187,7 @@ sap.ui.define([
 	 * @public
 	 * @param {string} alt The alt text
 	 * @method
-	 * @returns {this} Pointer to the control instance for chaining.
+	 * @returns {sap.m.LightBoxItem} Pointer to the control instance for chaining.
 	 */
 	LightBoxItem.prototype.setAlt = function (alt) {
 		var oImage = this.getAggregation("_image");
@@ -220,7 +203,7 @@ sap.ui.define([
 	 * @public
 	 * @param {string} title The image title
 	 * @method
-	 * @returns {this} Pointer to the control instance for chaining.
+	 * @returns {sap.m.LightBoxItem} Pointer to the control instance for chaining.
 	 */
 	LightBoxItem.prototype.setTitle = function (title) {
 		var oTitle = this.getAggregation("_title");
@@ -236,13 +219,13 @@ sap.ui.define([
 	 * @public
 	 * @param {string} subtitleText The image subtitle
 	 * @method
-	 * @returns {this} Pointer to the control instance for chaining.
+	 * @returns {sap.m.LightBoxItem} Pointer to the control instance for chaining.
 	 */
-	LightBoxItem.prototype.setSubtitle = function (sSubtitleText) {
-		var oSubtitle = this.getAggregation("_subtitle");
+	LightBoxItem.prototype.setSubtitle = function (subtitleText) {
+		var subtitle = this.getAggregation("_subtitle");
 
-		this.setProperty("subtitle", sSubtitleText, false);
-		oSubtitle.setText(sSubtitleText);
+		this.setProperty("subtitle", subtitleText, false);
+		subtitle.setText(subtitleText);
 
 		return this;
 	};

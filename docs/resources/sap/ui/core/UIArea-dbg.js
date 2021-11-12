@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -175,7 +175,7 @@ sap.ui.define([
 	 *
 	 * @extends sap.ui.base.ManagedObject
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @param {sap.ui.core.Core} oCore internal API of the <core>Core</code> that manages this UIArea
 	 * @param {object} [oRootNode] reference to the DOM element that should be 'hosting' the UI Area.
 	 * @public
@@ -203,7 +203,7 @@ sap.ui.define([
 			if (oRootNode != null) {
 				this.setRootNode(oRootNode);
 				// Figure out whether UI Area is pre-rendered (server-side JS rendering)!
-				this.bNeedsRerendering = this.bNeedsRerendering && !document.getElementById(oRootNode.id + "-Init");
+				this.bNeedsRerendering = this.bNeedsRerendering && !((oRootNode.id + "-Init" ? window.document.getElementById(oRootNode.id + "-Init") : null));
 			}
 			this.mInvalidatedControls = {};
 
@@ -229,34 +229,12 @@ sap.ui.define([
 				 */
 				dependents : {name : "dependents", type : "sap.ui.core.Control", multiple : true}
 			}
-		},
-
-		// make 'dependents' a non-invalidating aggregation
-		insertDependent: function(oElement, iIndex) {
-			return this.insertAggregation("dependents", oElement, iIndex, true);
-		},
-
-		addDependent: function(oElement) {
-			return this.addAggregation("dependents", oElement, true);
-		},
-
-		removeDependent: function(vElement) {
-			return this.removeAggregation("dependents", vElement, true);
-		},
-
-		removeAllDependents: function() {
-			return this.removeAllAggregation("dependents", true);
-		},
-
-		destroyDependents: function() {
-			return this.destroyAggregation("dependents", true);
 		}
 	});
 
 	/**
-	 * Returns whether re-rendering is currently suppressed on this UIArea.
-	 *
-	 * @returns {boolean} Whether re-rendering is currently suppressed on this UIArea
+	 * Returns whether rerendering is currently suppressed on this UIArea
+	 * @return boolean
 	 * @protected
 	 */
 	UIArea.prototype.isInvalidateSuppressed = function() {
@@ -287,8 +265,8 @@ sap.ui.define([
 	 *
 	 * The node must have an ID that will be used as ID for this instance of <code>UIArea</code>.
 	 *
-	 * @param {object} oRootNode
-	 *            the hosting DOM node for this instance of <code>UIArea</code>.
+	 * @param {object}
+	 *            oRootNode the hosting DOM node for this instance of <code>UIArea</code>.
 	 * @public
 	 */
 	UIArea.prototype.setRootNode = function(oRootNode) {
@@ -336,8 +314,8 @@ sap.ui.define([
 	 * The real re-rendering happens whenever the re-rendering is called. Either implicitly
 	 * at the end of any control event or by calling sap.ui.getCore().applyChanges().
 	 *
-	 * @param {sap.ui.base.Interface | sap.ui.core.Control} oRootControl
-	 *            the Control that should be the Root for this <code>UIArea</code>.
+	 * @param {sap.ui.base.Interface | sap.ui.core.Control}
+	 *            oRootControl the Control that should be the Root for this <code>UIArea</code>.
 	 * @public
 	 * @deprecated As of version 1.1, use {@link #removeAllContent} and {@link #addContent} instead
 	 */
@@ -474,8 +452,7 @@ sap.ui.define([
 
 	/**
 	 * Provide getBindingContext, as UIArea can be parent of an element.
-	 *
-	 * @returns {null} Always returns null.
+	 * @return {null} Always returns null.
 	 *
 	 * @protected
 	 */
@@ -507,7 +484,7 @@ sap.ui.define([
 	 * @protected
 	 */
 	UIArea.prototype.isActive = function() {
-		return !!this.getId() && document.getElementById(this.getId()) != null;
+		return ((this.getId() ? window.document.getElementById(this.getId()) : null)) != null;
 	};
 
 	/**
@@ -582,6 +559,15 @@ sap.ui.define([
 			that.bNeedsRerendering = false;
 		}
 
+		// at least IE9 can fail with a runtime error when accessing activeElement from within an iframe
+		function activeElement() {
+			try {
+				return document.activeElement;
+			} catch (err) {
+				// return undefined; -- also satisfies eslint check for empty block
+			}
+		}
+
 		if (force) {
 			this.bNeedsRerendering = true;
 		}
@@ -627,7 +613,7 @@ sap.ui.define([
 					return len;
 				};
 
-				var oFocusRef_Initial = document.activeElement;
+				var oFocusRef_Initial = activeElement();
 				var oStoredFocusInfo = this.oCore.oFocusHandler.getControlFocusInfo();
 
 				//First remove the old Dom nodes and then render the controls again
@@ -636,7 +622,7 @@ sap.ui.define([
 				var aContent = this.getContent();
 				var len = cleanUpDom(aContent, true);
 
-				var oFocusRef_AfterCleanup = document.activeElement;
+				var oFocusRef_AfterCleanup = activeElement();
 
 				for (var i = 0; i < len; i++) {
 					if (aContent[i] && aContent[i].getParent() === this) {
@@ -646,7 +632,7 @@ sap.ui.define([
 				bUpdated = true;
 
 				/* Try restoring focus when focus ref is changed due to cleanup operations and not changed anymore by the rendering logic */
-				if (oFocusRef_Initial && oFocusRef_Initial != oFocusRef_AfterCleanup && oFocusRef_AfterCleanup === document.activeElement) {
+				if (oFocusRef_Initial && oFocusRef_Initial != oFocusRef_AfterCleanup && oFocusRef_AfterCleanup === activeElement()) {
 					try {
 						this.oCore.oFocusHandler.restoreFocus(oStoredFocusInfo);
 					} catch (e) {
@@ -750,7 +736,7 @@ sap.ui.define([
 			oDomRef = oControl.getDomRef();
 			if (!oDomRef || RenderManager.isPreservedContent(oDomRef) ) {
 				// In case no old DOM node was found or only preserved DOM, search for an 'invisible' placeholder
-				oDomRef = document.getElementById(RenderManager.RenderPrefixes.Invisible + oControl.getId());
+				oDomRef = (RenderManager.RenderPrefixes.Invisible + oControl.getId() ? window.document.getElementById(RenderManager.RenderPrefixes.Invisible + oControl.getId()) : null);
 			}
 		}
 
@@ -885,7 +871,7 @@ sap.ui.define([
 
 		// in case of CRTL+SHIFT+ALT the contextmenu event should not be dispatched
 		// to allow to display the browsers context menu
-		if (oEvent.type === "contextmenu" && oEvent.shiftKey && oEvent.altKey && (oEvent.metaKey || oEvent.ctrlKey)) {
+		if (oEvent.type === "contextmenu" && oEvent.shiftKey && oEvent.altKey && !!(oEvent.metaKey || oEvent.ctrlKey)) {
 			Log.info("Suppressed forwarding the contextmenu event as control event because CTRL+SHIFT+ALT is pressed!");
 			return;
 		}
@@ -927,49 +913,40 @@ sap.ui.define([
 
 		// dispatch the event to the controls (callback methods: onXXX)
 		while (oElement instanceof Element && oElement.isActive() && !oEvent.isPropagationStopped()) {
-			var sScopeCheckId = oEvent.getMark("scopeCheckId"),
-				oScopeCheckDOM = sScopeCheckId && window.document.getElementById(sScopeCheckId),
-				oDomRef = oElement.getDomRef();
 
-			// for events which are dependent on the scope DOM (the DOM on which the 'mousedown' event is fired), the
-			// event is dispatched to the element only when the element's root DOM contains or equals the scope check
-			// DOM, so that the simulated 'touchmove' and 'touchend' event is only dispatched to the element when the
-			// 'touchstart' also occurred on the same element
-			if (!oScopeCheckDOM || containsOrEquals(oDomRef, oScopeCheckDOM)) {
-				// for each event type call the callback method
-				// if the execution should be stopped immediately
-				// then no further callback method will be executed
-				for (var i = 0, is = aEventTypes.length; i < is; i++) {
-					var sType = aEventTypes[i];
-					oEvent.type = sType;
-					// ensure currenTarget is the DomRef of the handling Control
-					oEvent.currentTarget = oElement.getDomRef();
-					oElement._handleEvent(oEvent);
-					if (oEvent.isImmediatePropagationStopped()) {
-						break;
-					}
-				}
-				if (!bGroupChanged && !oEvent.isMarked("enterKeyConsumedAsContent")) {
-					bGroupChanged = this._handleGroupChange(oEvent,oElement);
-				}
-
-				// if the propagation is stopped do not bubble up further
-				if (oEvent.isPropagationStopped()) {
+			// for each event type call the callback method
+			// if the execution should be stopped immediately
+			// then no further callback method will be executed
+			for (var i = 0, is = aEventTypes.length; i < is; i++) {
+				var sType = aEventTypes[i];
+				oEvent.type = sType;
+				// ensure currenTarget is the DomRef of the handling Control
+				oEvent.currentTarget = oElement.getDomRef();
+				oElement._handleEvent(oEvent);
+				if (oEvent.isImmediatePropagationStopped()) {
 					break;
 				}
+			}
+			if (!bGroupChanged && !oEvent.isMarked("enterKeyConsumedAsContent")) {
+				bGroupChanged = this._handleGroupChange(oEvent,oElement);
+			}
 
-				// Secret property on the element to allow to cancel bubbling of all events.
-				// This is a very special case, so there is no API method for this in the control.
-				if (oElement.bStopEventBubbling) {
-					break;
-				}
+			// if the propagation is stopped do not bubble up further
+			if (oEvent.isPropagationStopped()) {
+				break;
+			}
 
-				// This is the (not that common) situation that the element was deleted in its own event handler.
-				// i.e. the Element became 'inactive' (see Element#isActive())
-				oDomRef = oElement.getDomRef();
-				if (!oDomRef) {
-					break;
-				}
+			// Secret property on the element to allow to cancel bubbling of all events.
+			// This is a very special case, so there is no API method for this in the control.
+			if (oElement.bStopEventBubbling) {
+				break;
+			}
+
+			// This is the (not that common) situation that the element was deleted in its own event handler.
+			// i.e. the Element became 'inactive' (see Element#isActive())
+			var oDomRef = oElement.getDomRef();
+			if (!oDomRef) {
+				break;
 			}
 
 			// bubble up to the parent
@@ -1084,7 +1061,7 @@ sap.ui.define([
 		}
 
 		// mark the DOM as UIArea and bind the required events
-		jQuery(oDomRef).attr("data-sap-ui-area", oDomRef.id).on(ControlEvents.events.join(" "), this._handleEvent.bind(this));
+		jQuery(oDomRef).attr("data-sap-ui-area", oDomRef.id).bind(ControlEvents.events.join(" "), this._handleEvent.bind(this));
 
 	};
 
@@ -1101,18 +1078,18 @@ sap.ui.define([
 		}
 
 		// remove UIArea marker and unregister all event handlers of the control
-		jQuery(oDomRef).removeAttr("data-sap-ui-area").off();
+		jQuery(oDomRef).removeAttr("data-sap-ui-area").unbind();
 
 		// TODO: when optimizing the events => take care to unbind only the
 		//       required. additionally consider not to remove other event handlers.
 	//	var ojQRef = jQuery(oDomRef);
 	//	if (this.sEvents) {
-	//		ojQRef.off(this.sEvents, this._handleEvent);
+	//		ojQRef.unbind(this.sEvents, this._handleEvent);
 	//	}
 	//
 	//	var oFH = this.oCore.oFocusHandler;
-	//	ojQRef.off("focus",oFH.onfocusin);
-	//	ojQRef.off("blur", oFH.onfocusout);
+	//	ojQRef.unbind("focus",oFH.onfocusin);
+	//	ojQRef.unbind("blur", oFH.onfocusout);
 
 	};
 
@@ -1137,10 +1114,7 @@ sap.ui.define([
 	 */
 	UIArea.prototype._handleGroupChange = function(oEvent, oElement) {
 		var oKey = UIArea._oFieldGroupValidationKey;
-		if (oEvent.type === "focusin" || oEvent.type === "focusout") {
-			if (oEvent.type === "focusout") {
-				oElement = jQuery(document.activeElement).control(0);
-			}
+		if (oEvent.type === "focusin") {
 			// delay the check for a field group change to allow focus forwarding and resetting focus after selection
 			if (UIArea._iFieldGroupDelayTimer) {
 				clearTimeout(UIArea._iFieldGroupDelayTimer);

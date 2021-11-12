@@ -1,14 +1,15 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 	'sap/ui/core/library',
-	'sap/m/library'
+	'sap/m/library',
+	'sap/ui/Device'
 ],
-function(coreLibrary, library) {
+function(coreLibrary, library, Device) {
 	"use strict";
 
 
@@ -82,7 +83,7 @@ function(coreLibrary, library) {
 		rm.openEnd();
 		rm.close("div");
 		// logo
-		ShellRenderer.renderLogoImage(rm, oControl);
+		ShellRenderer.getLogoImageHtml(rm, oControl);
 
 		// header title
 		if (oControl.getTitle()) {
@@ -135,14 +136,30 @@ function(coreLibrary, library) {
 		rm.close("div");
 	};
 
-	ShellRenderer.renderLogoImage = function(rm, oControl) {
-		if (oControl._getImageSrc()) {
+	ShellRenderer.getLogoImageHtml = function(rm, oControl) {
+		var sImage = oControl.getLogo(); // configured logo
+		if (!sImage) {
+			//TODO: global jquery call found
+			jQuery.sap.require("sap.ui.core.theming.Parameters");
+			sImage = sap.ui.core.theming.Parameters._getThemeImage(); // theme logo
+		}
+
+		if (sImage) {
+			var oRb = sap.ui.getCore().getLibraryResourceBundle("sap.m");
 			rm.openStart("div");
 			rm.class("sapMShellLogo");
 			rm.openEnd();
-
-			rm.renderControl(oControl._getImage());
-
+			if (Device.browser.msie) {
+				rm.openStart("span");
+				rm.class("sapMShellLogoImgAligner");
+				rm.openEnd();
+				rm.close("span");
+			}
+			rm.voidStart("img", oControl.getId() + "-logo");
+			rm.class("sapMShellLogoImg");
+			rm.attr("src", sImage);
+			rm.attr("alt", oRb.getText("SHELL_ARIA_LOGO"));
+			rm.voidEnd();
 			rm.close("div");
 		}
 	};

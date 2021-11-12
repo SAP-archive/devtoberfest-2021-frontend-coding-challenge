@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -337,18 +337,24 @@ sap.ui.define(["sap/ui/thirdparty/jquery"], function(jQueryDOM) {
 
       var sErrorMessage = "dataTableUtils." + sFunc + ": parameter 'vNorm' must be either a Function or a String with the value 'titleCase', 'pascalCase', 'camelCase', 'hyphenated' or 'none'";
 
-      if (typeof vFun === "string" || vFun instanceof String) {
-        var fnNormalize = this.normalization[vFun];
-        if (fnNormalize === undefined) {
+      switch (jQueryDOM.type(vFun)) {
+
+        case "string":
+          var fnNormalize = this.normalization[vFun];
+          if (fnNormalize === undefined) {
+            throw new Error(sErrorMessage);
+          }
+          return fnNormalize;
+
+        case "function":
+          return vFun;
+
+        case "undefined":
+        case "null":
+          return this.normalization.none;
+
+        default:
           throw new Error(sErrorMessage);
-        }
-        return fnNormalize;
-      } else if (typeof vFun === "function") {
-        return vFun;
-      } else if (vFun === undefined || vFun === null) {
-        return this.normalization.none;
-      } else {
-        throw new Error(sErrorMessage);
       }
     },
 
@@ -361,7 +367,7 @@ sap.ui.define(["sap/ui/thirdparty/jquery"], function(jQueryDOM) {
      * @private
      */
     _testNormalizationInput: function(sString, sNormalizationFunction) {
-      if (typeof sString !== "string" && !(sString instanceof String)) {
+      if (jQueryDOM.type(sString) !== "string") {
         throw new Error("dataTableUtils.normalization." + sNormalizationFunction + ": parameter 'sString' must be a valid string");
       }
     },
@@ -378,12 +384,12 @@ sap.ui.define(["sap/ui/thirdparty/jquery"], function(jQueryDOM) {
 
       var sErrorMessage = "dataTableUtils." + sFunc + ": parameter 'aData' must be an Array of Array of Strings";
 
-      if (!Array.isArray(aArray)) {
+      if (jQueryDOM.type(aArray) !== "array") {
         throw new Error(sErrorMessage);
       }
 
       if (!aArray.every(function(a) {
-            return Array.isArray(a) && (a.every(function(s){return (typeof s === "string" || s instanceof String);}));
+            return (jQueryDOM.type(a) === "array") && (a.every(function(s){return (jQueryDOM.type(s) === "string");}));
           })) {
         throw new Error(sErrorMessage);
       }

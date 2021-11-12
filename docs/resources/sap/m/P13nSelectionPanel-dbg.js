@@ -1,6 +1,6 @@
 /*
  * ! OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -30,7 +30,7 @@ sap.ui.define([
 	 * @class The P13nSelectionPanel control is used to define selection settings like the visibility or the order of items.
 	 * @extends sap.m.P13nPanel
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @constructor
 	 * @private
 	 * @since 1.46.0
@@ -362,7 +362,6 @@ sap.ui.define([
 								href: "{href}",
 								text: "{text}",
 								target: "{target}",
-								wrapping: true,
 								enabled: {
 									path: 'href',
 									formatter: function(oValue) {
@@ -384,7 +383,6 @@ sap.ui.define([
 									fnPress(oEvent);
 								}
 							}), new Text({
-								wrapping: true,
 								visible: {
 									path: 'description',
 									formatter: function(sDescription) {

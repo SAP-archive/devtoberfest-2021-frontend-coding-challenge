@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -9,28 +9,20 @@ sap.ui.define([
 	'sap/ui/core/Renderer',
 	'sap/ui/core/library',
 	'sap/m/HyphenationSupport',
-	'./library',
-	'sap/ui/core/Core'
+	'./library'
 ], function(
 	Renderer,
 	coreLibrary,
 	HyphenationSupport,
-	mobileLibrary,
-	Core
+	mobileLibrary
 ) {
 		"use strict";
 
 		// shortcut for sap.ui.core.TextDirection
 		var TextDirection = coreLibrary.TextDirection;
 
-		// shortcut for sap.m.WrappingType
+		// shortcut for sap.ui.core.TextDirection
 		var WrappingType = mobileLibrary.WrappingType;
-
-		// shortcut for sap.m.EmptyIndicator
-		var EmptyIndicatorMode = mobileLibrary.EmptyIndicatorMode;
-
-		// shortcut for library resource bundle
-		var oRb = Core.getLibraryResourceBundle("sap.m");
 
 		/**
 		 * Text renderer.
@@ -64,9 +56,6 @@ sap.ui.define([
 			oRm.openStart("span", oText);
 			oRm.class("sapMText");
 			oRm.class("sapUiSelectable");
-			if (oText.hasMaxLines()) {
-				oRm.class("sapMTextMaxLineWrapper");
-			}
 
 			// set classes for wrapping
 			if (!bWrapping || nMaxLines == 1) {
@@ -80,8 +69,9 @@ sap.ui.define([
 
 			// write style and attributes
 			sWidth ? oRm.style("width", sWidth) : oRm.class("sapMTextMaxWidth");
-			oRm.attr("dir", sTextDir !== TextDirection.Inherit ? sTextDir.toLowerCase() : "auto");
-
+			if (sTextDir !== TextDirection.Inherit){
+				oRm.attr("dir", sTextDir.toLowerCase());
+			}
 			sTooltip && oRm.attr("title", sTooltip);
 			if (sTextAlign) {
 				sTextAlign = Renderer.getTextAlign(sTextAlign, sTextDir);
@@ -118,7 +108,8 @@ sap.ui.define([
 		 * @param {sap.m.Text} oText An object representation of the control that should be rendered
 		 */
 		TextRenderer.renderMaxLines = function(oRm, oText) {
-			oRm.openStart("span", oText.getId() + "-inner");
+			oRm.openStart("span");
+			oRm.attr("id", oText.getId() + "-inner");
 			oRm.class("sapMTextMaxLine");
 
 			// check native line clamp support
@@ -140,39 +131,8 @@ sap.ui.define([
 		 */
 		TextRenderer.renderText = function(oRm, oText) {
 			var sText = HyphenationSupport.getTextForRender(oText, "main");
-			if (oText.getEmptyIndicatorMode() !== EmptyIndicatorMode.Off && !oText.getText()) {
-				this.renderEmptyIndicator(oRm, oText);
-			} else {
-				oRm.text(sText);
-			}
+			oRm.text(sText);
 		};
-
-	/**
-	 * Renders the empty text indicator.
-	 *
-	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
-	 * @param {sap.m.Text} oText An object representation of the control that should be rendered.
-	 */
-	TextRenderer.renderEmptyIndicator = function(oRm, oText) {
-		oRm.openStart("span");
-			oRm.class("sapMEmptyIndicator");
-			if (oText.getEmptyIndicatorMode() === EmptyIndicatorMode.Auto) {
-				oRm.class("sapMEmptyIndicatorAuto");
-			}
-			oRm.openEnd();
-			oRm.openStart("span");
-			oRm.attr("aria-hidden", true);
-			oRm.openEnd();
-				oRm.text(oRb.getText("EMPTY_INDICATOR"));
-			oRm.close("span");
-			//Empty space text to be announced by screen readers
-			oRm.openStart("span");
-			oRm.class("sapUiPseudoInvisibleText");
-			oRm.openEnd();
-				oRm.text(oRb.getText("EMPTY_INDICATOR_TEXT"));
-			oRm.close("span");
-		oRm.close("span");
-	};
 
 		return TextRenderer;
 

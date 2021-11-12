@@ -1,8 +1,9 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
+
 sap.ui.define([
 	"sap/base/Log",
 	"sap/base/strings/escapeRegExp",
@@ -40,31 +41,23 @@ sap.ui.define([
 			"Number": Number,
 			"Object": Object,
 			"odata": {
-				"collection": function (aElements) {
-					return aElements.filter(function (vElement) {
-						return vElement !== undefined;
-					});
-				},
 				"compare": function () {
-					var oODataUtils = sap.ui.require("sap/ui/model/odata/v4/ODataUtils")
-							|| sap.ui.requireSync("sap/ui/model/odata/v4/ODataUtils");
+					var ODataUtils;
 
-					return oODataUtils.compare.apply(oODataUtils, arguments);
+					ODataUtils = sap.ui.requireSync("sap/ui/model/odata/v4/ODataUtils");
+					return ODataUtils.compare.apply(ODataUtils, arguments);
 				},
 				"fillUriTemplate": function (sExpression, mData) {
 					if (!URI.expand) {
-						// probing is not required since the presence of URI.expand is the indicator
-						// that URITemplate has been loaded already
 						/* URITemplate = */ sap.ui.requireSync("sap/ui/thirdparty/URITemplate");
 					}
-
 					return URI.expand(sExpression.trim(), mData).toString();
 				},
 				"uriEncode": function () {
-					var oODataUtils = sap.ui.require("sap/ui/model/odata/ODataUtils")
-							|| sap.ui.requireSync("sap/ui/model/odata/ODataUtils");
+					var ODataUtils;
 
-					return oODataUtils.formatValue.apply(oODataUtils, arguments);
+					ODataUtils = sap.ui.requireSync("sap/ui/model/odata/ODataUtils");
+					return ODataUtils.formatValue.apply(ODataUtils, arguments);
 				}
 			},
 			"parseFloat": parseFloat,

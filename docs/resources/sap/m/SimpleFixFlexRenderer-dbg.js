@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,9 +11,7 @@ sap.ui.define([],
 		 * SimpleFixFlex renderer
 		 * @namespace
 		 */
-		var SimpleFixFlexRenderer = {
-			apiVersion: 2
-		};
+		var SimpleFixFlexRenderer = {};
 
 		/**
 		 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
@@ -24,9 +22,11 @@ sap.ui.define([],
 		SimpleFixFlexRenderer.render = function (oRm, oControl) {
 			var oFixContent = oControl.getFixContent();
 
-			oRm.openStart('div', oControl);
-			oRm.class('sapUiSimpleFixFlex');
-			oRm.openEnd();
+			oRm.write('<div');
+			oRm.addClass('sapUiSimpleFixFlex');
+			oRm.writeControlData(oControl);
+			oRm.writeClasses();
+			oRm.write('>');
 
 			if (oFixContent) {
 				oRm.renderControl(oFixContent.addStyleClass('sapUiSimpleFixFlexFixed'));
@@ -34,7 +34,7 @@ sap.ui.define([],
 
 			this.renderFlexContentContainer(oRm, oControl);
 
-			oRm.close('div');
+			oRm.write('</div>');
 		};
 
 		/**
@@ -46,23 +46,26 @@ sap.ui.define([],
 		SimpleFixFlexRenderer.renderFlexContentContainer = function (oRm, oControl) {
 			var aFlexContent = oControl.getFlexContent();
 
-			oRm.openStart('div', oControl.getId() + "-flexContentContainer");
-			oRm.class('sapUiSimpleFixFlexFlexContentContainer');
-			oRm.openEnd();
+			oRm.write('<div');
+			oRm.writeAttribute("id", oControl.getId() + "-flexContentContainer");
+			oRm.addClass('sapUiSimpleFixFlexFlexContentContainer');
+			oRm.writeClasses();
+			oRm.write('>');
 
 			if (aFlexContent) {
-				oRm.openStart('div');
-				oRm.class('sapUiSimpleFixFlexFlexContent');
-				oRm.openEnd();
+				oRm.write('<div');
+				oRm.addClass('sapUiSimpleFixFlexFlexContent');
+				oRm.writeClasses();
+				oRm.write('>');
 
 				aFlexContent.forEach(function(oControl) {
 					oRm.renderControl(oControl);
 				});
 
-				oRm.close('div');
+				oRm.write('</div>');
 			}
 
-			oRm.close('div');
+			oRm.write('</div>');
 		};
 
 		return SimpleFixFlexRenderer;

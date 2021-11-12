@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,7 +8,6 @@
 sap.ui.define([
 	'./library',
 	'./Button',
-	'./Select',
 	'sap/ui/core/Control',
 	'sap/ui/core/EnabledPropagator',
 	'sap/ui/core/delegate/ItemNavigation',
@@ -20,7 +19,6 @@ sap.ui.define([
 function(
 	library,
 	Button,
-	Select,
 	Control,
 	EnabledPropagator,
 	ItemNavigation,
@@ -52,7 +50,7 @@ function(
 	 * @implements sap.ui.core.IFormContent
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -95,13 +93,11 @@ function(
 			 * The buttons of the SegmentedButton control. The items set in this aggregation are used as an interface for the buttons displayed by the control. Only the properties ID, icon, text, enabled and textDirections of the Button control are evaluated. Setting other properties of the button will have no effect. Alternatively, you can use the createButton method to add buttons.
 			 * @deprecated as of 1.28.0, replaced by <code>items</code> aggregation
 			 */
-			buttons : {type : "sap.m.Button", multiple : true, singularName : "button", deprecated: true},
+			buttons : {type : "sap.m.Button", multiple : true, singularName : "button"},
 
 			/**
 			 * Aggregation of items to be displayed. The items set in this aggregation are used as an interface for the buttons displayed by the control.
 			 * The "items" and "buttons" aggregations should NOT be used simultaneously as it causes the control to work incorrectly.
-			 * Note: If <code>width</code> is supplied in percetange to <code>SegmentedButtonItem</code> instances and
-			 * the sum of all percentages exeeds 100%, then the buttons display could overlap other elements in the page.
 			 * @since 1.28
 			 */
 			items : { type : "sap.m.SegmentedButtonItem", multiple : true, singularName : "item", bindable : "bindable" },
@@ -454,7 +450,7 @@ function(
 			canOverflow: true,
 			listenForEvents: ["select"],
 			autoCloseEvents: ["select"],
-			propsUnrelatedToSize: ["enabled", "selectedKey"],
+			noInvalidationProps: ["enabled", "selectedKey"],
 			invalidationEvents: ["_containerWidthChanged"],
 			onBeforeEnterOverflow: this._onBeforeEnterOverflow,
 			onAfterExitOverflow: this._onAfterExitOverflow
@@ -467,11 +463,7 @@ function(
 	};
 
 	SegmentedButton.prototype._onAfterExitOverflow = function(oControl) {
-		if (oControl._bForcedSelectMode) {
-			oControl._toSelectMode();
-		} else {
-			oControl._toNormalMode();
-		}
+		oControl._toNormalMode();
 	};
 
 	/**
@@ -493,8 +485,8 @@ function(
 	 * @param {sap.ui.core.URI} sURI
 	 *         Icon to be displayed as graphical element within the Button.
 	 *         Density related image will be loaded if image with density awareness name in format [imageName]@[densityValue].[extension] is provided.
-	 * @param {boolean} [bEnabled=true]
-	 *         Enables the control. Buttons that are disabled have other colors than enabled ones, depending on custom settings.
+	 * @param {boolean} bEnabled
+	 *         Enables the control (default is true). Buttons that are disabled have other colors than enabled ones, depending on custom settings.
 	 * @param {sap.ui.core.TextDirection} [sTextDirection]
 	 *         Element's text directionality with enumerated options
 	 *         @since 1.28.0
@@ -598,7 +590,7 @@ function(
 	 * Sets the <code>selectedKey</code> and is usable only when the control is initiated with the <code>items</code> aggregation.
 	 *
 	 * @param {string} sKey The key of the button to be selected
-	 * @returns {this} <code>this</code> pointer for chaining
+	 * @returns {sap.m.SegmentedButton} <code>this</code> pointer for chaining
 	 * @public
 	 * @override
 	 * @since 1.28
@@ -660,7 +652,7 @@ function(
 	/**
 	 * Adds item to <code>items</code> aggregation.
 	 * @param {sap.m.SegmentedButtonItem} oItem The item to be added
-	 * @returns {this} <code>this</code> pointer for chaining
+	 * @returns {sap.m.SegmentedButton} <code>this</code> pointer for chaining
 	 * @public
 	 * @override
 	 */
@@ -698,7 +690,7 @@ function(
 	 * Inserts item into <code>items</code> aggregation.
 	 * @param {sap.m.SegmentedButtonItem} oItem The item to be inserted
 	 * @param {int} iIndex index the item should be inserted at
-	 * @returns {this} <code>this</code> pointer for chaining
+	 * @returns {sap.m.SegmentedButton} <code>this</code> pointer for chaining
 	 * @public
 	 * @override
 	 */
@@ -738,7 +730,7 @@ function(
 			// CSN# 0001429454/2014: remove class for all other items
 			this.getButtons().forEach(function (oButton) {
 				oButton.$().removeClass("sapMSegBBtnSel");
-				oButton.$().attr("aria-selected", false);
+				oButton.$().attr("aria-checked", false);
 			});
 
 			//get the corresponding item regarding the pressed button
@@ -747,7 +739,7 @@ function(
 			})[0];
 
 			oButtonPressed.$().addClass("sapMSegBBtnSel");
-			oButtonPressed.$().attr("aria-selected", true);
+			oButtonPressed.$().attr("aria-checked", true);
 
 			this.setAssociation('selectedButton', oButtonPressed, true);
 			this.setProperty("selectedKey", this.getSelectedKey(), true);
@@ -790,7 +782,7 @@ function(
 	 *    An sap.m.Button instance which becomes the new target of this <code>selectedButton</code> association.
 	 *    Alternatively, the ID of an sap.m.Button instance may be given as a string.
 	 *    If the value of null, undefined, or an empty string is provided the first item will be selected.
-	 * @returns {this} <code>this</code> pointer for chaining
+	 * @returns {sap.m.SegmentedButton} <code>this</code> pointer for chaining
 	 * @public
 	 */
 	SegmentedButton.prototype.setSelectedButton = function (vButton) {
@@ -818,7 +810,7 @@ function(
 	 *    An sap.m.SegmentedButtonItem instance which becomes the new target of this <code>selectedItem</code> association.
 	 *    Alternatively, the ID of an <code>sap.m.SegmentedButtonItem</code> instance may be given as a string.
 	 *    If the value of null, undefined, or an empty string is provided, the first item will be selected.
-	 * @returns {this} <code>this</code> pointer for chaining
+	 * @returns {sap.m.SegmentedButton} <code>this</code> pointer for chaining
 	 * @public
 	 * @override
 	 */
@@ -859,14 +851,24 @@ function(
 		oEvent.preventDefault();
 	};
 
+	/** Select form function **/
+
 	/**
-	 * Hidden select aggregation factory function.
+	 * Lazy loader for the select hidden aggregation.
 	 * @private
 	 */
-	SegmentedButton.prototype._fnSelectFormFactory = function() {
-		return new Select(this.getId() + "-select")
-			.attachChange(this._selectChangeHandler, this)
-			.addStyleClass("sapMSegBSelectWrapper");
+	SegmentedButton.prototype._lazyLoadSelectForm = function() {
+		var oSelect = this.getAggregation("_select");
+
+		if (!oSelect) {
+			// lazy load sap.m.Select, TODO should be loaded async
+			jQuery.sap.require("sap.m.Select");
+			var Select = sap.ui.require("sap/m/Select");
+			oSelect = new Select(this.getId() + "-select");
+			oSelect.attachChange(this._selectChangeHandler, this);
+			oSelect.addStyleClass("sapMSegBSelectWrapper");
+			this.setAggregation("_select", oSelect, true);
+		}
 	};
 
 	/**
@@ -929,10 +931,7 @@ function(
 	SegmentedButton.prototype._toSelectMode = function() {
 		this._bInOverflow = true;
 		this.addStyleClass("sapMSegBSelectWrapper");
-		if (!this.getAggregation("_select")) {
-			this.setAggregation("_select", this._fnSelectFormFactory(), true);
-		}
-
+		this._lazyLoadSelectForm();
 		this._syncSelect();
 		this._syncAriaAssociations();
 	};
@@ -994,8 +993,8 @@ function(
 	SegmentedButton.prototype._getIconAriaLabel = function (oIcon) {
 		var oIconInfo = IconPool.getIconInfo(oIcon.getSrc()),
 			sResult = "";
-		if (oIconInfo) {
-			sResult = oIconInfo.text ? oIconInfo.text : oIconInfo.name;
+		if (oIconInfo && oIconInfo.name) {
+			sResult = oIconInfo.name;
 		}
 		return sResult;
 	};

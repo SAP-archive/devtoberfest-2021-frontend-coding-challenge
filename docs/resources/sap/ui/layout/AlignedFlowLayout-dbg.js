@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -40,7 +40,7 @@ sap.ui.define([
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @private
@@ -99,9 +99,6 @@ sap.ui.define([
 			}
 		});
 
-		/**
-		 * @inheritdoc
-		 */
 		AlignedFlowLayout.prototype.init = function() {
 
 			// resize observer feature detection
@@ -121,20 +118,9 @@ sap.ui.define([
 				// registration ID used for de-registering the resize handler
 				this._sResizeHandlerContainerListenerID = ResizeHandler.register(this, this.onResizeHandler.bind(this));
 			}
-
-			// reference to the reflow method that when called, has its `this`
-			// binding set to this layout instance
-			this.fnReflow = this.reflow.bind(this);
-
-			// indicates whether the invocation of the reflow method is suspended
-			this.bReflowSuspended = false;
 		};
 
-		/**
-		 * @inheritdoc
-		 */
 		AlignedFlowLayout.prototype.exit = function() {
-			this.fnReflow = null;
 
 			// resize observer cleanup
 			this.disconnectResizeObserver();
@@ -149,59 +135,42 @@ sap.ui.define([
 		};
 
 		AlignedFlowLayout.prototype.onAfterRenderingOrThemeChanged = function() {
+			var oDomRef = this.getDomRef(),
+				oEndItemDomRef = this.getDomRef("endItem"),
+				bEndItemAndContent = !!(this.hasContent() && oDomRef && oEndItemDomRef);
 
-			window.requestAnimationFrame(function() {
-				var oDomRef = this.getDomRef(),
-					oEndItemDomRef = this.getDomRef("endItem"),
-					bEndItemAndContent = !!(this.hasContent() && oDomRef && oEndItemDomRef);
+			if (bEndItemAndContent) {
+				var oLayoutComputedStyle = window.getComputedStyle(oDomRef, null),
+					iLayoutPaddingTop = oLayoutComputedStyle.getPropertyValue("padding-top"),
+					mEndItemStyle = oEndItemDomRef.style;
 
-				if (bEndItemAndContent) {
-					var oLayoutComputedStyle = window.getComputedStyle(oDomRef, null),
-						iLayoutPaddingTop = oLayoutComputedStyle.getPropertyValue("padding-top"),
-						mEndItemStyle = oEndItemDomRef.style;
-
-					// adapt the position of the absolute-positioned end item in case a standard CSS class is added
-					if (Core.getConfiguration().getRTL()) {
-						mEndItemStyle.left = oLayoutComputedStyle.getPropertyValue("padding-left");
-					} else {
-						mEndItemStyle.right = oLayoutComputedStyle.getPropertyValue("padding-right");
-					}
-
-					mEndItemStyle.bottom = iLayoutPaddingTop;
+				// adapt the position of the absolute-positioned end item in case a standard CSS class is added
+				if (Core.getConfiguration().getRTL()) {
+					mEndItemStyle.left = oLayoutComputedStyle.getPropertyValue("padding-left");
+				} else {
+					mEndItemStyle.right = oLayoutComputedStyle.getPropertyValue("padding-right");
 				}
 
-				var oDomRefs = {
-					domRef: oDomRef,
-					endItemDomRef: oEndItemDomRef
-				};
+				mEndItemStyle.bottom = iLayoutPaddingTop;
+			}
 
-				this.reflow(oDomRefs);
-			}.bind(this));
+			this.reflow({ domRef: oDomRef, endItemDomRef: oEndItemDomRef });
 		};
 
-		/**
-		 * @inheritdoc
-		 */
 		AlignedFlowLayout.prototype.onBeforeRendering = function() {
 			this.disconnectResizeObserver();
 			this.disconnectResizeHandlerForEndItem();
 		};
 
-		/**
-		 * @inheritdoc
-		 */
 		AlignedFlowLayout.prototype.onAfterRendering = function() {
 			this.observeSizeChangesIfRequired();
 			this.onAfterRenderingOrThemeChanged();
 		};
 
-		/**
-		 * @inheritdoc
-		 */
 		AlignedFlowLayout.prototype.onThemeChanged = AlignedFlowLayout.prototype.onAfterRenderingOrThemeChanged;
 
-		// this resize handler needs to be called on after rendering, theme change,
-		// and whenever the width of this control changes
+		// this resize handler needs to be called on after rendering, theme change, and whenever the width of this
+		// control changes
 		AlignedFlowLayout.prototype.onResizeHandler = function(oEvent) {
 
 			// avoid cyclic dependencies and infinite resizing callback loops
@@ -211,32 +180,22 @@ sap.ui.define([
 		};
 
 		AlignedFlowLayout.prototype.onResize = function(aObserverEntries) {
-			var oDomRef = this.getDomRef();
-			this.bReflowSuspended = this.bReflowSuspended || this.unobserveSizeChangesIfReflowSuspended(oDomRef);
-
-			if (this.bReflowSuspended) {
-				return;
-			}
-
-			var oEndItemDomRef,
+			var oDomRef = this.getDomRef(),
+				oEndItemDomRef,
 				oObserverEntry = aObserverEntries[0],
-				bWidthChangedSignificantly = hasWidthChangedSignificantly(this.fLayoutWidth, oObserverEntry, oDomRef),
-				fNewWidth = oObserverEntry.contentRect.width,
-				fNewHeight = oObserverEntry.contentRect.height;
+				bWidthChanged = isWidthChanged(this.fLayoutWidth, oObserverEntry, oDomRef),
+				fNewWidth = oObserverEntry.contentRect.width;
 
-			if (bWidthChangedSignificantly) {
+			if (bWidthChanged) {
 				this.fLayoutWidth = fNewWidth;
-				this.fLayoutHeight = fNewHeight;
 			} else {
 				oEndItemDomRef = this.getDomRef("endItem");
-				bWidthChangedSignificantly = hasWidthChangedSignificantly(this.fEndItemWidth, oObserverEntry, oEndItemDomRef);
+				bWidthChanged = isWidthChanged(this.fEndItemWidth, oObserverEntry, oEndItemDomRef);
 
-				if (bWidthChangedSignificantly) {
+				if (bWidthChanged) {
 					this.fEndItemWidth = fNewWidth;
-					this.fLayoutHeight = fNewHeight;
-				} else if (this.fLayoutHeight !== fNewHeight) {	// we may still have relevant height changes
-					this.fLayoutHeight = fNewHeight;
 				} else {
+
 					// avoid cyclic dependencies and/or infinite resizing callback loops
 					return;
 				}
@@ -263,15 +222,6 @@ sap.ui.define([
 		 * @since 1.60
 		 */
 		AlignedFlowLayout.prototype.reflow = function(oDomRefs) {
-
-			if (this.bReflowSuspended) {
-				this.bReflowSuspended = false;
-
-				if (this.oResizeObserver) {
-					this.observeSizeChangesIfRequired();
-				}
-			}
-
 			var aContent = this.getContent();
 
 			// skip unnecessary style recalculations if the items are not rendered or are rendered async
@@ -328,8 +278,7 @@ sap.ui.define([
 				iAvailableWidthForEndItem = oDomRef.offsetWidth - iRightBorderOfLastItem;
 			}
 
-			var iEndItemMarginRight = Number.parseFloat(window.getComputedStyle(oEndItemDomRef).marginRight);
-			var bEnoughSpaceForEndItem = iAvailableWidthForEndItem >= (iEndItemWidth + iEndItemMarginRight);
+			var bEnoughSpaceForEndItem = iAvailableWidthForEndItem >= iEndItemWidth;
 
 			// if the end item fits into the line
 			if (bEnoughSpaceForEndItem) {
@@ -403,22 +352,16 @@ sap.ui.define([
 			}
 		};
 
-		function hasWidthChangedSignificantly(fOldWidth, oObserverEntry, oTargetDomRef) {
-			var WIDTH_THRESHOLD = 0.25,
-				fNewWidth = oObserverEntry.contentRect.width;
-
-			return (oTargetDomRef === oObserverEntry.target) && (Math.abs(fNewWidth - fOldWidth) >= WIDTH_THRESHOLD);
+		function isWidthChanged(fOldWidth, oObserverEntry, oTargetDomRef) {
+			var fNewWidth = oObserverEntry.contentRect.width;
+			return (oTargetDomRef === oObserverEntry.target) && (fNewWidth !== fOldWidth);
 		}
 
 		function resetCSS(oDomRef, oLastSpacerDomRef) {
-			var mLastSpacerStyle = oLastSpacerDomRef && oLastSpacerDomRef.style;
-
-			if (mLastSpacerStyle) {
-				mLastSpacerStyle.width = "";
-				mLastSpacerStyle.height = "";
-				mLastSpacerStyle.display = "";
-			}
-
+			var mLastSpacerStyle = oLastSpacerDomRef.style;
+			mLastSpacerStyle.width = "";
+			mLastSpacerStyle.height = "";
+			mLastSpacerStyle.display = "";
 			oDomRef.classList.remove(oDomRef.classList.item(0) + "OneLine");
 		}
 
@@ -502,7 +445,6 @@ sap.ui.define([
 			} else if (sMinItemWidth.lastIndexOf("px") !== -1) {
 				fMinItemWidth = parseFloat(sMinItemWidth);
 			}
-
 			// else, the CSS unit is not in rem or px, in this case a conversion to px is not made and
 			// more spacers are rendered (worst case, but unusual in UI5)
 
@@ -529,6 +471,7 @@ sap.ui.define([
 		};
 
 		AlignedFlowLayout.prototype.observeSizeChanges = function() {
+
 			var oDomRef = this.getDomRef();
 
 			if (!oDomRef) {
@@ -561,24 +504,6 @@ sap.ui.define([
 				// registration ID used for de-registering the resize handler
 				this._sResizeHandlerEndItemListenerID = ResizeHandler.register(oEndItemDomRef, this.onResizeHandler.bind(this));
 			}
-		};
-
-		AlignedFlowLayout.prototype.unobserveSizeChanges = function(oDomRef) {
-			if (this.oResizeObserver && oDomRef) {
-				this.oResizeObserver.unobserve(oDomRef);
-			}
-		};
-
-		AlignedFlowLayout.prototype.unobserveSizeChangesIfReflowSuspended = function(oDomRef) {
-			var bReflowSuspended = ResizeHandler.isSuspended(oDomRef, this.fnReflow);
-
-			if (bReflowSuspended) {
-				this.unobserveSizeChanges(oDomRef);
-				this.unobserveSizeChanges(this.getDomRef("endItem"));
-				return true;
-			}
-
-			return false;
 		};
 
 		AlignedFlowLayout.prototype.disconnectResizeObserver = function() {

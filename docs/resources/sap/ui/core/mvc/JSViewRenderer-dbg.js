@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -16,28 +16,50 @@ sap.ui.define(['./ViewRenderer'],
 	 * @alias sap.ui.core.mvc.JSViewRenderer
 	 */
 	var JSViewRenderer = {
-		apiVersion: 2
 	};
 
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
 	 *
-	 * @param {sap.ui.core.RenderManager} rm the RenderManager that can be used for writing to the Render-Output-Buffer
+	 * @param {sap.ui.core.RenderManager} oRenderManager the RenderManager that can be used for writing to the Render-Output-Buffer
 	 * @param {sap.ui.core.Control} oControl an object representation of the control that should be rendered
 	 */
-	JSViewRenderer.render = function(rm, oControl){
-		rm.openStart("div", oControl);
-		rm.class("sapUiView");
-		rm.class("sapUiJSView");
+	JSViewRenderer.render = function(oRenderManager, oControl){
+		// convenience variable
+		var rm = oRenderManager;
+
+		// write the HTML into the render manager
+		rm.write("<div");
+		rm.writeControlData(oControl);
+		rm.addClass("sapUiView");
+		rm.addClass("sapUiJSView");
 		ViewRenderer.addDisplayClass(rm, oControl);
-		rm.style("width", oControl.getWidth());
-		rm.style("height", oControl.getHeight());
-		rm.openEnd();
+		if (oControl.getWidth()) {
+			rm.addStyle("width", oControl.getWidth());
+		}
+		if (oControl.getHeight()) {
+			rm.addStyle("height", oControl.getHeight());
+		}
+		rm.writeStyles();
+		rm.writeClasses();
+		rm.write(">");
 
-		oControl.getContent().forEach(rm.renderControl, rm);
+		var content = oControl.getContent();
+		if (content) {
+			if (Array.isArray(content)) {
+				// looks like an Array
+				for (var i = 0; i < content.length; i++) {
+					rm.renderControl(content[i]);
+				}
 
-		rm.close("div");
+			} else if (content) {
+				// should be a Control
+				rm.renderControl(content);
+			}
+		}
+
+		rm.write("</div>");
 	};
 
 

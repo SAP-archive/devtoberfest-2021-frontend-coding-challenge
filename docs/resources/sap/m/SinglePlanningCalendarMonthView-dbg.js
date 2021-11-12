@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -28,7 +28,7 @@ sap.ui.define([
 		 * @extends sap.m.SinglePlanningCalendarView
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @public
@@ -83,8 +83,7 @@ sap.ui.define([
 		 * @public
 		 */
 		SinglePlanningCalendarMonthView.prototype.calculateStartDate = function(oStartDate) {
-			var oReturnDate = CalendarUtils.getFirstDateOfMonth(CalendarUtils._createUTCDate(oStartDate, true)).getJSDate();
-			return CalendarUtils._createLocalDate(oReturnDate, true);
+			return CalendarUtils.getFirstDateOfMonth(oStartDate).getJSDate();
 		};
 
 		return SinglePlanningCalendarMonthView;

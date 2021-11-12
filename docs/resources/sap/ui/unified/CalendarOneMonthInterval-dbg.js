@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -57,7 +57,7 @@ sap.ui.define([
 		 * Navigation via year picker switches to the corresponding year and the same month as before the navigation.
 		 *
 		 * @extends sap.ui.unified.CalendarDateInterval
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @private
@@ -72,15 +72,15 @@ sap.ui.define([
 			this._bShowOneMonth = true;
 		};
 
-		CalendarOneMonthInterval.prototype._getCalendar = function (){
-			var oCalendar;
+		CalendarOneMonthInterval.prototype._getCalendarPicker = function (){
+			var oCalPicker = this.getAggregation("calendarPicker");
 
-			if (!this._oCalendar) {
-				oCalendar = new CustomMonthPicker(this.getId() + "--Cal");
-				oCalendar.setPopupMode(true);
+			if (!oCalPicker) {
+				oCalPicker = new CustomMonthPicker(this.getId() + "--Cal");
+				oCalPicker.setPopupMode(true);
 
-				oCalendar.attachEvent("select", function () {
-					var oCalPicker = this._getCalendar(),
+				oCalPicker.attachEvent("select", function () {
+					var oCalPicker = this._getCalendarPicker(),
 						oCalPickerFocusedDate = oCalPicker._getFocusedDate(),
 						oNewStartDate = CalendarUtils._getFirstDateOfMonth(oCalPickerFocusedDate);
 					var oOneMonthDateRow = this.getAggregation("month")[0];
@@ -91,13 +91,13 @@ sap.ui.define([
 						oNewStartDate = this._getStartDate();
 					}
 
-					this._adjustSelectedDate(oNewStartDate);
+					this._adjustSelectedDate(oNewStartDate, false);
 					this._oFocusDateOneMonth = oNewStartDate;
 					this._closeCalendarPicker(true);// true means do not focus, as we set the this._oFocusDateOneMonth and focus will happen in .focusDateExtend
 					this._focusDate(oCalPickerFocusedDate, false, true); //true means don't fire event (we already did it in setStartDate())
 				}, this);
-				oCalendar.attachEvent("cancel", function (oEvent) {
-					var oCalPicker = this._getCalendar(),
+				oCalPicker.attachEvent("cancel", function (oEvent) {
+					var oCalPicker = this._getCalendarPicker(),
 						oCalPickerFocusedDate = oCalPicker._getFocusedDate();
 
 					this._closeCalendarPicker(true);
@@ -109,9 +109,9 @@ sap.ui.define([
 						oDomRefB1.focus();
 					}
 				}, this);
-				this._oCalendar = oCalendar;
+				this.setAggregation("calendarPicker", oCalPicker);
 			}
-			return this._oCalendar;
+			return oCalPicker;
 		};
 
 		/**
@@ -259,11 +259,15 @@ sap.ui.define([
 
 		/**
 		 * Sets the selection to match the focused date for size S and M.
-		 * @param {sap.ui.unified.calendar.CalendarDate} oSelectDate The date to select unless bUseFirstOfMonth is used
+		 * @param {sap.ui.unified.calendar.CalendarDate} oDate The date to select unless bUseFirstOfMonth is used
+		 * @param {boolean} bUseFirstOfMonth If specified the first month of the given date will be used
 		 * @private
 		 */
-		CalendarOneMonthInterval.prototype._adjustSelectedDate = function(oSelectDate) {
-			var oMonth = this.getAggregation("month")[0];
+		CalendarOneMonthInterval.prototype._adjustSelectedDate = function(oDate, bUseFirstOfMonth) {
+			var oMonth = this.getAggregation("month")[0],
+				oSelectDate;
+
+			oSelectDate = bUseFirstOfMonth ? CalendarUtils._getFirstDateOfMonth(oDate) : oDate;
 
 			if (oMonth.getMode && oMonth.getMode() < 2) {
 				this._selectDate(oSelectDate);

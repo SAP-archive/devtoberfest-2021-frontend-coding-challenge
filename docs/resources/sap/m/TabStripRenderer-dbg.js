@@ -1,15 +1,10 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define([
-	'./TabStripItem',
-	'sap/ui/Device',
-	'sap/ui/core/InvisibleText',
-	"sap/ui/core/Element"
-], function(TabStripItem,  Device, InvisibleText, Element) {
+sap.ui.define(['./TabStripItem', 'sap/ui/Device', 'sap/ui/core/InvisibleText'], function(TabStripItem,  Device, InvisibleText) {
 	"use strict";
 
 	/**
@@ -35,7 +30,10 @@ sap.ui.define([
 		}
 		this.beginTabStrip(oRm, oControl);
 
-		if (!Device.system.phone) {
+		// for phones show only the select component of the strip & "+" button
+		if (Device.system.phone === true) {
+			this.renderTouchArea(oRm, oControl);
+		} else {
 			oRm.openStart("div", oControl.getId() + "-leftOverflowButtons");
 			oRm.class(this.LEFT_OVERRFLOW_BTN_CLASS_NAME);
 			oRm.openEnd();
@@ -43,13 +41,9 @@ sap.ui.define([
 				this.renderLeftOverflowButtons(oRm, oControl, false);
 			}
 			oRm.close("div");
-		}
-
-		this.beginTabsContainer(oRm, oControl);
-		this.renderItems(oRm, oControl);
-		this.endTabsContainer(oRm);
-
-		if (!Device.system.phone) {
+			this.beginTabsContainer(oRm, oControl);
+			this.renderItems(oRm, oControl);
+			this.endTabsContainer(oRm);
 			oRm.openStart("div", oControl.getId() + "-rightOverflowButtons");
 			oRm.class(this.RIGHT_OVERRFLOW_BTN_CLASS_NAME);
 			oRm.openEnd();
@@ -57,9 +51,8 @@ sap.ui.define([
 				this.renderRightOverflowButtons(oRm, oControl, false);
 			}
 			oRm.close("div");
+			this.renderTouchArea(oRm, oControl);
 		}
-
-		this.renderTouchArea(oRm, oControl);
 		this.endTabStrip(oRm);
 	};
 
@@ -71,20 +64,12 @@ sap.ui.define([
 	 */
 	TabStripRenderer.renderItems = function (oRm, oControl) {
 		var aItems = oControl.getItems(),
-			sSelectedItemId = oControl.getSelectedItem(),
-			bIsSelected,
-			oSelectedItem;
+			sSelectedItemId = oControl.getSelectedItem();
 
-		// On mobile device we render only the selected tab if there is one
-		if (Device.system.phone) {
-			oSelectedItem = Element.registry.get(sSelectedItemId);
-			oSelectedItem && this.renderItem(oRm, oControl, oSelectedItem, true);
-		} else {
-			aItems.forEach(function (oItem) {
-				bIsSelected = sSelectedItemId && sSelectedItemId === oItem.getId();
-				this.renderItem(oRm, oControl, oItem, bIsSelected);
-			}, this);
-		}
+		aItems.forEach(function (oItem) {
+			var bIsSelected = sSelectedItemId && sSelectedItemId === oItem.getId();
+			this.renderItem(oRm, oControl, oItem, bIsSelected);
+		}, this);
 	};
 
 	/**
@@ -101,6 +86,7 @@ sap.ui.define([
 			bModified = oItem.getModified();
 
 		oRm.openStart("div", oItem);
+		oRm.attr("id", oItem.getId());
 		oRm.class(TabStripItem.CSS_CLASS);
 		if (bModified) {
 			oRm.class(TabStripItem.CSS_CLASS_MODIFIED);
@@ -191,7 +177,7 @@ sap.ui.define([
 	 */
 	TabStripRenderer.beginTabStrip = function (oRm, oControl) {
 		oRm.openStart("div");
-		oRm.class("sapMTabStripContainer");
+		oRm.class("sapMTabStribContainer");
 		oRm.openEnd();
 		oRm.openStart("div", oControl);
 		oRm.class("sapMTabStrip");

@@ -1,12 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.m._overflowToolbarHelpers.OverflowToolbarAssociativePopover.
-sap.ui.define(['./Popover', './OverflowToolbarAssociativePopoverControls', './OverflowToolbarAssociativePopoverRenderer', './OverflowToolbarLayoutData', 'sap/m/library'],
-	function(Popover, OverflowToolbarAssociativePopoverControls, OverflowToolbarAssociativePopoverRenderer, OverflowToolbarLayoutData, library) {
+sap.ui.define(['./Popover', './PopoverRenderer', './OverflowToolbarAssociativePopoverControls', './OverflowToolbarLayoutData', 'sap/m/library'],
+	function(Popover, PopoverRenderer, OverflowToolbarAssociativePopoverControls, OverflowToolbarLayoutData, library) {
 	"use strict";
 
 
@@ -30,7 +30,7 @@ sap.ui.define(['./Popover', './OverflowToolbarAssociativePopoverControls', './Ov
 	 * @extends sap.m.Popover
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @private
@@ -39,7 +39,6 @@ sap.ui.define(['./Popover', './OverflowToolbarAssociativePopoverControls', './Ov
 	 */
 	var OverflowToolbarAssociativePopover = Popover.extend("sap.m._overflowToolbarHelpers.OverflowToolbarAssociativePopover", /** @lends sap.m._overflowToolbarHelpers.OverflowToolbarAssociativePopover.prototype */ {
 		metadata : {
-			library: "sap.m",
 			associations : {
 				/**
 				 * The same as content, but provided in the form of an association
@@ -47,7 +46,7 @@ sap.ui.define(['./Popover', './OverflowToolbarAssociativePopoverControls', './Ov
 				associatedContent: {type: "sap.ui.core.Control", multiple: true}
 			}
 		},
-		renderer: OverflowToolbarAssociativePopoverRenderer
+		renderer: PopoverRenderer.render
 	});
 
 	OverflowToolbarAssociativePopover.prototype.init = function() {
@@ -61,6 +60,16 @@ sap.ui.define(['./Popover', './OverflowToolbarAssociativePopoverControls', './Ov
 		Popover.prototype.onBeforeRendering.apply(this, arguments);
 		this.addStyleClass("sapMOTAPopover");
 		this.addStyleClass("sapMOverflowToolbarMenu-CTX");
+
+		var bHasButtonsWithIcons = this._getAllContent().some(function(oControl) {
+			return oControl.hasStyleClass("sapMOTAPButtonWithIcon");
+		});
+
+		if (bHasButtonsWithIcons) {
+			this.addStyleClass("sapMOTAPButtonsWithIcons");
+		} else {
+			this.removeStyleClass("sapMOTAPButtonsWithIcons");
+		}
 	};
 
 	/* Override API methods */
@@ -188,7 +197,6 @@ sap.ui.define(['./Popover', './OverflowToolbarAssociativePopoverControls', './Ov
 		}
 
 		oPosParams._fMarginBottom = oPosParams._fDocumentHeight - oPosParams._$parent.offset().top + this._arrowOffset + oPosParams._fOffsetY;
-		return oPosParams;
 	};
 
 	/**

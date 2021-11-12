@@ -52,6 +52,7 @@
 				cursor: pointer;
 				-webkit-user-select: none;
 				-moz-user-select: none;
+				-ms-user-select: none;
 				user-select: none;
 				background: transparent;
 				color: @sapUiGroupTitleTextColor;
@@ -170,42 +171,33 @@
 /* Phone                                         */
 /* ============================================= */
 
-html.sap-phone {
-	.sapMTabStrip {
-		.sapMSltWithArrow {
-			visibility: visible;
-			display: none;
+html.sap-phone .sapMTabStrip {
+	.sapMTSTouchArea {
+		position: inherit;
+		right: inherit;
+		margin: 0 0.25rem;
+		padding-right: 2.75rem;
+		.sapMTSSlt .sapMSltLabel {
+			position: absolute;
+			left: 0;
+			padding: 0 0 0 1rem;
 		}
-
-		.sapMTabStripItem {
-			line-height: 2.5rem;
-			.sapMTSItemCloseBtnCnt {
-				position: absolute;
-				right: 0;
-			}
+		.sapMSltIcon.sapUiIcon.sapUiIconMirrorInRTL {
+			position: absolute;
+			right: 2.5rem;
+			border-width: @sapButton_BorderWidth;
+			border-radius: @sapButton_BorderCornerRadius;
+			border-color: @sapButton_BorderColor;
+			height: 2.375rem;
 		}
-
-		.sapMTSTabs,
-		.sapMTabStripItem {
-			width: 100%;
+		.sapMBtn.sapMBtnBase {
+			position: absolute;
+			right: 0;
 		}
 	}
-
-	.sapMTabStrip.sapUiSelectable .sapMSltWithArrow {
-		display: inline-block;
-	}
-
-	.sapMTabContainer.sapUiShowAddNewButton .sapMTabStrip.sapUiSelectable .sapMTSTabsContainer {
-		right: 5.8rem;
-	}
-
-	.sapMTabContainer.sapUiShowAddNewButton .sapMTabStrip .sapMTSTabsContainer,
-	.sapMTabContainer .sapMTabStrip.sapUiSelectable .sapMTSTabsContainer {
-		right: 2.75rem;
-	}
-
-	.sapMTabContainer .sapMTabStrip .sapMTSTabsContainer {
-		right: 0rem;
+	.sapMSltWithArrow {
+		visibility: visible;
+		width: 100%;
 	}
 }
 
@@ -221,6 +213,12 @@ html[data-sap-ui-animation='on'] .sapMTabStrip .sapMTSTabsContainer .sapMTSTabs 
 html[data-sap-ui-animation='on'] .sapMTabStrip .sapMTSTabsContainer .sapMTSTabs .sapMTabStripItem .sapMTSItemCloseBtnCnt .sapMBtn {
 	-webkit-transition: opacity 0.3s;
 	transition: opacity 0.3s;
+}
+
+html[data-sap-ui-browser ^= "ie"], html[data-sap-ui-browser^="ed"] {// TODO remove after the end of support for Internet Explorer
+	.sapMTabStrip .sapMTSTabsContainer .sapMTSTabs .sapMTabStripItem:focus::before {
+		border-style: dashed;
+	}
 }
 
 html[dir=ltr] .sapMTabStrip .sapMTSLeftOverflowButtons,
@@ -365,7 +363,7 @@ html .sapMTabStripSelectListItemCloseBtn .sapMBtnInner {
 	}
 	.sapMTabStripSelectListItemCloseBtn {
 		height: 100%;
-		width: 2.25rem;
+		width: 2rem;
 		padding: 0;
 		float: right;
 	}
@@ -394,7 +392,9 @@ html .sapMTabStripSelectListItemCloseBtn .sapMBtnInner {
 
 .sapUiSizeCompact {
 	.sapMTabStripSelectListItemCloseBtn {
-		width: 2rem;
+		.sapMTSOverflowSelectListItem .sapMTabStripSelectListItemCloseBtn  {
+			width: 1.5rem;
+		}
 		.sapMBtnContent {
 			line-height: 1.25rem;
 		}

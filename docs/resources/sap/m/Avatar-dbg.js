@@ -1,20 +1,18 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.m.Avatar.
 sap.ui.define([
-
+    "./library",
     "sap/ui/core/Control",
     "sap/ui/core/IconPool",
     "./AvatarRenderer",
     "sap/ui/events/KeyCodes",
-    "sap/base/Log",
-    "sap/ui/core/Icon",
-    "./library"
-], function(Control, IconPool, AvatarRenderer, KeyCodes, Log, Icon, library) {
+    "sap/base/Log"
+], function(library, Control, IconPool, AvatarRenderer, KeyCodes, Log) {
 	"use strict";
 
 	// shortcut for sap.m.AvatarType
@@ -76,7 +74,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -133,39 +131,16 @@ sap.ui.define([
 				fallbackIcon: {type: "string", group: "Data", defaultValue: null},
 				/**
 				 * Determines the background color of the control.
+				 *
+				 * <b>Note:</b> By using background colors from the predefined sets,
+				 * your colors can later be customized from the Theme Designer.
 				 */
 				backgroundColor: {type: "sap.m.AvatarColor", group: "Appearance", defaultValue: AvatarColor.Accent6},
 
 				/**
 				 * Determines whether the control is displayed with border.
 				 */
-				showBorder: {type: "boolean", group: "Appearance", defaultValue: false},
-				/**
-				 * Defines what type of icon is displayed as visual affordance. It can be predefined or custom.
-				 *
-				 * The predefined icons are recommended for:
-				 * <ul>
-				 * <li>Suggesting a zooming action: <code>sap-icon://zoom-in</code></li>
-				 * <li>Suggesting an image change: <code>sap-icon://camera</code></li>
-				 * <li>Suggesting an editing action: <code>sap-icon://edit</code></li>
-				 * </ul>
-				 *
-				 * @since 1.77
-				 */
-				badgeIcon: {type: "sap.ui.core.URI", group: "Appearance", defaultValue: ""},
-				/**
-				 * Defines a custom tooltip for the <code>badgeIcon</code>. If set, it overrides the available default values.
-				 *
-				 * If not set, default tooltips are used as follows:
-				 * <ul>
-				 * <li>Specific default tooltips are displayed for each of the predefined <code>badgeIcons</code>.</li>
-				 * <li>For any other icons, the displayed tooltip is the same as the main control tooltip.</li>
-				 * <ul>
-				 *
-				 * @since 1.77
-				 */
-				badgeTooltip: {type: "string", group: "Data", defaultValue: null}
-
+				showBorder: {type: "boolean", group: "Appearance", defaultValue: false}
 			},
 			aggregations : {
 				/**
@@ -174,17 +149,7 @@ sap.ui.define([
 				 * The <code>press</code> event will still be fired.
 				 * @public
 				 */
-				detailBox: {type: 'sap.m.LightBox', multiple: false, bindable: "bindable"},
-				/**
-				 * A <code>sap.ui.core.Icon</code> instance that shows the badge icon of the <code>Avatar</code> control.
-				 * @private
-				 */
-				_badge: {type: "sap.ui.core.Icon", multiple: false, visibility: "hidden"},
-				/**
-				 * A <code>sap.ui.core.Icon</code> instance that shows the icon of the <code>Avatar</code> control.
-				 * @private
-				 */
-				_icon: {type: "sap.ui.core.Icon", multiple: false, visibility: "hidden"}
+				detailBox: {type: 'sap.m.LightBox', multiple: false, bindable: "bindable"}
 			},
 			associations : {
 				/**
@@ -222,18 +187,6 @@ sap.ui.define([
 	 */
 	Avatar.DEFAULT_SQUARE_PLACEHOLDER = "sap-icon://product";
 
-	/**
-	 * The predefined values for tooltip, when <code>badgeIcon</code> is set.
-	 *
-	 * @type {string}
-	 */
-	Avatar.AVATAR_BADGE_TOOLTIP = {
-		"sap-icon://zoom-in" : sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("AVATAR_TOOLTIP_ZOOMIN"),
-		"sap-icon://camera": sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("AVATAR_TOOLTIP_CAMERA"),
-		"sap-icon://edit": sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("AVATAR_TOOLTIP_EDIT")
-	};
-
-
 	Avatar.prototype.init = function () {
 		// Property holding the actual display type of the avatar
 		this._sActualType = null;
@@ -243,18 +196,14 @@ sap.ui.define([
 
 		// Property holding the currently picked random background color of the avatar, if any
 		this._sPickedRandomColor = null;
-
-		//Reference to badge hidden aggregation
-		this._badgeRef = null;
 	};
 
 	Avatar.prototype.exit = function () {
+		if (this._icon) {
+			this._icon.destroy();
+		}
 		if (this._fnLightBoxOpen) {
 			this._fnLightBoxOpen = null;
-		}
-
-		if (this._badgeRef) {
-			this._badgeRef.destroy();
 		}
 
 		this._sPickedRandomColor = null;
@@ -413,7 +362,7 @@ sap.ui.define([
 	 * Validates the <code>src</code> parameter, and sets the actual type appropriately.
 	 *
 	 * @param {string} sSrc
-	 * @returns {this}
+	 * @returns {sap.m.Avatar}
 	 * @private
 	 */
 	Avatar.prototype._validateSrc = function (sSrc) {
@@ -433,22 +382,6 @@ sap.ui.define([
 		}
 
 		return this;
-	};
-
-
-	/**
-	 * Validates the <code>src</code> parameter, and returns sap.ui.core.Icon object.
-	 *
-	 * @param {string} sSrc
-	 * @returns {sap.ui.core.Icon|null}
-	 * @private
-	 */
-	Avatar.prototype._getDisplayIcon = function (sSrc) {
-
-	return IconPool.isIconURI(sSrc) && IconPool.getIconInfo(sSrc) ?
-		IconPool.createControlByURI({
-			src: sSrc
-		}) : null;
 	};
 
 	/**
@@ -520,75 +453,28 @@ sap.ui.define([
 	 */
 	Avatar.prototype._getIcon = function () {
 		var sSrc = this.getSrc(),
-			oIcon = this.getAggregation("_icon"),
 			sDisplayShape = this.getDisplayShape();
 
 		if (this._bIsDefaultIcon) {
 			sSrc = this._getDefaultIconPath(sDisplayShape);
 		}
 
-		if (!oIcon) {
-			oIcon = IconPool.createControlByURI({
+		if (!this._icon) {
+			this._icon = IconPool.createControlByURI({
 				alt: "Image placeholder",
 				src: sSrc
 			});
-			this.setAggregation("_icon", oIcon);
-		} else if (oIcon.getSrc() !== sSrc) {
-			oIcon.setSrc(sSrc);
+		} else if (this._icon.getSrc() !== sSrc) {
+			this._icon.setSrc(sSrc);
 		}
 
-		return oIcon;
+		return this._icon;
 	};
 
 	Avatar.prototype._getDefaultTooltip = function() {
 		return sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("AVATAR_TOOLTIP");
 	};
 
-	Avatar.prototype._getBadgeIconSource = function() {
-		var sBadgeIconPath;
-
-		if (this.getDetailBox()) {
-			sBadgeIconPath = "sap-icon://zoom-in";
-		} else if (this.getBadgeIcon() !== "") {
-			if (this._getDisplayIcon(this.getBadgeIcon())) {
-				sBadgeIconPath = this.getBadgeIcon();
-			} else {
-				Log.warning("No valid Icon URI source for badge affordance was provided");
-			}
-		}
-
-		return sBadgeIconPath;
-	};
-
-	Avatar.prototype._getBadgeTooltip = function() {
-		var sBadgeTooltip = this._getDefaultTooltip(),
-			sBadgeIcon = this.getBadgeIcon();
-
-		if (this.getBadgeTooltip()) {
-			sBadgeTooltip = this.getBadgeTooltip();
-		} else if ( sBadgeIcon && Avatar.AVATAR_BADGE_TOOLTIP[this.getBadgeIcon()]) {
-			sBadgeTooltip = Avatar.AVATAR_BADGE_TOOLTIP[sBadgeIcon];
-		}
-		return sBadgeTooltip;
-	};
-
-
-	Avatar.prototype._getBadge = function () {
-		var sBadgeIconSrc = this._getBadgeIconSource(),
-			sBadgeTooltip = this._getBadgeTooltip();
-
-		if (!sBadgeIconSrc) {return;}
-
-		if (!this._badgeRef) {
-			this.setAggregation("_badge", new Icon({
-				src: sBadgeIconSrc,
-				tooltip: sBadgeTooltip
-			}));
-		}
-
-		this._badgeRef = this.getAggregation("_badge");
-		return this._badgeRef;
-	};
 
 	/**
 	 * We use this callback to make sure we hide fallback content if our original image source

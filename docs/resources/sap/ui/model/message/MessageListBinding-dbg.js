@@ -1,19 +1,21 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-/*eslint-disable max-len */
+
 // Provides the JSON model implementation of a list binding
 sap.ui.define([
+	'sap/ui/model/ChangeReason',
+	'sap/ui/model/ClientListBinding',
 	"sap/base/strings/hash",
 	"sap/base/util/deepEqual",
-	"sap/base/util/deepExtend",
-	"sap/base/util/each",
-	"sap/ui/model/ChangeReason",
-	"sap/ui/model/ClientListBinding"
-], function(hash, deepEqual, deepExtend, each, ChangeReason, ClientListBinding) {
+	"sap/ui/thirdparty/jquery"
+],
+	function(ChangeReason, ClientListBinding, hash, deepEqual, jQuery) {
 	"use strict";
+
+
 
 	/**
 	 *
@@ -31,8 +33,8 @@ sap.ui.define([
 	 */
 	var MessageListBinding = ClientListBinding.extend("sap.ui.model.message.MessageListBinding");
 
-	/*
-	 * Define the symbol function when extended change detection is enabled.
+	/**
+	 * Define the symbol function when extended change detection is enabled
 	 * @override
 	 */
 	MessageListBinding.prototype.enableExtendedChangeDetection = function() {
@@ -115,7 +117,7 @@ sap.ui.define([
 		var oList = this.oModel._getObject(this.sPath, this.oContext);
 		if (Array.isArray(oList)) {
 			if (this.bUseExtendedChangeDetection) {
-				this.oList = deepExtend([], oList);
+				this.oList = jQuery.extend(true, [], oList);
 			} else {
 				this.oList = oList.slice(0);
 			}
@@ -135,18 +137,16 @@ sap.ui.define([
 	 * inform interested parties about this.
 	 *
 	 * @param {boolean} bForceupdate
-	 *   Whether interested parties should be informed regardless of the bindings state
 	 *
 	 */
 	MessageListBinding.prototype.checkUpdate = function(bForceupdate){
-		var oList;
 
 		if (this.bSuspended && !this.bIgnoreSuspend) {
 			return;
 		}
 
 		if (!this.bUseExtendedChangeDetection) {
-			oList = this.oModel._getObject(this.sPath, this.oContext);
+			var oList = this.oModel._getObject(this.sPath, this.oContext);
 			if (!deepEqual(this.oList, oList) || bForceupdate) {
 				this.update();
 				this._fireChange({reason: ChangeReason.Change});
@@ -156,7 +156,7 @@ sap.ui.define([
 			var that = this;
 
 			//If the list has changed we need to update the indices first.
-			oList = this.oModel._getObject(this.sPath, this.oContext);
+			var oList = this.oModel._getObject(this.sPath, this.oContext);
 			if (!deepEqual(this.oList, oList)) {
 				this.update();
 			}
@@ -167,12 +167,11 @@ sap.ui.define([
 				if (this.aLastContexts.length != aContexts.length) {
 					bChangeDetected = true;
 				} else {
-					each(this.aLastContextData, function(iIndex, oLastData) {
+					jQuery.each(this.aLastContextData, function(iIndex, oLastData) {
 						if (that.getContextData(aContexts[iIndex]) !== oLastData) {
 							bChangeDetected = true;
 							return false;
 						}
-						return true;
 					});
 				}
 			} else {

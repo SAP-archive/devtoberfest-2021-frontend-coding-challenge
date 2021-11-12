@@ -1,11 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides class sap.ui.base.ManagedObjectMetadata
 sap.ui.define([
+	'sap/ui/thirdparty/jquery',
 	'./DataType',
 	'./Metadata',
 	'sap/base/Log',
@@ -16,6 +17,7 @@ sap.ui.define([
 	'sap/base/util/isPlainObject'
 ],
 function(
+	jQuery,
 	DataType,
 	Metadata,
 	Log,
@@ -73,7 +75,7 @@ function(
 	 *
 	 *
 	 * @author Frank Weigel
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @since 0.8.6
 	 * @alias sap.ui.base.ManagedObjectMetadata
 	 * @extends sap.ui.base.Metadata
@@ -88,7 +90,6 @@ function(
 
 	// chain the prototypes
 	ManagedObjectMetadata.prototype = Object.create(Metadata.prototype);
-	ManagedObjectMetadata.prototype.constructor = ManagedObjectMetadata;
 
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -211,10 +212,7 @@ function(
 	};
 
 	Property.prototype.getType = function() {
-		if (!this._oType) {
-			this._oType = DataType.getType(this.type);
-		}
-		return this._oType;
+		return this._oType || (this._oType = DataType.getType(this.type));
 	};
 
 	Property.prototype.getDefaultValue = function() {
@@ -326,10 +324,7 @@ function(
 	};
 
 	Aggregation.prototype.getType = function() {
-		if (!this._oType) {
-			this._oType = DataType.getType(this.type);
-		}
-		return this._oType;
+		return this._oType || (this._oType = DataType.getType(this.type));
 	};
 
 	Aggregation.prototype.get = function(instance) {
@@ -385,11 +380,12 @@ function(
 		return instance[this._sDestructor]();
 	};
 
-	Aggregation.prototype.update = function(instance, sChangeReason, oEventInfo) {
+	Aggregation.prototype.update = function(instance, sChangeReason) {
 		if (instance[this._sUpdater]) {
-			instance[this._sUpdater](sChangeReason, oEventInfo);
+			instance[this._sUpdater](sChangeReason);
 		} else {
-			instance.updateAggregation(this.name, sChangeReason, oEventInfo);
+			//no change reason
+			instance.updateAggregation(this.name);
 		}
 	};
 
@@ -602,7 +598,7 @@ function(
 	 * @protected
 	 */
 	ManagedObjectMetadata.addAPIParentInfoEnd = function(oAggregatedObject) {
-		oAggregatedObject && oAggregatedObject.aAPIParentInfos && oAggregatedObject.aAPIParentInfos.forwardingCounter--;
+		oAggregatedObject && oAggregatedObject.aAPIParentInfos.forwardingCounter--;
 	};
 
 	AggregationForwarder.prototype.remove = function(oInstance, vAggregatedObject) {
@@ -710,10 +706,7 @@ function(
 	};
 
 	Association.prototype.getType = function() {
-		if (!this._oType) {
-			this._oType = DataType.getType(this.type);
-		}
-		return this._oType;
+		return this._oType || (this._oType = DataType.getType(this.type));
 	};
 
 	Association.prototype.get = function(instance) {
@@ -797,8 +790,8 @@ function(
 		return instance[this._sDetachMutator](fn,listener);
 	};
 
-	Event.prototype.fire = function(instance,params) {
-		return instance[this._sTrigger](params, this.allowPreventDefault, this.enableEventBubbling);
+	Event.prototype.fire = function(instance,params, allowPreventDefault, enableEventBubbling) {
+		return instance[this._sTrigger](params, allowPreventDefault, enableEventBubbling);
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -888,16 +881,16 @@ function(
 		// PERFOPT: this could be done lazily
 		var oParent = this.getParent();
 		if ( oParent instanceof ManagedObjectMetadata ) {
-			this._mAllEvents = Object.assign({}, oParent._mAllEvents, this._mEvents);
-			this._mAllPrivateProperties = Object.assign({}, oParent._mAllPrivateProperties, this._mPrivateProperties);
-			this._mAllProperties = Object.assign({}, oParent._mAllProperties, this._mProperties);
-			this._mAllPrivateAggregations = Object.assign({}, oParent._mAllPrivateAggregations, this._mPrivateAggregations);
-			this._mAllAggregations = Object.assign({}, oParent._mAllAggregations, this._mAggregations);
-			this._mAllPrivateAssociations = Object.assign({}, oParent._mAllPrivateAssociations, this._mPrivateAssociations);
-			this._mAllAssociations = Object.assign({}, oParent._mAllAssociations, this._mAssociations);
+			this._mAllEvents = jQuery.extend({}, oParent._mAllEvents, this._mEvents);
+			this._mAllPrivateProperties = jQuery.extend({}, oParent._mAllPrivateProperties, this._mPrivateProperties);
+			this._mAllProperties = jQuery.extend({}, oParent._mAllProperties, this._mProperties);
+			this._mAllPrivateAggregations = jQuery.extend({}, oParent._mAllPrivateAggregations, this._mPrivateAggregations);
+			this._mAllAggregations = jQuery.extend({}, oParent._mAllAggregations, this._mAggregations);
+			this._mAllPrivateAssociations = jQuery.extend({}, oParent._mAllPrivateAssociations, this._mPrivateAssociations);
+			this._mAllAssociations = jQuery.extend({}, oParent._mAllAssociations, this._mAssociations);
 			this._sDefaultAggregation = this._sDefaultAggregation || oParent._sDefaultAggregation;
 			this._sDefaultProperty = this._sDefaultProperty || oParent._sDefaultProperty;
-			this._mAllSpecialSettings = Object.assign({}, oParent._mAllSpecialSettings, this._mSpecialSettings);
+			this._mAllSpecialSettings = jQuery.extend({}, oParent._mAllSpecialSettings, this._mSpecialSettings);
 			this._sProvider = this._sProvider || oParent._sProvider;
 		} else {
 			this._mAllEvents = this._mEvents;
@@ -942,12 +935,6 @@ function(
 		var oProp = this._mProperties[sName] = new Property(this, sName, oInfo);
 		if (!this._mAllProperties[sName]) {// ensure extended AllProperties meta-data is also enriched
 			this._mAllProperties[sName] = oProp;
-		}
-
-		if (this._fnPropertyBagFactory) {
-			// after the property bag class is already created that has the default values of the properties, the
-			// default value of the added property needs to be added to the property bag class as well
-			this._fnPropertyBagFactory.prototype[sName] = oProp.getDefaultValue();
 		}
 		// TODO notify listeners (subclasses) about change
 	};
@@ -1637,7 +1624,7 @@ function(
 		}
 
 		if ( this.getParent() instanceof ManagedObjectMetadata ) {
-			mDefaults = Object.assign({}, this.getParent().getPropertyDefaults());
+			mDefaults = jQuery.extend({}, this.getParent().getPropertyDefaults());
 		} else {
 			mDefaults = {};
 		}
@@ -1927,7 +1914,7 @@ function(
 	 * @param {string} [sScopeKey] scope name for which metadata will be resolved, see sap.ui.base.ManagedObjectMetadataScope
 	 * @return {Promise} A promise which will return the loaded design time metadata
 	 * @private
-	 * @ui5-restricted sap.ui.dt, com.sap.webide
+	 * @ui5-restricted sap.ui.dt com.sap.webide
 	 * @since 1.48.0
 	 */
 	ManagedObjectMetadata.prototype.loadDesignTime = function(oManagedObject, sScopeKey) {

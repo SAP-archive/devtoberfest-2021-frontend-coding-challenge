@@ -18,6 +18,7 @@
 	text-transform: none;
 	height: 3rem;
 	line-height: 3rem;
+	padding: 0 1rem;
 	margin: 0;
 
 	/*
@@ -30,25 +31,6 @@
 	font-size: @sapMFontHeader4Size;
 	font-family: @sapUiFontHeaderFamily;
 	color: @sapUiGroupTitleTextColor;
-}
-
-.sapMPanel {
-	.sapMPanelHdr,
-	.sapMTB.sapMPanelHeaderTB {
-		padding-left: 1rem;
-		padding-right: 0.5rem;
-	}
-
-	&.sapMPanelExpandable {
-		.sapMPanelHdr, .sapMTB.sapMPanelHeaderTB {
-			padding-left: 0;
-		}
-	}
-}
-
-.sapUiSizeCompact .sapMPanel .sapMPanelHdr {
-	line-height: 2rem;
-	height: 2rem;
 }
 
 .sapMPanelContent {
@@ -74,23 +56,8 @@
 
 	> .sapMBtn {
 		position: absolute;
-		top: 50%;
-		-webkit-transform: translateY(-50%);
-		transform: translateY(-50%);
-		padding-left: 0.25rem;
-		padding-right: 0.25rem;
+		top: 0;
 	}
-}
-
-.sapMPanelWrappingDiv .sapUiIcon {
-	position: absolute;
-	top: 50%;
-	-webkit-transform: translateY(-50%);
-	transform: translateY(-50%);
-	padding: 0.25rem;
-	font-size: 1rem;
-	cursor: inherit;
-	color: @sapUiContentIconColor;
 }
 
 /* if Panel is expandable, we do not wish toolbar to come with own border */
@@ -115,7 +82,8 @@ html.sap-desktop .sapUiFioriObjectPage > section > .sapMPanel {
 
 .sapMPanel .sapMPanelWrappingDiv .sapMPanelHdr,
 .sapMPanel .sapMPanelWrappingDivTb .sapMIBar.sapMTB {
-	margin-left: 2.5rem;
+	padding-left: 0;
+	margin-left: 3rem;
 
   	>:first-child {
 	  margin-left: 0;
@@ -125,14 +93,13 @@ html.sap-desktop .sapUiFioriObjectPage > section > .sapMPanel {
 /* mixin call for creating container content padding classes (arguments: rootContainer, contentSelector) */
 .sapUiContainerContentPadding(~".sapMPanel", ~"> .sapMPanelContent");
 
+/* TODO remove after the end of support for Internet Explorer */
+/* workaround for drawing issue in IE - ensures that the content will be redrawn */
+html[data-sap-ui-animation='on'][data-sap-ui-browser^="ie"] .sapMPanelContent {
+	transform: translate(0, 0);
+}
 
-.sapMPanelExpandable .sapMPanelWrappingDiv {
-	&:focus {
-		outline: @sapUiContentFocusWidth @sapUiContentFocusStyle @sapUiContentFocusColor;
-		outline-offset: -0.1875rem;
-	}
-
-	&:hover {
-		cursor: pointer;
-	}
+/* workaround for drawing issue in Edge - ensures that the content will be redrawn */
+html[data-sap-ui-animation='on'][data-sap-ui-browser^="ed"] .sapMPanelContent {
+	transform: translate(0, 0);
 }

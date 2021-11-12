@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -10,6 +10,7 @@ sap.ui.define([
 	'./library',
 	'sap/ui/Device',
 	'sap/ui/core/Control',
+	'sap/ui/core/IconPool',
 	'sap/ui/core/EnabledPropagator',
 	'sap/ui/core/library',
 	'./CheckBoxRenderer',
@@ -23,6 +24,7 @@ sap.ui.define([
 		library,
 		Device,
 		Control,
+		IconPool,
 		EnabledPropagator,
 		coreLibrary,
 		CheckBoxRenderer,
@@ -85,10 +87,10 @@ sap.ui.define([
 	 * @see {@link fiori:https://experience.sap.com/fiori-design-web/checkbox/ Check Box}
 	 *
 	 * @extends sap.ui.core.Control
-	 * @implements sap.ui.core.IFormContent, sap.ui.core.ISemanticFormContent
+	 * @implements sap.ui.core.IFormContent
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -97,7 +99,7 @@ sap.ui.define([
 	 */
 	var CheckBox = Control.extend("sap.m.CheckBox", /** @lends sap.m.CheckBox.prototype */ { metadata : {
 
-		interfaces : ["sap.ui.core.IFormContent", "sap.ui.core.ISemanticFormContent"],
+		interfaces : ["sap.ui.core.IFormContent"],
 		library : "sap.m",
 		properties : {
 
@@ -262,6 +264,7 @@ sap.ui.define([
 	 */
 	CheckBox.prototype.init = function() {
 		this.addActiveState(this);
+		IconPool.insertFontFaceStyle();
 		this._handleReferencingLabels();
 	};
 
@@ -343,20 +346,6 @@ sap.ui.define([
 		}
 	};
 
-	CheckBox.prototype.getFormattedState = function() {
-		var oBundle = sap.ui.getCore().getLibraryResourceBundle("sap.m");
-
-		return this.getSelected() ? oBundle.getText("ACC_CTR_STATE_CHECKED") : oBundle.getText("ACC_CTR_STATE_NOT_CHECKED");
-	};
-
-	CheckBox.prototype.getFormFormattedValue = function() {
-		return this.getFormattedState();
-	};
-
-	CheckBox.prototype.getFormValueProperty = function () {
-		return "selected";
-	};
-
 	/**
 	 * Event handler called when the CheckBox is touched.
 	 *
@@ -376,7 +365,7 @@ sap.ui.define([
 		var bSelected;
 
 		if (this.getEnabled() && this.getEditable() && !this.getDisplayOnly()) {
-			this.$().trigger("focus"); // In IE taping on the input doesn`t focus the wrapper div.
+			this.$().focus(); // In IE taping on the input doesn`t focus the wrapper div.
 
 			bSelected = this._getSelectedState();
 			this.setSelected(bSelected);
@@ -399,6 +388,7 @@ sap.ui.define([
 			this.ontap(oEvent);
 			// stop browsers default behavior
 			oEvent.preventDefault();
+			oEvent.stopPropagation();
 		}
 	};
 
@@ -425,7 +415,7 @@ sap.ui.define([
 	 * Sets the tab index of the control
 	 *
 	 * @param {int} iTabIndex The tab index should be greater than or equal -1
-	 * @returns {this} The <code>sap.m.CheckBox</code> instance
+	 * @returns {sap.m.CheckBox} The <code>sap.m.CheckBox</code> instance
 	 * @since 1.16
 	 * @protected
 	 */
@@ -517,7 +507,7 @@ sap.ui.define([
 	 * @private
 	 */
 	CheckBox.prototype._fnLabelTapHandler = function () {
-		this.$().trigger("focus");
+		this.$().focus();
 	};
 
 	/**
@@ -542,15 +532,14 @@ sap.ui.define([
 	/**
 	 * @see sap.ui.core.Control#getAccessibilityInfo
 	 * @protected
-	 * @returns {object} The <code>sap.m.CheckBox</code> accessibility information
+	 * @returns {Object} The <code>sap.m.CheckBox</code> accessibility information
 	 */
 	CheckBox.prototype.getAccessibilityInfo = function() {
-		var oBundle = sap.ui.getCore().getLibraryResourceBundle("sap.m"),
-			sText = this.getText();
+		var oBundle = sap.ui.getCore().getLibraryResourceBundle("sap.m");
 		return {
 			role: "checkbox",
 			type: oBundle.getText("ACC_CTR_TYPE_CHECKBOX"),
-			description: (sText ? sText + " " : "") + this.getFormattedState(),
+			description: (this.getText() || "") + (this.getSelected() ? (" " + oBundle.getText("ACC_CTR_STATE_CHECKED")) : ""),
 			focusable: this.getEnabled() && !this.getDisplayOnly(),
 			enabled: this.getEnabled(),
 			editable: this.getEditable()

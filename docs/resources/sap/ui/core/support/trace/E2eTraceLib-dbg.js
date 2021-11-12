@@ -1,10 +1,11 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-sap.ui.define(['sap/ui/Device', 'sap/ui/performance/trace/Passport', 'sap/base/Log', 'sap/ui/thirdparty/URI'],
-	function(Device, Passport, Log, URI) {
+
+sap.ui.define(['sap/ui/Device', "sap/ui/performance/trace/Passport", "sap/base/Log"],
+	function(Device, Passport, Log) {
 		"use strict";
 
 		/*global alert, confirm, performance */
@@ -39,15 +40,12 @@ sap.ui.define(['sap/ui/Device', 'sap/ui/performance/trace/Passport', 'sap/base/L
 				this.statusCode = xmlHttpReq.status;
 				this.status = xmlHttpReq.statusText;
 				this.startTimestamp = xmlHttpReq.xstartTimestamp;
-				this.firstByteSent = xmlHttpReq.xfirstByteSent;
+				this.firstByteSent = xmlHttpReq.xfirstByteSent ? xmlHttpReq.xfirstByteSent : xmlHttpReq.xstartTimestamp; //not available on IE9
 				this.lastByteSent = this.firstByteSent; //last Byte sent cannot be captured
 				this.firstByteReceived = xmlHttpReq.xfirstByteReceived ? xmlHttpReq.xfirstByteReceived : xmlHttpReq.xlastByteReceived;
 				this.lastByteReceived = xmlHttpReq.xlastByteReceived;
 				this.sentBytes = 0; //cannot be captured
-				this.receivedBytes = ((xmlHttpReq.responseType == "text") || (xmlHttpReq.responseType == "")) ? xmlHttpReq.responseText.length : 0; //uncompressed length
-				if (Log.isLoggable()) {
-					Log.debug("E2eTraceLib.Message: Response Type is \"" + xmlHttpReq.responseType + "\"");
-				}
+				this.receivedBytes = xmlHttpReq.responseText.length; //uncompressed
 
 				//public methods
 				this.getDuration = function() {
@@ -186,7 +184,6 @@ sap.ui.define(['sap/ui/Device', 'sap/ui/performance/trace/Passport', 'sap/base/L
 					if (r) {
 						busTrx.createTransactionStep();
 					} else {
-						busTrxRecording = false;
 						var busTrxXml = busTrx.getBusinessTransactionXml();
 						if (busTrx.fnCallback && typeof (busTrx.fnCallback) === 'function') {
 							busTrx.fnCallback(busTrxXml);
@@ -213,8 +210,8 @@ sap.ui.define(['sap/ui/Device', 'sap/ui/performance/trace/Passport', 'sap/base/L
 						} else {
 							// alternatively allow upload via form
 							try {
-								var bDone = false;
-								while (!bDone) {
+								var bDone = true;
+								while (bDone) {
 
 									/*eslint-disable no-alert */
 									var sUrl = window.prompt('Please enter a valid URL for the store server', 'http://<host>:<port>');
@@ -232,7 +229,7 @@ sap.ui.define(['sap/ui/Device', 'sap/ui/performance/trace/Passport', 'sap/base/L
 										xmlHttpPost.open("POST", sUrl + '/E2EClientTraceUploadW/UploadForm.jsp', false);
 										xmlHttpPost.setRequestHeader('Content-type', 'multipart/form-data; boundary="' + boundary + '"');
 										xmlHttpPost.send(postBody);
-										bDone = true;
+										break;
 									}
 								}
 							} catch (ex) {
@@ -243,6 +240,7 @@ sap.ui.define(['sap/ui/Device', 'sap/ui/performance/trace/Passport', 'sap/base/L
 
 						// allow clean-up of resources by initializing a new BusinessTransaction
 						busTrx = null;
+						busTrxRecording = false;
 					}
 				}
 			};
@@ -366,14 +364,7 @@ sap.ui.define(['sap/ui/Device', 'sap/ui/performance/trace/Passport', 'sap/base/L
 
 						//do not set passport as this is done already in jquery.sap.trace
 						//this.setRequestHeader("SAP-PASSPORT", EppLib.passportHeader(busTrx.getCurrentTransactionStep().trcLvl, busTrx.id, this.xDsrGuid));
-						//matching function isCORSRequest from FESR.js
-						var sHOST = (new URI(this.xurl)).host();
-						if (!(sHOST && (sHOST != window.location.host))) {
-						//if ((this.xRequestHeaders != undefined) && (this.xRequestHeaders[0][0] == "SAP-PASSPORT")) {
-							this.setRequestHeader("X-CorrelationID", busTrx.getCurrentTransactionStep().getId() + "-" + idx);
-						} else if (Log.isLoggable()) {
-							Log.debug("E2ETraceLib.Message: No SAP Passport - trace header suppressed.");
-						}
+						this.setRequestHeader("X-CorrelationID", busTrx.getCurrentTransactionStep().getId() + "-" + idx);
 
 						//attach event listeners
 						this.addEventListener("loadstart", onLoadstart, false);

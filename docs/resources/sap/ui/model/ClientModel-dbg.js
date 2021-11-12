@@ -1,22 +1,27 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-/*eslint-disable max-len */
+
+/* global XMLHttpRequest */
+
 // Provides client-based DataBinding implementation
 sap.ui.define([
-	"sap/ui/thirdparty/jquery",
-	'./Model',
 	'./ClientContextBinding',
-	'./ClientListBinding', // convenience dependency for legacy code using global names
-	'./ClientPropertyBinding', // convenience dependency for legacy code using global names
-	'./ClientTreeBinding' // convenience dependency for legacy code using global names
+	'./ClientListBinding',
+	'./ClientPropertyBinding',
+	'./ClientTreeBinding',
+	'./Model',
+	"sap/ui/thirdparty/jquery"
 ],
 	function(
-		jQuery,
+		ClientContextBinding,
+		ClientListBinding,
+		ClientPropertyBinding,
+		ClientTreeBinding,
 		Model,
-		ClientContextBinding
+		jQuery
 	) {
 	"use strict";
 
@@ -29,7 +34,7 @@ sap.ui.define([
 	 * @extends sap.ui.model.Model
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @param {string} [oData] URL where to load the data from
 	 * @public
@@ -57,16 +62,19 @@ sap.ui.define([
 
 	/**
 	 * Returns the current data of the model.
-	 *
 	 * Be aware that the returned object is a reference to the model data so all changes to that data will also change the model data.
 	 *
-	 * @returns {any} the data object
+	 * @return the data object
 	 * @public
 	 */
 	ClientModel.prototype.getData = function(){
 		return this.oData;
 	};
 
+	/**
+	 * @see sap.ui.model.Model.prototype.bindElement
+	 *
+	 */
 	/**
 	 * @see sap.ui.model.Model.prototype.createBindingContext
 	 *
@@ -149,11 +157,11 @@ sap.ui.define([
 	};
 
 	/**
-	 * Does nothing.
+	 * @see sap.ui.model.Model.prototype.destroyBindingContext
 	 *
-	 * @param {sap.ui.model.Context} oContext The context to destroy
 	 */
 	ClientModel.prototype.destroyBindingContext = function(oContext) {
+		// TODO: what todo here?
 	};
 
 	/**

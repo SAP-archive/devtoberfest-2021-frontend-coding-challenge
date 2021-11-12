@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,10 +8,7 @@ sap.ui.define([],
 	function() {
 	"use strict";
 
-	var oRb = sap.ui.getCore().getLibraryResourceBundle("sap.m");
-
-	var FeedInputRenderer = {
-		apiVersion: 2
+var FeedInputRenderer = {
 	};
 
 	/**
@@ -23,46 +20,50 @@ sap.ui.define([],
 	FeedInputRenderer.render = function (oRm, oControl) {
 		var sMyId = oControl.getId();
 
-		oRm.openStart("div", oControl);
-		oRm.class("sapMFeedInBase");
-		oRm.attr("role", "group");
-		oRm.attr("aria-label", oRb.getText("FEED_INPUT_ARIA_LABEL"));
-		oRm.openEnd();
-		oRm.openStart("div", sMyId + "-outerContainer");
-		oRm.class("sapMFeedIn");
+		oRm.write("<div");
+		oRm.writeControlData(oControl);
+		oRm.addClass("sapMFeedInBase");
+		oRm.writeClasses();
+		oRm.write(">");
+		oRm.write('<div id="' + sMyId + '-outerContainer"');
+		oRm.addClass("sapMFeedIn");
 		if (!oControl.getShowIcon()) {
-			oRm.class("sapMFeedInNoIcon");
+			oRm.addClass("sapMFeedInNoIcon");
 		}
 		if (!oControl.getEnabled()) {
-			oRm.class("sapMFeedInDisabled");
+			oRm.addClass("sapMFeedInDisabled");
 		}
-		oRm.openEnd();
-		if (oControl.getShowIcon()) {
+		oRm.writeClasses();
+		oRm.write(">");
+		if (!!oControl.getShowIcon()) {
 			this._addImage(oRm, oControl, sMyId);
 		}
-		oRm.openStart("div", sMyId + "-container");
-		oRm.class("sapMFeedInContainer");
-		oRm.openEnd();
+		oRm.write('<div id="' + sMyId + '-container"');
+		oRm.addClass("sapMFeedInContainer");
+		oRm.writeClasses();
+		oRm.write(">");
 		var oTextArea = oControl._getTextArea();
 		oRm.renderControl(oTextArea);
 		oRm.renderControl(oControl._getPostButton());
-		oRm.close("div");
-		oRm.close("div");
-		oRm.openStart("div", sMyId + "-counterContainer");
-		oRm.class("sapMFeedInCounter");
-		oRm.openEnd();
-		oRm.close("div");
-		oRm.close("div");
+		oRm.write("</div>");
+		oRm.write("</div>");
+		oRm.write('<div id="' + sMyId + '-counterContainer"');
+		oRm.addClass("sapMFeedInCounter");
+		oRm.writeClasses();
+		oRm.write(">");
+		oRm.write("</div>");
+		oRm.write("</div>");
 	};
 
 	FeedInputRenderer._addImage = function (oRm, oControl, sMyId) {
-		oRm.openStart("figure", sMyId + '-figure').class("sapMFeedInFigure");
-		if (!oControl.getIcon()) {
-			oRm.class("sapMFeedListItemIsDefaultIcon");
-		}
-		oRm.openEnd();
-		oRm.renderControl(oControl._getAvatar());
-		oRm.close("figure");
+		oRm.write('<figure id="' + sMyId + '-figure" class ="sapMFeedInFigure');
+		if (!!oControl.getIcon()) {
+				oRm.write('">');
+			} else {
+				oRm.write(' sapMFeedListItemIsDefaultIcon">');
+			}
+		oRm.renderControl(oControl._getImageControl());
+		oRm.write('</figure>');
 	};
 
 	return FeedInputRenderer;

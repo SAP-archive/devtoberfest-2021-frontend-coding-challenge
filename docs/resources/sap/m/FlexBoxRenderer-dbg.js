@@ -1,15 +1,16 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
-	"./FlexBoxStylingHelper",
-	"sap/m/library",
+	'./FlexBoxStylingHelper',
+	'sap/m/library',
 	"sap/base/Log",
 	"sap/m/FlexItemData"
-], function (FlexBoxStylingHelper, library, Log, FlexItemData) {
+],
+	function(FlexBoxStylingHelper, library, Log, FlexItemData) {
 	"use strict";
 
 	// shortcut for sap.m.FlexDirection
@@ -31,62 +32,61 @@ sap.ui.define([
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
 	 *
 	 * @param {sap.ui.core.RenderManager} oRm the RenderManager that can be used for writing to the render output buffer
-	 * @param {sap.m.FlexBox} oFlexBox an object representation of the control that should be rendered
+	 * @param {sap.ui.core.Control} oControl an object representation of the control that should be rendered
 	 */
-	FlexBoxRenderer.render = function(oRm, oFlexBox) {
+	FlexBoxRenderer.render = function(oRm, oControl) {
 		// Open FlexBox HTML element
-		var sElementType = oFlexBox.getRenderType() === FlexRendertype.List ? "ul" : "div";
-		oRm.openStart(sElementType, oFlexBox);
+		oRm.openStart(oControl.getRenderType() == FlexRendertype.List ? "ul" : "div", oControl);
 
 		// Special treatment if FlexBox is itself an item of a parent FlexBox
-		var oParent = oFlexBox.getParent();
+		var oParent = oControl.getParent();
 		if (oParent && oParent.isA("sap.m.FlexBox")) {
-			if (!oFlexBox.hasStyleClass("sapMFlexItem")) {
+
+			if (!oControl.hasStyleClass("sapMFlexItem")) {
 				oRm.class("sapMFlexItem");
 			}
 
 			// Set layout properties for flex item
-			var oLayoutData = oFlexBox.getLayoutData();
-			if (oLayoutData && oLayoutData.isA("sap.m.FlexItemData")) {
+			var oLayoutData = oControl.getLayoutData();
+			if (oLayoutData instanceof FlexItemData) {
 				FlexBoxStylingHelper.setFlexItemStyles(oRm, oLayoutData);
 			}
-		} else if (oFlexBox.getFitContainer()) {
+		} else if (oControl.getFitContainer()) {
 			oRm.class("sapMFlexBoxFit");
 		}
 
 		// Add classes for flex styling
 		oRm.class("sapMFlexBox");
-		if (oFlexBox.getDisplayInline()) {
+		if (oControl.getDisplayInline()) {
 			oRm.class("sapMFlexBoxInline");
 		}
 
-		if (oFlexBox.getDirection() === FlexDirection.Column || oFlexBox.getDirection() === FlexDirection.ColumnReverse) {
+		if (oControl.getDirection() === FlexDirection.Column || oControl.getDirection() === FlexDirection.ColumnReverse) {
 			oRm.class("sapMVBox");
 		} else {
 			oRm.class("sapMHBox");
 		}
 
-		if (oFlexBox.getDirection() === FlexDirection.RowReverse || oFlexBox.getDirection() === FlexDirection.ColumnReverse) {
+		if (oControl.getDirection() === FlexDirection.RowReverse || oControl.getDirection() === FlexDirection.ColumnReverse) {
 			oRm.class("sapMFlexBoxReverse");
 		}
 
-		oRm.class("sapMFlexBoxJustify" + oFlexBox.getJustifyContent());
-		oRm.class("sapMFlexBoxAlignItems" + oFlexBox.getAlignItems());
-		oRm.class("sapMFlexBoxWrap" + oFlexBox.getWrap());
-		oRm.class("sapMFlexBoxAlignContent" + oFlexBox.getAlignContent());
+		oRm.class("sapMFlexBoxJustify" + oControl.getJustifyContent());
+		oRm.class("sapMFlexBoxAlignItems" + oControl.getAlignItems());
+		oRm.class("sapMFlexBoxWrap" + oControl.getWrap());
+		oRm.class("sapMFlexBoxAlignContent" + oControl.getAlignContent());
 
-		var sBGClass = "sapMFlexBoxBG" + oFlexBox.getBackgroundDesign();
-
-		if (!oFlexBox.hasStyleClass(sBGClass)) {
+		var sBGClass = "sapMFlexBoxBG" + oControl.getBackgroundDesign();
+		if (!oControl.hasStyleClass(sBGClass)) {
 			oRm.class(sBGClass);
 		}
 
 		// Add inline styles
-		oRm.style("height", oFlexBox.getHeight());
-		oRm.style("width", oFlexBox.getWidth());
+		oRm.style("height", oControl.getHeight());
+		oRm.style("width", oControl.getWidth());
 
 		// Add tooltip
-		var sTooltip = oFlexBox.getTooltip_AsString();
+		var sTooltip = oControl.getTooltip_AsString();
 		if (sTooltip) {
 			oRm.attr("title", sTooltip);
 		}
@@ -95,21 +95,25 @@ sap.ui.define([
 		oRm.openEnd();
 
 		// Render the flex items
-		FlexBoxRenderer.renderItems(oFlexBox, oRm);
+		FlexBoxRenderer.renderItems(oControl, oRm);
 
 		// Close FlexBox HTML element
-		oRm.close(sElementType);
+		if (oControl.getRenderType() === FlexRendertype.List) {
+			oRm.close("ul");
+		} else {
+			oRm.close("div");
+		}
 	};
 
-	FlexBoxRenderer.renderItems = function(oFlexBox, oRm) {
-		var aChildren = oFlexBox.getItems(),
-			sWrapperTag = "";
+	FlexBoxRenderer.renderItems = function(oControl, oRm) {
+		var aChildren = oControl.getItems(),
+			sWrapperTag = '';
 
 		for (var i = 0; i < aChildren.length; i++) {
 			// Don't wrap if it's a FlexBox control
-			if (aChildren[i].isA("sap.m.FlexBox") || oFlexBox.getRenderType() === FlexRendertype.Bare) {
+			if (aChildren[i].isA('sap.m.FlexBox') || oControl.getRenderType() === FlexRendertype.Bare) {
 				sWrapperTag = "";
-			} else if (oFlexBox.getRenderType() === FlexRendertype.List) {
+			} else if (oControl.getRenderType() === FlexRendertype.List) {
 				sWrapperTag = "li";
 			} else {
 				sWrapperTag = "div";

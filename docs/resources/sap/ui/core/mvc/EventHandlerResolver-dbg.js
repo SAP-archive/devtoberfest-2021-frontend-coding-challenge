@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -42,7 +42,7 @@ sap.ui.define([
 			 *     the controller (example: <code>".myLocalHandler"</code>)</li>
 			 * <li><i>absolute</i>: names that contain, but do not start with a dot ('.') are first checked
 			 *     against the given local variables <code>mLocals</code>. When it can't be resolved, it's
-			 *     then assumed to mean a global handler function. {@link module:sap/base/util/ObjectPath.get}
+			 *     then assumed to mean a global handler function. {@link jQuery.sap.getObject}
 			 *     will be used to retrieve the function (example: <code>"some.global.handler"</code> )</li>
 			 * <li><i>legacy</i>: Names that contain no dot at all are first checked against the
 			 *     <code>oController</code>. If nothing is found, it's interpreted as a relative name and
@@ -93,7 +93,6 @@ sap.ui.define([
 								Log.error("Handler '" + sName + "' could not be resolved. No CommandExecution defined for command: " + sCommand);
 							}
 						};
-						fnHandler._sapui_commandName = sCommand;
 					} else {
 						// check for extended event handler syntax
 						iStartBracket = sName.indexOf("(");
@@ -215,7 +214,7 @@ sap.ui.define([
 			 * parse(".fnControllerMethod; .fnControllerMethod(${  path:'/someModelProperty', formatter: '.myFormatter', type: 'sap.ui.model.type.String'}    ); globalFunction")
 			 * => [".fnControllerMethod", ".fnControllerMethod(${  path:'/someModelProperty', formatter: '.myFormatter', type: 'sap.ui.model.type.String'}    )", "globalFunction"]
 			 *
-			 * @param {string} [sValue] - Incoming string
+			 * @param [string] sValue - Incoming string
 			 * @return {string[]} - Array of event handler definitions
 			 */
 			parse: function parse(sValue) {
@@ -243,8 +242,6 @@ sap.ui.define([
 							break;
 						case ")":
 							iParenthesesCounter--;
-							break;
-						default:
 							break;
 					}
 
@@ -306,7 +303,7 @@ sap.ui.define([
 				}
 			}
 
-			var fnTypeClass, oContext, oBinding, aBindings = [];
+			var clType, oContext, oBinding, aBindings = [];
 			oBindingInfo.parts.forEach(function(oPart) {
 				var oModel;
 				if (oPart.model === "$parameters") {
@@ -322,11 +319,11 @@ sap.ui.define([
 
 				oType = oPart.type;
 				if (typeof oType == "string") {
-					fnTypeClass = ObjectPath.get(oType);
-					if (typeof fnTypeClass !== "function") {
+					clType = ObjectPath.get(oType);
+					if (typeof clType !== "function") {
 						throw new Error("Cannot find type \"" + oType + "\" used for binding \"" + oPart.path + "\"!");
 					}
-					oType = new fnTypeClass(oPart.formatOptions, oPart.constraints);
+					oType = new clType(oPart.formatOptions, oPart.constraints);
 				}
 
 				oBinding = oModel.bindProperty(oPart.path, oContext, oBindingInfo.parameters);
@@ -341,8 +338,8 @@ sap.ui.define([
 				// Create type instance if needed
 				oType = oBindingInfo.type;
 				if (typeof oType == "string") {
-					fnTypeClass = ObjectPath.get(oType);
-					oType = new fnTypeClass(oBindingInfo.formatOptions, oBindingInfo.constraints);
+					clType = ObjectPath.get(oType);
+					oType = new clType(oBindingInfo.formatOptions, oBindingInfo.constraints);
 				}
 				oBinding = new CompositeBinding(aBindings, oBindingInfo.useRawValues, oBindingInfo.useInternalValues);
 				oBinding.setType(oType /* type that is able to parse etc. */, oPart.targetType /* string, boolean, etc. */ || "any");

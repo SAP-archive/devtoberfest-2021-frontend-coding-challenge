@@ -30,6 +30,11 @@ html[data-sap-ui-animation='on'] {
 	}
 }
 
+html[data-sap-ui-browser='ie11'] .sapMMsgStripMessage {
+	word-wrap: break-word;
+}
+
+
 .sapMMsgStripClosing {
 	opacity: 0;
 }
@@ -58,10 +63,6 @@ html[data-sap-ui-animation='on'] {
 
 	& > .sapMLnk {
 		margin-left: 0.25rem;
-
-		&:not(.sapMLnkDsbl) {
-			text-shadow: @sapUiContentTextShadow;
-		}
 	}
 
 	& > .sapMText {
@@ -71,20 +72,41 @@ html[data-sap-ui-animation='on'] {
 }
 
 .sapMMsgStripCloseButton {
+	border: 0;
+	padding: 0;
+	background: transparent;
+	color: inherit;
+	width: 1.625rem;
+	height: 1.625rem;
 	position: absolute;
-	top: -0.5625rem;
+	top: 0.125rem;
 	right: 0.125rem;
-}
+	box-sizing: border-box;
+	font-family: 'SAP-icons';
+	font-size: 0.75rem;
+	cursor: pointer;
 
-.sapUiSizeCompact .sapMMsgStripCloseButton {
-	top: -0.0625rem;
-}
+	&:focus {
+		outline: 0;
+	}
 
+	&::-moz-focus-inner {
+		border: 0;
+	}
 
-.sapMMsgStripCloseButton {
-	position: absolute;
-	top: -0.5625rem;
-	right: 0.125rem;
+	&::before {
+		content: "";
+		position: absolute;
+		top: -25%;
+		bottom: -25%;
+		left: -25%;
+		right: -25%;
+	}
+
+	&::after {
+		content: '\e03e';
+		position: absolute;
+	}
 }
 
 .sapMMsgStripInformation {

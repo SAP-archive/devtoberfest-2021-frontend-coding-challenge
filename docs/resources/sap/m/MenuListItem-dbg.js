@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -18,9 +18,6 @@ sap.ui.define([
 		// shortcut for sap.ui.core.TextDirection
 		var TextDirection = coreLibrary.TextDirection;
 
-		// shortcut for sap.m.ListType
-		var ListType = library.ListType;
-
 		/**
 		 * Constructor for a new <code>MenuListItem</code>.
 		 *
@@ -32,7 +29,7 @@ sap.ui.define([
 		 * @extends sap.m.ListItemBase
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @private
@@ -43,11 +40,6 @@ sap.ui.define([
 
 			library : "sap.m",
 			properties : {
-
-				/**
-				 * Enabled items can be selected.
-				 */
-				enabled : {type : "boolean", group : "Misc", defaultValue : true},
 
 				/**
 				 * Defines the title of the <code>MenuListItem</code>.
@@ -152,14 +144,6 @@ sap.ui.define([
 
 		MenuListItem.prototype._hasSubItems = function() {
 			return !!(this.getMenuItem() && sap.ui.getCore().byId(this.getMenuItem()).getItems().length);
-		};
-
-		MenuListItem.prototype.setProperty = function(sPropertyKey, vPropertyValue) {
-			ListItemBase.prototype.setProperty.apply(this, arguments);
-			this.fireEvent("propertyChanged", {propertyKey: sPropertyKey, propertyValue: vPropertyValue });
-			if (sPropertyKey === "enabled") {
-				this.setType(vPropertyValue ? ListType.Active : ListType.Inactive);
-			}
 		};
 
 		return MenuListItem;

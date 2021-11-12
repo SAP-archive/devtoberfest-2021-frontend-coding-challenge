@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -12,10 +12,9 @@ sap.ui.define([
 	'./ImageRenderer',
 	"sap/ui/events/KeyCodes",
 	"sap/ui/thirdparty/jquery",
-	"sap/base/security/encodeCSS",
-	"sap/ui/core/library"
+	"sap/base/security/encodeCSS"
 ],
-	function(library, Control, DataType, ImageRenderer, KeyCodes, jQuery, encodeCSS, coreLibrary) {
+	function(library, Control, DataType, ImageRenderer, KeyCodes, jQuery, encodeCSS) {
 	"use strict";
 
 
@@ -23,8 +22,7 @@ sap.ui.define([
 	// shortcut for sap.m.ImageMode
 	var ImageMode = library.ImageMode;
 
-	// shortcut for sap.ui.core.aria.HasPopup
-	var AriaHasPopup = coreLibrary.aria.HasPopup;
+
 
 	/**
 	 * Constructor for a new Image.
@@ -57,7 +55,7 @@ sap.ui.define([
 	 * @implements sap.ui.core.IFormContent
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @public
 	 * @alias sap.m.Image
@@ -176,35 +174,7 @@ sap.ui.define([
 			* It takes effect only when the <code>mode</code> property is set to <code>sap.m.ImageMode.Background</code>.
 			* @since 1.30.0
 			*/
-			backgroundRepeat : {type : "string", group : "Appearance", defaultValue : "no-repeat"},
-			/**
-			* Enables lazy loading for images that are offscreen. If set to <code>true</code>, the property
-			* ensures that offscreen images are loaded early enough so that they have finished loading once
-			* the user scrolls near them.
-			*
-			* <b>Note:</b> Keep in mind that the property uses the loading attribute of HTML <code>&lt;img&gt;</code> element
-			* which is not supported for Internet Explorer.
-			*
-			* @since 1.87
-			*/
-			lazyLoading : {type : "boolean", defaultValue : false },
-
-			/**
-			 * Defines the aria-haspopup attribute of the <code>Image</code>.
-			 *
-			 * <b>Guidance for choosing appropriate value:</b>
-			 * <ul>
-			 * <li> We recommend you to use the property only when press handler is set.</li>
-			 * <li> If you use controls based on <code>sap.m.Popover</code> or <code>sap.m.Dialog</code>,
-			 * then you must use <code>AriaHasPopup.Dialog</code> (both <code>sap.m.Popover</code> and
-			 * <code>sap.m.Dialog</code> have role "dialog" assigned internally).</li>
-			 * <li> If you use other controls, or directly <code>sap.ui.core.Popup</code>, you need to check
-			 * the container role/type and map the value of <code>ariaHasPopup</code> accordingly.</li>
-			 * </ul>
-			 *
-			 * @since 1.87.0
-			 */
-			ariaHasPopup : {type : "sap.ui.core.aria.HasPopup", group : "Accessibility", defaultValue : AriaHasPopup.None}
+			backgroundRepeat : {type : "string", group : "Appearance", defaultValue : "no-repeat"}
 		},
 		aggregations : {
 			/**
@@ -224,13 +194,7 @@ sap.ui.define([
 			/**
 			 * Association to controls / ids which label this control (see WAI-ARIA attribute aria-labelledBy).
 			 */
-			ariaLabelledBy: {type : "sap.ui.core.Control", multiple : true, singularName : "ariaLabelledBy"},
-
-			/**
-			 * Association to controls / IDs which are details to this control (see WAI-ARIA attribute aria-details).
-			 * @since 1.79
-			 */
-			ariaDetails: {type : "sap.ui.core.Control", multiple : true, singularName : "ariaDetails"}
+			ariaLabelledBy: {type : "sap.ui.core.Control", multiple : true, singularName : "ariaLabelledBy"}
 		},
 		events : {
 
@@ -746,8 +710,10 @@ sap.ui.define([
 	 * @returns {boolean} the check result
 	 */
 	Image.prototype._isValidBackgroundSizeValue = function (sValue) {
+		var whitespaceRegEx = /\s+/g;
+
 		// compress whitespace
-		sValue = normWS(sValue);
+		sValue = jQuery.trim(sValue).replace(whitespaceRegEx, " ");
 
 		return isSubSet(sValue.split(" "), ["auto", "cover", "contain", "initial"])
 			|| DataType.getType("sap.ui.core.CSSSizeShortHand").isValid(sValue);
@@ -762,8 +728,10 @@ sap.ui.define([
 	 * @returns {boolean} the check result
 	 */
 	Image.prototype._isValidBackgroundPositionValue = function (sValue) {
+		var whitespaceRegEx = /\s+/g;
+
 		// compress whitespace
-		sValue = normWS(sValue);
+		sValue = jQuery.trim(sValue).replace(whitespaceRegEx, " ");
 
 		return isSubSet(sValue.split(" "), ["left", "right", "top", "center", "bottom", "initial"])
 			|| DataType.getType("sap.ui.core.CSSSizeShortHand").isValid(sValue);
@@ -774,7 +742,7 @@ sap.ui.define([
 	 *
 	 * @see sap.ui.core.Control#getAccessibilityInfo
 	 * @protected
-	 * @returns {object} The <code>sap.m.Image</code> accessibility information
+	 * @returns {Object} The <code>sap.m.Image</code> accessibility information
 	 */
 	Image.prototype.getAccessibilityInfo = function() {
 		var bHasPressListeners = this.hasListeners("press");
@@ -817,16 +785,6 @@ sap.ui.define([
 		return aTestArray && aRefArray && !aTestArray.some(isOutsideSet);
 	}
 
-	/**
-	 * Utility function to normalize whitespace in a CSS value.
-	 * @param {string} sValue String value to normalize
-	 * @returns {string} Normalized value
-	 */
-	function normWS(sValue) {
-		var whitespaceRegEx = /\s+/g;
-		// compress whitespace
-		return sValue == null ? "" : String(sValue).trim().replace(whitespaceRegEx, " ");
-	}
 
 	return Image;
 

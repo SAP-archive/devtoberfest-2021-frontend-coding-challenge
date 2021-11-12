@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -18,7 +18,6 @@ sap.ui.define([
 	"sap/ui/Device",
 	"./MessagePopoverRenderer",
 	"sap/base/Log",
-	"sap/ui/base/ManagedObjectObserver",
 	"sap/ui/thirdparty/jquery"
 ],
 function(
@@ -34,7 +33,6 @@ function(
 	Device,
 	MessagePopoverRenderer,
 	Log,
-	ManagedObjectObserver,
 	jQuery
 ) {
 		"use strict";
@@ -91,7 +89,7 @@ function(
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @public
@@ -405,32 +403,6 @@ function(
 					this['set' + capitalize(sFuncName)](DEFAULT_ASYNC_HANDLERS[sFuncName]);
 				}
 			}, this);
-
-			this._observeItems();
-		};
-
-		MessagePopover.prototype._observeItems = function () {
-			var oItemsObserver = new ManagedObjectObserver(function(oChange) {
-				var sMutation = oChange.mutation;
-				var oItem = oChange.child;
-
-				switch (sMutation) {
-
-					case "insert":
-						// invalidate items when something is changed so we can have them recraeted
-						oItem.attachEvent("_change", this.invalidate, this);
-						break;
-					case "remove":
-						oItem.detachEvent("_change", this.invalidate, this);
-						break;
-					default:
-						break;
-				}
-			}.bind(this));
-
-			oItemsObserver.observe(this, {
-				aggregations: ["items"]
-			});
 		};
 
 		MessagePopover.prototype.onBeforeRendering = function () {
@@ -454,7 +426,7 @@ function(
 			}*/
 
 			// Update MV only if 'items' aggregation is changed
-			if (this._oMessageView && this._bItemsChanged) {
+			if (this._bItemsChanged) {
 				var items = this.getItems();
 				var that = this;
 
@@ -532,7 +504,7 @@ function(
 		 * Opens the MessagePopover
 		 *
 		 * @param {sap.ui.core.Control} oControl Control which opens the MessagePopover
-		 * @returns {this} Reference to the 'this' for chaining purposes
+		 * @returns {sap.m.MessagePopover} Reference to the 'this' for chaining purposes
 		 * @public
 		 * @ui5-metamodel
 		 */
@@ -568,7 +540,7 @@ function(
 		/**
 		 * Closes the MessagePopover
 		 *
-		 * @returns {this} Reference to the 'this' for chaining purposes
+		 * @returns {sap.m.MessagePopover} Reference to the 'this' for chaining purposes
 		 * @public
 		 */
 		MessagePopover.prototype.close = function () {
@@ -587,7 +559,7 @@ function(
 		 * @returns {boolean} Whether the MessagePopover is open
 		 */
 		MessagePopover.prototype.isOpen = function () {
-			return this._oPopover ? this._oPopover.isOpen() : false;
+			return this._oPopover.isOpen();
 		};
 
 		/**
@@ -595,7 +567,7 @@ function(
 		 * oControl parameter is mandatory in the same way as in 'openBy' method
 		 *
 		 * @param {sap.ui.core.Control} oControl Control which opens the MessagePopover
-		 * @returns {this} Reference to the 'this' for chaining purposes
+		 * @returns {sap.m.MessagePopover} Reference to the 'this' for chaining purposes
 		 * @public
 		 */
 		MessagePopover.prototype.toggle = function (oControl) {
@@ -678,7 +650,7 @@ function(
 		 * @private
 		 */
 		MessagePopover.prototype._restoreExpansionDefaults = function () {
-			if (this._oMessageView && !this.getInitiallyExpanded() && this.getItems().length != 1) {
+			if (!this.getInitiallyExpanded() && this.getItems().length != 1) {
 				this._collapseMsgPopover();
 				this._oMessageView._oSegmentedButton.setSelectedButton("none");
 			} else {
@@ -739,7 +711,7 @@ function(
 		 * @private
 		 */
 		MessagePopover.prototype._setInitialFocus = function () {
-			if (this._oMessageView && this._oMessageView._isListPage() && this.getInitiallyExpanded()) {
+			if (this._oMessageView._isListPage() && this.getInitiallyExpanded()) {
 				// if the controls state is "InitiallyExpanded: true" and
 				// if current page is the list page - set initial focus to the list.
 				// otherwise use default functionality built-in the popover
@@ -748,11 +720,9 @@ function(
 		};
 
 		MessagePopover.prototype._syncMessageView = function () {
-			if (this._oMessageView) {
-				this._oMessageView.setProperty('asyncDescriptionHandler', this.getAsyncDescriptionHandler(), true);
-				this._oMessageView.setProperty('asyncURLHandler', this.getAsyncURLHandler(), true);
-				this._oMessageView.setProperty("groupItems", this.getGroupItems(), false);
-			}
+			this._oMessageView.setProperty('asyncDescriptionHandler', this.getAsyncDescriptionHandler(), true);
+			this._oMessageView.setProperty('asyncURLHandler', this.getAsyncURLHandler(), true);
+			this._oMessageView.setProperty("groupItems", this.getGroupItems(), false);
 		};
 
 		/*
@@ -763,13 +733,11 @@ function(
 		 */
 
 		MessagePopover.prototype.setModel = function(oModel, sName) {
-			/* 	When a model is set to the MessagePopover it is propagated to all its aggregation
+			/* When a model is set to the MessagePopover it is propagated to all its aggregation
 				Unfortunately the MessageView is not an aggregation of the MessagePopover (due to some rendering issues)
 				Furthermore the MessageView is actually child of a ResponsivePopover
 				Therefore once the developer set a model to the MessagePopover we need to forward it to the internal MessageView */
-			if (this._oMessageView) {
-				this._oMessageView.setModel(oModel, sName);
-			}
+			this._oMessageView.setModel(oModel, sName);
 
 			return Control.prototype.setModel.apply(this, arguments);
 		};
@@ -781,9 +749,7 @@ function(
 		 */
 		MessagePopover.prototype.navigateBack = function () {
 			// MessagePopover is just a proxy to the MessageView
-			if (this._oMessageView) {
-				this._oMessageView.navigateBack();
-			}
+			this._oMessageView.navigateBack();
 		};
 
 		["invalidate", "addStyleClass", "removeStyleClass", "toggleStyleClass", "hasStyleClass", "getBusyIndicatorDelay",

@@ -29,7 +29,7 @@
 	}
 	.sapMBarChild& {
 		>.sapMGenericTagWrap {
-			display: flex;
+			width: 100%;
 		}
 	}
 }
@@ -56,6 +56,16 @@ html.sap-desktop .sapMGenericTag:focus {
 		left: 1px;
 		z-index: 2;
 		pointer-events: none;
+	}
+}
+
+/* FIX: IE and Edge - dotted line appears blurry. */
+html[data-sap-ui-browser^="ie"].sap-desktop,
+html[data-sap-ui-browser^="ed"].sap-desktop {
+	.sapMGenericTag:focus {
+		&:after{
+			border-style: dashed;
+		}
 	}
 }
 
@@ -122,7 +132,6 @@ html.sap-desktop .sapMGenericTag:focus {
 
 	&:hover {
 		box-shadow: 0 0 0 0.0625rem fade(@sapUiContentShadowColor, 30);
-		cursor: pointer;
 	}
 
 	.sapMGenericTagActive &  {
@@ -179,6 +188,7 @@ html.sap-desktop .sapMGenericTag:focus {
 			}
 		}
 		.sapMObjectNumberUnit {
+			padding-top: 0.0625rem;
 			min-width: 0.75rem;
 		}
 	}

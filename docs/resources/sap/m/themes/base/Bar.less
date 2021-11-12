@@ -69,9 +69,15 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 	left: 0px;
 }
 
+/* IE / Edge does not support "text-align: end" */
+/* use "right" and "left" instead        */
 .sapMBarRight {
-	text-align: end;
+	text-align: right;
 	right: 0px;
+}
+
+.sapMBarRight.sapMRTL {
+	text-align: left;
 }
 
 .sapMBarPH {
@@ -172,6 +178,12 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 	margin-right: 0;
 }
 
+.sapMBarLeft > .sapMBarChild:not(.sapMFlexBox),
+.sapMBarPH > .sapMBarChild:not(.sapMFlexBox),
+.sapMBarRight > .sapMBarChild:not(.sapMFlexBox) {
+	line-height: initial;
+}
+
 .sapUiSizeCompact{
 	.sapMBarRight > .sapMBarChild:not(.sapMTB) {
 		margin-bottom: 0;
@@ -189,9 +201,6 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 .sapMBarLeft,
 .sapMBarPH {
 	box-sizing: border-box;
-	.sapMObjectAttributeDiv .sapMText {
-		vertical-align: text-top;
-	}
 }
 
 .sapMBarRight,
@@ -214,10 +223,22 @@ html[data-sap-ui-browser^="ff"].sap-desktop {
 }
 
 /* Bar Title Alignment */
-.sapMBarTitleAlignStart .sapMBarPH {
+.sapMBarTitleStart .sapMBarPH {
 	justify-content: flex-start;
 }
 
-html[data-sap-ui-browser^="ff"].sap-desktop .sapMBarTitleAlignStart .sapMBarPH {
+html[data-sap-ui-browser^="ff"].sap-desktop .sapMBarTitleStart .sapMBarPH {
 	justify-content: start;
+}
+
+html[data-sap-ui-browser^="ie"] .sapMBarTitleStart .sapMBarPH,
+html[data-sap-ui-browser^="ie"] .sapMBarTitleStart .sapMBarMiddle,
+html[data-sap-ui-browser^="ed"] .sapMBarTitleStart .sapMBarPH {
+	text-align: left;
+}
+
+html[dir="rtl"][data-sap-ui-browser^="ie"] .sapMBarTitleStart .sapMBarPH,
+html[dir="rtl"][data-sap-ui-browser^="ie"] .sapMBarTitleStart .sapMBarMiddle,
+html[dir="rtl"][data-sap-ui-browser^="ed"] .sapMBarTitleStart .sapMBarPH {
+	text-align: right;
 }

@@ -1,12 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/core/Renderer", "sap/m/ListItemBaseRenderer"], function(Renderer, ListItemBaseRenderer) {
 	"use strict";
 
-	var TAG_INCLUDELIST = {
+	var TAG_WHITELIST = {
 		"svg": {
 			attributes: ["width", "height", "focusable", "preserveAspectRatio"]
 		},
@@ -16,7 +16,32 @@ sap.ui.define(["sap/ui/core/Renderer", "sap/m/ListItemBaseRenderer"], function(R
 		"line": {
 			attributes: ["x1", "x2", "y1", "y2", "stroke-width", "stroke", "stroke-dasharray", "stroke-linecap"]
 		}
-	};
+	},
+		bIsDOMParserSupported;
+
+	try {
+		var oParser = new DOMParser();
+		bIsDOMParserSupported = oParser.parseFromString("<svg />", "text/html") !== null;
+	} catch (ex) {
+		bIsDOMParserSupported = false;
+	}
+
+	var fnParseSvgString;
+
+	// Most browsers support DOMParser for text/html. Sadly our voter job uses phantomjs. This is a fix for phantomjs.
+	if (bIsDOMParserSupported) {
+		fnParseSvgString = function (sString) {
+			var oParser = new DOMParser(),
+				oDocument = oParser.parseFromString(sString, "text/html");
+			return oDocument.body.childNodes;
+		};
+	} else {
+		fnParseSvgString = function (sString) {
+			var oDocument = document.implementation.createHTMLDocument("");
+			oDocument.body.innerHTML = sString;
+			return oDocument.body.childNodes;
+		};
+	}
 
 	function every(aDomArray, fnCallback) {
 		var i;
@@ -36,7 +61,7 @@ sap.ui.define(["sap/ui/core/Renderer", "sap/m/ListItemBaseRenderer"], function(R
 			return true;
 		}
 		var sTagName = oNode.tagName.toLowerCase(),
-			oTag = TAG_INCLUDELIST[sTagName],
+			oTag = TAG_WHITELIST[sTagName],
 			bTagsValid;
 		if (!oTag) {
 			return false;
@@ -62,33 +87,32 @@ sap.ui.define(["sap/ui/core/Renderer", "sap/m/ListItemBaseRenderer"], function(R
 	 * @namespace
 	 */
 	var SelectionDetailsListItemRenderer = Renderer.extend(ListItemBaseRenderer);
-	SelectionDetailsListItemRenderer.apiVersion = 2;
 
 	SelectionDetailsListItemRenderer.renderLIAttributes = function(oRm, oControl) {
-		oRm.class("sapMSDItem");
+		oRm.addClass("sapMSDItem");
+		oRm.writeClasses();
 	};
 
 	SelectionDetailsListItemRenderer.renderLIContent = function(oRm, oControl) {
 		var aLines = oControl._getParentElement().getLines();
 
-		oRm.openStart("div");
-		oRm.class("sapMSDItemLines");
-		oRm.openEnd();
+		oRm.write("<div");
+		oRm.addClass("sapMSDItemLines");
+		oRm.writeClasses();
+		oRm.write(">");
 
 		for (var i = 0; i < aLines.length; i++) {
 			this.renderLine(oRm, oControl, aLines[i]);
 		}
 
-		oRm.close("div");
+		oRm.write("</div>");
 
 		ListItemBaseRenderer.renderType(oRm, oControl);
 	};
 
 	SelectionDetailsListItemRenderer._isValidSvg = function (data) {
 		try {
-			var oParser = new DOMParser(),
-				oDocument = oParser.parseFromString(data, "text/html");
-			var aNodes = oDocument.body.childNodes;
+			var aNodes = fnParseSvgString(data);
 			if (aNodes.length === 0) {
 				return false;
 			}
@@ -104,63 +128,69 @@ sap.ui.define(["sap/ui/core/Renderer", "sap/m/ListItemBaseRenderer"], function(R
 			sDisplayValue = line.getDisplayValue(),
 			sLineMarker = line.getLineMarker();
 
-		oRm.openStart("div");
-		oRm.class("sapMSDItemLine");
-		oRm.openEnd();
+		oRm.write("<div");
+		oRm.addClass("sapMSDItemLine");
+		oRm.writeClasses();
+		oRm.write(">");
 
-		oRm.openStart("div");
-		oRm.class("sapMSDItemLineMarkerContainer");
-		oRm.openEnd();
+		oRm.write("<div");
+		oRm.addClass("sapMSDItemLineMarkerContainer");
+		oRm.writeClasses();
+		oRm.write(">");
 		if (sLineMarker && SelectionDetailsListItemRenderer._isValidSvg(sLineMarker)) {
-			oRm.unsafeHtml(sLineMarker);
+			oRm.write(sLineMarker);
 		}
-		oRm.close("div");
+		oRm.write("</div>");
 
-		oRm.openStart("div");
-		oRm.class("sapMSDItemLineLabel");
-		oRm.openEnd();
+		oRm.write("<div");
+		oRm.addClass("sapMSDItemLineLabel");
+		oRm.writeClasses();
+		oRm.write(">");
 
-		oRm.text(line.getLabel());
+		oRm.writeEscaped(line.getLabel());
 
-		oRm.close("div");
+		oRm.write("</div>");
 
-		oRm.openStart("div");
-		oRm.class("sapMSDItemLineValue");
+		oRm.write("<div");
+		oRm.addClass("sapMSDItemLineValue");
 		if (sUnit) {
-			oRm.class("sapMSDItemLineBold");
+			oRm.addClass("sapMSDItemLineBold");
 		}
-		oRm.openEnd();
+		oRm.writeClasses();
+		oRm.write(">");
 
 		if (sDisplayValue) {
-			oRm.text(sDisplayValue);
+			oRm.writeEscaped(sDisplayValue);
 		} else {
-			oRm.text(sValue);
+			oRm.writeEscaped(sValue);
 		}
 
 		if (sUnit) {
-			oRm.openStart("span");
-			oRm.class("sapMSDItemLineUnit");
-			oRm.openEnd();
+			oRm.write("<span");
+			oRm.addClass("sapMSDItemLineUnit");
+			oRm.writeClasses();
+			oRm.write(">");
 
-			oRm.text("\u00a0");
-			oRm.text(sUnit);
+			oRm.write("&nbsp;");
+			oRm.writeEscaped(sUnit);
 
-			oRm.close("span");
+			oRm.write("</span>");
 		}
 
-		oRm.close("div");
+		oRm.write("</div>");
 
-		oRm.close("div");
+		oRm.write("</div>");
 	};
 
 	SelectionDetailsListItemRenderer.renderType = function(oRm, oControl) {
 		var oToolbar = oControl._getParentElement().getAggregation("_overflowToolbar");
 		if (oToolbar) {
-			oRm.openStart("div");
-			oRm.class("sapMSDItemActions");
-			oRm.openEnd();
+			oRm.write("<div");
+			oRm.addClass("sapMSDItemActions");
+			oRm.writeClasses();
+			oRm.write(">");
 			oRm.renderControl(oToolbar);
-			oRm.close("div");
+			oRm.write("</div>");
 		}
 	};
 

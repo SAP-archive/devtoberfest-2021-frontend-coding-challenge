@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -51,7 +51,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -159,6 +159,10 @@ sap.ui.define([
 		designtime: "sap/m/designtime/RatingIndicator.designtime"
 	}});
 
+	///**
+	// * This file defines behavior for the control,
+	// */
+
 	/* =========================================================== */
 	/*           temporary flags for jslint syntax check           */
 	/* =========================================================== */
@@ -191,14 +195,11 @@ sap.ui.define([
 	 * Sets the rating value. The method is automatically checking whether the value is in the valid range of 0-{@link #getMaxValue maxValue} and if it is a valid number. Calling the setter with null or undefined will reset the value to it's default.
 	 *
 	 * @param {float} fValue The rating value to be set.
-	 * @returns {this} Returns <code>this</code> to facilitate method chaining.
+	 * @returns {sap.m.RatingIndicator} Returns <code>this</code> to facilitate method chaining.
 	 * @override
 	 * @public
 	 */
-	RatingIndicator.prototype.setValue = function (vValue) {
-		// Allow passing float values as strings to support oData v2. Edm.Double type format
-		var fValue = typeof vValue !== "string" ? vValue : Number(vValue);
-
+	RatingIndicator.prototype.setValue = function (fValue) {
 		// validates the property and sets null/undefined values to the default
 		fValue = this.validateProperty("value", fValue);
 
@@ -209,7 +210,7 @@ sap.ui.define([
 
 		// check for valid numbers
 		if (isNaN(fValue)) {
-			Log.warning('Ignored new rating value "' + vValue + '" because it is NAN');
+			Log.warning('Ignored new rating value "' + fValue + '" because it is NAN');
 
 		// check if the number is in the range 0-maxValue (only if control is rendered)
 		// if control is not rendered it is handled by onBeforeRendering()
@@ -242,6 +243,7 @@ sap.ui.define([
 	RatingIndicator.prototype.onBeforeRendering = function () {
 		var fVal = this.getValue();
 		var iMVal = this.getMaxValue();
+		var oSizes = {};
 
 		if (fVal > iMVal) {
 			this.setValue(iMVal);
@@ -254,97 +256,56 @@ sap.ui.define([
 		var sIconSize = this.getIconSize();
 
 		if (sIconSize) {
-			this._setRegularSizes(sIconSize);
+			oSizes = this._getRegularSizes(sIconSize);
 		} else if (this.getDisplayOnly()) {
-			this._setDisplayOnlySizes();
+			oSizes = this._getDisplayOnlySizes();
 		} else {
-			this._setContentDensitySizes();
-		}
-	};
-
-	RatingIndicator.prototype._setDisplayOnlySizes = function () {
-		var sIconSize = "sapUiRIIconSizeDisplayOnly",
-			sIconPaddingSize = "sapUiRIIconPaddingDisplayOnly";
-
-		if (RatingIndicator.sizeMapppings[sIconSize] && RatingIndicator.paddingValueMappping[sIconPaddingSize]) {
-			this._iPxIconSize = RatingIndicator.sizeMapppings[sIconSize];
-			this._iPxPaddingSize = RatingIndicator.paddingValueMappping[sIconPaddingSize];
-
-			return;
+			oSizes = this._getContentDensitySizes();
 		}
 
-		var mParamеters = Object.assign({
-				// add global styles as default
-				"sapUiRIIconSizeDisplayOnly": "1rem",
-				"sapUiRIIconPaddingDisplayOnly": "0.125rem"
-			}, Parameters.get({
-				name: [sIconSize, sIconPaddingSize],
-				callback: function(mParams) {
-					this.setIconAndPaddingSizes(sIconSize, sIconPaddingSize, mParams[sIconSize], mParams[sIconPaddingSize]);
-				}.bind(this)
-			}));
-
-		this.setIconAndPaddingSizes(sIconSize, sIconPaddingSize, mParamеters[sIconSize], mParamеters[sIconPaddingSize]);
+		this._iPxIconSize = oSizes.icon;
+		this._iPxPaddingSize = oSizes.padding;
 	};
 
-	RatingIndicator.prototype._setContentDensitySizes = function () {
+	RatingIndicator.prototype._getDisplayOnlySizes = function () {
+		RatingIndicator.sizeMapppings["displayOnly"] = RatingIndicator.sizeMapppings["displayOnly"] || this._toPx(Parameters.get("sapUiRIIconSizeDisplayOnly"));
+		RatingIndicator.paddingValueMappping["displayOnlyPadding"] = RatingIndicator.paddingValueMappping["displayOnlyPadding"] || this._toPx(Parameters.get("sapUiRIIconPaddingDisplayOnly"));
+
+		return {
+			icon: RatingIndicator.sizeMapppings["displayOnly"],
+			padding: RatingIndicator.paddingValueMappping["displayOnlyPadding"]
+		};
+	};
+
+	RatingIndicator.prototype._getContentDensitySizes = function () {
 		var sDensityMode = this._getDensityMode();
 		var sSizeKey = "sapUiRIIconSize" + sDensityMode;
 		var sPaddingKey = "sapUiRIIconPadding" + sDensityMode;
 
-		if (RatingIndicator.sizeMapppings[sSizeKey] && RatingIndicator.paddingValueMappping[sPaddingKey]) {
-			this._iPxIconSize = RatingIndicator.sizeMapppings[sSizeKey];
-			this._iPxPaddingSize = RatingIndicator.paddingValueMappping[sPaddingKey];
+		RatingIndicator.sizeMapppings[sSizeKey] = RatingIndicator.sizeMapppings[sSizeKey] || this._toPx(Parameters.get(sSizeKey));
+		RatingIndicator.paddingValueMappping[sPaddingKey] = RatingIndicator.paddingValueMappping[sPaddingKey] || this._toPx(Parameters.get(sPaddingKey));
 
-			return;
-		}
-
-		var mParamеters = Parameters.get({
-			name: [sSizeKey, sPaddingKey],
-			callback: function(mParams) {
-				this.setIconAndPaddingSizes(sSizeKey, sPaddingKey, mParams[sSizeKey], mParams[sPaddingKey]);
-			}.bind(this)
-		});
-
-		if (mParamеters) {
-			this.setIconAndPaddingSizes(sSizeKey, sPaddingKey, mParamеters[sSizeKey], mParamеters[sPaddingKey]);
-		}
+		return {
+			icon: RatingIndicator.sizeMapppings[sSizeKey],
+			padding: RatingIndicator.paddingValueMappping[sPaddingKey]
+		};
 	};
 
-	RatingIndicator.prototype._setRegularSizes = function (sIconSize) {
+	RatingIndicator.prototype._getRegularSizes = function (sIconSize) {
 		RatingIndicator.sizeMapppings[sIconSize] = RatingIndicator.sizeMapppings[sIconSize] || this._toPx(sIconSize);
 
 		var iPxIconSize = RatingIndicator.sizeMapppings[sIconSize];
 
 		RatingIndicator.iconPaddingMappings[iPxIconSize] = RatingIndicator.iconPaddingMappings[iPxIconSize] || "sapUiRIIconPadding" + this._getIconSizeLabel(iPxIconSize);
 
-		var sPaddingClass = RatingIndicator.iconPaddingMappings[iPxIconSize];
+		var paddingClass = RatingIndicator.iconPaddingMappings[iPxIconSize];
 
-		if (RatingIndicator.paddingValueMappping[sPaddingClass]) {
-			this._iPxIconSize = RatingIndicator.sizeMapppings[sIconSize];
-			this._iPxPaddingSize = RatingIndicator.paddingValueMappping[sPaddingClass];
+		RatingIndicator.paddingValueMappping[paddingClass] = RatingIndicator.paddingValueMappping[paddingClass] || this._toPx(Parameters.get(paddingClass));
 
-			return;
-		}
-
-		var sParam = Parameters.get({
-			name: sPaddingClass,
-			callback: function (sPadding) {
-				this.setIconAndPaddingSizes(sIconSize, sPaddingClass, RatingIndicator.sizeMapppings[sIconSize], sPadding);
-			}.bind(this)
-		});
-
-		if (sParam) {
-			this.setIconAndPaddingSizes(sIconSize, sPaddingClass, RatingIndicator.sizeMapppings[sIconSize], sParam);
-		}
-	};
-
-	RatingIndicator.prototype.setIconAndPaddingSizes = function (sSizeKey, sPaddingKey, sSize, sPadding) {
-		RatingIndicator.sizeMapppings[sSizeKey] = this._toPx(sSize);
-		RatingIndicator.paddingValueMappping[sPaddingKey] = this._toPx(sPadding);
-
-		this._iPxIconSize = RatingIndicator.sizeMapppings[sSizeKey];
-		this._iPxPaddingSize = RatingIndicator.paddingValueMappping[sPaddingKey];
+		return {
+			icon: RatingIndicator.sizeMapppings[sIconSize],
+			padding: RatingIndicator.paddingValueMappping[paddingClass]
+		};
 	};
 
 	/**
@@ -410,11 +371,11 @@ sap.ui.define([
 		switch (true) {
 			case (iPxIconSize >= 32):
 				return "L";
-			case (iPxIconSize >= 22):
+			case (this._iPxIconSize >= 22):
 				return "M";
-			case (iPxIconSize >= 16):
+			case (this._iPxIconSize >= 16):
 				return "S";
-			case (iPxIconSize >= 12):
+			case (this._iPxIconSize >= 12):
 				return "XS";
 			default:
 				return "M";
@@ -422,21 +383,19 @@ sap.ui.define([
 	};
 
 	RatingIndicator.prototype._toPx = function (cssSize) {
-		var vScopeVal = Math.round(cssSize),
-			oScopeTest;
+		var scopeVal = Math.round(cssSize),
+			scopeTest;
 
-		if (isNaN(vScopeVal)) {
+		if (isNaN(scopeVal)) {
 			if (RegExp("^(auto|0)$|^[+-\.]?[0-9].?([0-9]+)?(px|em|rem|ex|%|in|cm|mm|pt|pc)$").test(cssSize)) {
-				oScopeTest = jQuery('<div>&nbsp;</div>')
-					.css({"display": "none", "width": cssSize, "margin": 0, "padding": 0, "height": "auto", "line-height": 1, "border": 0, "overflow": "hidden"})
-					.appendTo(sap.ui.getCore().getStaticAreaRef());
-				vScopeVal = oScopeTest.width();
-				oScopeTest.remove();
+				scopeTest = jQuery('<div style="display: none; width: ' + cssSize + '; margin: 0; padding:0; height: auto; line-height: 1; font-size: 1; border:0; overflow: hidden">&nbsp;</div>').appendTo(sap.ui.getCore().getStaticAreaRef());
+				scopeVal = scopeTest.width();
+				scopeTest.remove();
 			} else {
 				return false;
 			}
 		}
-		return Math.round(vScopeVal);
+		return Math.round(scopeVal);
 	};
 
 	/**
@@ -933,7 +892,7 @@ sap.ui.define([
 	/* =========================================================== */
 
 	/**
- 	 * @returns {object} Current accessibility state of the control
+ 	 * @returns {sap.m.RatingIndicator} this instance for method chaining
 	 * @see sap.ui.core.Control#getAccessibilityInfo
 	 * @protected
 	 */

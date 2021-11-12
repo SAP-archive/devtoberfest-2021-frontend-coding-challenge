@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -12,7 +12,8 @@ sap.ui.define([
 	"use strict";
 
 	var mAllowedChangeSetMethods = {"POST" : true, "PUT" : true, "PATCH" : true, "DELETE" : true},
-		rContentIdReference = /^\$\d+/,
+		oBatch,
+		rContentIdReference = /\$\d+/,
 		rHeaderParameter = /(\S*?)=(?:"(.+)"|(\S+))/;
 
 	/**
@@ -74,7 +75,7 @@ sap.ui.define([
 	 */
 	function getChangeSetContentType(sMimeTypeHeaders) {
 		var sContentType = getHeaderValue(sMimeTypeHeaders, "content-type");
-		return sContentType.startsWith("multipart/mixed;") ? sContentType : undefined;
+		return sContentType.indexOf("multipart/mixed;") === 0 ? sContentType : undefined;
 	}
 
 	/**
@@ -115,9 +116,9 @@ sap.ui.define([
 	 * @returns {string} The HTTP header value
 	 */
 	function getHeaderValue(sHeaders, sHeaderName) {
-		var aHeaderParts,
-			aHeaders = sHeaders.split("\r\n"),
-			i;
+		var i,
+			aHeaderParts,
+			aHeaders = sHeaders.split("\r\n");
 
 		for (i = 0; i < aHeaders.length; i += 1) {
 			aHeaderParts = aHeaders[i].split(":");
@@ -156,11 +157,11 @@ sap.ui.define([
 				sHttpHeaders,
 				iHttpHeadersEnd,
 				aHttpStatusInfos,
+				i,
 				sMimeHeaders,
 				iMimeHeadersEnd,
 				oResponse = {},
-				iResponseIndex,
-				i;
+				iResponseIndex;
 
 			iMimeHeadersEnd = sBatchPart.indexOf("\r\n\r\n");
 			sMimeHeaders = sBatchPart.slice(0, iMimeHeadersEnd);
@@ -225,55 +226,47 @@ sap.ui.define([
 			aHeaders = [];
 
 		for (sHeaderName in mHeaders) {
-			aHeaders.push(sHeaderName, ":", mHeaders[sHeaderName], "\r\n");
+			aHeaders = aHeaders.concat(sHeaderName, ":", mHeaders[sHeaderName], "\r\n");
 		}
 
 		return aHeaders;
 	}
 
 	/**
-	 * Serializes the given array of request objects into a $batch request body.
+	 * Serializes the given array of request objects into $batch request body.
 	 *
 	 * @param {object[]} aRequests
-	 *   An array consisting of request objects or arrays of request objects, in case requests need
-	 *   to be sent in scope of a change set. Change set requests are annotated with a property
-	 *   <code>$ContentID</code> containing the corresponding Content-ID from the serialized batch
-	 *   request body.
+	 *   See parameter <code>aRequests</code> of serializeBatchRequest function
 	 * @param {number} [iChangeSetIndex]
 	 *   Is only specified if the function is called to serialize change sets and
 	 *   contains zero-based index of the change set within <code>aRequests</code> array.
-	 * @param {string} [sEpilogue]
-	 *   String that will be included in the epilogue
 	 * @returns {object}
 	 *   The $batch request object with the following structure
 	 *   <ul>
-	 *     <li> <code>body</code>: {string[]} Array of strings representing batch request body
-	 *     <li> <code>batchBoundary</code>: {string} Batch boundary value
+	 *     <li><code>body</code>: {string[]} Array of strings representing batch request body
+	 *     <li><code>batchBoundary</code>: {string} Batch boundary value
 	 *   </ul>
-	 * @throws {Error}
-	 *   If change sets are nested or an HTTP method other than GET, POST, PUT, PATCH, or DELETE is
-	 *   used
 	 */
-	function _serializeBatchRequest(aRequests, iChangeSetIndex, sEpilogue) {
+	function _serializeBatchRequest(aRequests, iChangeSetIndex) {
 		var sBatchBoundary = (iChangeSetIndex !== undefined ? "changeset_" : "batch_")
 				+ _Helper.uid(),
 			bIsChangeSet = iChangeSetIndex !== undefined,
 			aRequestBody = [];
 
 		if (bIsChangeSet) {
-			aRequestBody.push("Content-Type: multipart/mixed;boundary=",
+			aRequestBody = aRequestBody.concat("Content-Type: multipart/mixed;boundary=",
 				sBatchBoundary, "\r\n\r\n");
 		}
+
 		aRequests.forEach(function (oRequest, iRequestIndex) {
 			var sContentIdHeader = "",
 				sUrl = oRequest.url;
 
 			if (bIsChangeSet) {
-				oRequest.$ContentID = iRequestIndex + "." + iChangeSetIndex;
-				sContentIdHeader = "Content-ID:" + oRequest.$ContentID + "\r\n";
+				sContentIdHeader = "Content-ID:" + iRequestIndex + "." + iChangeSetIndex + "\r\n";
 			}
 
-			aRequestBody.push("--", sBatchBoundary, "\r\n");
+			aRequestBody = aRequestBody.concat("--", sBatchBoundary, "\r\n");
 			if (Array.isArray(oRequest)) {
 				if (bIsChangeSet) {
 					throw new Error('Change set must not contain a nested change set.');
@@ -283,14 +276,11 @@ sap.ui.define([
 			} else {
 				if (bIsChangeSet && !mAllowedChangeSetMethods[oRequest.method]) {
 					throw new Error("Invalid HTTP request method: " + oRequest.method +
-						". Change set must contain only POST, PUT, PATCH, or DELETE requests.");
+						". Change set must contain only POST, PUT, PATCH or DELETE requests.");
 				}
 
-				if (iChangeSetIndex !== undefined && sUrl[0] === "$") {
-					// adjust URL if it starts with a Content-ID reference by adding the change set
-					// index
-					sUrl = sUrl.replace(rContentIdReference, "$&." + iChangeSetIndex);
-				}
+				// adjust URL if it contains Content-ID reference by adding the change set index
+				sUrl = sUrl.replace(rContentIdReference, "$&." + iChangeSetIndex);
 
 				aRequestBody = aRequestBody.concat(
 					"Content-Type:application/http\r\n",
@@ -303,42 +293,37 @@ sap.ui.define([
 					JSON.stringify(oRequest.body) || "", "\r\n");
 			}
 		});
-		aRequestBody.push("--", sBatchBoundary, "--\r\n", sEpilogue);
-
+		aRequestBody = aRequestBody.concat("--", sBatchBoundary, "--\r\n");
 
 		return {body : aRequestBody, batchBoundary : sBatchBoundary};
 	}
 
-	return {
+	oBatch = {
 		/**
-		 * Deserializes a batch response body using the batch boundary from the given value of
-		 * the "Content-Type" header. See
-		 * {@link sap.ui.model.odata.v4.ODataUtils.deserializeBatchResponse} for more details.
+		 * Deserializes batch response body using batch boundary from the specified value of the
+		 * 'Content-Type' header.
 		 *
 		 * @param {string} sContentType
-		 *   The value of the "Content-Type" header from the batch response, for example
-		 *  "multipart/mixed; boundary=batch_123456"
+		 *   Value of the Content-Type header from the batch response
+		 *   (e.g. "multipart/mixed; boundary=batch_123456")
 		 * @param {string} sResponseBody
-		 *   A batch response body
-		 * @returns {object[]}
-		 *   An array containing responses from the batch response body, each with the following
-		 *   structure:
+		 *   Batch response body
+		 * @returns {object[]} Array containing responses from the batch response body. Each of the
+		 *   returned responses has the following structure:
 		 *   <ul>
-		 *     <li> <code>status</code>: {number} HTTP status code
-		 *     <li> <code>statusText</code>: {string} (optional) HTTP status text
-		 *     <li> <code>headers</code>: {object} Map of response headers
-		 *     <li> <code>responseText</code>: {string} Response body
+		 *     <li><code>status</code>: {number} HTTP status code
+		 *     <li><code>statusText</code>: {string} (optional) HTTP status text
+		 *     <li><code>headers</code>: {object} Map of the response headers
+		 *     <li><code>responseText</code>: {string} Response body
 		 *   </ul>
 		 *   If the specified <code>sResponseBody</code> contains responses for change sets, then
 		 *   the corresponding response objects will be returned in a nested array.
 		 * @throws {Error}
 		 *   <ul>
-		 *     <li> If the <code>sContentType</code> parameter does not represent a
-		 *       "multipart/mixed" media type with "boundary" parameter
-		 *     <li> If the "charset" parameter of the "Content-Type" header of a nested response has
-		 *       a value other than "UTF-8"
-		 *     <li> If there is no "Content-ID" header for a change set response or its value is not
-		 *       a number
+		 *     <li>If <code>sContentType</code> parameter does not represent "multipart/mixed"
+		 *       media type with "boundary" parameter
+		 *     <li>If "charset" parameter of "Content-Type" header of a nested response has value
+		 *       other than "utf-8".
 		 *   </ul>
 		 */
 		deserializeBatchResponse : function (sContentType, sResponseBody) {
@@ -347,36 +332,74 @@ sap.ui.define([
 
 		/**
 		 * Serializes an array of requests to an object containing the batch request body and
-		 * mandatory headers for the batch request. See
-		 * {@link sap.ui.model.odata.v4.ODataUtils.serializeBatchRequest} for more details.
+		 * mandatory headers for the batch request.
 		 *
 		 * @param {object[]} aRequests
-		 *   An array consisting of request objects or arrays of request objects
-		 * @param {string} [sEpilogue]
-		 *   A string that will be included in the epilogue (which acts like a comment)
+		 *  An array consisting of request objects <code>oRequest</code> or out of array(s)
+		 *  of request objects <code>oRequest</code>, in case requests need to be sent in scope of
+		 *  a change set. See example below.
 		 * @param {string} oRequest.method
-		 *   The HTTP method; only "GET", "POST", "PUT", "PATCH", or "DELETE" are allowed
+		 *   HTTP method, e.g. "GET"
 		 * @param {string} oRequest.url
-		 *   An absolute or relative URL
+		 *   Absolute or relative URL. If the URL contains Content-ID reference then the reference
+		 *   has to be specified as zero-based index of the referred request inside the change set.
+		 *   See example below.
 		 * @param {object} oRequest.headers
-		 *   A map of request headers
+		 *   Map of request headers. RFC-2047 encoding rules are not supported. Nevertheless non
+		 *   US-ASCII values can be used. If the value of an "If-Match" header is an object, that
+		 *   object's ETag is used instead.
 		 * @param {object} oRequest.body
-		 *   The request body
-		 * @returns {object}
-		 *   An object containing the following properties:
+		 *   Request body. If specified, oRequest.headers map must contain "Content-Type" header
+		 *   either without "charset" parameter or with "charset" parameter having value "UTF-8".
+		 * @returns {object} Object containing the following properties:
 		 *   <ul>
-		 *     <li> <code>body</code>: {string} Batch request body
-		 *     <li> <code>headers</code>: {object} Map of batch-specific request headers:
-		 *       <ul>
-		 *         <li> <code>Content-Type</code>: Value for the "Content-Type" header
-		 *         <li> <code>MIME-Version</code>: Value for the "MIME-Version" header
-		 *       </ul>
+		 *     <li><code>body</code>: Batch request body
+		 *     <li><code>headers</code>: Batch-specific request headers
+		 *     <ul>
+		 *       <li><code>Content-Type</code>: Value for the 'Content-Type' header
+		 *       <li><code>MIME-Version</code>: Value for the 'MIME-Version' header
+		 *     </ul>
 		 *   </ul>
-		 * @throws {Error}
-		 *   If change sets are nested or an invalid HTTP method is used
+		 * @example
+		 *   var oBatchRequest = Batch.serializeBatchRequest([
+		 *       {
+		 *           method : "GET",
+		 *           url : "/sap/opu/odata4/IWBEP/TEA/default/IWBEP/TEA_BUSI/0001/Employees('1')",
+		 *           headers : {
+		 *               Accept : "application/json"
+		 *           }
+		 *       },
+		 *       [{
+		 *           method : "POST",
+		 *           url : "TEAMS",
+		 *           headers : {
+		 *               "Content-Type" : "application/json"
+		 *           },
+		 *           body : {"TEAM_ID" : "TEAM_03"}
+		 *       }, {
+		 *           method : "POST",
+		 *           url : "$0/TEAM_2_Employees",
+		 *           headers : {
+		 *               "Content-Type" : "application/json",
+		 *               "If-Match" : "etag0"
+		 *           },
+		 *           body : {"Name" : "John Smith"}
+		 *       }],
+		 *       {
+		 *           method : "PATCH",
+		 *           url : "/sap/opu/odata4/IWBEP/TEA/default/IWBEP/TEA_BUSI/0001/Employees('3')",
+		 *           headers : {
+		 *               "Content-Type" : "application/json",
+		 *               "If-Match" : {
+		 *                   "@odata.etag" : "etag1"
+		 *               }
+		 *           },
+		 *           body : {"TEAM_ID" : "TEAM_01"}
+		 *       }
+		 *   ]);
 		 */
-		serializeBatchRequest : function (aRequests, sEpilogue) {
-			var oBatchRequest = _serializeBatchRequest(aRequests, undefined, sEpilogue);
+		serializeBatchRequest : function (aRequests) {
+			var oBatchRequest = _serializeBatchRequest(aRequests);
 
 			return {
 				body : oBatchRequest.body.join(""),
@@ -387,4 +410,6 @@ sap.ui.define([
 			};
 		}
 	};
+
+	return oBatch;
 }, /* bExport= */false);

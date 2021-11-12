@@ -1,21 +1,23 @@
 /*
  * ! OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.m.QuickView.
 sap.ui.define([
-	"./library",
-	"sap/ui/Device",
-	"sap/ui/core/IconPool",
-	"./QuickViewBase",
-	"./ResponsivePopover",
-	"./NavContainer",
-	"./Page",
-	"./Bar",
-	"./Button"
-], function (
+	'./library',
+	'sap/ui/Device',
+	'sap/ui/core/IconPool',
+	'./QuickViewBase',
+	'./ResponsivePopover',
+	'./NavContainer',
+	'./Page',
+	'./Bar',
+	'./Button',
+	'./QuickViewRenderer'
+],
+	function(
 	library,
 	Device,
 	IconPool,
@@ -24,8 +26,9 @@ sap.ui.define([
 	NavContainer,
 	Page,
 	Bar,
-	Button
-) {
+	Button,
+	QuickViewRenderer
+	) {
 	"use strict";
 
 	// shortcut for sap.m.PlacementType
@@ -42,7 +45,7 @@ sap.ui.define([
 	 * The quick view is used to show business information on either a person or an entity (e.g. a company). It uses a set of pre-defined controls.
 	 * Objects can be linked together and you can navigate between several objects. An unlimited number of objects can be linked.
 	 * <h3>Structure</h3>
-	 * Each card is represented by a {@link sap.m.QuickViewPage} which holds all the information (avatar, title, header, description) for the object.
+	 * Each card is represented by a {@link sap.m.QuickViewPage} which holds all the information (icon, title, header, description) for the object.
 	 * A single quick view can hold multiple objects, each showing information on a single entity.
 	 * <h3>Usage</h3>
 	 * <h4>When to use</h4>
@@ -59,7 +62,7 @@ sap.ui.define([
 	 * @extends sap.m.QuickViewBase
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -69,92 +72,107 @@ sap.ui.define([
 	 * @ui5-metamodel This control/element also will be described in the UI5 (legacy) designtime metamodel
 	 */
 	var QuickView = QuickViewBase.extend("sap.m.QuickView", /** @lends sap.m.QuickView.prototype */	{
-		metadata: {
+				metadata: {
 
-			library: "sap.m",
-			properties: {
-
-				/**
-				 * This property is reused from sap.m.Popover and only takes effect when running on desktop or tablet. Please refer the documentation of the placement property of sap.m.Popover.
-				 */
-				placement : { type : "sap.m.PlacementType", group : "Misc", defaultValue : PlacementType.Right },
-
-				/**
-				 * The width of the QuickView. The property takes effect only when running on desktop or tablet.
-				 */
-				width : { type : 'sap.ui.core.CSSSize', group : 'Dimension', defaultValue : '320px' }
-			},
-			aggregations: {},
-			designtime: "sap/m/designtime/QuickView.designtime",
-			events: {
-				/**
-				 * This event fires after the QuickView is opened.
-				 */
-				afterOpen: {
-					parameters: {
+					library: "sap.m",
+					properties: {
 						/**
-						 * This parameter refers to the control, which opens the QuickView.
+						 * This property is reused from sap.m.Popover and only takes effect when running on desktop or tablet. Please refer the documentation of the placement property of sap.m.Popover.
 						 */
-						openBy: { type: "sap.ui.core.Control" }
-					}
-				},
-
-				/**
-				 * This event fires after the QuickView is closed.
-				 */
-				afterClose: {
-					parameters: {
+						placement : {
+							type : "sap.m.PlacementType",
+							group : "Misc",
+							defaultValue : PlacementType.Right
+						},
 						/**
-						 * This parameter refers to the control, which opens the QuickView.
+						 * The width of the QuickView. The property takes effect only when running on desktop or tablet.
 						 */
-						openBy: { type: "sap.ui.core.Control" },
-
+						width : {
+							type : 'sap.ui.core.CSSSize',
+							group : 'Dimension',
+							defaultValue : '320px'
+						}
+					},
+					aggregations: {
+					},
+					designtime: "sap/m/designtime/QuickView.designtime",
+					events: {
 						/**
-						 * This parameter contains the control,
-						 * which triggers the close of the QuickView.
-						 * It is undefined when running on desktop or tablet.
+						 * This event fires after the QuickView is opened.
 						 */
-						origin : { type : "sap.m.Button" }
-					}
-				},
-
-				/**
-				 * This event fires before the QuickView is opened.
-				 */
-				beforeOpen: {
-					parameters: {
-						/**
-						 * This parameter refers to the control, which opens the QuickView.
-						 */
-						openBy: { type: "sap.ui.core.Control" }
-					}
-				},
-
-				/**
-				 * This event fires before the QuickView is closed.
-				 */
-				beforeClose: {
-					parameters: {
-						/**
-						 * This parameter refers to the control, which opens the QuickView.
-						 */
-						openBy: { type: "sap.ui.core.Control" },
+						afterOpen: {
+							parameters: {
+								/**
+								 * This parameter refers to the control, which opens the QuickView.
+								 */
+								openBy: {
+									type: "sap.ui.core.Control"
+								}
+							}
+						},
 
 						/**
-						 * This parameter contains the control,
-						 * which triggers the close of the QuickView.
-						 * It is undefined when running on desktop or tablet.
+						 * This event fires after the QuickView is closed.
 						 */
-						origin : { type : "sap.m.Button" }
+						afterClose: {
+							parameters: {
+								/**
+								 * This parameter refers to the control, which opens the QuickView.
+								 */
+								openBy: {
+									type: "sap.ui.core.Control"
+								},
+
+								/**
+								 * This parameter contains the control,
+								 * which triggers the close of the QuickView.
+								 * It is undefined when running on desktop or tablet.
+								 */
+								origin : {
+									type : "sap.m.Button"
+								}
+							}
+						},
+
+						/**
+						 * This event fires before the QuickView is opened.
+						 */
+						beforeOpen: {
+							parameters: {
+								/**
+								 * This parameter refers to the control, which opens the QuickView.
+								 */
+								openBy: {
+									type: "sap.ui.core.Control"
+								}
+							}
+						},
+
+						/**
+						 * This event fires before the QuickView is closed.
+						 */
+						beforeClose: {
+							parameters: {
+								/**
+								 * This parameter refers to the control, which opens the QuickView.
+								 */
+								openBy: {
+									type: "sap.ui.core.Control"
+								},
+
+								/**
+								 * This parameter contains the control,
+								 * which triggers the close of the QuickView.
+								 * It is undefined when running on desktop or tablet.
+								 */
+								origin : {
+									type : "sap.m.Button"
+								}
+							}
+						}
 					}
 				}
-			}
-		},
-		renderer: {
-			apiVersion: 2,
-			render: function () {}
-		}
-	});
+			});
 
 	/**
 	 * Initialize the control.
@@ -162,6 +180,7 @@ sap.ui.define([
 	 * @private
 	 */
 	QuickView.prototype.init = function() {
+
 		var oNavConfig = {
 			pages: [new Page()],
 			navigate: this._navigate.bind(this),
@@ -205,7 +224,7 @@ sap.ui.define([
 			}
 		});
 
-		this._oPopover.addStyleClass("sapMQuickView");
+		this._oPopover.addStyleClass('sapMQuickView');
 
 		var oPopupControl = this._oPopover.getAggregation("_popup");
 		oPopupControl.addEventDelegate({
@@ -226,6 +245,8 @@ sap.ui.define([
 		}
 
 		this._bItemsChanged = true;
+
+		this._oPopover.addStyleClass("sapMQuickView");
 	};
 
 	/**
@@ -233,6 +254,7 @@ sap.ui.define([
 	 * @private
 	 */
 	QuickView.prototype._initializeQuickView = function() {
+
 		this._bRendered = true;
 
 		// Update pages only if items aggregation is changed
@@ -243,8 +265,8 @@ sap.ui.define([
 			var oPage = this._oNavContainer.getCurrentPage();
 			if (oPage) {
 				var oHeader = oPage.getCustomHeader();
-				if (oHeader && oHeader.getContentMiddle()[0]) {
-					this._oPopover.addAriaLabelledBy(oHeader.getContentMiddle()[0].getId());
+				if (oHeader) {
+					this._oPopover.addAriaDescribedBy(oHeader.getId());
 				}
 			}
 
@@ -387,7 +409,7 @@ sap.ui.define([
 	 * The method sets placement position of the QuickView.
 	 *
 	 * @param {sap.m.PlacementType} sPlacement The side from which the QuickView appears relative to the control that opens it.
-	 * @returns {this} Pointer to the control instance for chaining.
+	 * @returns {sap.m.QuickView} Pointer to the control instance for chaining.
 	 * @public
 	 */
 	QuickView.prototype.setPlacement = function (sPlacement) {
@@ -401,7 +423,7 @@ sap.ui.define([
 	 * The method sets the width of the QuickView.
 	 * Works only on desktop or tablet.
 	 * @param {sap.ui.core.CSSSize} sWidth The new width of the QuickView.
-	 * @returns {this} Pointer to the control instance for chaining
+	 * @returns {sap.m.QuickView} Pointer to the control instance for chaining
 	 * @public
 	 */
 	QuickView.prototype.setWidth = function (sWidth) {
@@ -416,7 +438,7 @@ sap.ui.define([
 	/**
 	 * Opens the QuickView.
 	 * @param {sap.ui.core.Control} oControl The control which opens the QuickView.
-	 * @returns {this} Pointer to the control instance for chaining
+	 * @returns {sap.m.QuickView} Pointer to the control instance for chaining
 	 * @public
 	 */
 	QuickView.prototype.openBy = function(oControl) {
@@ -428,7 +450,7 @@ sap.ui.define([
 
 	/**
 	 * Closes the QuickView.
-	 * @returns {this} Pointer to the control instance for chaining
+	 * @returns {sap.m.QuickView} Pointer to the control instance for chaining
 	 * @public
 	 */
 	QuickView.prototype.close = function() {
@@ -455,16 +477,22 @@ sap.ui.define([
 
 	["setModel", "bindAggregation", "setAggregation", "insertAggregation", "addAggregation",
 		"removeAggregation", "removeAllAggregation", "destroyAggregation"].forEach(function (sFuncName) {
+			QuickView.prototype["_" + sFuncName + "Old"] = QuickView.prototype[sFuncName];
 			QuickView.prototype[sFuncName] = function () {
-				var newArgs = Array.prototype.slice.call(arguments),
-					result;
+				var newArgs = [],
+					result,
+					i;
+
+				for (i = 0; i < arguments.length; i++) {
+					newArgs.push(arguments[i]);
+				}
 
 				// suppress invalidation
 				if (["setModel", "bindAggregation"].indexOf(sFuncName) === -1) {
 					newArgs.push(true);
 				}
 
-				result = QuickViewBase.prototype[sFuncName].apply(this, newArgs);
+				result = QuickView.prototype["_" + sFuncName + "Old"].apply(this, newArgs);
 
 				// Marks items aggregation as changed and invalidate popover to trigger rendering
 				this._bItemsChanged = true;
@@ -488,4 +516,5 @@ sap.ui.define([
 		});
 
 	return QuickView;
+
 });

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -16,8 +16,12 @@ sap.ui.define([
 	function(library, Control, coreLibrary, Image, Label, BusyIndicatorRenderer) {
 	"use strict";
 
+
+
 	// shortcut for sap.ui.core.TextDirection
 	var TextDirection = coreLibrary.TextDirection;
+
+
 
 	/**
 	 * Constructor for a new BusyIndicator.
@@ -46,7 +50,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -116,7 +120,7 @@ sap.ui.define([
 			 * in versions greater than or equal to 1.32.1
 			 * @deprecated Since version 1.32.1
 			 */
-			design : {type : "string", group : "Appearance", defaultValue : "auto", deprecated: true}
+			design : {type : "string", group : "Appearance", defaultValue : "auto"}
 		},
 		associations: {
 			/**
@@ -156,6 +160,11 @@ sap.ui.define([
 			this._busyLabel.setTextDirection(this.getTextDirection());
 		} else if (!this._busyLabel && this.getText()) {
 			this._createLabel(this.getText());
+		}
+
+		var sRotationSpeed = this.getCustomIconRotationSpeed();
+		if (sRotationSpeed < 0) {
+			this.setCustomIconRotationSpeed(0);
 		}
 	};
 
@@ -200,20 +209,13 @@ sap.ui.define([
 			return;
 		}
 
-		var iCustomIconRotationSpeed = this.getCustomIconRotationSpeed();
-
-		if (iCustomIconRotationSpeed === this.getMetadata().getProperty("customIconRotationSpeed").getDefaultValue()) {
-			return;
-		}
-
-		iCustomIconRotationSpeed = Math.max(0, iCustomIconRotationSpeed);
-
 		var $icon = this._iconImage.$();
-		var sRotationSpeed = iCustomIconRotationSpeed + "ms";
+		var sRotationSpeed = this.getCustomIconRotationSpeed() + "ms";
 
-		$icon.css("animation-duration", sRotationSpeed);
+		$icon.css("-webkit-animation-duration", sRotationSpeed)
+			.css("animation-duration", sRotationSpeed);
 
-		//Bug in Chrome: After changing height of image -> changing the rotation speed will have no affect
+		//Bug in Chrome: After changing height of image -> changing the rotationspeed will have no affect
 		//chrome needs a rerendering of this element.
 		$icon.css("display", "none");
 		setTimeout(function() {

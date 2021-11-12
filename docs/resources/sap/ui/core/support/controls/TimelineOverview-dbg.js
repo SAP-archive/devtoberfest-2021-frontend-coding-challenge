@@ -1,18 +1,13 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define([
-	"sap/ui/base/ManagedObject"
-], function (ManagedObject) {
-		"use strict";
-		var TimelineOverview = ManagedObject.extend("sap.ui.core.support.controls.TimelineOverview", {
-			metadata: {
-				library: "sap.ui.core"
-			}
-		});
+sap.ui.define(['sap/ui/base/ManagedObject'],
+	function (ManagedObject) {
+		'use strict';
+		var TimelineOverview = ManagedObject.extend("sap.ui.core.support.controls.TimelineOverview", {});
 
 		TimelineOverview.prototype.setInteractions = function (interactions) {
 
@@ -41,12 +36,14 @@ sap.ui.define([
 		};
 
 		TimelineOverview.prototype.render = function (rm) {
-			rm.openStart("div", "sapUiInteractionTimelineOverview")
-				.openEnd();
+			rm.write('<div id="sapUiInteractionTimelineOverview"><ol id="' + this.getId() + '"');
 
-			rm.openStart("ol", this.getId())
-				.class("InteractionTimeline")
-				.openEnd();
+			rm.addClass("InteractionTimeline");
+
+			rm.writeClasses();
+
+			rm.write(">");
+
 
 			var interaction,
 				interactions = this.interactions;
@@ -74,8 +71,7 @@ sap.ui.define([
 				this.renderInteractionStep(rm, interaction, i);
 			}
 
-			rm.close("ol");
-			rm.close("div");
+			rm.write("</ol></div>");
 		};
 
 		TimelineOverview.prototype.renderInteractionStep = function (rm, step, index) {
@@ -83,70 +79,45 @@ sap.ui.define([
 			var MAX_ALLOWED_HEIGHT_IN_PERC = 69,
 				stepDurationInPercent = Math.ceil((step.totalDuration / this.maxDuration) * MAX_ALLOWED_HEIGHT_IN_PERC);
 
-			rm.openStart("li")
-				.openEnd();
 
-			rm.openStart("div")
-				.class("bars-wrapper")
-				.attr("title", "Duration: " + step.totalDuration + "ms")
-				.openEnd();
-
-			rm.openStart("div")
-				.class("duration")
-				.style("height", stepDurationInPercent + "%;");
-
+			var stepDurationInPercentInlineStyle = 'height: ' + stepDurationInPercent + '%;';
 			if (stepDurationInPercent > 0) {
-				rm.style("min-height", "1px");
+				stepDurationInPercentInlineStyle += ' min-height: 1px;';
 			}
 
-			rm.openEnd();
-
+			rm.write('<li>');
+			rm.write('<div class="bars-wrapper" title="Duration: ' + step.totalDuration + 'ms">');
+			rm.write('<div class="duration" style="' + stepDurationInPercentInlineStyle + '">');
 			// write step duration
 			var aInteractions = step.interactions,
 				stepInteractionInPercent = 100;
 			aInteractions.forEach(function(interaction, index) {
 				stepInteractionInPercent = (step.totalDuration === 0) ? 100 : Math.ceil((interaction.calculatedDuration
 					/ step.totalDuration) * 100);
-				rm.openStart("div")
-					.class("requestType")
-					.style("height", stepInteractionInPercent + "%")
-					.style("min-height", "1px")
-					.openEnd()
-					.close("div");
-
+				rm.write('<div class="requestType" style="height: ' + stepInteractionInPercent + '%; min-height: 1px;"></div>');
 				//write spacer between interactions
 				if (index !== (aInteractions.length - 1)) {
-					rm.openStart("div")
-						.style("min-height", "1px")
-						.openEnd()
-						.close("div");
+					rm.write('<div style="min-height: 1px;"></div>');
 				}
 			});
 
-			rm.close("div"); // duration
-			rm.close("div"); // bars-wrapper
 
+			rm.write('</div>');
+			rm.write('</div>');
 			var intIndex = index + 1;
 			var sClassNameSeparator = (intIndex % 10 === 0 ) ? "sapUiInteractionTimelineStepRightBold" :
 				"sapUiInteractionTimelineStepRight";
 
 			if (intIndex % 2 === 0 ) {
-				rm.openStart("div")
-					.class(sClassNameSeparator)
-					.openEnd()
-					.close("div");
+				rm.write('<div class="' + sClassNameSeparator + '"></div>');
 			}
 
 			if (intIndex % 10 === 0 && intIndex !== this.stepCount) {
-				rm.openStart("div")
-					.class("sapUiInteractionTimelineTimeLbl")
-					.openEnd()
-					.text(Math.round((index * this.timeRange / this.stepCount) / 10 ) / 100 + "s")
-					.close("div");
+				rm.write('<div class="sapUiInteractionTimelineTimeLbl">' + Math.round((index * this.timeRange /
+						this.stepCount) / 10 ) / 100 + 's</div>');
 			}
-			rm.close("li");
+			rm.write('</li>');
 		};
-
 		TimelineOverview.prototype._getTimelineOverviewData = function(copiedData) {
 			var stepCount = this.stepCount;
 			var stepTime = this.timeRange / stepCount;

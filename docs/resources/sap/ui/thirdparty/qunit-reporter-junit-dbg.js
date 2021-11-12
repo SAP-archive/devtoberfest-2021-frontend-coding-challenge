@@ -3,12 +3,6 @@
  *
  * https://github.com/JamesMGreene/qunit-reporter-junit
  *
- * ##### BEGIN: MODIFIED BY SAP
- * Support for nested modules was inspired by
- * https://github.com/JamesMGreene/qunit-reporter-junit/pull/30
- * (https://github.com/abstraktor/qunit-reporter-junit/commit/526cd95adf147f9867f5ec025e61d2cd9ee1aa3f).
- * ##### END: MODIFIED BY SAP
- *
  * Copyright jQuery Foundation and other contributors
  * Released under the MIT license.
  * https://jquery.org/license/
@@ -18,9 +12,6 @@
 
 	var currentRun, currentModule, currentTest, assertCount,
 			jUnitReportData, _executeRegisteredCallbacks,
-			// ##### BEGIN: MODIFIED BY SAP
-			currentModules = [],
-			// ##### END: MODIFIED BY SAP
 			jUnitDoneCallbacks = [];
 
 	// Old API
@@ -71,9 +62,6 @@
 	});
 
 	QUnit.moduleStart(function(data) {
-		// ##### BEGIN: MODIFIED BY SAP
-		currentModules.push(currentModule);
-		// ##### END: MODIFIED BY SAP
 		currentModule = {
 			name: data.name,
 			tests: [],
@@ -153,10 +141,7 @@
 		currentModule.passed = data.passed;
 		currentModule.failed = data.failed;
 
-		// ##### BEGIN: MODIFIED BY SAP
-		currentModule = currentModules.pop();
-		// ##### END: MODIFIED BY SAP
-
+		currentModule = null;
 	});
 
 	QUnit.done(function(data) {

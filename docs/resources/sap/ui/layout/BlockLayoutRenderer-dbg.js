@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,9 +11,7 @@ sap.ui.define(['./library'],
 		// shortcut for sap.ui.layout.BlockRowColorSets
 		var BlockRowColorSets = library.BlockRowColorSets;
 
-		var BlockLayoutRenderer = {
-			apiVersion: 2
-		};
+		var BlockLayoutRenderer = {};
 
 		BlockLayoutRenderer.render = function (oRm, oBlockLayout) {
 			this.startLayout(oRm, oBlockLayout);
@@ -22,20 +20,26 @@ sap.ui.define(['./library'],
 		};
 
 		BlockLayoutRenderer.startLayout = function (oRm, oBlockLayout) {
-			oRm.openStart("div", oBlockLayout)
-				.class("sapUiBlockLayout")
-				.class("sapUiBlockLayoutBackground" + oBlockLayout.getBackground());
+			var backgroundType = oBlockLayout.getBackground();
 
+			oBlockLayout.addStyleClass("sapUiBlockLayoutBackground" + backgroundType);
+
+			oRm.write("<div");
+			oRm.writeControlData(oBlockLayout);
+			oRm.addClass("sapUiBlockLayout");
 			if (oBlockLayout.getKeepFontSize()) {
-				oRm.class("sapUiBlockLayoutKeepFontSize");
+				oRm.addClass("sapUiBlockLayoutKeepFontSize");
 			}
-			oRm.openEnd();
+			oRm.writeStyles();
+			oRm.writeClasses();
+			oRm.write(">");
 		};
 
 		BlockLayoutRenderer.addContent = function (oRm, blockLayout) {
 			var aContent = blockLayout.getContent(),
-				aTypes = Object.keys(BlockRowColorSets).map(function (sKey) {
-					return BlockRowColorSets[sKey];
+				oBlockRowType = BlockRowColorSets,
+				aTypes = Object.keys(oBlockRowType).map(function (sKey) {
+					return oBlockRowType[sKey];
 				}),
 				iNumTypes = aTypes.length;
 
@@ -59,7 +63,7 @@ sap.ui.define(['./library'],
 		};
 
 		BlockLayoutRenderer.endLayout = function (oRm) {
-			oRm.close("div");
+			oRm.write("</div>");
 		};
 
 		return BlockLayoutRenderer;

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -37,7 +37,7 @@ sap.ui.define([
 	 * @param {string} [sIdPrefix] Prefix used for the Ids. If not set a default prefix is used.
 	 * @returns {jQuery.sap.storage.Storage}
 	 *
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @since 0.11.0
 	 * @namespace
 	 * @public
@@ -61,11 +61,8 @@ sap.ui.define([
 			if (sIdPrefix && sIdPrefix != "state.key_") {
 				sKey = oStorage + "_" + sIdPrefix;
 			}
-			if (!mStorages[sKey]) {
-				mStorages[sKey] = new Storage(oStorage, sIdPrefix);
-			}
 
-			return mStorages[sKey];
+			return mStorages[sKey] || (mStorages[sKey] = new Storage(oStorage, sIdPrefix));
 		}
 
 		// OK, tough but probably good for issue identification. As something was passed in, let's at least ensure our used API is fulfilled.
@@ -97,7 +94,7 @@ sap.ui.define([
 	 * should be deleted the method {@link #removeAll} should be used.
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @since 0.11.0
 	 * @public
 	 * @name jQuery.sap.storage.Storage
@@ -201,7 +198,7 @@ sap.ui.define([
 	 * Enumeration of the storage types supported by {@link jQuery.sap.storage.Storage}
 	 * @enum {string}
 	 * @public
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @since 0.11.0
 	 */
 	jQuery.sap.storage.Type = Storage.Type;

@@ -1,9 +1,9 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-/*eslint-disable max-len */
+
 /**
  * XML-based DataBinding
  *
@@ -40,14 +40,12 @@ sap.ui.define([
 	 * Constructor for a new XMLModel.
 	 *
 	 * @class
-	 * Model implementation for the XML format.
-	 *
-	 * This model is not prepared to be inherited from.
+	 * Model implementation for XML format
 	 *
 	 * @extends sap.ui.model.ClientModel
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @param {object} oData either the URL where to load the XML from or an XML
 	 * @public
@@ -93,7 +91,7 @@ sap.ui.define([
 	/**
 	 * Serializes the current XML data of the model into a string.
 	 *
-	 * @return {string} The XML document serialized as string
+	 * @return the XML document serialized as string
 	 * @public
 	 */
 	XMLModel.prototype.getXML = function(){
@@ -118,10 +116,7 @@ sap.ui.define([
 	 *
 	 * @param {string} sURL A string containing the URL to which the request is sent
 	 * @param {object | string} [oParameters] A map of parameters or a single parameter string that is sent to the server with the request
-	 * @param {boolean} [bAsync=true] By default, all requests are sent asynchronous.
-	 * <b>Do not use <code>bAsync=false</code></b> because synchronous requests may temporarily lock
-	 * the browser, disabling any actions while the request is active. Cross-domain requests do not
-	 * support synchronous operation.
+	 * @param {boolean} [bAsync=true] Whether the request should be asynchronous or not
 	 * @param {string} [sType=GET] HTTP method of request
 	 * @param {string} [bCache=false] Force no caching if false
 	 * @param {object} [mHeaders] An object of additional header key/value pairs to send along with the request
@@ -167,8 +162,8 @@ sap.ui.define([
 	/**
 	 * Sets an XML namespace to use in the binding path
 	 *
-	 * @param {string} sNameSpace The namespace URI
-	 * @param {string} [sPrefix] The prefix for the namespace
+	 * @param {string} sNameSpace the namespace URI
+	 * @param {string} [sPrefix=null] the prefix for the namespace (optional)
 	 * @public
 	 */
 	XMLModel.prototype.setNameSpace = function(sNameSpace, sPrefix){
@@ -209,17 +204,11 @@ sap.ui.define([
 	 * Sets a new value for the given property <code>sPropertyName</code> in the model.
 	 * If the model value changed all interested parties are informed.
 	 *
-	 * @param {string} sPath
-	 *   Path of the property to set
-	 * @param {any} oValue
-	 *   Value to set the property to
-	 * @param {object} [oContext]
-	 *   The context which will be used to set the property
-	 * @param {boolean} [bAsyncUpdate]
-	 *   Whether to update other bindings dependent on this property asynchronously
-	 *
-	 * @return {boolean}
-	 *   Whether the value was set correctly
+	 * @param {string}  sPath path of the property to set
+	 * @param {any}     oValue value to set the property to
+	 * @param {object} [oContext=null] the context which will be used to set the property
+	 * @param {boolean} [bAsyncUpdate] whether to update other bindings dependent on this property asynchronously
+	 * @return {boolean} true if the value was set correctly and false if errors occurred like the entry was not found.
 	 * @public
 	 */
 	XMLModel.prototype.setProperty = function(sPath, oValue, oContext, bAsyncUpdate) {
@@ -256,14 +245,14 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the value for the property with the given <code>sPropertyName</code>.
-	 *
-	 * @param {string} sPath The path to the property
-	 * @param {object} [oContext] The context which will be used to retrieve the property
-	 *
-	 * @return {string} The value of the property
-	 * @public
-	 */
+	* Returns the value for the property with the given <code>sPropertyName</code>
+	*
+	* @param {string} sPath the path to the property
+	* @param {object} [oContext=null] the context which will be used to retrieve the property
+	* @type any
+	* @return the value of the property
+	* @public
+	*/
 	XMLModel.prototype.getProperty = function(sPath, oContext) {
 		var oResult = this._getObject(sPath, oContext);
 		if (oResult && typeof oResult != "string") {
@@ -273,14 +262,14 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the object for the given path and context.
-	 *
-	 * @param {string} sPath The path to the object
-	 * @param {object} [oContext] The context which will be used to retrieve the object
-	 *
-	 * @return {object} The object
-	 * @public
-	 */
+	* Returns the object for the given <code>path</code>
+	*
+	* @param {string} sPath the path to the object
+	* @param {object} [oContext=null] the context which will be used to retrieve the object
+	* @type any
+	* @return the object
+	* @public
+	*/
 	XMLModel.prototype.getObject = function(sPath, oContext) {
 		var oObject = this._getObject(sPath, oContext);
 		if (Array.isArray(oObject)) {
@@ -290,11 +279,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the object for the given path and context.
-	 *
-	 * @param {string} sPath The path to the object
-	 * @param {object} [oContext] The context which will be used to retrieve the object
-	 *
+	 * @param {string} sPath
+	 * @param {object} oContext
 	 * @returns {any} the node of the specified path/context
 	 */
 	XMLModel.prototype._getObject = function (sPath, oContext) {
@@ -340,12 +326,9 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the attribute for the given path and context.
-	 *
-	 * @param {string} oNode The node to get the attribute of
-	 * @param {object} sName The name of the attribute to return
-	 *
-	 * @returns {any} The extracted attribute
+	 * @param {string} sPath
+	 * @param {object} oContext
+	 * @returns {any}
 	 */
 	XMLModel.prototype._getAttribute = function (oNode, sName) {
 		if (!this.oNameSpaces || sName.indexOf(":") == -1) {
@@ -353,16 +336,22 @@ sap.ui.define([
 		}
 		var sNameSpace = this._getNameSpace(sName),
 			sLocalName = this._getLocalName(sName);
-		return oNode.getAttributeNS(sNameSpace, sLocalName);
+		if (oNode.getAttributeNS) {
+			return oNode.getAttributeNS(sNameSpace, sLocalName);
+		} else { // IE8
+			if (!this.oDocNSPrefixes) {
+				this.oDocNSPrefixes = this._getDocNSPrefixes();
+			}
+			var sPrefix = this.oDocNSPrefixes[sNameSpace];
+			sName = (sPrefix ? sPrefix + ":" : "") + sLocalName;
+			return oNode.getAttribute(sName);
+		}
 	};
 
 	/**
-	 * Retrieves the child elements of the node by their name.
-	 *
-	 * @param {object} oNode The node holding the child elements
-	 * @param {string} sName The name of the child elements
-	 *
-	 * @returns {any} The child elements matching the given name
+	 * @param {object} oNode
+	 * @param {string} sName
+	 * @returns {any}
 	 */
 	XMLModel.prototype._getChildElementsByTagName = function (oNode, sName) {
 		var aChildNodes = oNode.childNodes,
@@ -390,10 +379,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Gets the namespace for the given name.
-	 *
-	 * @param {string} sName The full name
-	 * @returns {string} The namespace for the given name
+	 * @param {string} sName
+	 * @returns {string}
 	 */
 	XMLModel.prototype._getNameSpace = function (sName) {
 		var iColonPos = sName.indexOf(":"),
@@ -405,11 +392,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Gets the local name for the given name.
-	 *
-	 * @param {string} sName The full name
-	 *
-	 * @returns {string} The local name for the given name
+	 * @param {string} sName
+	 * @returns {string}
 	 */
 	XMLModel.prototype._getLocalName = function (sName) {
 		var iColonPos = sName.indexOf(":"),
@@ -422,9 +406,7 @@ sap.ui.define([
 
 
 	/**
-	 * Gets the namespaces of the XML document
-	 *
-	 * @returns {object} The document's namespace prefixes
+	 * @returns {object}
 	 */
 	XMLModel.prototype._getDocNSPrefixes = function () {
 		var oPrefixes = {},
@@ -446,12 +428,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Resolves the path relative to the given context.
-	 *
-	 * @param {string} sPath Path to resolve
-	 * @param {sap.ui.model.Context} [oContext] Context to resolve a relative path against
-	 *
-	 * @return {string} Resolved path or undefined
+	 * Resolve the path relative to the given context
 	 */
 	XMLModel.prototype._resolve = function(sPath, oContext) {
 		var bIsRelative = !sPath.startsWith("/"),

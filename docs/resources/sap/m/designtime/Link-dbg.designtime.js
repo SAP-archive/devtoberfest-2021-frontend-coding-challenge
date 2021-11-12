@@ -1,12 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides the Design Time Metadata for the sap.m.Link control
-sap.ui.define(["sap/ui/model/json/JSONModel"],
-	function (JSONModel) {
+sap.ui.define([],
+	function () {
 		"use strict";
 
 	var oSelectTargetDialog = function(oControl, mPropertyBag) {
@@ -19,7 +19,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel"],
 				cancelBtn : oTextResources.getText("LINK_DIALOG_CANCEL_BTN"),
 				okBtn : oTextResources.getText("LINK_DIALOG_OK_BTN")
 			};
-			var oModel = new JSONModel();
+			var oModel = new sap.ui.model.json.JSONModel();
 			oModel.setData(data);
 
 			var oDialog = sap.ui.xmlfragment("sap.m.designtime.LinkTargetSelectDialog", this);

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,14 +8,13 @@
  * Initialization Code and shared classes of library sap.m.
  */
 sap.ui.define([
-	"sap/ui/Device",
-	"sap/ui/base/DataType",
-	"sap/ui/base/EventProvider",
-	"sap/ui/core/Control",
-	"sap/base/util/ObjectPath",
-	"sap/ui/util/openWindow",
+	'sap/ui/Device',
+	'sap/ui/base/DataType',
+	'sap/ui/base/EventProvider',
+	'sap/ui/core/Control',
+	'sap/base/util/ObjectPath',
 	// library dependency
-	"sap/ui/core/library",
+	'sap/ui/core/library',
 	"sap/base/strings/capitalize",
 	"sap/ui/thirdparty/jquery",
 	"sap/base/assert",
@@ -27,11 +26,8 @@ sap.ui.define([
 	"./AvatarType",
 	"./AvatarColor",
 	"./AvatarImageFitType",
-	"./upload/UploaderHttpRequestMethod",
-	"sap/ui/core/theming/Parameters",
-	"sap/ui/core/LocaleData",
 	// referenced here to enable the Support feature
-	"./Support"
+	'./Support'
 ],
 	function(
 	Device,
@@ -39,7 +35,6 @@ sap.ui.define([
 	EventProvider,
 	Control,
 	ObjectPath,
-	openWindow,
 	CoreLibrary,
 	capitalize,
 	jQuery,
@@ -51,10 +46,7 @@ sap.ui.define([
 	AvatarSize,
 	AvatarType,
 	AvatarColor,
-	AvatarImageFitType,
-	UploaderHttpRequestMethod,
-	Parameters,
-	LocaleData
+	AvatarImageFitType
 ) {
 
 	"use strict";
@@ -63,7 +55,7 @@ sap.ui.define([
 	// delegate further initialization of this library to the Core
 	sap.ui.getCore().initLibrary({
 		name : "sap.m",
-		version: "1.96.0",
+		version: "1.76.0",
 		dependencies : ["sap.ui.core"],
 		designtime: "sap/m/designtime/library.designtime",
 		types: [
@@ -73,8 +65,6 @@ sap.ui.define([
 			"sap.m.AvatarType",
 			"sap.m.AvatarColor",
 			"sap.m.BackgroundDesign",
-			"sap.m.BadgeState",
-			"sap.m.BadgeAnimationType",
 			"sap.m.BarDesign",
 			"sap.m.BreadcrumbsSeparatorStyle",
 			"sap.m.ButtonType",
@@ -117,7 +107,6 @@ sap.ui.define([
 			"sap.m.ListType",
 			"sap.m.LoadState",
 			"sap.m.MenuButtonMode",
-			"sap.m.MultiSelectMode",
 			"sap.m.ObjectHeaderPictureShape",
 			"sap.m.ObjectMarkerType",
 			"sap.m.ObjectMarkerVisibility",
@@ -135,13 +124,11 @@ sap.ui.define([
 			"sap.m.QuickViewGroupElementType",
 			"sap.m.RatingIndicatorVisualMode",
 			"sap.m.ScreenSize",
-			"sap.m.SelectColumnRatio",
 			"sap.m.SelectionDetailsActionLevel",
 			"sap.m.SelectListKeyboardNavigationMode",
 			"sap.m.SelectType",
 			"sap.m.Size",
 			"sap.m.SplitAppMode",
-			"sap.m.StandardDynamicDateRangeKeys",
 			"sap.m.StandardTileType",
 			"sap.m.StepInputStepModeType",
 			"sap.m.StepInputValidationMode",
@@ -149,11 +136,9 @@ sap.ui.define([
 			"sap.m.StringFilterOperator",
 			"sap.m.SwipeDirection",
 			"sap.m.SwitchType",
-			"sap.m.TabsOverflowMode",
 			"sap.m.TileSizeBehavior",
 			"sap.m.TimePickerMaskMode",
 			"sap.m.TitleAlignment",
-			"sap.m.TokenizerRenderMode",
 			"sap.m.ToolbarDesign",
 			"sap.m.ToolbarStyle",
 			"sap.m.UploadState",
@@ -161,13 +146,10 @@ sap.ui.define([
 			"sap.m.ValueCSSColor",
 			"sap.m.VerticalPlacementType",
 			"sap.m.WrappingType",
-			"sap.m.WizardRenderMode",
-			"sap.m.semantic.SemanticRuleSetType",
-			"sap.m.upload.UploaderHttpRequestMethod"
+			"sap.m.semantic.SemanticRuleSetType"
 		],
 		interfaces: [
 			"sap.m.IBar",
-			"sap.m.IBadge",
 			"sap.m.IBreadcrumbs",
 			"sap.m.IconTab",
 			"sap.m.IScale",
@@ -210,8 +192,6 @@ sap.ui.define([
 			"sap.m.Dialog",
 			"sap.m.DisplayListItem",
 			"sap.m.DraftIndicator",
-			"sap.m.DynamicDateRange",
-			"sap.m.ExpandableText",
 			"sap.m.FacetFilter",
 			"sap.m.FacetFilterItem",
 			"sap.m.FacetFilterList",
@@ -228,7 +208,6 @@ sap.ui.define([
 			"sap.m.HeaderContainer",
 			"sap.m.IconTabBar",
 			"sap.m.IconTabBarSelectList",
-			"sap.m.IconTabFilterExpandButtonBadge",
 			"sap.m.IconTabHeader",
 			"sap.m.Image",
 			"sap.m.ImageContent",
@@ -254,7 +233,6 @@ sap.ui.define([
 			"sap.m.NavContainer",
 			"sap.m.NewsContent",
 			"sap.m.NumericContent",
-			"sap.m.NotificationList",
 			"sap.m.NotificationListBase",
 			"sap.m.NotificationListItem",
 			"sap.m.NotificationListGroup",
@@ -301,7 +279,6 @@ sap.ui.define([
 			"sap.m.SegmentedButton",
 			"sap.m.Select",
 			"sap.m.SelectDialog",
-			"sap.m.SelectDialogBase",
 			"sap.m.SelectList",
 			"sap.m.SelectionDetails",
 			"sap.m.Shell",
@@ -331,9 +308,6 @@ sap.ui.define([
 			"sap.m.TileContainer",
 			"sap.m.TileContent",
 			"sap.m.TimePicker",
-			"sap.m.TimePickerInputs",
-			"sap.m.TimePickerClock",
-			"sap.m.TimePickerClocks",
 			"sap.m.TimePickerSliders",
 			"sap.m.Title",
 			"sap.m.ToggleButton",
@@ -357,25 +331,14 @@ sap.ui.define([
 			"sap.m.semantic.SemanticPage",
 			"sap.m.semantic.ShareMenuPage",
 			"sap.m.semantic.FullscreenPage",
-			"sap.m.semantic.MasterPage",
-			"sap.m.p13n.AbstractContainer",
-			"sap.m.p13n.BasePanel",
-			"sap.m.p13n.Container",
-			"sap.m.p13n.GroupPanel",
-			"sap.m.p13n.QueryPanel",
-			"sap.m.p13n.SelectionPanel",
-			"sap.m.p13n.SortPanel"
+			"sap.m.semantic.MasterPage"
 		],
 		elements: [
-			"sap.m.BadgeCustomData",
 			"sap.m.Column",
 			"sap.m.ColumnPopoverActionItem",
 			"sap.m.ColumnPopoverCustomItem",
 			"sap.m.ColumnPopoverItem",
 			"sap.m.ColumnPopoverSortItem",
-			"sap.m.CustomDynamicDateOption",
-			"sap.m.DynamicDateOption",
-			"sap.m.DynamicDateValueHelpUIType",
 			"sap.m.FlexItemData",
 			"sap.m.FeedListItemAction",
 			"sap.m.IconTabFilter",
@@ -402,11 +365,9 @@ sap.ui.define([
 			"sap.m.SelectionDetailsItem",
 			"sap.m.SelectionDetailsItemLine",
 			"sap.m.SinglePlanningCalendarDayView",
-			"sap.m.SinglePlanningCalendarMonthView",
 			"sap.m.SinglePlanningCalendarWeekView",
 			"sap.m.SinglePlanningCalendarWorkWeekView",
 			"sap.m.SinglePlanningCalendarView",
-			"sap.m.StandardDynamicDateOption",
 			"sap.m.SuggestionItem",
 			"sap.m.TabContainerItem",
 			"sap.m.TabStripItem",
@@ -419,11 +380,8 @@ sap.ui.define([
 			"sap.m.ViewSettingsCustomTab",
 			"sap.m.ViewSettingsFilterItem",
 			"sap.m.ViewSettingsItem",
-			"sap.m.plugins.ColumnResizer",
 			"sap.m.plugins.DataStateIndicator",
-			"sap.m.plugins.PasteProvider",
 			"sap.m.plugins.PluginBase",
-			"sap.m.p13n.AbstractContainerItem",
 			"sap.m.semantic.AddAction",
 			"sap.m.semantic.CancelAction",
 			"sap.m.semantic.DeleteAction",
@@ -477,7 +435,6 @@ sap.ui.define([
 					"unhideControl": "default"
 				},
 				"sap.m.Dialog": "sap/m/flexibility/Dialog",
-				"sap.m.ExpandableText": "sap/m/flexibility/ExpandableText",
 				"sap.m.FlexBox": {
 					"hideControl": "default",
 					"unhideControl": "default",
@@ -488,8 +445,9 @@ sap.ui.define([
 					"unhideControl": "default",
 					"moveControls": "default"
 				},
-				"sap.m.IconTabBar": "sap/m/flexibility/IconTabBar",
-
+				"sap.m.IconTabBar": {
+					"moveControls": "default"
+				},
 				"sap.m.IconTabFilter": "sap/m/flexibility/IconTabFilter",
 				"sap.m.Image": {
 					"hideControl": "default",
@@ -582,13 +540,10 @@ sap.ui.define([
 	 * @namespace
 	 * @alias sap.m
 	 * @author SAP SE
-	 * @version 1.96.0
-	 * @since 1.4
+	 * @version 1.76.0
 	 * @public
 	 */
 	var thisLib = sap.m;
-	thisLib.upload.UploaderHttpRequestMethod = UploaderHttpRequestMethod;
-
 	/* eslint-disable no-undef */
 
 
@@ -621,119 +576,6 @@ sap.ui.define([
 
 	};
 
-	/**
-	 * Types of state of {@link sap.m.BadgeEnabler} to expose its current state.
-	 *
-	 * @enum {string}
-	 * @public
-	 * @since 1.81
-	 * @ui5-metamodel This enumeration also will be described in the UI5 (legacy) designtime metamodel
-	 */
-	thisLib.BadgeState = {
-
-		/**
-		 * Informing interested parties that the badge has been updated.
-		 * @public
-		 */
-		Updated : "Updated",
-
-		/**
-		 * Informing interested parties that the badge has appeared.
-		 * @public
-		 */
-		Appear : "Appear",
-
-		/**
-		 * Informing interested parties that the badge has disappeared.
-		 * @public
-		 */
-		Disappear : "Disappear"
-
-	};
-
-	/**
-	 * Types of animation performed by {@link sap.m.BadgeEnabler}.
-	 *
-	 * @enum {string}
-	 * @public
-	 * @since 1.87
-	 * @ui5-metamodel This enumeration also will be described in the UI5 (legacy) designtime metamodel
-	 */
-	thisLib.BadgeAnimationType = {
-
-		/**
-		 * Badge indicator will perform Appear,Update,and Disappear animation.
-		 * @public
-		 */
-		Full : "Full",
-
-		/**
-		 * Badge indicator will perform only Update animation (suitable for controls, which invalidate often).
-		 * @public
-		 */
-		Update : "Update",
-
-		/**
-		 * No animation is performed.
-		 * @public
-		 */
-		None : "None"
-
-	};
-
-	/**
-	 * Modes in which a control will render empty indicator if its content is empty.
-	 *
-	 * @enum {string}
-	 * @public
-	 * @since 1.87
-	 * @ui5-metamodel This enumeration also will be described in the UI5 (legacy) designtime metamodel
-	 */
-	thisLib.EmptyIndicatorMode = {
-
-		/**
-		 * Empty indicator is rendered always when the control's content is empty.
-		 * @public
-		 */
-		On : "On",
-
-		/**
-		 * Empty indicator is never rendered.
-		 * @public
-		 */
-		Off : "Off",
-
-		/**
-		 * Empty indicator will be rendered depending on the context in which the control is placed.
-		 * If one of the parents has the context class sapMShowEmpty-CTX then the empty indicator will be shown.
-		 * @public
-		 */
-		Auto : "Auto"
-
-	};
-
-	/**
-	 * Types of badge rendering style.
-	 *
-	 * @enum {string}
-	 * @private
-	 * @ui5-metamodel This enumeration also will be described in the UI5 (legacy) designtime metamodel
-	 */
-	thisLib.BadgeStyle = {
-		/**
-		 * Default style. Use for badges which contain text or numbers.
-		 *
-		 * @private
-		 */
-		Default: "Default",
-
-		/**
-		 * Attention style. This badge is rendered as a single dot meant to grab attention.
-		 *
-		 * @private
-		 */
-		Attention: "Attention"
-	};
 
 	/**
 	 * Types of the Bar design.
@@ -934,52 +776,7 @@ sap.ui.define([
 		 * @public
 		 * @since 1.73
 		 */
-		Neutral : "Neutral",
-
-		/**
-		 * Attention type
-		 *
-		 * @public
-		 * @since 1.77
-		 */
-		Attention : "Attention"
-	};
-
-	/**
-	 * Different predefined accessibility types for the {@link sap.m.Button}.
-	 *
-	 * @enum {string}
-	 * @private
-	 * @ui5-metamodel This enumeration also will be described in the UI5 (legacy) designtime metamodel
-	 */
-	thisLib.ButtonAccessibilityType = {
-		/**
-		 * Default type
-		 *
-		 * @private
-		 */
-		Default: "Default",
-
-		/**
-		 * Labelled type
-		 *
-		 * @private
-		 */
-		Labelled: "Labelled",
-
-		/**
-		 * Described type
-		 *
-		 * @private
-		 */
-		Described: "Described",
-
-		/**
-		 * Combined type
-		 *
-		 * @private
-		 */
-		Combined: "Combined"
+		Neutral : "Neutral"
 	};
 
 	/**
@@ -1300,7 +1097,7 @@ sap.ui.define([
 		Center : "Center",
 
 		/**
-		 * If the flex item`s inline axes are the same as the cross axis, this value is identical to "Start".
+		 * If the flex item's inline axes are the same as the cross axis, this value is identical to "Start".
 		 *
 		 * Otherwise, it participates in baseline alignment: all participating box items on the line are aligned
 		 * such that their baselines align, and the item with the largest distance between its baseline and
@@ -1459,6 +1256,7 @@ sap.ui.define([
 
 		/**
 		 * Flex items are evenly distributed in the line, with half-size spaces on either end.
+		 * <b>Note:</b> This value behaves like SpaceBetween in Internet Explorer 10.
 		 * @public
 		 */
 		SpaceAround : "SpaceAround",
@@ -1504,6 +1302,9 @@ sap.ui.define([
 
 	/**
 	 * Available options for the layout of container lines along the cross axis of the flexbox layout.
+	 *
+	 * <b>Note:</b> This property has no effect in Internet Explorer 10.
+	 *
 	 * @enum {string}
 	 * @public
 	 * @ui5-metamodel This enumeration also will be described in the UI5 (legacy) designtime metamodel
@@ -1536,6 +1337,7 @@ sap.ui.define([
 
 		/**
 		 * Lines are evenly distributed in the line, with half-size spaces on either end.
+		 * <b>Note:</b> This value behaves like SpaceBetween in Internet Explorer 10.
 		 * @public
 		 */
 		SpaceAround : "SpaceAround",
@@ -1595,13 +1397,13 @@ sap.ui.define([
 	thisLib.FrameType = {
 
 		/**
-		 * The 2x2 frame type.
+		 * The 1x1 frame type.
 		 * @public
 		 */
 		OneByOne : "OneByOne",
 
 		/**
-		 * The 4x2 frame type.
+		 * The 2x1 frame type.
 		 * @public
 		 */
 		TwoByOne : "TwoByOne",
@@ -1618,30 +1420,7 @@ sap.ui.define([
 		 * Support for this type in sap.m.GenericTile is deprecated since 1.48.0.
 		 * @protected
 		 */
-		Auto : "Auto",
-
-		/**
-		 * The 4x1 frame type.
-		 * <b>Note:</b> The 4x1 frame type is currently only supported for Generic tile.
-		 * @public
-		 * @since 1.83
-		 */
-		TwoByHalf: "TwoByHalf",
-
-		/**
-		 * The 2x1 frame type.
-		 * <b>Note:</b> The 2x1 frame type is currently only supported for Generic tile.
-		 * @public
-		 * @since 1.83
-		 */
-		OneByHalf: "OneByHalf",
-
-		/**
-		 * The Stretch frame type adjusts the size of the control to the parent.
-		 * @since 1.96
-		 * @experimental
-		 */
-		 Stretch: "Stretch"
+		Auto : "Auto"
 
 	};
 
@@ -1775,24 +1554,6 @@ sap.ui.define([
 		HeaderMode : "HeaderMode",
 
 		/**
-		 * Action Mode (Two lines for the header).
-		 *
-		 * Generic Tile renders buttons that are specified under 'actionButtons' aggregation
-		 * @public
-		 * @experimental since 1.96
-		 */
-		ActionMode: "ActionMode",
-
-		/**
-		 * Article Mode (Two lines for the header and one line for the subtitle).
-		 *
-		 * Enables Article Mode.
-		 * @public
-		 * @experimental since 1.96
-		 */
-		 ArticleMode: "ArticleMode",
-
-		/**
 		 * Line mode (Implemented for both, cozy and compact densities).
 		 *
 		 * Generic Tile is displayed as in-line element, header and subheader are displayed in one line.
@@ -1802,15 +1563,7 @@ sap.ui.define([
 		 * @since 1.44.0
 		 * @public
 		 */
-		LineMode : "LineMode",
-		/**
-		 * Icon mode.
-		 *
-		 * GenericTile displays a combination of icon and header title. It is applicable only for the OneByOne FrameType and TwoByHalf FrameType.
-		 * @public 1.96
-		 * @experimental Since 1.96
-		*/
-		IconMode : "IconMode"
+		LineMode : "LineMode"
 	};
 
 	/**
@@ -1832,39 +1585,7 @@ sap.ui.define([
 		 * Action scope (Possible footer and Error State information is overlaid, "Remove" and "More" icons are added to the tile).
 		 * @public
 		 */
-		Actions: "Actions",
-		/**
-		 * More action scope (Only the More icon is added to the tile)
-		 * @since 1.76
-		 * @public
-		 */
-		ActionMore: "ActionMore",
-		/**
-		 * Remove action scope (Only the Remove icon is added to the tile)
-		 * @since 1.76
-		 * @public
-		 */
-		ActionRemove: "ActionRemove"
-	};
-
-	/**
-	 * Specifies <code>IconTabBar</code> tab overflow mode.
-	 * @enum {string}
- 	 * @since 1.90.0
-	 * @public
-	 * @ui5-metamodel This enumeration also will be described in the UI5 (legacy) designtime metamodel
-	 */
-	thisLib.TabsOverflowMode = {
-		/**
-		 * Default behavior: One overflow tab at the end of the header.
-		 * @public
-		 */
-		End: "End",
-		/**
-		 * Two overflow tabs at both ends of the header to keep tabs order intact.
-		 * @public
-		 */
-		StartAndEnd: "StartAndEnd"
+		Actions: "Actions"
 	};
 
 	/**
@@ -1950,16 +1671,6 @@ sap.ui.define([
 	 */
 
 	/**
-	 * Interface for controls which implement the notification badge concept.
-	 *
-	 * @since 1.80
-	 * @name sap.m.IBadge
-	 * @interface
-	 * @public
-	 * @ui5-metamodel This interface also will be described in the UI5 (legacy) designtime metamodel
-	 */
-
-	/**
 	 * Interface for controls which have the meaning of a breadcrumbs navigation.
 	 *
 	 * @since 1.52
@@ -2008,9 +1719,7 @@ sap.ui.define([
 	 * regardless of the value this method returns. The start and the end tickmark are taken into account
 	 * for the later calculations.
 	 *
-	 * @param {float} fSize - Size of the scale. This is the distance between the start and end point i.e. 0..100
-	 * @param {float} fStep - The step walking from start to end.
-	 * @param {int} iTickmarksThreshold - Limits the number of tickmarks.
+	 * @param {object} mOptions The option array
 	 * @returns {int} The number of tickmarks
 	 *
 	 * @function
@@ -2418,18 +2127,7 @@ sap.ui.define([
 		 * Error value color.
 		 * @public
 		 */
-		Error : "Error",
-
-		/**
-		 * None value color.
-		 *
-		 * <b>Note:</b> The None value color is set to prevent the display of tooltip
-		 * 'Neutral' for numeric content.
-		 *
-		 * @public
-		 * @since 1.84
-		 */
-		None : "None"
+		Error : "Error"
 
 	};
 
@@ -2445,7 +2143,7 @@ sap.ui.define([
 	 * @public
 	 * @ui5-metamodel This simple type also will be described in the UI5 (legacy) designtime metamodel
 	 */
-	thisLib.ValueCSSColor = DataType.createType("sap.m.ValueCSSColor", {
+	thisLib.ValueCSSColor = DataType.createType('sap.m.ValueCSSColor', {
 		isValid : function (vValue) {
 			var bResult = thisLib.ValueColor.hasOwnProperty(vValue);
 			if (bResult) {
@@ -2455,26 +2153,12 @@ sap.ui.define([
 				if (bResult) {
 					return bResult;
 				} else {
+					var Parameters = sap.ui.requireSync("sap/ui/core/theming/Parameters");
 					return CoreLibrary.CSSColor.isValid(Parameters.get(vValue));
 				}
 			}
 		}
-	}, DataType.getType("string"));
-
-	/**
-	 * @classdesc A string type that represents column ratio.
-	 *
-	 * Allowed values are strings that follow the number:number (3:2) format.
-	 * @namespace
-	 * @public
-	 * @since 1.86
-	 * @ui5-metamodel This simple type also will be described in the UI5 (legacy) designtime metamodel
-	 */
-	thisLib.SelectColumnRatio = DataType.createType("sap.m.SelectColumnRatio", {
-		isValid : function (vValue) {
-			return /^([0-9]+:[0-9]+)$/.test(vValue);
-		}
-	}, DataType.getType("string"));
+	}, DataType.getType('string'));
 
 	/**
 	 * A subset of input types that fits to a simple API returning one string.
@@ -3044,18 +2728,6 @@ sap.ui.define([
 		GE: "GE",
 		Initial: "Initial",
 		Empty: "Empty",
-
-		// filter exclude operations
-		NotBT: "NotBT",
-		NotEQ: "NotEQ",
-		NotContains: "NotContains",
-		NotStartsWith: "NotStartsWith",
-		NotEndsWith: "NotEndsWith",
-		NotLT: "NotLT",
-		NotLE: "NotLE",
-		NotGT: "NotGT",
-		NotGE: "NotGE",
-		NotInitial: "NotInitial",
 		NotEmpty: "NotEmpty",
 
 		// sort operations
@@ -3071,11 +2743,6 @@ sap.ui.define([
 		Average: "Average",
 		Minimum: "Minimum",
 		Maximum: "Maximum"
-	};
-
-	thisLib.P13nConditionOperationType = {
-		Include: "Include",
-		Exclude: "Exclude"
 	};
 
 	/**
@@ -3324,57 +2991,6 @@ sap.ui.define([
 		Auto : "Auto"
 
 	};
-
-	/**
-	 * The option keys of all the standard options of a DynamicDateRange control.
-	 *
-	 * @public
-	 * @ui5-metamodel This array also will be described in the UI5 (legacy) designtime metamodel
-	 * @experimental Since 1.92. These keys are experimental. The API might be changed in future.
-	 */
-	thisLib.StandardDynamicDateRangeKeys = [
-		"DATE",
-		"TODAY",
-		"YESTERDAY",
-		"TOMORROW",
-
-		"DATERANGE",
-		"FROM",
-		"TO",
-		"YEARTODATE",
-		"LASTDAYS",
-		"LASTWEEKS",
-		"LASTMONTHS",
-		"LASTQUARTERS",
-		"LASTYEARS",
-		"NEXTDAYS",
-		"NEXTWEEKS",
-		"NEXTMONTHS",
-		"NEXTQUARTERS",
-		"NEXTYEARS",
-		"TODAYFROMTO",
-
-		"THISWEEK",
-		"LASTWEEK",
-		"NEXTWEEK",
-
-		"SPECIFICMONTH",
-		"THISMONTH",
-		"LASTMONTH",
-		"NEXTMONTH",
-
-		"THISQUARTER",
-		"LASTQUARTER",
-		"NEXTQUARTER",
-		"QUARTER1",
-		"QUARTER2",
-		"QUARTER3",
-		"QUARTER4",
-
-		"THISYEAR",
-		"LASTYEAR",
-		"NEXTYEAR"
-	];
 
 	/**
 	 * QuickViewGroupElement is a combination of one label and another control (Link or Text) associated to this label.
@@ -3954,29 +3570,6 @@ sap.ui.define([
 
 	};
 
-	/**
-	 * Types of the <code>sap.m.Tokenizer</code> responsive modes.
-	 *
-	 * @enum {string}
-	 * @public
-	 * @since 1.80
-	 * @ui5-metamodel This enumeration also will be described in the UI5 (legacy) designtime metamodel
-	 */
-	thisLib.TokenizerRenderMode = {
-
-		/**
-		 * In <code>Loose</code> mode, the <code>sap.m.Tokenizer</code> will show all its tokens, even if this means that scrolling needs to be used.
-		 * @public
-		 */
-		Loose : "Loose",
-
-		/**
-		 * In  <code>Narrow</code> mode, the <code>sap.m.Tokenizer</code> will show as many tokens as its width allows, as well as an n-More indicator with the count of the hidden tokens. The rest tokens will be hidden.
-		 * @public
-		 */
-		Narrow : "Narrow"
-	};
-
 
 	/**
 	 * Types of the Toolbar Design.
@@ -4216,7 +3809,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * States of the upload process of {@link sap.m.UploadCollectionItem}.
+	 * States of the upload process for {@link sap.m.UploadCollectionItem}.
 	 *
 	 * @enum {string}
 	 * @public
@@ -4224,7 +3817,7 @@ sap.ui.define([
 	 */
 	thisLib.UploadState = {
 		/**
-		 * The file has been uploaded successfully.
+		 * The file has been uploaded successfuly.
 		 * @public
 		 */
 		Complete: "Complete",
@@ -4310,13 +3903,6 @@ sap.ui.define([
 	thisLib.TitleAlignment = {
 
 		/**
-		 * Disables an automatic title alignment depending on theme
-		 * Mostly used in sap.m.Bar
-		 * @public
-		 */
-		None : "None",
-
-		/**
 		 * The default type (if specified in the theme)
 		 * @public
 		 */
@@ -4329,32 +3915,11 @@ sap.ui.define([
 		Start : "Start",
 
 		/**
-		 * Explicitly sets the alignment to the center
+		 * Explicitly sets the alignment to the start (left or right depending on LTR/RTL)
 		 * @public
 		 */
 		Center : "Center"
 
-	};
-
-	/**
-	 * Expandable text overflow mode
-	 *
-	 * @enum {string}
-	 * @public
-	 * @ui5-metamodel This enumeration also will be described in the UI5 (legacy) designtime metamodel
-	 */
-	thisLib.ExpandableTextOverflowMode = {
-		/**
-		 * InPlace
-		 * @public
-		 */
-		InPlace: "InPlace",
-
-		/**
-		 * Popover
-		 * @public
-		 */
-		Popover: "Popover"
 	};
 
 	thisLib.AvatarShape = AvatarShape;
@@ -4363,80 +3928,8 @@ sap.ui.define([
 	thisLib.AvatarColor = AvatarColor;
 	thisLib.AvatarImageFitType = AvatarImageFitType;
 
-		/**
-		 * Wizard rendering mode.
-		 *
-		 * @enum {string}
-		 * @public
-		 * @experimental since 1.83
-		 * @ui5-metamodel This enumeration also will be described in the UI5 (legacy) designtime metamodel
-		 */
-		thisLib.WizardRenderMode = {
 
-			/**
-			 * Display all steps into a scroll section.
-			 * @public
-			 */
-			Scroll: "Scroll",
-
-			/**
-			 * Display steps as separate, single pages.
-			 * @public
-			 */
-			Page: "Page"
-		};
-
-	/**
-	 * Enumeration of the <code>ResetAllMode>/code> that can be used in a <code>TablePersoController</code>.
-	 * @enum {string}
-	 * @public
-	 */
-	thisLib.ResetAllMode = {
-
-		/**
-		 * Default behavior of the <code>TablePersoDialog</code> Reset All button.
-		 * @public
-		 */
-		Default: "Default",
-
-		/**
-		 * Resets the table to the default of the attached <code>PersoService</code>.
-		 * @public
-		 */
-		ServiceDefault: "ServiceDefault",
-
-		/**
-		 * Resets the table to the result of <code>getResetPersData</code> of the attached <code>PersoService</code>.
-		 * @public
-		 */
-		ServiceReset: "ServiceReset"
-	};
-
-	/**
-	 * Enumeration of the <code>multiSelectMode>/code> in <code>ListBase</code>.
-	 * @enum {string}
-	 * @public
-	 * @since 1.93
-	 * @ui5-metamodel This enumeration also will be described in the UI5 (legacy) designtime metamodel
-	 */
-	thisLib.MultiSelectMode = {
-
-		/**
-		 * Renders the <code>selectAll</code> checkbox (default behavior).
-		 * @public
-		 */
-		Default: "Default",
-
-		/**
-		 * Renders the <code>clearAll</code> icon.
-		 * @public
-		 */
-		 ClearAll: "ClearAll"
-	};
-
-	sap.ui.lazyRequire("sap.m.DynamicDate");
-
-	//lazy imports for MessageToast
+		//lazy imports for MessageToast
 	sap.ui.lazyRequire("sap.m.MessageToast", "show");
 
 	// requires for routing
@@ -4445,6 +3938,11 @@ sap.ui.define([
 	sap.ui.lazyRequire("sap.m.routing.Target");
 	sap.ui.lazyRequire("sap.m.routing.TargetHandler");
 	sap.ui.lazyRequire("sap.m.routing.Targets");
+
+	//enable ios7 support
+	if (Device.os.ios && Device.os.version >= 7 && Device.os.version < 8 && Device.browser.name === "sf") {
+		sap.ui.requireSync("sap/m/ios7");
+	}
 
 	//Internal: test the whole page with compact design
 	if (/sap-ui-xx-formfactor=compact/.test(location.search)) {
@@ -4502,7 +4000,7 @@ sap.ui.define([
 	 * @since 1.10
 	 */
 	thisLib.getLocaleData = function() {
-		var oLocaleData = LocaleData.getInstance(thisLib.getLocale());
+		var oLocaleData = sap.ui.requireSync("sap/ui/core/LocaleData").getInstance(thisLib.getLocale());
 
 		thisLib.getLocaleData = function() {
 			return oLocaleData;
@@ -4574,7 +4072,7 @@ sap.ui.define([
 		/*eslint-disable no-cond-assign */
 		for (var parent = oControl; parent = doGetParent(parent);) {
 			if (parent && typeof parent.getScrollDelegate == "function") {
-				return parent.getScrollDelegate(oControl);
+				return parent.getScrollDelegate();
 			}
 		}
 		/*eslint-enable no-cond-assign */
@@ -4632,7 +4130,7 @@ sap.ui.define([
 	/**
 	 * Touch helper.
 	 *
-	 * @namespace sap.m.touch
+	 * @namespace
 	 * @public
 	 **/
 	thisLib.touch = thisLib.touch || {};
@@ -4643,8 +4141,6 @@ sap.ui.define([
 	 * @param {TouchList} oTouchList The list of touch objects to search.
 	 * @param {Touch | number} oTouch A touch object to find or a Touch.identifier that uniquely identifies the current finger in the touch session.
 	 * @returns {object | undefined} The touch matching if any.
-	 * @name sap.m.touch.find
-	 * @function
 	 * @public
 	*/
 	thisLib.touch.find = function(oTouchList, oTouch) {
@@ -4658,7 +4154,7 @@ sap.ui.define([
 		if (oTouch && typeof oTouch.identifier !== "undefined") {
 			oTouch = oTouch.identifier;
 		} else if (typeof oTouch !== "number") {
-			assert(false, "sap.m.touch.find(): oTouch must be a touch object or a number");
+			assert(false, 'sap.m.touch.find(): oTouch must be a touch object or a number');
 			return;
 		}
 
@@ -4681,10 +4177,8 @@ sap.ui.define([
 	 * @param {TouchList} oTouchList The list of touch objects to search.
 	 * @param {jQuery | Element | string} vElement A jQuery element or an element reference or an element id.
 	 * @returns {number} The number of touches related with the given element.
-	 * @name sap.m.touch.countContained
-	 * @function
 	 * @public
-	 */
+	*/
 	thisLib.touch.countContained = function(oTouchList, vElement) {
 		var i,
 			iTouchCount = 0,
@@ -4701,7 +4195,7 @@ sap.ui.define([
 		} else if (typeof vElement === "string") {
 			vElement = jQuery(document.getElementById(vElement));
 		} else if (!(vElement instanceof jQuery)) {
-			assert(false, "sap.m.touch.countContained(): vElement must be a jQuery object or Element reference or a string");
+			assert(false, 'sap.m.touch.countContained(): vElement must be a jQuery object or Element reference or a string');
 			return 0;
 		}
 
@@ -4733,25 +4227,13 @@ sap.ui.define([
 	 * <ul>
 	 * <li>Some browsers do not let you pass more than 2022 characters in the URL</li>
 	 * <li>MAPI (Outlook) limit is 2083, max. path under Internet Explorer is 2048</li>
-	 * <li>Different Internet Explorer versions have a different URL length limits (IE9 approximately 1000 characters)</li>
+	 * <li>Different Internet Explorer versions have a different limitation (IE9 approximately 1000 characters)</li>
 	 * <li>MS mail app under Windows 8 cuts mail links after approximately 100 characters</li>
 	 * <li>Safari gets a confirmation from user before opening a native application and can block other triggers if the user cancels it</li>
 	 * <li>Some mail applications(Outlook) do not respect all encodings (e.g. Cyrillic texts are not encoded correctly)</li>
 	 * </ul>
 	 *
-	 * <b>Note:</b> all the given maximum lengths are for URL encoded text (e.g a space character will be encoded as "%20").
-	 *
-	 * It has been reported by some users that the content send through the <code>URLHelper</code> is not correctly displayed by the native applications (e.g. a native mail application).
-	 *
-	 * After sending the body to the application, <code>URLHelper</code> cannot affect its rendering and the application takes responsibility to correctly display the content.
-	 * Inconsistencies between different native applications or operative systems (OS) can lead to different behaviors and differences in the displayed content.
-	 *
-	 * <b>Example:</b>
-	 *
-	 * What happens with a link added to the content of an email using the <code>URLHelper</code> ?
-	 *
-	 * Apart from the correct generation of URL, everything else is outside of the scope of <code>URLHelper</code> as responsibility from then on is passed to the browser and the native applications handling the URL.
-	 * For instance, clicking on an email link should result in triggering an action in the default mail application for the user's OS and it is this application's responsibility to correctly handle the URL, given it is generated correctly.
+	 * <b>Note:</b> all the given limitation lengths are for URL encoded text (e.g a space character will be encoded as "%20").
 	 *
 	 * @see {@link topic:4f1c1075d88c41a5904389fa12b28f6b URL Helper}
 	 *
@@ -4824,11 +4306,11 @@ sap.ui.define([
 					encode = encodeURIComponent;
 
 				// Within mailto URLs, the characters "?", "=", "&" are reserved
-				isValidString(sEmail) && (sURL += encode(sEmail.trim()));
+				isValidString(sEmail) && (sURL += encode(jQuery.trim(sEmail)));
 				isValidString(sSubject) && aParams.push("subject=" + encode(sSubject));
 				isValidString(sBody) && aParams.push("body=" + formatMessage(sBody));
-				isValidString(sBCC) && aParams.push("bcc=" + encode(sBCC.trim()));
-				isValidString(sCC) && aParams.push("cc=" + encode(sCC.trim()));
+				isValidString(sBCC) && aParams.push("bcc=" + encode(jQuery.trim(sBCC)));
+				isValidString(sCC) && aParams.push("cc=" + encode(jQuery.trim(sCC)));
 
 				if (aParams.length) {
 					sURL += "?" + aParams.join("&");
@@ -4853,7 +4335,14 @@ sap.ui.define([
 				if (!bNewWindow) {
 					window.location.href = sURL;
 				} else {
-					openWindow(sURL, "_blank");
+					var oWindow = window.open(sURL, "_blank");
+					if (!oWindow) {
+						Log.error(this + "#redirect: Could not open " + sURL);
+						if (Device.os.windows_phone || (Device.browser.edge && Device.browser.mobile)) {
+							Log.warning("URL will be enforced to open in the same window as a fallback from a known Windows Phone system restriction. Check the documentation for more information.");
+							window.location.href = sURL;
+						}
+					}
 				}
 			},
 
@@ -4910,12 +4399,10 @@ sap.ui.define([
 			 * @param {string} [sBody] Default message text
 			 * @param {string} [sCC] Carbon Copy email address
 			 * @param {string} [sBCC] Blind carbon copy email address
-			 * @param {boolean} [bNewWindow] Opens email template in a new browser window or tab.
 			 * @public
 			 */
-			triggerEmail: function(sEmail, sSubject, sBody, sCC, sBCC, bNewWindow) {
-				var bNewWindow = bNewWindow || false;
-				this.redirect(this.normalizeEmail.apply(0, [sEmail, sSubject, sBody, sCC, sBCC]), bNewWindow);
+			triggerEmail: function(sEmail, sSubject, sBody, sCC, sBCC) {
+				this.redirect(this.normalizeEmail.apply(0, arguments));
 			},
 
 			toString : function() {
@@ -4936,7 +4423,7 @@ sap.ui.define([
 	thisLib.BackgroundHelper = {
 		/**
 		 * Adds CSS classes and styles to the given RenderManager, depending on the given configuration for background color and background image.
-		 * To be called by control renderers supporting the global themable background image within their root tag, before they call openEnd, voidEnd, writeClasses() and writeStyles().
+		 * To be called by control renderers supporting the global themable background image within their root tag, before they call writeClasses() and writeStyles().
 		 *
 		 * @param {sap.ui.core.RenderManager} rm The RenderManager
 		 * @param {sap.ui.core.CSSColor} [sBgColor] A configured custom background color for the control, if any
@@ -4967,6 +4454,7 @@ sap.ui.define([
 		 */
 		/* currently not needed
 		isThemeBackgroundImageModified: function() {
+			var Parameters = sap.ui.requireSync("sap/ui/core/theming/Parameters");
 			var sBgImgUrl = Parameters.get('sapUiGlobalBackgroundImage'); // the global background image from the theme
 			if (sBgImgUrl && sBgImgUrl !== "''") {
 				var sBgImgUrlDefault = Parameters.get('sapUiGlobalBackgroundImageDefault');
@@ -5052,7 +4540,7 @@ sap.ui.define([
 		 */
 		function checkAndSetProperty(oControl, property, value) {
 			if (value !== undefined) {
-				var fSetter = oControl["set" + capitalize(property)];
+				var fSetter = oControl['set' + capitalize(property)];
 				if (typeof (fSetter) === "function") {
 					fSetter.call(oControl, value);
 					return true;
@@ -5092,9 +4580,10 @@ sap.ui.define([
 						checkAndSetProperty(oImage, key,  mProperties[key]);
 					}
 				} else {
+					var Image = sap.ui.require("sap/m/Image") || sap.ui.requireSync("sap/m/Image");
 					//add 'id' to properties. This is required by utility method 'createControlByURI'
 					var mSettings = Object.assign({}, mProperties, {id: sImgId});
-					oImage = sap.ui.core.IconPool.createControlByURI(mSettings, sap.m.Image);
+					oImage = sap.ui.core.IconPool.createControlByURI(mSettings, Image);
 					//Set the parent so the image gets re-rendered, when the parent is
 					oImage.setParent(oParent, null, true);
 				}
@@ -5214,7 +4703,7 @@ sap.ui.define([
 			if (!oAnnotation) {
 				return false;
 			}
-			var sProperty = sPath.substr(sPath.lastIndexOf("/") + 1);
+			var sProperty = sPath.substr(sPath.lastIndexOf('/') + 1);
 			mValueListAnnotation.inProperty = sProperty;
 
 			jQuery.each(oAnnotation.record, function(i, aPropertyValues){
@@ -5342,7 +4831,7 @@ sap.ui.define([
 						if (sSearchFocus) {
 							oCustomParams["search-focus"] = sSearchFocus;
 						} else {
-							assert(false, "no search-focus defined");
+							assert(false, 'no search-focus defined');
 						}
 					}
 
@@ -5351,7 +4840,7 @@ sap.ui.define([
 						length: iLength,
 						filters: aFilters,
 						parameters: {
-							select: mValueListAnnotation.selection.join(","),
+							select: mValueListAnnotation.selection.join(','),
 							custom: oCustomParams
 						},
 						events: {
@@ -5378,7 +4867,7 @@ sap.ui.define([
 						template: mValueListAnnotation.listItem,
 						length: iLength,
 						parameters: {
-							select: mValueListAnnotation.selection.join(",")
+							select: mValueListAnnotation.selection.join(',')
 						},
 						events: {
 							dataReceived: _fnButtonHandler
@@ -5397,9 +4886,19 @@ sap.ui.define([
 			return new sap.m.Label(sId, {text: sText});
 		},
 		createButton: function(sId, fnPressFunction, fnCallback){
-			var oButton = new sap.m.Button(sId, {type: thisLib.ButtonType.Transparent});
-			oButton.attachEvent("press", fnPressFunction, this); // attach event this way to have the right this-reference in handler
-			fnCallback.call(this, oButton);
+			var that = this;
+			var _createButton = function(Button){
+				var oButton = new Button(sId, {type: thisLib.ButtonType.Transparent});
+				oButton.attachEvent('press', fnPressFunction, that); // attach event this way to have the right this-reference in handler
+				fnCallback.call(that, oButton);
+			};
+			var fnButtonClass = sap.ui.require("sap/m/Button");
+			if (fnButtonClass) {
+				// already loaded -> execute synchronously
+				_createButton(fnButtonClass);
+			} else {
+				sap.ui.require(["sap/m/Button"], _createButton);
+			}
 		},
 		setButtonContent: function(oButton, sText, sTooltip, sIcon, sIconHovered){
 			oButton.setText(sText);
@@ -5418,31 +4917,6 @@ sap.ui.define([
 				oToolbar.setDesign(sap.m.ToolbarDesign.Transparent, true);
 			}
 			return oToolbar;
-		},
-		getToolbarTitle: function(oToolbar) {
-			// determine Title to point aria-label on this. As Fallback use the whole Toolbar
-			if (oToolbar) {
-				var aContent = oToolbar.getContent();
-				for (var i = 0; i < aContent.length; i++) {
-					var oContent = aContent[i];
-					if (oContent.isA("sap.m.Title")) {
-						return oContent.getId();
-					}
-				}
-				return oToolbar.getId(); // fallback
-			}
-		},
-		createDelimiter: function(sDelimiter, sId){
-			return new sap.m.Text(sId, {text: sDelimiter, textAlign: CoreLibrary.TextAlign.Center});
-		},
-		createSemanticDisplayControl: function(sText, sId){
-			return new sap.m.Text(sId, {text: sText});
-		},
-		updateDelimiter: function(oText, sDelimiter){
-			oText.setText(sDelimiter);
-		},
-		updateSemanticDisplayControl: function(oText, sText){
-			oText.setText(sText);
 		},
 		bArrowKeySupport: false, /* disables the keyboard support for arrow keys */
 		bFinal: true

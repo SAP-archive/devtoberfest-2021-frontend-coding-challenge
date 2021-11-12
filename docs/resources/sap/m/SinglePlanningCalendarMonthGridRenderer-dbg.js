@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -9,18 +9,15 @@ sap.ui.define([
 	'sap/ui/unified/calendar/CalendarUtils',
 	'sap/ui/unified/calendar/Month',
 	'sap/ui/core/date/UniversalDate',
-	'sap/ui/core/IconPool',
 	'./PlanningCalendarLegend',
 	'sap/ui/core/InvisibleText',
 	'sap/ui/core/Core',
-	'sap/ui/unified/library'
-	],
+	'sap/ui/unified/library'],
 	function(
 		CalendarDate,
 		CalendarUtils,
 		Month,
 		UniversalDate,
-		IconPool,
 		PlanningCalendarLegend,
 		InvisibleText,
 		Core,
@@ -112,7 +109,6 @@ sap.ui.define([
 				oRm.openStart("div");
 				oRm.class("sapMSPCMonthDays");
 				oRm.class("sapMSPCMonthDaysMax" + iWeekMaxAppCount);
-				oRm.attr("role", "row");
 				oRm.openEnd();
 
 				for (j = 0; j < iColumns; j++) {
@@ -124,7 +120,6 @@ sap.ui.define([
 				oRm.openStart("div");
 				oRm.class("sapMSinglePCBlockers");
 				oRm.class("sapUiCalendarRowVisFilled");
-				oRm.attr("role", "list" );
 				oRm.openEnd();
 
 				for (j = 0; j < iColumns; j++) {
@@ -133,10 +128,10 @@ sap.ui.define([
 
 					// render appointments which started in previous rows
 					if (j === 0) {
-						this.renderAppointments(oRm, oControl, aPreviousWeekAppsPerDay[iCellIndex], j, aMoreCountPerCell[iCellIndex], oDensitySizes, i);
+						this.renderAppointments(oRm, oControl, aPreviousWeekAppsPerDay[iCellIndex], j, aMoreCountPerCell[iCellIndex], oDensitySizes);
 					}
 
-					this.renderAppointments(oRm, oControl, aAppsPerDay[iCellIndex], j, aMoreCountPerCell[iCellIndex], oDensitySizes, i);
+					this.renderAppointments(oRm, oControl, aAppsPerDay[iCellIndex], j, aMoreCountPerCell[iCellIndex], oDensitySizes);
 				}
 
 				oRm.close("div"); // end appointments
@@ -146,21 +141,16 @@ sap.ui.define([
 		};
 
 		SinglePlanningCalendarMonthGridRenderer.renderDay = function(oRm, oControl, oDay, oLocaleData, more, iCellIndex) {
-			var aSpecialDates = oControl._getSpecialDates(),
+			var aSpecialDates = oControl.getSpecialDates(),
 				aDayTypes = Month.prototype._getDateTypes.call(oControl, oDay),
 				oFormat = oControl._getDateFormatter(),
-				bToday = oDay.isSame(CalendarDate.fromLocalJSDate(new Date())),
 				oType,
 				sLegendItemType;
 
 			oRm.openStart("div");
 			oRm.class("sapMSPCMonthDay");
-			if (bToday) {
-				oRm.class("sapMSPCMonthDayToday");
-			}
-			oRm.attr("role", "gridcell");
 
-			if (CalendarUtils._isWeekend(oDay, oLocaleData) || !CalendarUtils._isSameMonthAndYear(oDay, CalendarDate.fromLocalJSDate(oControl.getStartDate()))) {
+			if (CalendarUtils._isWeekend(oDay, oLocaleData)) {
 				oRm.class("nonWorkingTimeframe");
 			}
 
@@ -178,12 +168,6 @@ sap.ui.define([
 			oRm.openEnd();
 
 			this.renderDndPlaceholder(oRm, oControl.getAggregation("_appsPlaceholders")[iCellIndex]);
-
-			if (bToday) {
-				oRm.openStart("div");
-				oRm.class("sapMSPCMonthNowMarker");
-				oRm.openEnd();
-			}
 
 			oRm.openStart("div");
 			oRm.class("specialDateIndicator");
@@ -216,25 +200,21 @@ sap.ui.define([
 			}
 			oRm.close("span");
 
-			if (bToday) {
-				oRm.close("div"); // close today wrapper
-			}
-
 			oRm.close("div");
 		};
 
-		SinglePlanningCalendarMonthGridRenderer.renderAppointments = function(oRm, oControl, apps, iColumn, iMore, oDensitySizes, iRow) {
+		SinglePlanningCalendarMonthGridRenderer.renderAppointments = function(oRm, oControl, apps, iColumn, iMore, oDensitySizes) {
 			var MAX_APPS = oControl._getMaxAppointments(),
 				iMaxLvl = iMore ? MAX_APPS - 2 : MAX_APPS - 1;
 
 			for (var i = 0; i < apps.length; i++) {
 				if (apps[i].level <= iMaxLvl) {
-					this.renderAppointment(oRm, oControl, apps[i], iColumn, oDensitySizes, iRow);
+					this.renderAppointment(oRm, oControl, apps[i], iColumn, oDensitySizes);
 				}
 			}
 		};
 
-		SinglePlanningCalendarMonthGridRenderer.renderAppointment = function(oRm, oControl, app, iColumn, oDensitySizes, iRow) {
+		SinglePlanningCalendarMonthGridRenderer.renderAppointment = function(oRm, oControl, app, iColumn, oDensitySizes) {
 			var oAppointment = app.data,
 				iWidth = app.width,
 				iLevel = app.level,
@@ -246,15 +226,14 @@ sap.ui.define([
 				sText = oAppointment.getText(),
 				sIcon = oAppointment.getIcon(),
 				sId = oAppointment.getId(),
-				bDraggable = oAppointment.getParent().getEnableAppointmentsDragAndDrop(),
 				mAccProps = {
-					role: "listitem",
+					role: "gridcell",
 					labelledby: {
 						value: InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT"),
 						append: true
 					},
-					// Prevents aria-selected from being added on the appointment
-					selected: null
+					// Setting aria-selected attribute to all blockers
+					selected: !!oAppointment.getSelected()
 				},
 				// aAriaLabels = oControl.getAriaLabelledBy(),
 				iRight = iColumns - iColumn - iWidth,
@@ -279,14 +258,7 @@ sap.ui.define([
 				mAccProps["labelledby"].value = mAccProps["labelledby"].value + " " + InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT_TENTATIVE");
 			}
 
-			if (oAppointment.getSelected()) {
-				mAccProps["labelledby"].value = mAccProps["labelledby"].value + " " + InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT_SELECTED");
-			}
-
-			oRm.openStart("div", oAppointment.getId() + "-" + iColumn + "_" + iRow);
-			oRm.attr("draggable", bDraggable);
-			oRm.attr("data-sap-ui-draggable", bDraggable);
-			oRm.attr("data-sap-ui-related", oAppointment.getId());
+			oRm.openStart("div", oAppointment);
 			oRm.attr("data-sap-level", iLevel);
 			oRm.attr("data-sap-width", iWidth);
 			oRm.attr("tabindex", 0);
@@ -385,7 +357,6 @@ sap.ui.define([
 				sCalendarType = Core.getConfiguration().getCalendarType(),
 				aWeekDays = oLocaleData.getDaysStandAlone("abbreviated", sCalendarType),
 				aWeekDaysWide = oLocaleData.getDaysStandAlone("wide", sCalendarType),
-				oFirstRenderedDate = CalendarUtils._getFirstDateOfWeek(CalendarDate.fromLocalJSDate(oControl.getStartDate())),
 				iDayIndex;
 
 			oRm.openStart("div", sId + "-Names");
@@ -402,11 +373,6 @@ sap.ui.define([
 				if (i === 0) {
 					oRm.class("sapUiCalFirstWDay");
 				}
-
-				if (CalendarUtils._isWeekend(oFirstRenderedDate, oLocaleData)) {
-					oRm.class("sapUiCalItemWeekEnd");
-				}
-				oFirstRenderedDate.setDate(oFirstRenderedDate.getDate() + 1);
 
 				oRm.accessibilityState(null, {
 					role: "columnheader",

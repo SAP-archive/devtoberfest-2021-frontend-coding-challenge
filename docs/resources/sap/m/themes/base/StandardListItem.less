@@ -16,6 +16,7 @@
 
 .sapMSLI > .sapMLIBContent {
 	white-space: nowrap;
+	overflow: hidden;
 	text-overflow: ellipsis;
 	display: flex;
 	align-items: center;
@@ -38,7 +39,13 @@
 	flex-direction: column;
 }
 
-.sapMSLINoTitleAdapt:not(.sapMSLIWithDescription) .sapMSLIDiv {
+/* flex-direction: column is not supported in IE11 */
+html[data-sap-ui-browser='ie11'] .sapMSLIWithDescription > .sapMLIBContent > .sapMSLIDiv {
+	display: inline-block;
+	width: 100%;
+}
+
+.sapMSLINoTitleAdapt .sapMSLIDiv {
 	height: 2.5625rem;
 }
 
@@ -75,7 +82,7 @@
 }
 
 .sapMSLIWithDescription > .sapMLIBContent > .sapMSLIDiv > .sapMSLIDescription {
-	padding-top: 0.5rem;
+	padding-top: 0.875rem;
 }
 
 .sapMSLIImgIcon,
@@ -109,10 +116,6 @@
 	text-shadow: none;
 }
 
-.sapMLIBActive .sapMSLIInfo:not(.sapMSLIInfoStateInverted) {
-	text-shadow: none;
-}
-
 .sapMSLIDiv.sapMSLIInfoMiddle {
 	flex-direction: row;
 }
@@ -124,15 +127,6 @@
 	text-align: right;
 	margin: 0 0 0 1rem;
 	font-size: @sapMFontMediumSize;
-}
-
-.sapMSLIWrapping .sapMSLIInfo {
-	white-space: normal;
-	word-break: break-word;
-}
-
-.sapMSLIInfo:not(.sapMSLIInfoStateInverted) {
-	text-shadow: @sapUiContentTextShadow;
 }
 
 .sapMSLIInfoMiddle > .sapMSLIInfo {
@@ -220,8 +214,6 @@ html[dir=rtl] .sapMSLIInfo {
 	word-wrap: break-word;
 }
 
-.sapMSLINoTitleAdapt > .sapMLIBSelectS,
-.sapMSLINoTitleAdapt > .sapMLIBSelectM,
 .sapMSLIWithDescription > .sapMLIBSelectS,
 .sapMSLIWithDescription > .sapMLIBSelectM,
 .sapMSLIWrapping > .sapMLIBSelectS,
@@ -265,11 +257,7 @@ html[dir=rtl] .sapMSLIInfo {
 }
 
 .sapMSLIExpandCollapse:focus {
-	outline: @_sap_m_ListItemBase_Focus_Outline;
-}
-
-.sapMSLIImgIcon {
-	margin-left: -0.75rem;
+	outline: 1px dotted @sapUiContentFocusColor;
 }
 
 /* Compact size */

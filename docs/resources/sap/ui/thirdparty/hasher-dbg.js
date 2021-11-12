@@ -387,9 +387,7 @@
 				 */
 				replaceHash : function(path){
 					// ##### BEGIN: MODIFIED BY SAP
-					var dispatchFunction,
-						href = window.location.href,
-						hashIndex = href.indexOf("#");
+					var dispatchFunction;
 					// ##### END: MODIFIED BY SAP
 					path = _makePath.apply(null, arguments);
 					if(path !== _hash){
@@ -399,10 +397,7 @@
 						if (!hasher.raw) {
 							path = _encodePath(path);
 						}
-						if (hashIndex !== -1) {
-							href = href.slice(0, hashIndex);
-						}
-						window.location.replace(href + '#' + path);
+						window.location.replace('#' + path);
 						dispatchFunction && dispatchFunction();
 						// ##### END: MODIFIED BY SAP
 					}

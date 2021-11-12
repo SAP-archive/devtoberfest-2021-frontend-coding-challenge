@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/core/library"],
@@ -31,8 +31,7 @@ sap.ui.define(["sap/ui/core/library"],
 	 */
 	ObjectAttributeRenderer.render = function(oRm, oOA) {
 		var oParent = oOA.getParent(),
-			sTooltip = oOA.getTooltip_AsString(),
-			sTextDir = oOA.getTextDirection();
+			sTooltip = oOA.getTooltip_AsString();
 
 		oRm.openStart("div", oOA);
 		if (oOA._isEmpty()) {
@@ -44,11 +43,6 @@ sap.ui.define(["sap/ui/core/library"],
 		}
 
 		oRm.class("sapMObjectAttributeDiv");
-
-		if (sTextDir !== TextDirection.Inherit) {
-			oRm.attr("dir", sTextDir.toLowerCase());
-		}
-
 		// add tabindex, "active" class and ARIA only when the ObjectAttribute is clickable
 		// e.g. when is active ot the CustomContent is sap.m.Link
 		if (oOA._isClickable()) {
@@ -57,12 +51,7 @@ sap.ui.define(["sap/ui/core/library"],
 			oRm.accessibilityState(oOA, {
 				role: "link"
 			});
-			if (!oOA.getTitle() && oOA.getText()) {
-			// in case of title only or text only, allow 100% of width to be taken
-				oRm.class("sapMObjectAttributeTextOnly");
-			}
 		}
-
 
 		if (sTooltip) {
 			oRm.attr("title", sTooltip);
@@ -78,56 +67,38 @@ sap.ui.define(["sap/ui/core/library"],
 			this.renderActiveText(oRm, oOA, oParent);
 		} else {
 			oRm.renderControl(oOA._getUpdatedTextControl());
-			if (oOA._bEmptyIndicatorMode) {
-				oRm.renderControl(oOA.getAggregation("_textControl"));
-			}
 		}
 		oRm.close("div");
 	};
 
-	ObjectAttributeRenderer.renderActiveTitle = function(oRm, oOA) {
-		var sColon,
-			bRenderBDI = oOA.getTextDirection() === TextDirection.Inherit;
-
+	ObjectAttributeRenderer.renderActiveTitle = function (oRm, oOA) {
 		if (!oOA.getProperty("title")) {
 			return;
 		}
 
-		sColon = ": ";
-
 		oRm.openStart("span", oOA.getId() + "-title");
 		oRm.class("sapMObjectAttributeTitle");
 		oRm.openEnd();
-
-		if (bRenderBDI) {
-			oRm.openStart("bdi");
-			oRm.openEnd();
-		}
-
 		oRm.text(oOA.getProperty("title"));
-
-		if (bRenderBDI) {
-			oRm.close("bdi");
-		}
-
 		oRm.close("span");
-
 		oRm.openStart("span", oOA.getId() + "-colon");
 		oRm.class("sapMObjectAttributeColon");
 		oRm.openEnd();
-		if (sap.ui.getCore().getConfiguration().getLocale().getLanguage().toLowerCase() === "fr") {
-			sColon = " " + sColon;
-		}
-		oRm.text(sColon);
+		oRm.unsafeHtml(":&nbsp;");
 		oRm.close("span");
 	};
 
 	ObjectAttributeRenderer.renderActiveText = function (oRm, oOA, oParent) {
-		var oAttrAggregation = oOA.getAggregation("customContent"),
-			bRenderBDI = oOA.getTextDirection() === TextDirection.Inherit;
+		var sTextDir = oOA.getTextDirection(),
+			oAttrAggregation = oOA.getAggregation("customContent");
 
 		oRm.openStart("span", oOA.getId() + "-text");
 		oRm.class("sapMObjectAttributeText");
+
+		if (sTextDir && sTextDir !== TextDirection.Inherit) {
+			oRm.attr("dir", sTextDir.toLowerCase());
+		}
+
 		oRm.openEnd();
 
 		if (oAttrAggregation && oParent) {
@@ -138,16 +109,7 @@ sap.ui.define(["sap/ui/core/library"],
 			}
 			oRm.renderControl(oAttrAggregation);
 		} else {
-			if (bRenderBDI) {
-				oRm.openStart("bdi");
-				oRm.openEnd();
-			}
-
 			oRm.text(oOA.getProperty("text"));
-
-			if (bRenderBDI) {
-				oRm.close("bdi");
-			}
 		}
 		oRm.close("span");
 	};

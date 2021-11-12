@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -20,15 +20,14 @@ sap.ui.define([
 	 * @namespace
 	 * @name sap.ui.layout
 	 * @author SAP SE
-	 * @version 1.96.0
-	 * @since 1.15
+	 * @version 1.76.0
 	 * @public
 	 */
 
 	// delegate further initialization of this library to the Core
 	sap.ui.getCore().initLibrary({
 		name : "sap.ui.layout",
-		version: "1.96.0",
+		version: "1.76.0",
 		dependencies: ["sap.ui.core"],
 		designtime: "sap/ui/layout/designtime/library.designtime",
 		types: [
@@ -57,8 +56,7 @@ sap.ui.define([
 			"sap.ui.layout.cssgrid.CSSGridGapShortHand"
 		],
 		interfaces: [
-			"sap.ui.layout.cssgrid.IGridConfigurable",
-			"sap.ui.layout.cssgrid.IGridItemLayoutData"
+			"sap.ui.layout.cssgrid.IGridConfigurable"
 		],
 		controls: [
 			"sap.ui.layout.AlignedFlowLayout",
@@ -180,15 +178,6 @@ sap.ui.define([
 	 * @public
 	 * @function
 	 * @name sap.ui.layout.cssgrid.IGridConfigurable.getGridLayoutConfiguration
-	 */
-
-	/**
-	 * LayoutData for grid items
-	 *
-	 * @since 1.88.0
-	 * @public
-	 * @interface
-	 * @name sap.ui.layout.cssgrid.IGridItemLayoutData
 	 */
 
 	/**
@@ -544,7 +533,6 @@ sap.ui.define([
 		/**
 		 * Uses the <code>ResponsiveLayout</code> layout to render the <code>SimpleForm</code> control
 		 * @public
-		 * @deprecated As of version 1.93, replaced by {@link sap.ui.layout.form.SimpleFormLayout.ColumnLayout ColumnLayout}
 		 */
 		ResponsiveLayout : "ResponsiveLayout",
 
@@ -662,8 +650,7 @@ sap.ui.define([
 	 * @classdesc An <code>int</code> type that defines how many columns a <code>Form</code> control using
 	 * the <code>ColumnLayout</code> as layout can have if it has extra-large size
 	 *
-	 * Allowed values are numbers from 1 to 6.
-	 * <b>Note:</b> In versions lower than 1.89 only 4 columns are allowed.
+	 * Allowed values are numbers from 1 to 4.
 	 *
 	 * @final
 	 * @namespace
@@ -673,7 +660,7 @@ sap.ui.define([
 	 */
 	sap.ui.layout.form.ColumnsXL = DataType.createType('sap.ui.layout.form.ColumnsXL', {
 		isValid : function(vValue) {
-			if (vValue > 0 && vValue <= 6) {
+			if (vValue > 0 && vValue <= 4) {
 				return true;
 			} else {
 				return false;
@@ -738,7 +725,7 @@ sap.ui.define([
 	 * @classdesc An <code>int</code> type that defines how many cells a control inside of a column
 	 * of a <code>Form</code> control using the <code>ColumnLayout</code> control as layout can use.
 	 *
-	 * Allowed values are numbers from 1 to 12 and -1. -1 means the value is calculated.
+	 * Allowed values are numbers from 1 to 12.
 	 *
 	 * @final
 	 * @namespace
@@ -748,9 +735,7 @@ sap.ui.define([
 	 */
 	sap.ui.layout.form.ColumnCells = DataType.createType('sap.ui.layout.form.ColumnCells', {
 		isValid : function(vValue) {
-			if (vValue === -1) {
-				return true;
-			} else if (vValue > 0 && vValue <= 12) {
+			if (vValue > 0 && vValue <= 12) {
 				return true;
 			} else {
 				return false;
@@ -795,11 +780,6 @@ sap.ui.define([
 			setButtonContent: function(oButton, sText, sTooltip, sIcon, sIconHovered){ throw new Error("no Button control available!"); },
 			addFormClass: function(){ return null; },
 			setToolbar: function(oToolbar){ return oToolbar; }, /* allow to overwrite toolbar settings */
-			getToolbarTitle: function(oToolbar) { return oToolbar && oToolbar.getId(); }, /* To determine title ID in toolbar for aria-label */
-			createDelimiter: function(sDelimiter, sId){ throw new Error("no delimiter control available!"); }, /* must return a kind of text control */
-			createSemanticDisplayControl: function(sText, sId){ throw new Error("no display control available!"); }, /* must return a kind of text control */
-			updateDelimiter: function(oDelimiter, sDelimiter){ throw new Error("no delimiter control available!"); },
-			updateSemanticDisplayControl: function(oControl, sText){ throw new Error("no display control available!"); },
 			bArrowKeySupport: true, /* enables the keyboard support for arrow keys */
 			bFinal: false /* if true, the helper must not be overwritten by an other library */
 		};

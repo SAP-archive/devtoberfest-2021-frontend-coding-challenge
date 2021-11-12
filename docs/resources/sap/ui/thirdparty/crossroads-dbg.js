@@ -530,17 +530,9 @@ var factory = function (signals) {
                     //the regex for slash which isn't fully optional based on the given pattern
                     //for example, given patterns foo/:bar: and foobar/:bar:, the slash isn't fully
                     //optional because if the slash is optional, hash "foobar" will also match foo/:bar:
-                    //with parameter bar set to "bar".
-                    //
-                    //(?:\\/(?=(?:[^\\/?]+)?)):
-                    //A single slash will be matched because the positive lookahead is optional.
-                    //If there are some symbols after the slash, it must not be a slash '/' or question mark '?'.
-                    //
-                    //(?:\\/?(?=\\?)):
-                    //A single slash is optional, if the slash is followed by questions mark (query param).
-                    //
+                    //with parameter bar set to "bar"
                     //arsbq stands for "after required slash or before query"
-                    res_arsbq : '(?:(?:\\/(?=(?:[^\\/?]+)?))|(?:\\/?(?=\\?))|^\\/?|\\/?$)'
+                    res_arsbq : '(?:(?:\\/(?=(?:[^\\/?]+)?))|^\\/?|\\/?$)'
                     // ##### END: MODIFIED BY SAP
                 },
                 'RS' : {
@@ -553,16 +545,14 @@ var factory = function (signals) {
                 'RQ' : {
                     //required query string - everything in between `{? }`
                     rgx : /\{\?([^}]+)\}/g,
-                    // ##### BEGIN: MODIFIED BY SAP
-                    //everything from `?` till end of string
-                    res : '\\?(.+)'
+                    //everything from `?` till `#` or end of string
+                    res : '\\?([^#]+)'
                 },
                 'OQ' : {
                     //optional query string - everything in between `:? :`
                     rgx : /:\?([^:]+):/g,
-                    //everything from `?` till end of string
-                    res : '(?:\\?(.*))?'
-                    // ##### END: MODIFIED BY SAP
+                    //everything from `?` till `#` or end of string
+                    res : '(?:\\?([^#]*))?'
                 },
                 'OR' : {
                     //optional rest - everything in between `: *:`

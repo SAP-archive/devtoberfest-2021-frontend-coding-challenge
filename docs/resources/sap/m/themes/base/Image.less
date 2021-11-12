@@ -28,10 +28,11 @@ span.sapMImg {
 
 .sapMImgFocusable:focus {
 	outline: 0.0625rem dotted @sapUiContentFocusColor;
-    outline-offset: 0.0625rem;
-	.sapUiRespGrid & {
-		z-index: 100;
-	}
+}
+
+html[data-sap-ui-browser^="ie"] .sapMImgFocusable:focus,
+html[data-sap-ui-browser^="ed"] .sapMImgFocusable:focus {
+	outline-style: dashed;
 }
 
 html:not(.sap-desktop) .sapMImgFocusable:focus {

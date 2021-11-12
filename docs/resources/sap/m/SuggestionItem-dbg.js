@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -18,11 +18,10 @@ sap.ui.define(['./library', 'sap/ui/core/Item', 'sap/ui/core/IconPool'],
 	 * @class
 	 * Display suggestion list items.
 	 *
-	 * <b>Note:</b> The inherited <code>enabled</code> property is not supported. If an item shouldn't be selected, remove it from the list instead.
 	 * @extends sap.ui.core.Item
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @since 1.34
 	 *
 	 * @constructor
@@ -42,12 +41,6 @@ sap.ui.define(['./library', 'sap/ui/core/Item', 'sap/ui/core/IconPool'],
 			icon : {type : "string", group : "Appearance", defaultValue : ""},
 
 			/**
-			 * The property should not be used in sap.m.SearchField's items.
-			 * @private
-			 */
-			enabled : {type : "boolean", group : "Misc", defaultValue : true, visibility: "hidden" },
-
-			/**
 			 * Additional text of type string, optionally to be displayed along with this item.
 			 */
 			description : {type : "string", group : "Data", defaultValue : ""}
@@ -57,18 +50,18 @@ sap.ui.define(['./library', 'sap/ui/core/Item', 'sap/ui/core/IconPool'],
 	IconPool.insertFontFaceStyle();
 
 	// Render output text to make occurrences of the search text value bold:
-	function renderItemText(oRm, sText, sSearch) {
+	function renderItemText(oRm, sText, sSearch){
 		var i;
 		if (sText) {
 			i = sText.toUpperCase().indexOf(sSearch.toUpperCase());
 			if (i > -1){
-				oRm.text(sText.slice(0, i));
-				oRm.openStart("b").openEnd();
-				oRm.text(sText.slice(i, i + sSearch.length));
-				oRm.close("b");
+				oRm.writeEscaped(sText.slice(0, i));
+				oRm.write("<b>");
+				oRm.writeEscaped(sText.slice(i, i + sSearch.length));
+				oRm.write("</b>");
 				sText = sText.substring(i + sSearch.length);
 			}
-			oRm.text(sText);
+			oRm.writeEscaped(sText);
 		}
 	}
 
@@ -77,62 +70,57 @@ sap.ui.define(['./library', 'sap/ui/core/Item', 'sap/ui/core/IconPool'],
 	 *
 	 * Subclasses may override this function.
 	 *
-	 * @param {sap.ui.core.RenderManager} oRM The <code>RenderManager</code>
+	 * @param {sap.ui.core.RenderManager} oRenderManager The <code>RenderManager</code>
 	 * @param {sap.m.SuggestionItem} oItem The item which should be rendered
 	 * @param {string} sSearch The search text that should be emphasized
 	 * @param {boolean} bSelected The item is selected
 	 * @protected
 	 */
-	SuggestionItem.prototype.render = function(oRM, oItem, sSearch, bSelected) {
-		var sText = oItem.getText(),
-			sIcon = oItem.getIcon(),
-			sSeparator = "",
-			sDescription = oItem.getDescription(),
-			oParent = oItem.getParent(),
-			aItems = oParent && oParent.getSuggestionItems && oParent.getSuggestionItems() || [],
-			iIndex = aItems.indexOf(oItem),
-			sSearch = sSearch || "";
+	SuggestionItem.prototype.render = function(oRenderManager, oItem, sSearch, bSelected){
+		var rm = oRenderManager;
+		var text = oItem.getText();
+		var icon = oItem.getIcon();
+		var separator = "";
+		var description = oItem.getDescription();
+		var parent = oItem.getParent();
+		var items = parent && parent.getSuggestionItems && parent.getSuggestionItems() || [];
+		var index = items.indexOf(oItem);
+		sSearch = sSearch || "";
 
-		oRM.openStart("li", oItem)
-			.class("sapMSuLI")
-			.class("sapMSelectListItem")
-			.class("sapMSelectListItemBase")
-			.class("sapMSelectListItemBaseHoverable");
+		rm.write("<li");
+		rm.writeElementData(oItem);
+		rm.addClass("sapMSuLI");
+		rm.addClass("sapMSelectListItem");
+		rm.addClass("sapMSelectListItemBase");
+		rm.addClass("sapMSelectListItemBaseHoverable");
 
-		oRM.accessibilityState({
-			role: "option",
-			posinset: iIndex + 1,
-			setsize: aItems.length,
-			selected: bSelected
-		});
-
+		rm.writeAttribute("role", "option");
+		rm.writeAttribute("aria-posinset", index + 1);
+		rm.writeAttribute("aria-setsize", items.length);
 		if (bSelected) {
-			oRM.class("sapMSelectListItemBaseSelected");
-
-			if (oParent) {
-				oParent.$("I").attr("aria-activedescendant", oItem.getId());
+			rm.addClass("sapMSelectListItemBaseSelected");
+			rm.writeAttribute("aria-selected", "true");
+			if (parent) {
+				parent.$("I").attr("aria-activedescendant", oItem.getId());
 			}
+		} else {
+			rm.writeAttribute("aria-selected", "false");
 		}
-
-		oRM.openEnd();
-
-		if (sIcon) {
-			oRM.icon(sIcon, "sapMSuggestionItemIcon");
+		rm.writeClasses();
+		rm.write(">");
+		if (icon) {
+			rm.writeIcon(icon, "sapMSuggestionItemIcon", {});
 		}
-
-		if (sText) {
-			renderItemText(oRM, sText, sSearch);
-			sSeparator = " ";
+		if (text) {
+			renderItemText(rm, text, sSearch);
+			separator = " ";
 		}
-
-		if (sDescription) {
-			oRM.text(sSeparator);
-			oRM.openStart("i").openEnd();
-			renderItemText(oRM, sDescription, sSearch);
-			oRM.close("i");
+		if (description) {
+			rm.write(separator + "<i>");
+			renderItemText(rm, description, sSearch);
+			rm.write("</i>");
 		}
-
-		oRM.close("li");
+		rm.write("</li>");
 	};
 
 	/**
@@ -147,5 +135,11 @@ sap.ui.define(['./library', 'sap/ui/core/Item', 'sap/ui/core/IconPool'],
 		return this.getText();
 	};
 
+	// Suppress invalidate of the parent input field by property changes.
+	SuggestionItem.prototype.invalidate = function() {
+		return undefined;
+	};
+
 	return SuggestionItem;
+
 });

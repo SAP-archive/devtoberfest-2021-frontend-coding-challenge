@@ -1,20 +1,20 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 	"sap/base/Log",
-	"sap/base/util/extend",
 	"sap/ui/core/CalendarType",
 	"sap/ui/core/format/DateFormat",
 	"sap/ui/model/FormatException",
 	"sap/ui/model/ParseException",
 	"sap/ui/model/ValidateException",
-	"sap/ui/model/odata/type/ODataType"
-], function (Log, extend, CalendarType, DateFormat, FormatException, ParseException,
-		ValidateException, ODataType) {
+	"sap/ui/model/odata/type/ODataType",
+	"sap/ui/thirdparty/jquery"
+], function (Log, CalendarType, DateFormat, FormatException, ParseException, ValidateException,
+	ODataType, jQuery) {
 	"use strict";
 
 	/*
@@ -42,7 +42,7 @@ sap.ui.define([
 		var oFormatOptions;
 
 		if (!oType.oUiFormat) {
-			oFormatOptions = extend({strictParsing : true}, oType.oFormatOptions);
+			oFormatOptions = jQuery.extend({strictParsing : true}, oType.oFormatOptions);
 			oFormatOptions.UTC = true; // value is always UTC; no overwrite via format options
 			oType.oUiFormat = DateFormat.getTimeInstance(oFormatOptions);
 		}
@@ -110,7 +110,7 @@ sap.ui.define([
 	 * @extends sap.ui.model.odata.type.ODataType
 	 * @public
 	 * @since 1.37.0
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 */
 	var TimeOfDay = ODataType.extend("sap.ui.model.odata.type.TimeOfDay", {
 			constructor : function (oFormatOptions, oConstraints) {

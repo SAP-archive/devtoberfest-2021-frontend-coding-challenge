@@ -1,6 +1,6 @@
 /*
  * ! OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -10,8 +10,8 @@ sap.ui.define([
 	'sap/ui/base/ManagedObject',
 	'sap/ui/base/EventProvider',
 	"sap/base/util/array/uniqueSort",
-	'sap/base/util/deepExtend'
-], function(BaseObject, ManagedObject, EventProvider, uniqueSort, deepExtend) {
+	"sap/ui/thirdparty/jquery"
+], function(BaseObject, ManagedObject, EventProvider, uniqueSort, jQuery) {
 	"use strict";
 
 	/**
@@ -470,7 +470,7 @@ sap.ui.define([
 			var iIndex = oTargetConfig.listeners.indexOf(oListener);
 			if (iIndex >= 0) {
 				//return the current configuration
-				var oConfiguration = deepExtend({}, oTargetConfig.configurations[iIndex]);
+				var oConfiguration = jQuery.extend(true,{}, oTargetConfig.configurations[iIndex]);
 				return oConfiguration;
 			}
 		}

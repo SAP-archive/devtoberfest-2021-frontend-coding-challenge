@@ -1,17 +1,14 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-
-/*global Promise, FileReader*/
 
 // Provides control sap.ui.unified.FileUploader.
 sap.ui.define([
 	'sap/ui/core/Control',
 	'./library',
 	'sap/ui/core/LabelEnablement',
-	'sap/ui/core/InvisibleText',
 	'sap/ui/core/library',
 	'sap/ui/Device',
 	'./FileUploaderRenderer',
@@ -26,7 +23,6 @@ sap.ui.define([
 	Control,
 	library,
 	LabelEnablement,
-	InvisibleText,
 	coreLibrary,
 	Device,
 	FileUploaderRenderer,
@@ -36,12 +32,12 @@ sap.ui.define([
 	encodeXML,
 	jQuery
 ) {
+	"use strict";
 
 
 
 	// shortcut for sap.ui.core.ValueState
 	var ValueState = coreLibrary.ValueState;
-	var HttpRequestMethod = library.FileUploaderHttpRequestMethod;
 
 
 
@@ -63,7 +59,7 @@ sap.ui.define([
 	 * @implements sap.ui.core.IFormContent, sap.ui.unified.IProcessableBlobs
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -159,16 +155,10 @@ sap.ui.define([
 			maximumFileSize : {type : "float", group : "Data", defaultValue : null},
 
 			/**
-			 * The chosen files will be checked against an array of MIME types defined in this property.
+			 * The chosen files will be checked against an array of mime types.
 			 *
-			 * If at least one file does not fit the MIME type restriction, the upload is prevented.
-			 *
-			 * <b>Note:</b> This property is not supported by Internet Explorer.
-			 * It is only reliable for common file types like images, audio, video, plain text and HTML documents.
-			 * File types that are not recognized by the browser result in <code>file.type</code> to be returned
-			 * as an empty string. In this case the verification could not be performed.
-			 * The file upload is not prevented and the validation based on file type is left to the receiving backend side.
-			 *
+			 * If at least one file does not fit the mime type restriction, the upload is prevented.
+			 * <b>Note:</b> This property is not supported by Internet Explorer & Microsoft Edge.
 			 *
 			 * Example: <code>["image/png", "image/jpeg"]</code>.
 			 */
@@ -180,13 +170,6 @@ sap.ui.define([
 			 * This property is not supported by Internet Explorer 9.
 			 */
 			sendXHR : {type : "boolean", group : "Behavior", defaultValue : false},
-
-			/**
-			 * Chosen HTTP request method for file upload.
-			 * @since 1.81.0
-			 *
-			 */
-			httpRequestMethod : {type: "sap.ui.unified.FileUploaderHttpRequestMethod", group : "Behavior", defaultValue : HttpRequestMethod.Post},
 
 			/**
 			 * Placeholder for the text field.
@@ -599,7 +582,7 @@ sap.ui.define([
 		//retrieving the default browse button text from the resource bundle
 		if (!this.getIconOnly()) {
 			this.oBrowse.setText(this.getBrowseText());
-		} else  {
+		}else {
 			this.oBrowse.setTooltip(this.getBrowseText());
 		}
 
@@ -611,12 +594,7 @@ sap.ui.define([
 			if (this.oBrowse.addAriaDescribedBy) {
 				this.oBrowse.addAriaDescribedBy(this.getId() + "-AccDescr");
 			}
-
-			if (this.oFilePath) {
-				this.oFilePath.addAriaLabelledBy(InvisibleText.getStaticId("sap.ui.unified", "FILEUPLOAD_FILENAME"));
-			}
 		}
-		this._submitAfterRendering = false;
 
 	};
 
@@ -624,8 +602,8 @@ sap.ui.define([
 		this.setProperty("buttonText", sText, false);
 		if (!this.getIconOnly()) {
 			this.oBrowse.setText(sText || this.getBrowseText());
-		} else  {
-			this.oBrowse.setTooltip(this.getBrowseText());
+		}else {
+			this.oBrowse.setTooltip(sText || this.getBrowseText());
 		}
 		return this;
 	};
@@ -664,8 +642,8 @@ sap.ui.define([
 		this.setProperty("iconOnly", bIconOnly, false);
 		if (bIconOnly) {
 			this.oBrowse.setText("");
-			this.oBrowse.setTooltip(this.getBrowseText());
-		} else  {
+			this.oBrowse.setTooltip(this.getButtonText() || this.getBrowseText());
+		}else {
 			this.oBrowse.setText(this.getButtonText() || this.getBrowseText());
 			this.oBrowse.setTooltip("");
 		}
@@ -680,7 +658,7 @@ sap.ui.define([
 	 * Ensures that FileUploader's internal button will have a reference back to the labels, by which
 	 * the FileUploader is labelled
 	 *
-	 * @returns {this} For chaining
+	 * @returns {sap.ui.unified.FileUploader} For chaining
 	 * @private
 	 */
 	FileUploader.prototype._ensureBackwardsReference = function () {
@@ -703,7 +681,6 @@ sap.ui.define([
 		// Compatibility issue: converting the given types to an array in case it is a string
 		var aTypes = this._convertTypesToArray(vTypes);
 		this.setProperty("fileType", aTypes, false);
-		this._rerenderInputField();
 		return this;
 	};
 
@@ -711,28 +688,7 @@ sap.ui.define([
 		// Compatibility issue: converting the given types to an array in case it is a string
 		var aTypes = this._convertTypesToArray(vTypes);
 		this.setProperty("mimeType", aTypes, false);
-		this._rerenderInputField();
 		return this;
-	};
-
-	FileUploader.prototype.setMultiple = function(bMultiple) {
-		this.setProperty("multiple", bMultiple, false);
-		this._rerenderInputField();
-		return this;
-	};
-
-	FileUploader.prototype._rerenderInputField = function() {
-		if (this.oFileUpload) {
-			var aFiles = this.oFileUpload.files;
-			this._clearInputField();
-			this._prepareFileUpload();
-
-			// Register change event listener for the new input field
-			jQuery(this.oFileUpload).on("change", this.handlechange.bind(this));
-			// Reattach files to the input field if already selected
-			/*eslint strict: [2, "never"]*/
-			this.oFileUpload.files = aFiles;
-		}
 	};
 
 	FileUploader.prototype.setTooltip = function(oTooltip) {
@@ -822,12 +778,7 @@ sap.ui.define([
 		var sTooltip = this.getTooltip_AsString(),
 			sPlaceholder = this.getPlaceholder(),
 			sValue = this.getValue(),
-			bIsRequired = LabelEnablement.isRequired(this),
 			sAccDescription = "";
-
-		if (bIsRequired) {
-			sAccDescription += sap.ui.getCore().getLibraryResourceBundle("sap.ui.unified").getText("FILEUPLOAD_REQUIRED") + " ";
-		}
 
 		if (sTooltip) {
 			sAccDescription += sTooltip + " ";
@@ -851,7 +802,7 @@ sap.ui.define([
 	 * what's visible on the screen.
 	 */
 	FileUploader.prototype._updateAccDescription = function () {
-		var oAccDescriptionHolder = this.getDomRef("AccDescr"),
+		var oAccDescriptionHolder = document.getElementById(this.getId() + "-AccDescr"),
 			sNewDescription = this._generateAccDescriptionText();
 
 		if (oAccDescriptionHolder) {
@@ -889,28 +840,11 @@ sap.ui.define([
 
 		// remove the IFRAME
 		if (this.oIFrameRef) {
-			jQuery(this.oIFrameRef).off();
+			jQuery(this.oIFrameRef).unbind();
 			sap.ui.getCore().getStaticAreaRef().removeChild(this.oIFrameRef);
 			this.oIFrameRef = null;
 		}
 
-		if (this.oFileUpload) {
-			this._clearInputField();
-		}
-
-		if (this.FUEl) {
-			this.FUEl = null;
-		}
-
-		if (this.FUDataEl) {
-			this.FUDataEl = null;
-		}
-	};
-
-	FileUploader.prototype._clearInputField = function() {
-		jQuery(this.oFileUpload).off();
-		this.oFileUpload.parentElement.removeChild(this.oFileUpload);
-		this.oFileUpload = null;
 	};
 
 	/**
@@ -918,16 +852,13 @@ sap.ui.define([
 	 * @private
 	 */
 	FileUploader.prototype.onBeforeRendering = function() {
+
 		// store the file uploader outside in the static area
 		var oStaticArea = sap.ui.getCore().getStaticAreaRef();
 		jQuery(this.oFileUpload).appendTo(oStaticArea);
 
-		if (!this.getName()) {
-			Log.warning("Name property is not set. Id would be used instead to identify the control on the server.", this);
-		}
-
 		// unbind the custom event handlers
-		jQuery(this.oFileUpload).off();
+		jQuery(this.oFileUpload).unbind();
 
 	};
 
@@ -937,7 +868,6 @@ sap.ui.define([
 	 * @private
 	 */
 	FileUploader.prototype.onAfterRendering = function() {
-
 		// prepare the file upload control and the upload iframe
 		this.prepareFileUploadAndIFrame();
 
@@ -945,22 +875,31 @@ sap.ui.define([
 		this._addLabelFeaturesToBrowse();
 
 		// event listener registration for change event
-		jQuery(this.oFileUpload).on("change", this.handlechange.bind(this));
+		jQuery(this.oFileUpload).change(jQuery.proxy(this.handlechange, this));
 
 		if (!this.bMobileLib) {
 			this.oFilePath.$().attr("tabindex", "-1");
 		} else {
 			this.oFilePath.$().find('input').attr("tabindex", "-1");
 		}
+		// in case of IE9 we prevent the browse button from being focused because the
+		// native file uploader requires the focus for catching the keyboard events
+		if ((!!Device.browser.internet_explorer && Device.browser.version == 9)) {
+			this.oBrowse.$().attr("tabindex", "-1");
+		}
+
+		if (LabelEnablement.isRequired(this)) {
+			this.oBrowse.$().attr("aria-required", "true");
+		}
 
 		setTimeout(this._recalculateWidth.bind(this), 0);
 
 		this.oFilePath.$().find('input').removeAttr("role").attr("aria-live", "polite");
 
-		if (this._submitAfterRendering) {
-			this._submitAndResetValue();
-			this._submitAfterRendering = false;
+		if (this.getValueState() == ValueState.Error) {
+			this.oBrowse.$().attr("aria-invalid", "true");
 		}
+
 	};
 
 
@@ -987,7 +926,7 @@ sap.ui.define([
 
 	FileUploader.prototype._recalculateWidth = function() {
 		// calculation of the width of the overlay for the original file upload
-		// !Device.browser.msie check: only for non IE browsers since there we need
+		// !sap.ui.Device.browser.internet_explorer check: only for non IE browsers since there we need
 		// the button in front of the fileuploader
 		if (this.getWidth()) {
 			if (this.getButtonOnly() && this.oBrowse.getDomRef()) {
@@ -1034,7 +973,7 @@ sap.ui.define([
 				var _newWidth = $fp.outerWidth() - _buttonWidth;
 				if (_newWidth < 0) {
 					this.oFilePath.getDomRef().style.width = "0px";
-					if (this.oFileUpload) {
+					if (this.oFileUpload && !Device.browser.internet_explorer) {
 						this.oFileUpload.style.width = $b.outerWidth(true);
 					}
 				} else {
@@ -1073,22 +1012,24 @@ sap.ui.define([
 			Log.warning("Setting the valueState property with the combination of libraries used is not supported.", this);
 		}
 
-		var bControlFocused = containsOrEquals(this.getDomRef(), document.activeElement);
+		if (this.oBrowse.getDomRef()) {
+			if (sValueState == ValueState.Error) {
+				this.oBrowse.$().attr("aria-invalid", "true");
+			}else {
+				this.oBrowse.$().removeAttr("aria-invalid");
+			}
+		}
 
-		switch (sValueState) {
-			case ValueState.Error:
-			case ValueState.Warning:
-			case ValueState.Success:
-				this.oBrowse.addAssociation("ariaDescribedBy", this.oFilePath.getId() + "-message-sr");
-				if (bControlFocused) {
+		if (containsOrEquals(this.getDomRef(), document.activeElement)) {
+			switch (sValueState) {
+				case ValueState.Error:
+				case ValueState.Warning:
+				case ValueState.Success:
 					this.openValueStateMessage();
-				}
-				break;
-			default:
-				this.oBrowse.removeAssociation("ariaDescribedBy", this.oFilePath.getId() + "-message-sr");
-				if (bControlFocused) {
+					break;
+				default:
 					this.closeValueStateMessage();
-				}
+			}
 		}
 
 		return this;
@@ -1194,7 +1135,7 @@ sap.ui.define([
 	 * @public
 	 * @since 1.25.0
 	 * @ui5-metamodel This method also will be described in the UI5 (legacy) designtime metamodel
-	 * @returns {this} The <code>sap.ui.unified.FileUploader</code> instance
+	 * @returns {sap.ui.unified.FileUploader} The <code>sap.ui.unified.FileUploader</code> instance
 	 */
 	FileUploader.prototype.clear = function () {
 		var uploadForm = this.getDomRef("fu_form");
@@ -1243,16 +1184,16 @@ sap.ui.define([
 	};
 
 	FileUploader.prototype.sendFiles = function(aXhr, iIndex) {
-		var that = this;
-		var bAllPosted = true;
 
+		var that = this;
+
+		var bAllPosted = true;
 		for (var i = 0; i < aXhr.length; i++) {
 			if (!aXhr[i].bPosted) {
 				bAllPosted = false;
 				break;
 			}
 		}
-
 		if (bAllPosted) {
 			if (this.getSameFilenameAllowed() && this.getUploadOnChange()) {
 				that.setValue("", true);
@@ -1262,6 +1203,13 @@ sap.ui.define([
 
 		var oXhr = aXhr[iIndex];
 		var sFilename = oXhr.file.name ? oXhr.file.name : "MultipartFile";
+
+		if ((Device.browser.edge || Device.browser.internet_explorer) && oXhr.file.type && oXhr.xhr.readyState == 1) {
+			var sContentType = oXhr.file.type;
+			oXhr.xhr.setRequestHeader("Content-Type", sContentType);
+			oXhr.requestHeaders.push({name: "Content-Type", value: sContentType});
+		}
+
 		var oRequestHeaders = oXhr.requestHeaders;
 
 		var fnProgressListener = function(oProgressEvent) {
@@ -1348,16 +1296,11 @@ sap.ui.define([
 	 * @ui5-metamodel This method also will be described in the UI5 (legacy) designtime metamodel
 	 */
 	FileUploader.prototype.upload = function(bPreProcessFiles) {
-		var uploadForm,
-			sActionAttr;
-
 		//supress Upload if the FileUploader is not enabled
 		if (!this.getEnabled()) {
 			return;
 		}
-
-		uploadForm = this.getDomRef("fu_form");
-
+		var uploadForm = this.getDomRef("fu_form");
 		try {
 			this._bUploading = true;
 			if (this.getSendXHR() && window.File) {
@@ -1368,27 +1311,12 @@ sap.ui.define([
 					this._sendFilesWithXHR(aFiles);
 				}
 			} else if (uploadForm) {
-				// In order to do the submit, the action DOM attribute of the inner form should be accurate.
-				// If there is a change in the passed to the uploadUrl property string, we must ensure that it is
-				// applied in the DOM and the submit is performed after there is new rendering.
-				sActionAttr = uploadForm.getAttribute("action");
-				if (sActionAttr !== this.getUploadUrl()) {
-					this._submitAfterRendering = true;
-				} else {
-					this._submitAndResetValue();
-				}
+				uploadForm.submit();
+				this._resetValueAfterUploadStart();
 			}
 		} catch (oException) {
 			Log.error("File upload failed:\n" + oException.message);
 		}
-	};
-
-	FileUploader.prototype._submitAndResetValue = function() {
-		var uploadForm = this.getDomRef("fu_form");
-
-		uploadForm.submit();
-		this.fireUploadStart();
-		this._resetValueAfterUploadStart();
 	};
 
 	/**
@@ -1451,12 +1379,16 @@ sap.ui.define([
 		}
 	};
 
+	FileUploader.prototype.onkeypress = function(oEvent) {
+		this.onkeydown(oEvent);
+	};
+
 	FileUploader.prototype.onclick = function(oEvent) {
 		if (this.getSameFilenameAllowed() && this.getEnabled()) {
 			this.setValue("", true);
 		}
 		//refocus the Button, except bSupressFocus is set
-		if (this.oBrowse.getDomRef() && (Device.browser.safari || containsOrEquals(this.getDomRef(), document.activeElement))) {
+		if (this.oBrowse.getDomRef() && containsOrEquals(this.getDomRef(), document.activeElement)) {
 			this.oBrowse.focus();
 		}
 	};
@@ -1471,54 +1403,36 @@ sap.ui.define([
 		if (this.getSameFilenameAllowed() && this.getUploadOnChange()) {
 			this.setValue("", true);
 		}
-		var iKeyCode = oEvent.keyCode;
-		if (iKeyCode === KeyCodes.ENTER) {
-			// consider to always put the focus on the hidden file uploader
-			// and let the fileuploader manage the keyboard interaction
+		var iKeyCode = oEvent.keyCode,
+			eKC = KeyCodes;
+		if (iKeyCode == eKC.DELETE || iKeyCode == eKC.BACKSPACE) {
 			if (this.oFileUpload) {
+				this.setValue("", true);
+			}
+		} else if (iKeyCode == eKC.SPACE || iKeyCode == eKC.ENTER) {
+			// this does not work for IE9 and downwards! TODO: check with IE10/11
+			// consider to always put the focus on the hidden file uploader
+			// and let the fileuploader manager the keyboard interaction
+			if (!(!!Device.browser.internet_explorer && Device.browser.version <= 9) && this.oFileUpload) {
 				this.oFileUpload.click();
 				oEvent.preventDefault();
 				oEvent.stopPropagation();
 			}
-		}
-
-		this.oBrowse._bPressedSpace = false;
-	};
-
-	FileUploader.prototype.onkeyup = function(oEvent) {
-		if (!this.getEnabled()) {
-			return;
-		}
-		if (this.getSameFilenameAllowed() && this.getUploadOnChange()) {
-			this.setValue("", true);
-		}
-		var iKeyCode = oEvent.keyCode,
-			eKC = KeyCodes;
-		if (iKeyCode === eKC.DELETE || iKeyCode === eKC.BACKSPACE) {
-			if (this.oFileUpload) {
-				this.setValue("", true);
-			}
-		} else if (iKeyCode === eKC.SPACE) {
-			this.oFileUpload.click();
-			oEvent.preventDefault();
-			oEvent.stopPropagation();
-		} else if (iKeyCode !== eKC.TAB &&
-					iKeyCode !== eKC.SHIFT &&
-					iKeyCode !== eKC.F6 &&
-					iKeyCode !== eKC.PAGE_UP &&
-					iKeyCode !== eKC.PAGE_DOWN &&
-					iKeyCode !== eKC.ESCAPE &&
-					iKeyCode !== eKC.END &&
-					iKeyCode !== eKC.HOME &&
-					iKeyCode !== eKC.ARROW_LEFT &&
-					iKeyCode !== eKC.ARROW_UP &&
-					iKeyCode !== eKC.ARROW_RIGHT &&
-					iKeyCode !== eKC.ARROW_DOWN) {
+		} else if (iKeyCode != eKC.TAB &&
+					iKeyCode != eKC.SHIFT &&
+					iKeyCode != eKC.F6 &&
+					iKeyCode != eKC.PAGE_UP &&
+					iKeyCode != eKC.PAGE_DOWN &&
+					iKeyCode != eKC.ESCAPE &&
+					iKeyCode != eKC.END &&
+					iKeyCode != eKC.HOME &&
+					iKeyCode != eKC.ARROW_LEFT &&
+					iKeyCode != eKC.ARROW_UP &&
+					iKeyCode != eKC.ARROW_RIGHT &&
+					iKeyCode != eKC.ARROW_DOWN) {
 			oEvent.preventDefault();
 			oEvent.stopPropagation();
 		}
-
-		this.oBrowse._bPressedSpace = false;
 	};
 
 	/**
@@ -1598,13 +1512,14 @@ sap.ui.define([
 			// returning the filename only - we strip this path now
 			var sValue = this.oFileUpload.value || "";
 			var iIndex = sValue.lastIndexOf("\\");
-
 			if (iIndex >= 0) {
 				sValue = sValue.substring(iIndex + 1);
 			}
-
 			if (this.getMultiple()) {
-				sValue = sFileString;
+				//multiple is not supported in IE <= 9
+				if (!(Device.browser.internet_explorer && Device.browser.version <= 9)) {
+					sValue = sFileString;
+				}
 			}
 
 			//sValue has to be filled to avoid clearing the FilePath by pressing cancel
@@ -1650,7 +1565,7 @@ sap.ui.define([
 					requestHeaders: []
 				};
 				this._aXhr.push(oXhrEntry);
-				oXhrEntry.xhr.open(this.getHttpRequestMethod(), this.getUploadUrl(), true);
+				oXhrEntry.xhr.open("POST", this.getUploadUrl(), true);
 				if (oXHRSettings) {
 					oXhrEntry.xhr.withCredentials = oXHRSettings.getWithCredentials();
 				}
@@ -1765,8 +1680,10 @@ sap.ui.define([
 
 		for (var i = 0; i < aFiles.length; i++) {
 			sName = aFiles[i].name;
-			sType = aFiles[i].type || "unknown";
-
+			sType = aFiles[i].type;
+			if (!sType) {
+				sType = "unknown";
+			}
 			var fSize = ((aFiles[i].size / 1024) / 1024);
 			if (fMaxSize && (fSize > fMaxSize)) {
 				Log.info("File: " + sName + " is of size " + fSize + " MB which exceeds the file size limit of " + fMaxSize + " MB.");
@@ -1799,11 +1716,11 @@ sap.ui.define([
 						bWrongMime = false;
 					}
 				}
-				if (bWrongMime && sType !== "unknown") {
+				if (bWrongMime && !(sType === "unknown" && (Device.browser.edge || Device.browser.msie))) {
 					Log.info("File: " + sName + " is of type " + sType + ". Allowed types are: "  + aMimeTypes + ".");
 					this.fireTypeMissmatch({
-						fileName: sName,
-						mimeType: sType
+						fileName:sName,
+						mimeType:sType
 					});
 
 					return false;
@@ -1894,42 +1811,9 @@ sap.ui.define([
 	 * @private
 	 */
 	FileUploader.prototype.prepareFileUploadAndIFrame = function() {
-		this._prepareFileUpload();
 
-		if (!this.oIFrameRef) {
-			// create the upload iframe
-			var oIFrameRef = document.createElement("iframe");
-			oIFrameRef.style.display = "none";
-			/*eslint-enable no-script-url */
-			oIFrameRef.id = this.getId() + "-frame";
-			sap.ui.getCore().getStaticAreaRef().appendChild(oIFrameRef);
-			oIFrameRef.contentWindow.name = this.getId() + "-frame";
-
-			// sink the load event of the upload iframe
-			this._bUploading = false; // flag for uploading
-			jQuery(oIFrameRef).on("load", function(oEvent) {
-				if (this._bUploading) {
-					Log.info("File uploaded to " + this.getUploadUrl());
-					var sResponse;
-					try {
-						sResponse = this.oIFrameRef.contentWindow.document.body.innerHTML;
-					} catch (ex) {
-						// in case of cross-domain submit we get a permission denied exception
-						// when we try to access the body of the IFrame document
-					}
-					this.fireUploadComplete({"response": sResponse});
-					this._bUploading = false;
-				}
-			}.bind(this));
-
-			// keep the reference
-			this.oIFrameRef = oIFrameRef;
-
-		}
-	};
-
-	FileUploader.prototype._prepareFileUpload = function() {
 		if (!this.oFileUpload) {
+
 			// create the file uploader markup
 			var aFileUpload = [];
 			aFileUpload.push('<input ');
@@ -1937,24 +1821,31 @@ sap.ui.define([
 			aFileUpload.push('aria-hidden="true" ');
 			if (this.getName()) {
 				if (this.getMultiple()) {
-					aFileUpload.push('name="' + encodeXML(this.getName()) + '[]" ');
+					//multiple is not supported in IE <= 9
+					if (!(Device.browser.internet_explorer && Device.browser.version <= 9)) {
+						aFileUpload.push('name="' + encodeXML(this.getName()) + '[]" ');
+					}
 				} else {
 					aFileUpload.push('name="' + encodeXML(this.getName()) + '" ');
 				}
 			} else {
 				if (this.getMultiple()) {
-					aFileUpload.push('name="' + this.getId() + '[]" ');
+					//multiple is not supported in IE <= 9
+					if (!(Device.browser.internet_explorer && Device.browser.version <= 9)) {
+						aFileUpload.push('name="' + this.getId() + '[]" ');
+					}
 				} else {
 					aFileUpload.push('name="' + this.getId() + '" ');
 				}
 			}
 			aFileUpload.push('id="' + this.getId() + '-fu" ');
-			// for IE9 the file uploader itself gets the focus to make sure that the
-			// keyboard interaction works and there is no security issue - unfortunately
-			// this has the negative side effect that 2 tabs are required.
-			aFileUpload.push('tabindex="-1" ');
+			if (!(!!Device.browser.internet_explorer && Device.browser.version == 9)) {
+				// for IE9 the file uploader itself gets the focus to make sure that the
+				// keyboard interaction works and there is no security issue - unfortunately
+				// this has the negative side effect that 2 tabs are required.
+				aFileUpload.push('tabindex="-1" ');
+			}
 			aFileUpload.push('size="1" ');
-
 			if (this.getTooltip_AsString() ) {
 				aFileUpload.push('title="' + encodeXML(this.getTooltip_AsString()) + '" ');
 			//} else if (this.getTooltip() ) {
@@ -1963,27 +1854,66 @@ sap.ui.define([
 				// only if there is no tooltip, then set value as fallback
 				aFileUpload.push('title="' + encodeXML(this.getValue()) + '" ');
 			}
-
 			if (!this.getEnabled()) {
 				aFileUpload.push('disabled="disabled" ');
 			}
-
 			if (this.getMultiple()) {
-				aFileUpload.push('multiple ');
+				//multiple is not supported in IE <= 9
+				if (!(Device.browser.internet_explorer && Device.browser.version <= 9)) {
+					aFileUpload.push('multiple ');
+				}
 			}
-
 			if ((this.getMimeType() || this.getFileType()) && window.File) {
-				var sAcceptedTypes = this._getAcceptedTypes();
+				var aMimeTypes = this.getMimeType() || [];
+				var aFileTypes = this.getFileType() || [];
+				aFileTypes = aFileTypes.map(function(item) {
+					return item.indexOf(".") === 0 ? item : "." + item;
+				});
+				var sAcceptedTypes = aFileTypes.concat(aMimeTypes).join(",");
 				aFileUpload.push('accept="' + encodeXML(sAcceptedTypes) + '" ');
 			}
 			aFileUpload.push('>');
 
 			// add it into the control markup
 			this.oFileUpload = jQuery(aFileUpload.join("")).prependTo(this.$().find(".sapUiFupInputMask")).get(0);
+
 		} else {
 
 			// move the file uploader from the static area to the control markup
 			jQuery(this.oFileUpload).prependTo(this.$().find(".sapUiFupInputMask"));
+
+		}
+
+		if (!this.oIFrameRef) {
+
+			// create the upload iframe
+			var oIFrameRef = document.createElement("iframe");
+			oIFrameRef.style.display = "none";
+			/*eslint-enable no-script-url */
+			oIFrameRef.id = this.sId + "-frame";
+			sap.ui.getCore().getStaticAreaRef().appendChild(oIFrameRef);
+			oIFrameRef.contentWindow.name = this.sId + "-frame";
+
+			// sink the load event of the upload iframe
+			var that = this;
+			this._bUploading = false; // flag for uploading
+			jQuery(oIFrameRef).on( "load", function(oEvent) {
+				if (that._bUploading) {
+					Log.info("File uploaded to " + that.getUploadUrl());
+					var sResponse;
+					try {
+						sResponse = that.oIFrameRef.contentWindow.document.body.innerHTML;
+					} catch (ex) {
+						// in case of cross-domain submit we get a permission denied exception
+						// when we try to access the body of the IFrame document
+					}
+					that.fireUploadComplete({"response": sResponse});
+					that._bUploading = false;
+				}
+			});
+
+			// keep the reference
+			this.oIFrameRef = oIFrameRef;
 
 		}
 	};
@@ -1992,6 +1922,7 @@ sap.ui.define([
 
 		if (this.oFilePath.openValueStateMessage) {
 			this.oFilePath.openValueStateMessage();
+			this.oBrowse.$().addAriaDescribedBy(this.oFilePath.getId() + "-message");
 		}
 
 	};
@@ -2000,17 +1931,9 @@ sap.ui.define([
 
 		if (this.oFilePath.closeValueStateMessage) {
 			this.oFilePath.closeValueStateMessage();
+			this.oBrowse.$().removeAriaDescribedBy(this.oFilePath.getId() + "-message");
 		}
 
-	};
-
-	FileUploader.prototype._getAcceptedTypes = function() {
-		var aMimeTypes = this.getMimeType() || [],
-			aFileTypes = this.getFileType() || [];
-		aFileTypes = aFileTypes.map(function(item) {
-			return item.indexOf(".") === 0 ? item : "." + item;
-		});
-		return aFileTypes.concat(aMimeTypes).join(",");
 	};
 
 	FileUploader.prototype._resetValueAfterUploadStart = function () {
@@ -2028,7 +1951,7 @@ sap.ui.define([
 		if (this.oBrowse &&  this.oBrowse.$().length) {
 			$browse = this.oBrowse.$();
 			$browse.attr("type', 'button"); // The default type of button is submit that's why on click of label there are submit of the form. This way we are avoiding the submit of form.
-			$browse.off("click").on("click", function(e) {
+			$browse.click(function(e) {
 				e.preventDefault();
 				this.FUEl.click(); // The default behaviour on click on label is to open "open file" dialog. The only way to attach click event that is transferred from the label to the button is this way. AttachPress and attachTap don't work in this case.
 			}.bind(this));
@@ -2045,8 +1968,8 @@ sap.ui.define([
 	 *
 	 * This is a default implementation of the interface <code>sap.ui.unified.IProcessableBlobs</code>.
 	 *
-	 * @public
-	 * @since 1.52
+         * @public
+         * @since 1.52
 	 * @param {Blob[]} aBlobs The initial Blobs which can be used to determine/calculate a new array of Blobs for further processing.
 	 * @return {Promise} A Promise that resolves with an array of Blobs which is used for the final uploading.
 	 */
@@ -2056,40 +1979,6 @@ sap.ui.define([
 		});
 	};
 
-	// If the file has been edited after it has been chosen,
-	// Chrome 85 fails silently on submit, so we could
-	// check if it is readable first.
-	// https://stackoverflow.com/questions/61916331
-	// BCP: 2070313680
-
-	/**
-	 * Checks if the chosen file is readable.
-	 *
-	 * @returns {Promise} A promise that resolves successfully if the
-	 * chosen file can be read and fails with an error message
-	 * if it cannot
-	 * @public
-	 */
-	FileUploader.prototype.checkFileReadable = function() {
-		return new Promise(function(resolve, reject) {
-			var oReader;
-
-			if (window.File && this.FUEl && this.FUEl.files.length) {
-				var oReader = new FileReader();
-				oReader.readAsArrayBuffer(this.FUEl.files[0].slice(0, 1));
-
-				oReader.onload = function() {
-					resolve();
-				};
-
-				oReader.onerror = function() {
-					reject(oReader.error);
-				};
-			} else {
-				resolve();
-			}
-		}.bind(this));
-	};
 
 	return FileUploader;
 

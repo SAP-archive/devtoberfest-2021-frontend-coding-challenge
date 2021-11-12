@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -17,14 +17,6 @@ sap.ui.define([],
 		apiVersion: 2
 	};
 
-	// Holds the possible values for the "_currentPicker" property.
-	var CURRENT_PICKERS = {
-		MONTH: "month", // represents the "month" aggregation
-		MONTH_PICKER: "monthPicker",  // represents the "monthPicker" aggregation
-		YEAR_PICKER: "yearPicker",  // represents the "yearPicker" aggregation
-		YEAR_RANGE_PICKER: "yearRangePicker"  // represents the "yearRangePicker" aggregation
-	};
-
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
 	 *
@@ -33,13 +25,12 @@ sap.ui.define([],
 	 */
 	CalendarRenderer.render = function(oRm, oCal){
 
-		var sId = oCal.getId(),
-			sTooltip = oCal.getTooltip_AsString(),
-			aMonths = oCal.getAggregation("month"),
-			sCurrentPicker = oCal.getProperty("_currentPicker"),
-			sWidth = oCal.getWidth(),
-			rb = sap.ui.getCore().getLibraryResourceBundle("sap.ui.unified"),
-			mAccProps = {labelledby: {value: "", append: false}};
+		oCal._iMode = 0; // it's rendered always as DayPicker
+
+		var sId = oCal.getId();
+		var sTooltip = oCal.getTooltip_AsString();
+		var aMonths = oCal.getAggregation("month");
+		var sWidth = oCal.getWidth();
 
 		oRm.openStart("div", oCal);
 		oRm.class("sapUiCal");
@@ -47,6 +38,12 @@ sap.ui.define([],
 			oRm.class("sapUiCalMulti");
 		}
 
+		var rb = sap.ui.getCore().getLibraryResourceBundle("sap.ui.unified");
+		var mAccProps = {labelledby: {value: "", append: false}}; // render on Month
+		if (oCal._bPoupupMode) {
+			mAccProps.role = "dialog";
+			mAccProps.modal = true;
+		}
 		oRm.accessibilityState(oCal, mAccProps);
 
 		if (sTooltip) {
@@ -71,35 +68,24 @@ sap.ui.define([],
 		var oHeader = oCal.getAggregation("header");
 		oRm.renderControl(oHeader);
 
+		var iMonthsCount = aMonths.length;
 		oRm.openStart("div", sId + "-content");
 		oRm.class("sapUiCalContent");
 		oRm.openEnd();
-
-		if (oCal.getMonths() > 1) { // in case of more than 1 month - render them below the actual picker
-			switch (sCurrentPicker) {
-				case CURRENT_PICKERS.MONTH_PICKER: // month picker
-				case CURRENT_PICKERS.YEAR_PICKER: // year picker
-				case CURRENT_PICKERS.YEAR_RANGE_PICKER: // year picker
-					this.renderMonths(oRm, oCal, aMonths);
-					this.renderCalContentOverlay(oRm, oCal, sId);
-					break;
-				// no default
+		for (var i = 0; i < iMonthsCount; i++) {
+			var oMonth = aMonths[i];
+			oRm.renderControl(oMonth);
+			if (iMonthsCount === 2 && i === 0) {
+				oRm.renderControl(oCal.getAggregation("secondMonthHeader"));
 			}
 		}
-		switch (sCurrentPicker) {
-			case CURRENT_PICKERS.MONTH: // month picker
-				this.renderMonths(oRm, oCal, aMonths);
-				break;
-			case CURRENT_PICKERS.MONTH_PICKER: // month picker
-				oRm.renderControl(oCal._getMonthPicker());
-				break;
-			case CURRENT_PICKERS.YEAR_PICKER: // year picker
-				oRm.renderControl(oCal._getYearPicker());
-				break;
-			case CURRENT_PICKERS.YEAR_RANGE_PICKER: // year picker
-				oRm.renderControl(oCal._getYearRangePicker());
-				break;
-			// no default
+
+		this.renderCalContentOverlay(oRm, oCal, sId);
+
+		if (!oCal._bNamesLengthChecked) {
+			// render MonthPicker to check month names length
+			var oMonthPicker = oCal.getAggregation("monthPicker");
+			oRm.renderControl(oMonthPicker);
 		}
 
 		oRm.close("div");
@@ -130,18 +116,10 @@ sap.ui.define([],
 		oRm.close("div");
 	};
 
-	CalendarRenderer.renderMonths = function(oRm, oCal, aMonths) {
-		aMonths.forEach(function(oMonth, iIndex) {
-			oRm.renderControl(oMonth);
-			if (aMonths.length === 2 && iIndex === 0) {
-				oRm.renderControl(oCal.getAggregation("secondMonthHeader"));
-			}
-		});
-	};
-
 	CalendarRenderer.renderCalContentOverlay = function(oRm, oCal, sId) {
 		oRm.openStart("div", sId + "-contentOver");
 		oRm.class("sapUiCalContentOver");
+		oRm.style("display", "none");
 		oRm.openEnd();
 		oRm.close("div");
 	};

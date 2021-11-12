@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -17,10 +17,9 @@ sap.ui.define([
 	/**
 	 * Creates the base class for the metadata converters.
 	 *
-	 * @alias sap.ui.model.odata.v4.lib._MetadataConverter
 	 * @constructor
 	 */
-	function _MetadataConverter() {
+	function MetadataConverter() {
 		this.aliases = {}; // maps alias -> namespace
 		this.oAnnotatable = null; // the current annotatable, see function annotatable
 		this.entityContainer = null; // the current EntityContainer
@@ -38,11 +37,11 @@ sap.ui.define([
 	/**
 	 * A pattern for "Collection(QualifiedType)"
 	 */
-	_MetadataConverter.prototype.rCollection = /^Collection\((.*)\)$/;
+	MetadataConverter.prototype.rCollection = /^Collection\((.*)\)$/;
 
 	// namespaces
-	_MetadataConverter.prototype.sEdmNamespace = "http://docs.oasis-open.org/odata/ns/edm";
-	_MetadataConverter.prototype.sEdmxNamespace = "http://docs.oasis-open.org/odata/ns/edmx";
+	MetadataConverter.prototype.sEdmNamespace = "http://docs.oasis-open.org/odata/ns/edm";
+	MetadataConverter.prototype.sEdmxNamespace = "http://docs.oasis-open.org/odata/ns/edmx";
 
 	/**
 	 * Adds a name/value pair with the given qualified name and given value to the result. Warns
@@ -53,7 +52,7 @@ sap.ui.define([
 	 * @param {any} vValue
 	 *   Value
 	 */
-	_MetadataConverter.prototype.addToResult = function (sQualifiedName, vValue) {
+	MetadataConverter.prototype.addToResult = function (sQualifiedName, vValue) {
 		if (sQualifiedName in this.result) {
 			Log.warning("Duplicate qualified name " + sQualifiedName, undefined, sClassName);
 		}
@@ -74,7 +73,7 @@ sap.ui.define([
 	 * @param {string} [sQualifier]
 	 *   The qualifier for all annotations
 	 */
-	_MetadataConverter.prototype.annotatable = function (vTarget, sPrefix, sQualifier) {
+	MetadataConverter.prototype.annotatable = function (vTarget, sPrefix, sQualifier) {
 		var oAnnotatable,
 			oAnnotations,
 			sPath;
@@ -115,7 +114,7 @@ sap.ui.define([
 	 * @returns {object}
 	 *   The metadata JSON
 	 */
-	_MetadataConverter.prototype.convertXMLMetadata = function (oDocument, sUrl) {
+	MetadataConverter.prototype.convertXMLMetadata = function (oDocument, sUrl) {
 		var oElement;
 
 		Measurement.average("convertXMLMetadata", "",
@@ -144,8 +143,7 @@ sap.ui.define([
 	 * Finalizes the conversion after having traversed the XML completely.
 	 *
 	 * @abstract
-	 * @function
-	 * @name sap.ui.model.odata.v4.lib._MetadataConverter#finalize
+	 * @name MetadataConverter#finalize
 	 */
 
 	/**
@@ -159,8 +157,8 @@ sap.ui.define([
 	 * @returns {any}
 	 *   The value for the JSON
 	 */
-	_MetadataConverter.prototype.getAnnotationValue = function (sType, sValue) {
-		var vValue, aValues, i;
+	MetadataConverter.prototype.getAnnotationValue = function (sType, sValue) {
+		var i, vValue, aValues;
 
 		switch (sType) {
 			case "AnnotationPath":
@@ -210,11 +208,11 @@ sap.ui.define([
 	 * @returns {any}
 	 *   The value for the JSON
 	 */
-	_MetadataConverter.prototype.getInlineAnnotationValue = function (oElement) {
+	MetadataConverter.prototype.getInlineAnnotationValue = function (oElement) {
 		var oAttribute,
 			oAttributeList = oElement.attributes,
-			vValue,
-			i;
+			i,
+			vValue;
 
 		// check the last attribute first, this is typically the one with the annotation value
 		for (i = oAttributeList.length - 1; i >= 0; i -= 1) {
@@ -234,7 +232,7 @@ sap.ui.define([
 	 * @param {string} sProperty The property name
 	 * @returns {any[]} The array at the given property
 	 */
-	_MetadataConverter.prototype.getOrCreateArray = function (oParent, sProperty) {
+	MetadataConverter.prototype.getOrCreateArray = function (oParent, sProperty) {
 		var oResult = oParent[sProperty];
 
 		if (!oResult) {
@@ -250,7 +248,7 @@ sap.ui.define([
 	 * @param {string} sProperty The property name
 	 * @returns {object} The object at the given property
 	 */
-	_MetadataConverter.prototype.getOrCreateObject = function (oParent, sProperty) {
+	MetadataConverter.prototype.getOrCreateObject = function (oParent, sProperty) {
 		var oResult = oParent[sProperty];
 
 		if (!oResult) {
@@ -266,7 +264,7 @@ sap.ui.define([
 	 * @param {Element} oElement The element
 	 * @param {any[]} aResult The results from child elements
 	 */
-	_MetadataConverter.prototype.postProcessAnnotation = function (oElement, aResult) {
+	MetadataConverter.prototype.postProcessAnnotation = function (oElement, aResult) {
 		// this.oAnnotatable is the Annotation itself currently.
 		var oAnnotatable = this.oAnnotatable.parent;
 
@@ -281,7 +279,7 @@ sap.ui.define([
 	 * @param {any[]} aResult The results from child elements
 	 * @returns {object} The value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessApply = function (oElement, aResult) {
+	MetadataConverter.prototype.postProcessApply = function (oElement, aResult) {
 		var oResult = this.oAnnotatable.target;
 
 		oResult.$Apply = aResult;
@@ -296,7 +294,7 @@ sap.ui.define([
 	 * @param {any[]} aResult The results from child elements
 	 * @returns {object} The value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessCastOrIsOf = function (oElement, aResult) {
+	MetadataConverter.prototype.postProcessCastOrIsOf = function (oElement, aResult) {
 		var sName = oElement.localName,
 			oResult = this.oAnnotatable.target;
 
@@ -309,11 +307,11 @@ sap.ui.define([
 	/**
 	 * Post-processing of a Collection element.
 	 *
-	 * @param {Element} _oElement The element
+	 * @param {Element} oElement The element
 	 * @param {any[]} aResult The results from child elements
 	 * @returns {object} The value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessCollection = function (_oElement, aResult) {
+	MetadataConverter.prototype.postProcessCollection = function (oElement, aResult) {
 		return aResult;
 	};
 
@@ -324,7 +322,7 @@ sap.ui.define([
 	 * @param {any[]} aResult The results from child elements
 	 * @returns {any} The value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessLabeledElement = function (oElement, aResult) {
+	MetadataConverter.prototype.postProcessLabeledElement = function (oElement, aResult) {
 		var oResult = this.oAnnotatable.target;
 
 		oResult.$LabeledElement = aResult.length ? aResult[0] :
@@ -337,10 +335,10 @@ sap.ui.define([
 	 * Post-processing of a LabeledElementReference element within an Annotation element.
 	 *
 	 * @param {Element} oElement The element
-	 * @param {any[]} _aResult The results from child elements
+	 * @param {any[]} aResult The results from child elements
 	 * @returns {any} The value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessLabeledElementReference = function (oElement, _aResult) {
+	MetadataConverter.prototype.postProcessLabeledElementReference = function (oElement, aResult) {
 		return {
 			"$LabeledElementReference" : this.resolveAlias(oElement.textContent)
 		};
@@ -350,21 +348,21 @@ sap.ui.define([
 	 * Post-processing of a leaf element within an Annotation element.
 	 *
 	 * @param {Element} oElement The element
-	 * @param {any[]} _aResult The results from child elements
+	 * @param {any[]} aResult The results from child elements
 	 * @returns {any} The constant value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessLeaf = function (oElement, _aResult) {
+	MetadataConverter.prototype.postProcessLeaf = function (oElement, aResult) {
 		return this.getAnnotationValue(oElement.localName, oElement.textContent);
 	};
 
 	/**
 	 * Post-processing of a Not element within an Annotation element.
 	 *
-	 * @param {Element} _oElement The element
+	 * @param {Element} oElement The element
 	 * @param {any[]} aResult The results from child elements
 	 * @returns {object} The value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessNot = function (_oElement, aResult) {
+	MetadataConverter.prototype.postProcessNot = function (oElement, aResult) {
 		var oResult = this.oAnnotatable.target;
 
 		oResult.$Not = aResult[0];
@@ -374,11 +372,11 @@ sap.ui.define([
 	/**
 	 * Post-processing of a Null element within an Annotation element.
 	 *
-	 * @param {Element} _oElement The element
-	 * @param {any[]} _aResult The results from child elements
+	 * @param {Element} oElement The element
+	 * @param {any[]} aResult The results from child elements
 	 * @returns {object} The value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessNull = function (_oElement, _aResult) {
+	MetadataConverter.prototype.postProcessNull = function (oElement, aResult) {
 		var oAnnotatable = this.oAnnotatable,
 			vResult = null;
 
@@ -396,7 +394,7 @@ sap.ui.define([
 	 * @param {any[]} aResult The results from child elements
 	 * @returns {object} The value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessOperation = function (oElement, aResult) {
+	MetadataConverter.prototype.postProcessOperation = function (oElement, aResult) {
 		var oResult = this.oAnnotatable.target;
 
 		oResult["$" + oElement.localName] = aResult;
@@ -410,7 +408,7 @@ sap.ui.define([
 	 * @param {any[]} aResult The results from child elements
 	 * @returns {any} The value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessPropertyValue = function (oElement, aResult) {
+	MetadataConverter.prototype.postProcessPropertyValue = function (oElement, aResult) {
 		return {
 			property : oElement.getAttribute("Property"),
 			value : aResult.length ? aResult[0] : this.getInlineAnnotationValue(oElement)
@@ -424,11 +422,11 @@ sap.ui.define([
 	 * @param {any[]} aResult The results from child elements
 	 * @returns {object} The value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessRecord = function (oElement, aResult) {
-		var oPropertyValue,
+	MetadataConverter.prototype.postProcessRecord = function (oElement, aResult) {
+		var i,
+			oPropertyValue,
 			oResult = this.oAnnotatable.target,
-			oType = oElement.getAttribute("Type"),
-			i;
+			oType = oElement.getAttribute("Type");
 
 		if (oType) {
 			oResult.$Type = this.resolveAlias(oType);
@@ -443,11 +441,11 @@ sap.ui.define([
 	/**
 	 * Post-processing of a UrlRef element within an Annotation element.
 	 *
-	 * @param {Element} _oElement The element
+	 * @param {Element} oElement The element
 	 * @param {any[]} aResult The results from child elements
 	 * @returns {object} The constant value for the JSON
 	 */
-	_MetadataConverter.prototype.postProcessUrlRef = function (_oElement, aResult) {
+	MetadataConverter.prototype.postProcessUrlRef = function (oElement, aResult) {
 		return {$UrlRef : aResult[0]};
 	};
 
@@ -456,7 +454,7 @@ sap.ui.define([
 	 *
 	 * @param {Element} oElement The element
 	 */
-	_MetadataConverter.prototype.processAlias = function (oElement) {
+	MetadataConverter.prototype.processAlias = function (oElement) {
 		var sAlias = oElement.getAttribute("Alias");
 
 		if (sAlias) {
@@ -467,9 +465,9 @@ sap.ui.define([
 	/**
 	 * Processes an element of an annotatable expression.
 	 *
-	 * @param {Element} _oElement The element
+	 * @param {Element} oElement The element
 	 */
-	_MetadataConverter.prototype.processAnnotatableExpression = function (_oElement) {
+	MetadataConverter.prototype.processAnnotatableExpression = function (oElement) {
 		this.annotatable({});
 	};
 
@@ -478,7 +476,7 @@ sap.ui.define([
 	 *
 	 * @param {Element} oElement The element
 	 */
-	_MetadataConverter.prototype.processAnnotation = function (oElement) {
+	MetadataConverter.prototype.processAnnotation = function (oElement) {
 		var oAnnotatable = this.oAnnotatable,
 			oAnnotations,
 			sQualifiedName = oAnnotatable.prefix + "@"
@@ -507,7 +505,7 @@ sap.ui.define([
 	 *
 	 * @param {Element} oElement The element
 	 */
-	_MetadataConverter.prototype.processAnnotations = function (oElement) {
+	MetadataConverter.prototype.processAnnotations = function (oElement) {
 		this.annotatable(this.resolveAliasInPath(oElement.getAttribute("Target"), true),
 			undefined, // no prefix
 			oElement.getAttribute("Qualifier"));
@@ -524,7 +522,7 @@ sap.ui.define([
 	 * @param {object} oConfig
 	 *   The configuration: a map from attribute name to a function to convert it
 	 */
-	_MetadataConverter.prototype.processAttributes = function (oElement, oTarget, oConfig) {
+	MetadataConverter.prototype.processAttributes = function (oElement, oTarget, oConfig) {
 		var sProperty;
 
 		for (sProperty in oConfig) {
@@ -544,8 +542,7 @@ sap.ui.define([
 	 * @param {function} [fnProcessor] The processor
 	 *
 	 * @abstract
-	 * @function
-	 * @name sap.ui.model.odata.v4.lib._MetadataConverter#processElement
+	 * @name MetadataConverter#processElement
 	 */
 
 	/**
@@ -553,7 +550,7 @@ sap.ui.define([
 	 *
 	 * @param {Element} oElement The element
 	 */
-	_MetadataConverter.prototype.processInclude = function (oElement) {
+	MetadataConverter.prototype.processInclude = function (oElement) {
 		var oInclude = this.getOrCreateArray(this.reference, "$Include");
 
 		oInclude.push(oElement.getAttribute("Namespace") + ".");
@@ -564,7 +561,7 @@ sap.ui.define([
 	 *
 	 * @param {Element} oElement The element
 	 */
-	_MetadataConverter.prototype.processIncludeAnnotations = function (oElement) {
+	MetadataConverter.prototype.processIncludeAnnotations = function (oElement) {
 		var oReference = this.reference,
 			oIncludeAnnotation = {
 				"$TermNamespace" : oElement.getAttribute("TermNamespace") + "."
@@ -586,7 +583,7 @@ sap.ui.define([
 	 *
 	 * @param {Element} oElement The element
 	 */
-	_MetadataConverter.prototype.processPropertyValue = function (oElement) {
+	MetadataConverter.prototype.processPropertyValue = function (oElement) {
 		this.annotatable(this.oAnnotatable.target, oElement.getAttribute("Property"));
 	};
 
@@ -595,7 +592,7 @@ sap.ui.define([
 	 *
 	 * @param {Element} oElement The element
 	 */
-	_MetadataConverter.prototype.processReference = function (oElement) {
+	MetadataConverter.prototype.processReference = function (oElement) {
 		var oReference = this.getOrCreateObject(this.result, "$Reference");
 
 		this.reference = oReference[oElement.getAttribute("Uri")] = {};
@@ -605,11 +602,11 @@ sap.ui.define([
 	/**
 	 * Resolves an alias in the given qualified name or full name.
 	 *
-	 * @param {string} [sName] The name
+	 * @param {string} sName The name
 	 * @returns {string} The name with the alias resolved (if there was one)
 	 */
-	_MetadataConverter.prototype.resolveAlias = function (sName) {
-		var iDot = sName ? sName.indexOf(".") : -1,
+	MetadataConverter.prototype.resolveAlias = function (sName) {
+		var iDot = sName.indexOf("."),
 			sNamespace;
 
 		if (iDot >= 0 && !sName.includes(".", iDot + 1)) { // if there is exactly one dot
@@ -630,7 +627,7 @@ sap.ui.define([
 	 * @param {string} sSegment The path segment
 	 * @returns {string} The path segment with aliases resolved (if there were any)
 	 */
-	_MetadataConverter.prototype.resolveAliasInParentheses = function (bHandleParentheses,
+	MetadataConverter.prototype.resolveAliasInParentheses = function (bHandleParentheses,
 			sSegment) {
 		var iParentheses = bHandleParentheses ? sSegment.indexOf("(") : -1;
 
@@ -650,12 +647,12 @@ sap.ui.define([
 	 * Resolves all aliases in the given path.
 	 *
 	 * @param {string} sPath The path
-	 * @param {boolean} [bHandleParentheses]
+	 * @param {boolean} [bHandleParentheses=false]
 	 *   Whether parentheses in a path segment should be handled specially for alias replacement,
 	 *   for example to address a bound action's specific overload
 	 * @returns {string} The path with aliases resolved (if there were any)
 	 */
-	_MetadataConverter.prototype.resolveAliasInPath = function (sPath, bHandleParentheses) {
+	MetadataConverter.prototype.resolveAliasInPath = function (sPath, bHandleParentheses) {
 		var iAt, sTerm = "";
 
 		if (!sPath.includes(".")) {
@@ -677,7 +674,7 @@ sap.ui.define([
 	 * @param {string} sValue The attribute value in the element
 	 * @returns {boolean} false or undefined
 	 */
-	_MetadataConverter.prototype.setIfFalse = function (sValue) {
+	MetadataConverter.prototype.setIfFalse = function (sValue) {
 		return sValue === "false" ? false : undefined;
 	};
 
@@ -688,7 +685,7 @@ sap.ui.define([
 	 * @param {string} sValue The attribute value in the element
 	 * @returns {boolean} true or undefined
 	 */
-	_MetadataConverter.prototype.setIfTrue = function (sValue) {
+	MetadataConverter.prototype.setIfTrue = function (sValue) {
 		return sValue === "true" ? true : undefined;
 	};
 
@@ -698,7 +695,7 @@ sap.ui.define([
 	 * @param {string} sValue The attribute value in the element
 	 * @returns {number} The value as number or undefined
 	 */
-	_MetadataConverter.prototype.setNumber = function (sValue) {
+	MetadataConverter.prototype.setNumber = function (sValue) {
 		return sValue ? parseInt(sValue) : undefined;
 	};
 
@@ -708,7 +705,7 @@ sap.ui.define([
 	 * @param {string} sValue The attribute value in the element
 	 * @returns {string} sValue
 	 */
-	_MetadataConverter.prototype.setValue = function (sValue) {
+	MetadataConverter.prototype.setValue = function (sValue) {
 		return sValue;
 	};
 
@@ -729,25 +726,26 @@ sap.ui.define([
 	 *     known children.
 	 *   * All other properties are known child elements, the value is the configuration for
 	 *     that child element.
-	 * @param {boolean} [bUseProcessElementHook]
+	 * @param {boolean} [bUseProcessElementHook=false]
 	 *   If true, the hook processElement at the aggregate is used, otherwise the processor is
 	 *   called directly
 	 * @returns {any}
 	 *   The return value from __postProcessor or undefined if there is none
 	 */
-	_MetadataConverter.prototype.traverse = function (oElement, oConfig, bUseProcessElementHook) {
+	MetadataConverter.prototype.traverse = function (oElement, oConfig, bUseProcessElementHook) {
 		var oAnnotatable = this.oAnnotatable, // "push" oAnnotatable to the recursion stack
 			oChildConfig,
 			oChildList = oElement.childNodes,
 			oChildNode,
 			vChildResult,
+			i,
 			aIncludes,
+			j,
 			sName,
 			sPreviousNamespace = this.xmlns,
 			vResult,
 			aResult = [],
-			sXmlNamespace = oConfig.__xmlns || this.xmlns,
-			i, j;
+			sXmlNamespace = oConfig.__xmlns || this.xmlns;
 
 		if (sXmlNamespace && sXmlNamespace !== oElement.namespaceURI) {
 			// Ignore this element because the namespace is not as expected
@@ -938,7 +936,7 @@ sap.ui.define([
 			}
 		};
 
-	})(_MetadataConverter.prototype);
+	})(MetadataConverter.prototype);
 
-	return _MetadataConverter;
+	return MetadataConverter;
 }, /* bExport= */false);

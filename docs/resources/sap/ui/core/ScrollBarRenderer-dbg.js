@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -16,26 +16,28 @@ sap.ui.define(['sap/ui/Device', "sap/ui/dom/getScrollbarSize"],
 	 * @alias sap.ui.core.ScrollBarRenderer
 	 */
 	var ScrollBarRenderer = {
-		apiVersion: 2
 	};
 
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
 	 *
-	 * @param {sap.ui.core.RenderManager} oRM RenderManager that can be used for writing to the Render-Output-Buffer
+	 * @param {sap.ui.core.RenderManager} oRenderManager RenderManager that can be used for writing to the Render-Output-Buffer
 	 * @param {sap.ui.core.Control} oControl Object representation of the control that should be rendered
 	 */
-	ScrollBarRenderer.render = function(oRM, oScrollBar){
+	ScrollBarRenderer.render = function(oRenderManager, oScrollBar){
+
+		// convenience variable
+		var rm = oRenderManager;
 		var bRTL = sap.ui.getCore().getConfiguration().getRTL();
 
-		oRM.openStart("div", oScrollBar);
-		oRM.class("sapUiScrollBar");
+
+		rm.addClass("sapUiScrollBar");
 
 		var sScrollBarTouchClass;
 		if (Device.support.touch) {
 			sScrollBarTouchClass = "sapUiScrollBarTouch";
-			oRM.class(sScrollBarTouchClass);
+			rm.addClass(sScrollBarTouchClass);
 		}
 
 		// Get Properties
@@ -46,74 +48,86 @@ sap.ui.define(['sap/ui/Device', "sap/ui/dom/getScrollbarSize"],
 		var oBSS = getScrollbarSize(sScrollBarTouchClass);
 		var sWidth = oBSS.width;
 		var sHeight = oBSS.height;
+		// Fix for Fiori Client and Edge in Mobile Mode on Win8 and Win10
+		if (Device.browser.edge) {
+			if (!sWidth) {
+				sWidth = "15";
+			}
+			if (!sHeight) {
+				sHeight = "15";
+			}
+		}
 
 		if (bVertical) {
 			// First div. <div style="overflow:hidden;width:16px;height:200px">
-			oRM.style("overflow", "hidden");
-			oRM.style("width", sWidth + "px");
-			oRM.style("height", sSize);
-			oRM.openEnd();
+			rm.write("<div");
+			rm.writeControlData(oScrollBar);
+			rm.write(" style=\"overflow:hidden;width:" + sWidth + "px");
+			if (sSize) {
+				rm.write(";height:" + sSize);
+			}
+			rm.write("\"");
+			rm.writeClasses();
+			rm.write(">");
 
 			// Middle div - ScrollBar itself.
-			oRM.openStart("div", oScrollBar.getId() + "-sb");
-			oRM.style("width", (sWidth * 2) + "px");
-			oRM.style("height", "100%");
-			oRM.style("overflow-y", "scroll");
-			oRM.style("overflow-x", "hidden");
+			rm.write("<div ");
+			rm.writeAttribute( "id", oScrollBar.getId() + "-sb");
+			rm.write(" style=\"width:" + sWidth * 2 + "px;height:100%;overflow-y:scroll;overflow-x:hidden");
 			if (bRTL) {
-				oRM.style("margin-right", "-" + sWidth + "px");
+				rm.write(";margin-right:-" + sWidth + "px");
 			} else {
-				oRM.style("margin-left", "-" + sWidth + "px");
+				rm.write(";margin-left:-" + sWidth + "px;");
 			}
-			oRM.openEnd();
+			rm.write("\">");
 
 			//Last div - The content div <div style="height:1000px;width:16px"></div>
-			oRM.openStart("div", oScrollBar.getId() + "-sbcnt");
-			oRM.style("width", sWidth + "px");
-			oRM.style("height", sContentSize);
-			oRM.openEnd();
-			oRM.close("div");
-			oRM.close("div");
+			rm.write("<div");
+			rm.writeAttribute( "id", oScrollBar.getId() + "-sbcnt");
+			rm.write(" style=\"width:" + sWidth + "px");
+			if (sContentSize) {
+				rm.write(";height:" + sContentSize);
+			}
+			rm.write("\"");
+			rm.write(">");
+			rm.write("</div>");
+			rm.write("</div>");
 
-			oRM.openStart("div");
-			oRM.openEnd();
-			oRM.openStart("span", oScrollBar.getId() + "-ffsize");
-			oRM.style("position", "absolute");
-			oRM.style("top", "-9000px");
-			oRM.style("left", "-9000px");
-			oRM.style("visibility", "hidden");
-			oRM.style("line-height", "normal");
-			oRM.openEnd();
-			oRM.text("FF Size");
-			oRM.close("span");
-			oRM.close("div");
+			rm.write("<div> <span id=" + oScrollBar.getId() + "-ffsize" + " style='position: absolute; top: -9000px; left: -9000px; visibility: hidden; line-height: normal;'> FF Size</span></div>");
+			rm.write("</div>");
 
 		} else {
 
 			// Horizontal Scrollbar
 			// First div.    <div style="width:200px;height:16px;overflow:hidden">
-			oRM.style("overflow", "hidden");
-			oRM.style("height", sHeight + "px");
-			oRM.style("width", sSize);
-			oRM.openEnd();
+			rm.write("<div");
+			rm.writeControlData(oScrollBar);
+			rm.write(" style=\"overflow:hidden;height:" + sHeight + "px");
+			if (sSize) {
+				rm.write(";width:" + sSize);
+			}
+			rm.write("\"");
+			rm.writeClasses();
+			rm.write(">");
 
 			// Middle div - ScrollBar itself.
-			oRM.openStart("div", oScrollBar.getId() + "-sb");
-			oRM.style("height", (sHeight * 2) + "px");
-			oRM.style("margin-top", "-" + sHeight + "px");
-			oRM.style("overflow-x", "scroll");
-			oRM.style("overflow-y", "hidden");
-			oRM.openEnd();
+			rm.write("<div ");
+			rm.writeAttribute( "id", oScrollBar.getId() + "-sb");
+			rm.write(" style=\"height:" + sHeight * 2 + "px;margin-top:-" + sHeight + "px;overflow-x:scroll;overflow-y:hidden\">");
 
 			//Last div - The content div   <div style="width:1000px;height:16px;"></div>
-			oRM.openStart("div", oScrollBar.getId() + "-sbcnt");
-			oRM.style("height", sHeight + "px");
-			oRM.style("width", sContentSize);
-			oRM.openEnd();
-			oRM.close("div");
-			oRM.close("div");
+			rm.write("<div");
+			rm.writeAttribute( "id", oScrollBar.getId() + "-sbcnt");
+			rm.write(" style=\"height:" + sHeight + "px");
+			if (sContentSize) {
+				rm.write(";width:" + sContentSize);
+			}
+			rm.write("\"");
+			rm.write(">");
+			rm.write("</div>");
+			rm.write("</div>");
+			rm.write("</div>");
 		}
-		oRM.close("div");
 	};
 
 

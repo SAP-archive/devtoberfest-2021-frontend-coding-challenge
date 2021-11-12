@@ -8,6 +8,7 @@
     overflow: hidden;
     -webkit-user-select: none;
     -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     height: 15px;
     opacity: 0.7;
@@ -58,6 +59,7 @@
     cursor: ew-resize;
     overflow: hidden;
     background: #457BAA;
+    /*background: rgba(66, 124, 172, 0.2);*/
 }
 
 #interactionLeftHandle {
@@ -79,6 +81,7 @@
     overflow: hidden;
     -webkit-user-select: none;
     -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     height: 35px;
 }

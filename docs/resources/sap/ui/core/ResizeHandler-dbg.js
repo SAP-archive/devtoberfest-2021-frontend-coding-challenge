@@ -1,10 +1,8 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-
-/* globals Map */
 
 // Provides class sap.ui.core.ResizeHandler
 sap.ui.define([
@@ -34,7 +32,7 @@ sap.ui.define([
 	 * @alias sap.ui.core.ResizeHandler
 	 * @extends sap.ui.base.Object
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @public
 	 */
 
@@ -48,13 +46,12 @@ sap.ui.define([
 			this.aResizeListeners = [];
 			this.aSuspendedDomRefs = [];
 			this.bRegistered = false;
-			this.mCallbacks = new Map();
 
 			this.iIdCounter = 0;
 
 			this.fDestroyHandler = this.destroy.bind(this);
 
-			jQuery(window).on("unload", this.fDestroyHandler);
+			jQuery(window).bind("unload", this.fDestroyHandler);
 
 			ActivityDetection.attachActivate(initListener, this);
 		}
@@ -84,7 +81,7 @@ sap.ui.define([
 	 */
 	ResizeHandler.prototype.destroy = function(oEvent) {
 		ActivityDetection.detachActivate(initListener, this);
-		jQuery(window).off("unload", this.fDestroyHandler);
+		jQuery(window).unbind("unload", this.fDestroyHandler);
 		oCoreRef = null;
 		this.aResizeListeners = [];
 		this.aSuspendedDomRefs = [];
@@ -317,22 +314,11 @@ sap.ui.define([
 		// Remove the dom ref and execute listeners again
 		oResizeHandler.aSuspendedDomRefs.splice(iIndex, 1);
 		oResizeHandler.checkSizes();
-
-		// inform interested parties
-		var aCallbacks = oResizeHandler.mCallbacks.get(oDomRef);
-		if (aCallbacks) {
-			for (var i = 0; i < aCallbacks.length; i++) {
-				aCallbacks[i]();
-			}
-			oResizeHandler.mCallbacks.delete(oDomRef);
-		}
-
 		return true;
 	};
 
 	/**
-	 * Checks if the given DOM reference is a child (or exact match) of a DOM area that is suspended from observation for size changes.
-	 * This instance method is an internal shortcut.
+	 * Checks if the given DOM reference is a child (or exact match) of a DOM area that is suspended from observation for resize changes
 	 * @param {Element} oDomRef the DOM reference
 	 * @return {boolean} Whether the <code>oDomRef</code> is suspended
 	 * @private
@@ -343,39 +329,10 @@ sap.ui.define([
 		for (var i = 0; i < aSuspendedDomRefs.length; i++) {
 			oNextSuspendedDomRef = aSuspendedDomRefs[i];
 			if (oNextSuspendedDomRef.contains(oDomRef)) {
-				return oNextSuspendedDomRef;
+				return true;
 			}
 		}
 		return false;
-	};
-
-	/**
-	 * Checks if the given DOM reference is a child (or exact match) of a DOM area that is suspended from observation for size changes
-	 *
-	 * @param {Element} oDomRef the DOM reference.
-	 * @param {function} [fnCallback] a callback function to be called once the DOM node is resumed which was found to be the primary
-	 *        reason for oDomRef to be suspended. Note that isSuspended() may still be true when other DOM nodes are still suspended.
-	 *        Also note that each isSuspended() call registers the callback, but only if it was not found to be already registered.
-	 * @return {boolean} Whether the <code>oDomRef</code> is suspended
-	 * @private
-	 */
-	ResizeHandler.isSuspended = function(oDomRef, fnCallback) {
-		if (!oCoreRef || !oCoreRef.oResizeHandler) {
-			return false;
-		}
-		var oHandler = oCoreRef.oResizeHandler;
-		var vSuspended = oHandler._isSuspended(oDomRef);
-		if (fnCallback && vSuspended) { // DOM node causing the suspension
-			var aCallbacks = oHandler.mCallbacks.get(vSuspended);
-			if (!aCallbacks) {
-				aCallbacks = [];
-				oHandler.mCallbacks.set(vSuspended, aCallbacks);
-			}
-			if (aCallbacks.indexOf(fnCallback) === -1) {
-				aCallbacks.push(fnCallback);
-			}
-		}
-		return !!vSuspended;
 	};
 
 	return ResizeHandler;

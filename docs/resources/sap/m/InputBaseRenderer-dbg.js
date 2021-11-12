@@ -1,11 +1,11 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library', 'sap/ui/core/ValueStateSupport', 'sap/ui/core/LabelEnablement', 'sap/ui/Device'],
-	function(Renderer, Core, coreLibrary, ValueStateSupport, LabelEnablement, Device) {
+sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/library', 'sap/ui/core/LabelEnablement', 'sap/ui/Device'],
+	function(Renderer, coreLibrary, LabelEnablement, Device) {
 	"use strict";
 
 	// shortcut for sap.ui.core.TextDirection
@@ -59,7 +59,7 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 			oRm.class("sapMInputBaseReadonly");
 		}
 
-		if (sValueState !== ValueState.None && oControl.getEditable() && oControl.getEnabled()) {
+		if (sValueState !== ValueState.None) {
 			oRm.class("sapMInputBaseState");
 		}
 
@@ -102,7 +102,7 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 			oRm.class("sapMInputBaseReadonlyWrapper");
 		}
 
-		if (sValueState !== ValueState.None && oControl.getEditable() && oControl.getEnabled()) {
+		if (sValueState !== ValueState.None) {
 			this.addValueStateClasses(oRm, oControl);
 		}
 
@@ -139,6 +139,10 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 		} else if (!oControl.getEditable()) {
 			oRm.attr("readonly", "readonly");
 
+		}
+
+		if (LabelEnablement.isRequired(oControl)) {
+			oRm.attr("required", "required");
 		}
 
 		// check if textDirection property is not set to default "Inherit" and add "dir" attribute
@@ -196,7 +200,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 		if (bAccessibility) {
 			this.renderAriaLabelledBy(oRm, oControl);
 			this.renderAriaDescribedBy(oRm, oControl);
-			this.renderValueStateAccDom(oRm, oControl);
 		}
 
 		// finish outer
@@ -207,7 +210,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * Returns aria accessibility role for the control.
 	 * Hook for the subclasses.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.Control} oControl an object representation of the control
 	 * @returns {String}
 	 */
@@ -219,7 +221,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * Returns the inner aria labelledby ids for the accessibility.
 	 * Hook for the subclasses.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.Control} oControl an object representation of the control.
 	 * @returns {String|undefined}
 	 */
@@ -233,7 +234,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * Returns the inner aria labelledby announcement texts for the accessibility.
 	 * Hook for the subclasses.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.Control} oControl an object representation of the control.
 	 * @returns {String}
 	 */
@@ -245,7 +245,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * Renders the hidden aria labelledby node for the accessibility.
 	 * Hook for the subclasses.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -265,7 +264,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * Returns the inner aria describedby ids for the accessibility.
 	 * Hook for the subclasses.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.Control} oControl an object representation of the control.
 	 * @returns {String|undefined}
 	 */
@@ -279,7 +277,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * Returns the inner aria describedby announcement texts for the accessibility.
 	 * Hook for the subclasses.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.Control} oControl an object representation of the control.
 	 * @returns {String}
 	 */
@@ -291,7 +288,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * Renders the hidden aria labelledby node for the accessibility.
 	 * Hook for the subclasses.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -308,57 +304,9 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	};
 
 	/**
-	 * Renders the hidden aria describedby and errormessage nodes for the accessibility.
-	 *
-	 * @protected
-	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
-	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
-	 */
-	InputBaseRenderer.renderValueStateAccDom = function(oRm, oControl) {
-		var sValueState = oControl.getValueState();
-
-		if (sValueState === ValueState.None || !oControl.getEditable() || !oControl.getEnabled()) {
-			return;
-		}
-
-		var bShouldBeLiveRegion = document.activeElement !== oControl.getFocusDomRef() || sValueState === ValueState.Error;
-		var sAccDomNodeId = oControl.getValueStateMessageId() + "-sr";
-		var oFormattedValueStateText = oControl.getAggregation("_invisibleFormattedValueStateText");
-		var sValueStateTypeText = Core.getLibraryResourceBundle("sap.m").getText("INPUTBASE_VALUE_STATE_" + sValueState.toUpperCase());
-
-		oRm.openStart("div", sAccDomNodeId).class("sapUiPseudoInvisibleText");
-		// Prevent double announcements for value state messages other than errors (referenced by aria-describedby),
-		// when value state is changed via user interaction
-		// Only make the acc DOM element an "assertive" "live region"when aria-errormessage is used, otherwise
-		// when the element is referenced by "aria-describedby" it is treated as "live region" by default
-		if (bShouldBeLiveRegion) {
-			oRm.attr("aria-live", "assertive");
-		}
-
-		// Tells screen readers to announce the live region as a whole even if only part of it is changed.
-		// This is needed because of the way semantic renderer works - it won't replace text content if it is the same -
-		// the so called in-place DOM patching - and the control will get rerendered when value state is not changed.
-		// For example if only the value state type is changed and not the text, if aria-atomic is not set to 'true'
-		// the value state text won't be announced.
-		oRm.attr("aria-atomic", "true")
-			.openEnd()
-			.text(sValueStateTypeText).text(" ");
-
-		if (oFormattedValueStateText) {
-			oRm.renderControl(oFormattedValueStateText);
-		} else {
-			// Flush previous value state text and populate it again even if the same as before to avoid the
-			// semantic renderer's DOM patching and update the live region
-			oRm.text(oControl.getValueStateText() || ValueStateSupport.getAdditionalText(oControl));
-		}
-		oRm.close("div");
-	};
-
-	/**
 	 * Returns the accessibility state of the control.
 	 * Hook for the subclasses.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.Control} oControl an object representation of the control.
 	 * @returns {Object}
 	 */
@@ -366,18 +314,14 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 		var sAriaLabelledBy = this.getAriaLabelledBy(oControl),
 			sAriaDescribedBy = this.getAriaDescribedBy(oControl),
 			sRole = this.getAriaRole(oControl),
-			sValueStateAccNodeId = oControl.getValueStateMessageId() + "-sr",
 			mAccessibilityState = { };
 
 		if (sRole) {
 			mAccessibilityState.role = sRole;
 		}
 
-		if (oControl.getValueState() === ValueState.Error && oControl.getEditable() && oControl.getEnabled()) {
+		if (oControl.getValueState() === ValueState.Error) {
 			mAccessibilityState.invalid = true;
-			mAccessibilityState.errormessage = sValueStateAccNodeId;
-		} else if (oControl.getValueState() !== ValueState.None && oControl.getEditable() && oControl.getEnabled()) {
-			sAriaDescribedBy = sAriaDescribedBy ? sValueStateAccNodeId + " " + sAriaDescribedBy : sValueStateAccNodeId;
 		}
 
 		if (sAriaLabelledBy) {
@@ -395,6 +339,7 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 		}
 		mAccessibilityState.disabled = null;
 		mAccessibilityState.readonly = null;
+		mAccessibilityState.required = null;
 
 		return mAccessibilityState;
 	};
@@ -403,7 +348,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * Writes the accessibility state of the control.
 	 * Hook for the subclasses.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -414,7 +358,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * Write the opening tag name of the input.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -425,7 +368,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * Ends opened input tag.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -436,7 +378,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * Write the value of the input.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -447,7 +388,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * Add cursor class to input container.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -457,7 +397,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * Add a padding class to input container.
 	 * May be overwritten by subclasses.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -468,7 +407,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * This method is reserved for derived class to add extra styles for input container.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -477,7 +415,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * This method is reserved for derived class to set width inline style
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -492,7 +429,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * This method is reserved for derived classes to add extra classes for input container.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -501,7 +437,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * This method is reserved for derived class to add extra attributes for input container.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -510,7 +445,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * This method is reserved for derived classes to add extra styles for input element.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -519,7 +453,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * This method is reserved for derived classes to add extra styles for input element.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -530,7 +463,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * This method is reserved for derived classes to add extra classes for input element.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -539,7 +471,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * This method is reserved for derived classes to add extra attributes for the input element.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -548,7 +479,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * This method is reserved for derived classes to prepend inner content.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -557,7 +487,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * Write the value of the input.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -566,7 +495,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * Renders icons from the icon aggregations.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 * @param {string} sPosition An aggregation from which the icon should be rendered - begin or end.
@@ -583,7 +511,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * Write the decorations of the input - description and value-help icon.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -592,7 +519,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * Write the closing tag name of the input.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -602,7 +528,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * This method is reserved for derived classes to add extra styles for the placeholder, if rendered as label.
 	 *
 	 * @deprecated
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -614,7 +539,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * Note that this method should not be used anymore as native placeholder is used on all browsers
 	 *
 	 * @deprecated
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -624,7 +548,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	 * Add the CSS value state classes to the control's root element using the provided {@link sap.ui.core.RenderManager}.
 	 * To be overwritten by subclasses.
 	 *
-	 * @protected
 	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
 	 * @param {sap.ui.core.Control} oControl An object representation of the control that should be rendered.
 	 */
@@ -636,7 +559,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/Core', 'sap/ui/core/library'
 	/**
 	 * Defines the ID suffix of the inner element
 	 *
-	 * @protected
 	 * @returns {string} The inner element ID suffix.
 	 */
 	InputBaseRenderer.getInnerSuffix = function() {

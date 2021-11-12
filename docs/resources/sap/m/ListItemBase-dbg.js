@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -14,7 +14,6 @@ sap.ui.define([
 	"sap/ui/core/Control",
 	"sap/ui/core/IconPool",
 	"sap/ui/core/Icon",
-	"sap/ui/core/InvisibleText",
 	"sap/ui/core/theming/Parameters",
 	"./library",
 	"./Button",
@@ -35,7 +34,6 @@ function(
 	Control,
 	IconPool,
 	Icon,
-	InvisibleText,
 	ThemeParameters,
 	library,
 	Button,
@@ -76,7 +74,7 @@ function(
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -142,7 +140,6 @@ function(
 			 * The navigated state of the list item.
 			 *
 			 * If set to <code>true</code>, a navigation indicator is displayed at the end of the list item.
-			 * <b>Note:</b> This property must be set for <b>one</b> list item only.
 			 *
 			 * @since 1.72
 			 */
@@ -187,10 +184,8 @@ function(
 	}});
 
 	ListItemBase.getAccessibilityText = function(oControl, bDetectEmpty) {
-		var oBundle = sap.ui.getCore().getLibraryResourceBundle("sap.m");
-
 		if (!oControl || !oControl.getVisible || !oControl.getVisible()) {
-			return bDetectEmpty ? oBundle.getText("CONTROL_EMPTY") : "";
+			return "";
 		}
 
 		var oAccInfo;
@@ -207,7 +202,8 @@ function(
 			children: []
 		}, oAccInfo);
 
-		var sText = oAccInfo.type + " " + oAccInfo.description + " ",
+		var oBundle = sap.ui.getCore().getLibraryResourceBundle("sap.m"),
+			sText = oAccInfo.type + " " + oAccInfo.description + " ",
 			sTooltip = oControl.getTooltip_AsString();
 
 		if (oAccInfo.enabled === false) {
@@ -237,11 +233,27 @@ function(
 			return null;
 		}
 
-		var aText = [],
-			Node = window.Node,
+		var Node = window.Node,
 			NodeFilter = window.NodeFilter,
-			oTreeWalker = document.createTreeWalker(oDomRef, NodeFilter.SHOW_TEXT + NodeFilter.SHOW_ELEMENT);
+			oTreeWalker = document.createTreeWalker(oDomRef, NodeFilter.SHOW_TEXT + NodeFilter.SHOW_ELEMENT, function(oNode) {
+				if (oNode.type === Node.ELEMENT_NODE) {
+					if (oNode.classList.contains("sapUiInvisibleText")) {
+						return NodeFilter.FILTER_SKIP;
+					}
 
+					if (oNode.getAttribute("aria-hidden") == "true" ||
+						oNode.style.visibility == "hidden" ||
+						oNode.style.display == "none") {
+						return NodeFilter.FILTER_REJECT;
+					}
+
+					return NodeFilter.FILTER_SKIP;
+				}
+
+				return NodeFilter.FILTER_ACCEPT;
+			}, false);
+
+		var aText = [];
 		while (oTreeWalker.nextNode()) {
 			var oNode = oTreeWalker.currentNode;
 			if (oNode.nodeType === Node.TEXT_NODE) {
@@ -421,10 +433,7 @@ function(
 			}
 		}
 
-		var sGroupAnnouncement = this.getGroupAnnouncement() || "";
-		if (sGroupAnnouncement) {
-			aOutput.push(sGroupAnnouncement);
-		}
+		aOutput.push(this.getGroupAnnouncement() || "");
 
 		if (this.getContentAnnouncement) {
 			aOutput.push((this.getContentAnnouncement(oBundle) || "").trim());
@@ -434,12 +443,11 @@ function(
 			aOutput.push(sTooltip);
 		}
 
-		if (this._bAnnounceNotSelected && this.isSelectable() && !this.getSelected()) {
-			aOutput.push(oBundle.getText("LIST_ITEM_NOT_SELECTED"));
+		if (this.getNavigated()) {
+			aOutput.push(oBundle.getText("LIST_ITEM_NAVIGATED"));
 		}
 
-		//The dot is added  so the screenreader can pause
-		return aOutput.join(" . ");
+		return aOutput.join(" ");
 	};
 
 	ListItemBase.prototype.getAccessibilityInfo = function() {
@@ -505,9 +513,7 @@ function(
 		}
 
 		if (!this.DeleteIconURI) {
-			ListItemBase.prototype.DeleteIconURI = IconPool.getIconURI(
-				ThemeParameters.get({name: "_sap_m_ListItemBase_DeleteIcon"}) || "decline"
-			);
+			ListItemBase.prototype.DeleteIconURI = IconPool.getIconURI(ThemeParameters.get("_sap_m_ListItemBase_DeleteIcon"));
 		}
 
 		this._oDeleteControl = new Button({
@@ -521,16 +527,11 @@ function(
 
 		this._oDeleteControl._bExcludeFromTabChain = true;
 
-		// prevent disabling of internal controls by the sap.ui.core.EnabledPropagator
-		this._oDeleteControl.useEnabledPropagator(false);
-
 		return this._oDeleteControl;
 	};
 
 	ListItemBase.prototype.onThemeChanged = function() {
-		ListItemBase.prototype.DeleteIconURI = IconPool.getIconURI(
-			ThemeParameters.get({name: "_sap_m_ListItemBase_DeleteIcon"})
-		);
+		ListItemBase.prototype.DeleteIconURI = IconPool.getIconURI(ThemeParameters.get("_sap_m_ListItemBase_DeleteIcon"));
 		if (this._oDeleteControl) {
 			this._oDeleteControl.setIcon(this.DeleteIconURI);
 		}
@@ -558,9 +559,6 @@ function(
 		}, this);
 
 		this._oDetailControl._bExcludeFromTabChain = true;
-
-		// prevent disabling of internal controls by the sap.ui.core.EnabledPropagator
-		this._oDetailControl.useEnabledPropagator(false);
 
 		return this._oDetailControl;
 	};
@@ -602,16 +600,12 @@ function(
 			id: this.getId() + "-selectSingle",
 			groupName: this.getListProperty("id") + "_selectGroup",
 			activeHandling: false,
-			selected: this.getSelected(),
-			ariaLabelledBy: InvisibleText.getStaticId("sap.m", "LIST_ITEM_SELECTION")
+			selected: this.getSelected()
 		}).addStyleClass("sapMLIBSelectS").setParent(this, null, true).setTabIndex(-1).attachSelect(function(oEvent) {
 			var bSelected = oEvent.getParameter("selected");
 			this.setSelected(bSelected);
 			this.informList("Select", bSelected);
 		}, this);
-
-		// prevent disabling of internal controls by the sap.ui.core.EnabledPropagator
-		this._oSingleSelectControl.useEnabledPropagator(false);
 
 		return this._oSingleSelectControl;
 	};
@@ -631,8 +625,7 @@ function(
 		this._oMultiSelectControl = new CheckBox({
 			id: this.getId() + "-selectMulti",
 			activeHandling: false,
-			selected: this.getSelected(),
-			ariaLabelledBy: InvisibleText.getStaticId("sap.m", "LIST_ITEM_SELECTION")
+			selected: this.getSelected()
 		}).addStyleClass("sapMLIBSelectM").setParent(this, null, true).setTabIndex(-1).addEventDelegate({
 			onkeydown: function (oEvent) {
 				this.informList("KeyDown", oEvent);
@@ -645,9 +638,6 @@ function(
 			this.setSelected(bSelected);
 			this.informList("Select", bSelected);
 		}, this);
-
-		// prevent disabling of internal controls by the sap.ui.core.EnabledPropagator
-		this._oMultiSelectControl.useEnabledPropagator(false);
 
 		return this._oMultiSelectControl;
 	};
@@ -750,7 +740,7 @@ function(
 	 * By default, when item should be in selectable mode
 	 *
 	 * Subclasses can overwrite in case of unselectable item.
-	 * @returns {boolean}
+	 * @returns {Boolean}
 	 * @private
 	 */
 	ListItemBase.prototype.isSelectable = function() {
@@ -769,11 +759,10 @@ function(
 	 * Returns the state of the item selection as a boolean
 	 *
 	 * @public
-	 * @returns {boolean}
+	 * @return boolean
 	 * @deprecated Since version 1.10.2.
-	 * API Change makes this method unnecessary. Use the {@link #getSelected} method instead.
+	 * API Change makes this method unnecessary. Use getSelected method instead.
 	 * @ui5-metamodel This method also will be described in the UI5 (legacy) designtime metamodel
-	 * @function
 	 */
 	ListItemBase.prototype.isSelected = ListItemBase.prototype.getSelected;
 
@@ -830,7 +819,7 @@ function(
 	/**
 	 * Determines whether group header item or not.
 	 *
-	 * @return {boolean}
+	 * @return {Boolean}
 	 */
 	ListItemBase.prototype.isGroupHeader = function() {
 		return this._bGroupHeader;
@@ -840,7 +829,7 @@ function(
 	 * Determines whether item is in SingleSelectMaster mode or
 	 * other selection modes when includeItemInSelection is true
 	 *
-	 * @return {boolean}
+	 * @return {Boolean}
 	 */
 	ListItemBase.prototype.isIncludedIntoSelection = function() {
 		if (!this.isSelectable()) {
@@ -883,7 +872,7 @@ function(
 	/**
 	 * Determines whether item needs icon to render type or not
 	 *
-	 * @return {boolean}
+	 * @return {Boolean}
 	 */
 	ListItemBase.prototype.hasActiveType = function() {
 		var sType = this.getType();
@@ -996,10 +985,6 @@ function(
 		if (this._eventHandledByControl ||
 			oEvent.touches.length != 1 ||
 			!this.hasActiveType()) {
-			if (this.getListProperty("includeItemInSelection") && this.getList()._mRangeSelection) {
-				// prevet text selection when rangeSelection is detected
-				oEvent.preventDefault();
-			}
 			return;
 		}
 
@@ -1154,7 +1139,7 @@ function(
 		} else if ($Tabbables.length) {
 			var iFocusPos = oList._iLastFocusPosOfItem || 0;
 			iFocusPos = $Tabbables[iFocusPos] ? iFocusPos : -1;
-			$Tabbables.eq(iFocusPos).trigger("focus");
+			$Tabbables.eq(iFocusPos).focus();
 		}
 
 		oEvent.preventDefault();
@@ -1275,7 +1260,6 @@ function(
 		}
 
 		this.informList("FocusIn", oEvent.srcControl);
-		oEvent.setMarked();
 
 		if (oEvent.srcControl === this) {
 			return;
@@ -1288,6 +1272,7 @@ function(
 
 		// inform the list async that this item should be focusable
 		setTimeout(oList["setItemFocusable"].bind(oList, this), 0);
+		oEvent.setMarked();
 	};
 
 	// inform the list for the vertical navigation

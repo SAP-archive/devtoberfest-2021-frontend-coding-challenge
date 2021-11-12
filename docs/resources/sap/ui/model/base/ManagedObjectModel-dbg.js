@@ -1,6 +1,6 @@
 /*
  * ! OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -18,14 +18,9 @@ sap.ui.define([
 	 * @param {boolean} <code>true</code> for observing and <code>false</code> for unobserving
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc
 	 */
 	function _adaptDeepChildObservation(caller, oControl, oAggregation, bObserve) {
 		var aChildren = oAggregation.get(oControl) || [], oChild, bRecord;
-
-		if (aChildren && !Array.isArray(aChildren) && !oAggregation.multiple) {
-			aChildren = [aChildren];
-		}
 
 		for (var i = 0; i < aChildren.length; i++) {
 			oChild = aChildren[i];
@@ -131,31 +126,6 @@ sap.ui.define([
 		constructor: function() {
 			JSONListBinding.apply(this, arguments);
 			this._getOriginOfManagedObjectModelBinding();
-		},
-		/**
-		 * Checks if this list binding might by affected by changes inside the given control.
-		 * This means the control is inside the subtree spanned by the managed object whose
-		 * aggregation or property represents this list binding.
-		 *
-		 * @param {sap.ui.base.ManagedObject} oControl The possible descendant
-		 * @returns {boolean}
-		 *    <code>true</code> if the list binding might be affected by changes inside the given
-		 *    control, <code>false</code> otherwise
-		 * @private
-		 */
-		_mightBeAffectedByChangesInside : function(oControl) {
-			while ( oControl ) {
-				if ( oControl.getParent() === this._oOriginMO ) {
-					// Note: No check for _sParentAggregation because of possible aggregation
-					// forwarding.
-					return true;
-				}
-				// Note: For aggregation forwarding the parent is hopefully contained in the
-				// origin managed object otherwise this binding is not refreshed correct
-				oControl = oControl.getParent();
-			}
-
-			return false;
 		},
 		/**
 		 * Use the id of the ManagedObject instance as the unique key to identify
@@ -294,7 +264,7 @@ sap.ui.define([
 	 * this object.
 	 *
 	 * @param {sap.ui.base.ManagedObject} oObject the managed object models root object
-	 * @param {object} [oData] an object for custom data
+	 * @param {object} oData an object for custom data
 	 * @alias sap.ui.model.base.ManagedObjectModel
 	 * @extends sap.ui.model.json.JSONModel
 	 * @public
@@ -318,8 +288,6 @@ sap.ui.define([
 				]);
 
 				this._oObserver = new ManagedObjectObserver(this.observerChanges.bind(this));
-
-				this.setSizeLimit(1000000); // SizeLimit should be set on Model the control is bound to, the ManagedObjectModel should not limit aggregations inside.
 			}
 		});
 
@@ -972,14 +940,6 @@ sap.ui.define([
 					_adaptDeepChildObservation(this, oChange.child, mAggregations[sKey], false);
 				}
 			}
-		} else if (oChange.type === "property") {
-			// list bindings can be affected
-			this.aBindings.forEach(function (oBinding) {
-				if (oBinding._mightBeAffectedByChangesInside
-					&& oBinding._mightBeAffectedByChangesInside(oChange.object)) {
-					oBinding.checkUpdate(true/*bForceUpdate*/);
-				}
-			});
 		}
 
 		this.checkUpdate();
@@ -994,25 +954,17 @@ sap.ui.define([
 	 */
 	ManagedObjectModel.prototype.checkUpdate = function (bForceUpdate, bAsync, fnFilter) {
 		if (bAsync) {
-			this.bForceUpdate = this.bForceUpdate || bForceUpdate;
 			if (!this.sUpdateTimer) {
-				this.fnFilter = this.fnFilter || fnFilter;
 				this.sUpdateTimer = setTimeout(function () {
-					this.checkUpdate(this.bForceUpdate, false, this.fnFilter);
+					this.checkUpdate(bForceUpdate, false, fnFilter);
 				}.bind(this), 0);
-			} else if (this.fnFilter && this.fnFilter !== fnFilter) {
-				this.fnFilter = undefined; // if different filter set use no filter
 			}
 			return;
 		}
-		bForceUpdate = this.bForceUpdate || bForceUpdate;
-		fnFilter = !this.fnFilter || this.fnFilter === fnFilter ? fnFilter : undefined; // if different filter set use no filter
 
 		if (this.sUpdateTimer) {
 			clearTimeout(this.sUpdateTimer);
 			this.sUpdateTimer = null;
-			this.bForceUpdate = undefined;
-			this.fnFilter = undefined;
 		}
 		var aBindings = this.aBindings.slice(0);
 		aBindings.forEach(function (oBinding) {

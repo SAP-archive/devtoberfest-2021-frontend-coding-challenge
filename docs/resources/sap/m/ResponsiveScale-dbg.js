@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -34,7 +34,7 @@ sap.ui.define([
 		 * @extends sap.ui.core.Element
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @public
@@ -65,7 +65,6 @@ sap.ui.define([
 		 * @param {float} fStep - The step walking from start to end.
 		 * @param {int} iTickmarksThreshold - Limits the number of tickmarks.
 		 *
-		 * @public
 		 * @returns {number} The max number of possible tickmarks
 		 */
 		Scale.prototype.calcNumberOfTickmarks = function (fSize, fStep, iTickmarksThreshold) {
@@ -138,7 +137,7 @@ sap.ui.define([
 			var iJumpStep, iCurPos,
 				aHiddenLabelsIndices = new Array(iTotalLabelsCount),
 				// How many labels should get hidden, so there would be enough space.
-				// There's min distance design size limits of {TICKMARKS.MIN_SIZE.WITH_LABEL} between the labels
+				// There's min distance design limitation of {TICKMARKS.MIN_SIZE.WITH_LABEL} between the labels
 				iStartPosition = Math.ceil(1 / (fOffsetLeftPx / iLabelsMinDistance)),
 				fnCalcJumpStep = function (iPos) {
 					// iPos^2 === iPos * iPos === iPos << 1
@@ -186,7 +185,7 @@ sap.ui.define([
 		};
 
 		/**
-		 * Shows/hides tickmarks when some size limits are met.
+		 * Shows/hides tickmarks when some limitations are met.
 		 * Implements responsiveness of the tickmarks.
 		 *
 		 * @param {jQuery.Event} oEvent The event object passed.
@@ -198,7 +197,7 @@ sap.ui.define([
 				$oSlider = oEvent.control.$(),
 				aTickmarksInDOM = $oSlider.find(".sapMSliderTick"),
 				iScaleWidth = $oSlider.find(".sapMSliderTickmarks").width(),
-				bShowTickmarks = (iScaleWidth / aTickmarksInDOM.length) >= SliderUtilities.CONSTANTS.TICKMARKS.MIN_SIZE.SMALL;
+				bShowTickmarks = (iScaleWidth / aTickmarksInDOM.size()) >= SliderUtilities.CONSTANTS.TICKMARKS.MIN_SIZE.SMALL;
 
 			//Small tickmarks should get hidden if their width is less than _SliderUtilities.CONSTANTS.TICKMARKS.MIN_SIZE.SMALL
 			aTickmarksInDOM.css("visibility", bShowTickmarks ? '' /* visible */ : 'hidden');
@@ -210,7 +209,7 @@ sap.ui.define([
 			// Convert to PX
 			fOffsetLeftPx = iScaleWidth * fOffsetLeftPct / 100;
 			// Get which labels should become hidden
-			aHiddenLabels = this.getHiddenTickmarksLabels(iScaleWidth, aLabelsInDOM.length, fOffsetLeftPx, SliderUtilities.CONSTANTS.TICKMARKS.MIN_SIZE.WITH_LABEL);
+			aHiddenLabels = this.getHiddenTickmarksLabels(iScaleWidth, aLabelsInDOM.size(), fOffsetLeftPx, SliderUtilities.CONSTANTS.TICKMARKS.MIN_SIZE.WITH_LABEL);
 
 			aLabelsInDOM.each(function (iIndex, oElem) {
 				// All the labels are positioned prior the corresponding tickmark, except for the last label.

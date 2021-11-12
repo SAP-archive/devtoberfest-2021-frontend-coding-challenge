@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -10,6 +10,7 @@ sap.ui.define([
 	'./ResponsiveFlowLayoutData',
 	'./library',
 	'sap/ui/core/ResizeHandler',
+	'sap/ui/Device',
 	'./ResponsiveFlowLayoutRenderer',
 	"sap/ui/thirdparty/jquery",
 	'sap/ui/dom/jquery/rect' // jQuery Plugin "rect"
@@ -19,6 +20,7 @@ sap.ui.define([
 		ResponsiveFlowLayoutData,
 		library,
 		ResizeHandler,
+		Device,
 		ResponsiveFlowLayoutRenderer,
 		jQuery
 	) {
@@ -37,7 +39,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -79,7 +81,7 @@ sap.ui.define([
 			this._rows = [];
 
 			this._bIsRegistered = false;
-			this._proxyComputeWidths = computeWidths.bind(this);
+			this._proxyComputeWidths = jQuery.proxy(computeWidths, this);
 
 			this._iRowCounter = 0;
 		};
@@ -503,7 +505,7 @@ sap.ui.define([
 			}
 		};
 
-		var computeWidths = function() {
+		var computeWidths = function(bInitial) {
 			this._iRowCounter = 0;
 
 			this._oDomRef = this.getDomRef();
@@ -531,8 +533,17 @@ sap.ui.define([
 							bRender = bRender || (oRowRect.width !== oPrevRect.width) && (oRowRect.height !== oPrevRect.height);
 						}
 
+						// if this should be the initial rendering -> do it
+						bRender = bRender || (typeof (bInitial) === "boolean" && bInitial);
+
 						if (this._bLayoutDataChanged || bRender) {
-							this._oDomRef.innerHTML = "";
+
+							//in IE when setting the innerHTML property to "" the changes do not take effect correctly and all the children are gone
+							if (Device.browser.internet_explorer){
+								jQuery(this._oDomRef).empty();
+							} else {
+								this._oDomRef.innerHTML = "";
+							}
 
 							// reset this to be clean for next check interval
 							this._bLayoutDataChanged = false;
@@ -579,17 +590,16 @@ sap.ui.define([
 		 * If the layout should be responsive, it is necessary to fix the width of the content
 		 * items to correspond to the width of the layout.
 		 */
-		ResponsiveFlowLayout.prototype.onAfterRendering = function() {
+		ResponsiveFlowLayout.prototype.onAfterRendering = function(oEvent) {
 			this._oDomRef = this.getDomRef();
 			this._$DomRef = jQuery(this._oDomRef);
 
-			this._proxyComputeWidths();
+			// Initial Width Adaptation
+			this._proxyComputeWidths(true);
 
 			if (this.getResponsive()) {
 				if (!this._resizeHandlerComputeWidthsID) {
-					// Trigger rerendering when the control is resized so width recalculations
-					// are handled in the on after rendering hook the same way as the initial width calculations.
-					this._resizeHandlerComputeWidthsID = ResizeHandler.register(this, ResponsiveFlowLayout.prototype.rerender.bind(this));
+					this._resizeHandlerComputeWidthsID = ResizeHandler.register(this, this._proxyComputeWidths);
 				}
 			} else {
 				if (this._resizeHandlerComputeWidthsID) {
@@ -604,9 +614,7 @@ sap.ui.define([
 				this._bLayoutDataChanged = true;
 			}
 			if (!this._resizeHandlerComputeWidthsID) {
-				// Trigger rerendering when the control is resized so width recalculations
-				// are handled in the on after rendering hook the same way as the initial width calculations.
-				this._resizeHandlerComputeWidthsID = ResizeHandler.register(this, ResponsiveFlowLayout.prototype.rerender.bind(this));
+				this._resizeHandlerComputeWidthsID = ResizeHandler.register(this, this._proxyComputeWidths);
 			}
 
 			updateRows(this);

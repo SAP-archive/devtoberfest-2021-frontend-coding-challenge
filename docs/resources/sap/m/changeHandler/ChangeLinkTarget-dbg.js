@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -12,7 +12,7 @@ sap.ui.define(function () {
 	 *
 	 * @alias sap.m.changeHandler.ChangeLinkTarget
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @experimental Since 1.71
 	 */
 	var ChangeLinkTarget = {};
@@ -24,23 +24,22 @@ sap.ui.define(function () {
 	 * @param {sap.m.Link} oControl - Link which target should be changed
 	 * @param {object} mPropertyBag - Map of properties
 	 * @param {object} mPropertyBag.modifier - Modifier for the controls
-	 * @return {Promise} Promise resolving when change was successfully applied
+	 * @return {boolean} true if change could be applied
 	 *
 	 * @public
 	 */
 	ChangeLinkTarget.applyChange = function(oChange, oControl, mPropertyBag) {
-		var oModifier = mPropertyBag.modifier;
-		var oChangeDefinition = oChange.getDefinition();
-		var sTarget = oChangeDefinition.content;
-		return Promise.resolve()
-			.then(oModifier.getProperty.bind(oModifier, oControl, "target"))
-			.then(function(oProperty) {
-				var oRevertData = {
-					target: oProperty
-				};
-				oModifier.setProperty(oControl, "target", sTarget);
-				oChange.setRevertData(oRevertData);
-			});
+		var oModifier = mPropertyBag.modifier,
+			oChangeDefinition = oChange.getDefinition(),
+			sTarget = oChangeDefinition.content,
+			oRevertData = {
+				target: oModifier.getProperty(oControl, "target")
+			};
+
+		oModifier.setProperty(oControl, "target", sTarget);
+		oChange.setRevertData(oRevertData);
+
+		return true;
 	};
 
 	/**
@@ -50,14 +49,17 @@ sap.ui.define(function () {
 	 * @param {sap.m.Link} oControl - Link that matches the change selector for reverting the change
 	 * @param {object} mPropertyBag - Property bag containing the modifier and the view
 	 * @param {object} mPropertyBag.modifier - Modifier for the controls
+	 * @return {boolean} true if successful
 	 * @public
 	 */
 	ChangeLinkTarget.revertChange = function(oChange, oControl, mPropertyBag) {
-		var oModifier = mPropertyBag.modifier;
-		var oRevertData = oChange.getRevertData();
-		var sTarget = oRevertData.target;
+		var oModifier = mPropertyBag.modifier,
+			oRevertData = oChange.getRevertData(),
+			sTarget = oRevertData.target;
 
 		oModifier.setProperty(oControl, "target", sTarget);
+
+		return true;
 	};
 
 	/**
@@ -70,7 +72,10 @@ sap.ui.define(function () {
 	 *
 	 * @public
 	 */
-	ChangeLinkTarget.completeChangeContent = function(oChange, oSpecificChangeInfo, mPropertyBag) {};
+	ChangeLinkTarget.completeChangeContent = function(oChange, oSpecificChangeInfo, mPropertyBag) {
+
+		return true;
+	};
 
 
 	return ChangeLinkTarget;

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -29,7 +29,7 @@ sap.ui.define([
 	"./MessageViewRenderer",
 	"sap/ui/events/KeyCodes",
 	"sap/base/Log",
-	"sap/base/security/URLListValidator",
+	"sap/base/security/URLWhitelist",
 	"sap/ui/thirdparty/caja-html-sanitizer"
 ], function(
 	jQuery,
@@ -56,7 +56,7 @@ sap.ui.define([
 	MessageViewRenderer,
 	KeyCodes,
 	Log,
-	URLListValidator
+	URLWhitelist
 ) {
 	"use strict";
 
@@ -108,11 +108,8 @@ sap.ui.define([
 	 * If needed the navigation between the message item and the source of the error can be created by the application.
 	 * This can be done by setting the <code>activeTitle</code> property to true and providing a handler for the <code>activeTitlePress</code> event.</li>
 	 * </ul>
-	 * <h3>Responsive Behavior</h3>
-	 * The responsiveness of the <code>MessageView</code> is determined by the container in which it is embedded. For that reason the control could not be visualized if the
-	 * container’s sizes are not defined.
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @extends sap.ui.core.Control
 	 * @constructor
@@ -188,8 +185,7 @@ sap.ui.define([
 						 * This refers to the control which opens the popover.
 						 */
 						openBy: {type: "sap.ui.core.Control"}
-					},
-					deprecated: true
+					}
 				},
 				/**
 				 * Event fired when description is shown.
@@ -248,10 +244,10 @@ sap.ui.define([
 	var ICONS = {
 		back: IconPool.getIconURI("nav-back"),
 		close: IconPool.getIconURI("decline"),
-		information: IconPool.getIconURI("information"),
-		warning: IconPool.getIconURI("alert"),
-		error: IconPool.getIconURI("error"),
-		success: IconPool.getIconURI("sys-enter-2")
+		information: IconPool.getIconURI("message-information"),
+		warning: IconPool.getIconURI("message-warning"),
+		error: IconPool.getIconURI("message-error"),
+		success: IconPool.getIconURI("message-success")
 	};
 
 	var LIST_TYPES = ["all", "error", "warning", "success", "information"];
@@ -432,48 +428,45 @@ sap.ui.define([
 
 	/**
 	 * Fills grouped items in the lists
-	 * @param {sap.m.MessageItem[]} aGroupedItems An array of items
+	 * @param {sap.m.MessageItem[]} oGroupedItems An array of items
 	 * @private
 	 */
-	MessageView.prototype._fillGroupedLists = function(aGroupedItems) {
-		var aGroups = Object.keys(aGroupedItems),
+	MessageView.prototype._fillGroupedLists = function(oGroupedItems) {
+		var aGroups = Object.keys(oGroupedItems),
 			iUngroupedIndex = aGroups.indexOf(""),
-			aUngrouped;
+			oUngrouped, aUngroupedTypes;
 
 		if (iUngroupedIndex !== -1) {
-			aUngrouped = aGroupedItems[""];
+			oUngrouped = oGroupedItems[""];
+			aUngroupedTypes = Object.keys(oUngrouped);
 
-			this._fillLists(aUngrouped);
+			aUngroupedTypes.forEach(function(sType) {
+				var aUngroupedItems = oUngrouped[sType];
+				this._fillLists(aUngroupedItems);
 
-			delete aGroupedItems[""];
-			aGroups.splice(iUngroupedIndex, 1);
+				delete oGroupedItems[""];
+				aGroups.splice(iUngroupedIndex, 1);
+			}, this);
 		}
 
 		aGroups.forEach(function(sGroupName) {
-			this._fillListsWithGroups(sGroupName, aGroupedItems[sGroupName]);
+			this._fillListsWithGroups(sGroupName, oGroupedItems[sGroupName]);
 		}, this);
 	};
 
-	MessageView.prototype._fillListsWithGroups = function(sGroupName, aItems) {
-		var oHeader = new GroupHeaderListItem({
-			title: sGroupName
-		});
+	MessageView.prototype._fillListsWithGroups = function(sGroupName, oItemTypes) {
+		var aTypes = Object.keys(oItemTypes),
+			oHeader = new GroupHeaderListItem({
+				title: sGroupName
+			}), aItems;
 
 		this._oLists["all"].addAggregation("items", oHeader, true);
 
-		["error", "warning", "success", "information"].forEach(function (sListType) {
-			if (this._hasGroupItemsOfType(aItems, sListType)) {
-				this._oLists[sListType].addAggregation("items", oHeader.clone(), true);
-			}
+		aTypes.forEach(function(sType) {
+			this._oLists[sType.toLowerCase()].addAggregation("items", oHeader.clone(), true);
+			aItems = oItemTypes[sType];
+			this._fillLists(aItems);
 		}, this);
-
-		this._fillLists(aItems);
-	};
-
-	MessageView.prototype._hasGroupItemsOfType = function (aItems, sListType) {
-		return aItems.some(function (oItem) {
-			return oItem.getType().toLowerCase() === sListType;
-		});
 	};
 
 	/**
@@ -547,13 +540,20 @@ sap.ui.define([
 	 * @private
 	 */
 	MessageView.prototype._groupItems = function (aItems) {
-		var oGroups = {}, sItemGroup;
+		var oGroups = {}, sItemGroup, sItemType;
 
 		aItems.forEach(function(oItem) {
 			sItemGroup = oItem.getGroupName();
-			oGroups[sItemGroup] = oGroups[sItemGroup] || [];
+			sItemType = oItem.getType();
+			oGroups[sItemGroup] = oGroups[sItemGroup] || {};
 
-			oGroups[sItemGroup].push(oItem);
+			var oGroup = oGroups[sItemGroup];
+
+			if (oGroup[sItemType]) {
+				oGroup[sItemType].push(oItem);
+			} else {
+				oGroup[sItemType] = [oItem];
+			}
 		});
 
 		return oGroups;
@@ -601,13 +601,13 @@ sap.ui.define([
 		var sCloseBtnDescr = this._oResourceBundle.getText("MESSAGEPOPOVER_CLOSE");
 		var sCloseBtnDescrId = this.getId() + "-CloseBtnDescr";
 		var oCloseBtnARIAHiddenDescr = new HTML(sCloseBtnDescrId, {
-			content: "<span id=\"" + sCloseBtnDescrId + "\" class=\"sapMMsgViewHiddenContainer\">" + sCloseBtnDescr + "</span>"
+			content: "<span id=\"" + sCloseBtnDescrId + "\" style=\"display: none;\">" + sCloseBtnDescr + "</span>"
 		});
 
 		var sHeadingDescr = this._oResourceBundle.getText("MESSAGEPOPOVER_ARIA_HEADING");
 		var sHeadingDescrId = this.getId() + "-HeadingDescr";
 		var oHeadingARIAHiddenDescr = new HTML(sHeadingDescrId, {
-			content: "<span id=\"" + sHeadingDescrId + "\" class=\"sapMMsgViewHiddenContainer\" role=\"heading\">" + sHeadingDescr + "</span>"
+			content: "<span id=\"" + sHeadingDescrId + "\" style=\"display: none;\" role=\"heading\">" + sHeadingDescr + "</span>"
 		});
 
 		this._oSegmentedButton = new SegmentedButton(this.getId() + "-segmented", {}).addStyleClass("sapMSegmentedButtonNoAutoWidth");
@@ -629,14 +629,14 @@ sap.ui.define([
 		var sCloseBtnDescr = this._oResourceBundle.getText("MESSAGEPOPOVER_CLOSE");
 		var sCloseBtnDescrId = this.getId() + "-CloseBtnDetDescr";
 		var oCloseBtnARIAHiddenDescr = new HTML(sCloseBtnDescrId, {
-			content: "<span id=\"" + sCloseBtnDescrId + "\" class=\"sapMMsgViewHiddenContainer\">" + sCloseBtnDescr + "</span>"
+			content: "<span id=\"" + sCloseBtnDescrId + "\" style=\"display: none;\">" + sCloseBtnDescr + "</span>"
 		});
 
 		var sBackBtnTooltipDescr = this._oResourceBundle.getText("MESSAGEPOPOVER_ARIA_BACK_BUTTON_TOOLTIP");
 		var sBackBtnDescr = this._oResourceBundle.getText("MESSAGEPOPOVER_ARIA_BACK_BUTTON");
 		var sBackBtnDescrId = this.getId() + "-BackBtnDetDescr";
 		var oBackBtnARIAHiddenDescr = new HTML(sBackBtnDescrId, {
-			content: "<span id=\"" + sBackBtnDescrId + "\" class=\"sapMMsgViewHiddenContainer\">" + sBackBtnDescr + "</span>"
+			content: "<span id=\"" + sBackBtnDescrId + "\" style=\"display: none;\">" + sBackBtnDescr + "</span>"
 		});
 
 		this._oBackButton = new Button({
@@ -656,7 +656,7 @@ sap.ui.define([
 	/**
 	 * Creates navigation pages
 	 *
-	 * @returns {this} Reference to the 'this' for chaining purposes
+	 * @returns {sap.m.MessageView} Reference to the 'this' for chaining purposes
 	 * @private
 	 */
 	MessageView.prototype._createNavigationPages = function () {
@@ -667,7 +667,7 @@ sap.ui.define([
 
 		this._detailsPage = new Page(this.getId() + "-detailsPage", {
 			customHeader: this._getDetailsHeader()
-		}).addStyleClass("sapMMsgViewDetailsPage");
+		});
 
 		// TODO: check if this is the best location for this
 		// Disable clicks on disabled and/or pending links
@@ -699,7 +699,7 @@ sap.ui.define([
 	/**
 	 * Creates Lists of the MessageView
 	 *
-	 * @returns {this} Reference to the 'this' for chaining purposes
+	 * @returns {sap.m.MessageView} Reference to the 'this' for chaining purposes
 	 * @private
 	 */
 	MessageView.prototype._createLists = function () {
@@ -721,7 +721,7 @@ sap.ui.define([
 	/**
 	 * Destroy items in the MessageView's Lists
 	 *
-	 * @returns {this} Reference to the 'this' for chaining purposes
+	 * @returns {sap.m.MessageView} Reference to the 'this' for chaining purposes
 	 * @private
 	 */
 	MessageView.prototype._clearLists = function () {
@@ -860,7 +860,7 @@ sap.ui.define([
 	/**
 	 * Destroy the buttons in the SegmentedButton
 	 *
-	 * @returns {this} Reference to the 'this' for chaining purposes
+	 * @returns {sap.m.MessageView} Reference to the 'this' for chaining purposes
 	 * @private
 	 */
 	MessageView.prototype._clearSegmentedButton = function () {
@@ -874,7 +874,7 @@ sap.ui.define([
 	/**
 	 * Fill SegmentedButton with needed Buttons for filtering
 	 *
-	 * @returns {this} Reference to the 'this' for chaining purposes
+	 * @returns {sap.m.MessageView} Reference to the 'this' for chaining purposes
 	 * @private
 	 */
 	MessageView.prototype._fillSegmentedButton = function () {
@@ -1029,7 +1029,7 @@ sap.ui.define([
 	MessageView.prototype._iNextValidationTaskId = 0;
 
 	MessageView.prototype._validateURL = function (sUrl) {
-		if (URLListValidator.validate(sUrl)) {
+		if (URLWhitelist.validate(sUrl)) {
 			return sUrl;
 		}
 
@@ -1043,7 +1043,7 @@ sap.ui.define([
 		var iValidationTaskId = ++this._iNextValidationTaskId;
 		var oPromiseArgument = {};
 
-		var oPromise = new Promise(function (resolve, reject) {
+		var oPromise = new window.Promise(function (resolve, reject) {
 
 			oPromiseArgument.resolve = resolve;
 			oPromiseArgument.reject = reject;
@@ -1198,13 +1198,13 @@ sap.ui.define([
 
 		this._clearDetailsPage.call(this, aDetailsPageContent);
 
-		if (typeof asyncDescHandler === "function" && oMessageItem.getLongtextUrl()) {
+		if (typeof asyncDescHandler === "function" && !!oMessageItem.getLongtextUrl()) {
 			// Set markupDescription to true as markup description should be processed as markup
 			oMessageItem.setMarkupDescription(true);
 
 			var oPromiseArgument = {};
 
-			var oPromise = new Promise(function (resolve, reject) {
+			var oPromise = new window.Promise(function (resolve, reject) {
 				oPromiseArgument.resolve = resolve;
 				oPromiseArgument.reject = reject;
 			});
@@ -1250,7 +1250,7 @@ sap.ui.define([
 		this._setTitle(oMessageItem, oListItem);
 		this._sanitizeDescription(oMessageItem);
 		this._setIcon(oMessageItem, oListItem);
-		this._detailsPage.invalidate();
+		this._detailsPage.rerender();
 		this.fireLongtextLoaded();
 
 		if (!bSuppressNavigate) {

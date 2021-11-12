@@ -1,22 +1,22 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.m.Link.
 sap.ui.define([
-	"./library",
-	"sap/ui/core/Control",
-	"sap/ui/core/InvisibleText",
-	"sap/ui/core/EnabledPropagator",
-	"sap/ui/core/LabelEnablement",
-	"sap/ui/core/library",
-	"sap/ui/Device",
-	"./LinkRenderer",
+	'./library',
+	'sap/ui/core/Control',
+	'sap/ui/core/InvisibleText',
+	'sap/ui/core/EnabledPropagator',
+	'sap/ui/core/LabelEnablement',
+	'sap/ui/core/library',
+	'sap/ui/Device',
+	'./LinkRenderer',
 	"sap/ui/events/KeyCodes",
 	"sap/base/Log",
-	"sap/base/security/URLListValidator"
+		"sap/base/security/URLWhitelist"
 ],
 function(
 	library,
@@ -29,9 +29,11 @@ function(
 	LinkRenderer,
 	KeyCodes,
 	Log,
-	URLListValidator
+	URLWhitelist
 ) {
 	"use strict";
+
+
 
 	// shortcut for sap.ui.core.TextDirection
 	var TextDirection = coreLibrary.TextDirection;
@@ -39,11 +41,7 @@ function(
 	// shortcut for sap.ui.core.TextAlign
 	var TextAlign = coreLibrary.TextAlign;
 
-	// shortcut for sap.ui.core.aria.HasPopup
-	var AriaHasPopup = coreLibrary.aria.HasPopup;
 
-	// shortcut for sap.m.EmptyIndicator
-	var EmptyIndicatorMode = library.EmptyIndicatorMode;
 
 	/**
 	 * Constructor for a new <code>Link</code>.
@@ -78,10 +76,10 @@ function(
 	 * @see {@link fiori:https://experience.sap.com/fiori-design-web/link/ Link}
 	 *
 	 * @extends sap.ui.core.Control
-	 * @implements sap.ui.core.IShrinkable, sap.ui.core.IFormContent, sap.ui.core.ITitleContent
+	 * @implements sap.ui.core.IShrinkable, sap.ui.core.IFormContent
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -93,8 +91,7 @@ function(
 
 		interfaces : [
 			"sap.ui.core.IShrinkable",
-			"sap.ui.core.IFormContent",
-			"sap.ui.core.ITitleContent"
+			"sap.ui.core.IFormContent"
 		],
 		library : "sap.m",
 		designtime: "sap/m/designtime/Link.designtime",
@@ -120,15 +117,6 @@ function(
 			target : {type : "string", group : "Behavior", defaultValue : null},
 
 			/**
-			 * Specifies the value of the HTML <code>rel</code> attribute.
-			 *
-			 * <b>Note:</b> A default value of <code>noopener noreferrer</code> is set only to links that have a cross-origin URL
-			 * and a specified <code>target</code> with value other than <code>_self</code>.
-			 * @since 1.84
-			 */
-			rel : {type : "string", group : "Behavior", defaultValue : null},
-
-			/**
 			 * Determines the width of the link (CSS-size such as % or px). When it is set, this is the exact size.
 			 * When left blank, the text defines the size.
 			 */
@@ -145,8 +133,8 @@ function(
 			 *
 			 * If validation fails, the value of the <code>href</code> property will still be set, but will not be applied to the DOM.
 			 *
-			 * <b>Note:</b> Additional URLs are allowed through
-			 * {@link module:sap/base/security/URLListValidator URLListValidator}.
+			 * <b>Note:</b> Additional whitelisting of URLs is allowed through
+			 * {@link module:sap/base/security/URLWhitelist URLWhitelist}.
 			 *
 			 * @since 1.54.0
 			 */
@@ -179,27 +167,7 @@ function(
 			 * Emphasized links look visually more important than regular links.
 			 * @since 1.22
 			 */
-			emphasized : {type : "boolean", group : "Behavior", defaultValue : false},
-
-			/**
-			 * Specifies the value of the <code>aria-haspopup</code> attribute
-			 *
-			 * If the value is <code>None</code>, the attribute will not be rendered. Otherwise it will be rendered according to the selected value.
-			 *
-			 * NOTE: Use this property only when a link is related to a popover/popup. The value needs to be equal to the main/root role of the popup - e.g. dialog,
-			 * menu or list (examples: if you have dialog -> dialog, if you have menu -> menu; if you have list -> list; if you have dialog containing a list -> dialog).
-			 * Do not use it, if you open a standard sap.m.Dialog, MessageBox or other type of dialogs displayed as on overlay over the application.
-			 *
-			 * @since 1.86.0
-			 */
-			ariaHasPopup : {type : "sap.ui.core.aria.HasPopup", group : "Accessibility", defaultValue : AriaHasPopup.None},
-
-			/**
-			 * Specifies if an empty indicator should be displayed when there is no text.
-			 *
-			 * @since 1.89
-			 */
-			emptyIndicatorMode: { type: "sap.m.EmptyIndicatorMode", group: "Appearance", defaultValue: EmptyIndicatorMode.Off }
+			emphasized : {type : "boolean", group : "Behavior", defaultValue : false}
 		},
 		associations : {
 
@@ -386,11 +354,11 @@ function(
 	 * Checks if the given sUri is valid depending on the validateUrl property
 	 *
 	 * @param {String} sUri
-	 * @returns {boolean}
+	 * @returns {Boolean}
 	 * @private
 	 */
 	Link.prototype._isHrefValid = function (sUri) {
-		return this.getValidateUrl() ? URLListValidator.validate(sUri) : true;
+		return this.getValidateUrl() ? URLWhitelist.validate(sUri) : true;
 	};
 
 	/**
@@ -398,24 +366,13 @@ function(
 	 *
 	 * @see sap.ui.core.Control#getAccessibilityInfo
 	 * @protected
-	 * @returns {object} The <code>sap.m.Link</code>  accessibility information
+	 * @returns {Object} The <code>sap.m.Link</code>  accessibility information
 	 */
 	Link.prototype.getAccessibilityInfo = function() {
-		var oResourceBundle = sap.ui.getCore().getLibraryResourceBundle("sap.m"),
-			sEmphasizedInfo = this.getEmphasized() ? oResourceBundle.getText("LINK_EMPHASIZED") : "",
-			sSubtleInfo = this.getSubtle() ? oResourceBundle.getText("LINK_SUBTLE") : "",
-			sText = this.getText(),
-			sDescription = sText;
-
-		if (sText) {
-			sEmphasizedInfo && (sDescription += " " + sEmphasizedInfo);
-			sSubtleInfo && (sDescription += " " + sSubtleInfo);
-		}
-
 		return {
 			role: "link",
-			type: sText ? oResourceBundle.getText("ACC_CTR_TYPE_LINK") : undefined,
-			description: sDescription,
+			type: this.getText() ? sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("ACC_CTR_TYPE_LINK") : undefined,
+			description: this.getText() || this.getHref() || "",
 			focusable: this.getEnabled(),
 			enabled: this.getEnabled()
 		};

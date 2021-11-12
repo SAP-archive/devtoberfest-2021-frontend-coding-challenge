@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -48,7 +48,7 @@ function(
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @public
@@ -57,10 +57,7 @@ function(
 		 */
 		var Switch = Control.extend("sap.m.Switch", /** @lends sap.m.Switch.prototype */ { metadata: {
 
-			interfaces: [
-				"sap.ui.core.IFormContent",
-				"sap.m.IOverflowToolbarContent"
-			],
+			interfaces: ["sap.ui.core.IFormContent"],
 			library: "sap.m",
 			properties: {
 
@@ -143,11 +140,6 @@ function(
 				iPosition = Switch._OFFPOSITION;
 			} else if (iPosition < Switch._ONPOSITION) {
 				iPosition = Switch._ONPOSITION;
-			}
-
-			// fix handle movement when the switch is shorter (no label) in some themes | BCP: 2170252080
-			if (iPosition > this._iNoLabelFix) {
-				iPosition = this._iNoLabelFix;
 			}
 
 			if (this._iCurrentPosition === iPosition) {
@@ -272,9 +264,6 @@ function(
 
 			// add active state
 			this.$("switch").addClass(CSS_CLASS + "Pressed");
-
-			// necessary for fixing handle movement when the switch is shorter (no label) in some themes | BCP: 2170252080
-			this._iNoLabelFix = parseInt(getComputedStyle(this.getDomRef("switch")).outlineOffset);
 		};
 
 		/**
@@ -456,30 +445,17 @@ function(
 		Switch.prototype.getAccessibilityInfo = function() {
 			var oBundle = sap.ui.getCore().getLibraryResourceBundle("sap.m"),
 				bState = this.getState(),
-				sDesc = this.getInvisibleElementText(bState);
+				sDesc = bState ? oBundle.getText("ACC_CTR_STATE_CHECKED") + " "
+						+ this.getInvisibleElementText(bState) : oBundle.getText("ACC_CTR_STATE_NOT_CHECKED") + " " + this.getInvisibleElementText(bState);
 
 			return {
 				role: "switch",
-				type: oBundle.getText("ACC_CTR_TYPE_SWITCH"),
-				description: sDesc,
+				type: oBundle.getText("ACC_CTR_TYPE_CHECKBOX"),
+				description: sDesc.trim(),
 				focusable: this.getEnabled(),
 				enabled: this.getEnabled()
 			};
 		};
-
-	/**
-	 * Required by the {@link sap.m.IOverflowToolbarContent} interface.
-	 *
-	 * @returns {object} Configuration information for the <code>sap.m.IOverflowToolbarContent</code> interface.
-	 *
-	 * @private
-	 * @ui5-restricted sap.m.OverflowToolBar
-	 */
-	Switch.prototype.getOverflowToolbarConfig = function() {
-		return {
-			propsUnrelatedToSize: ["enabled", "state"]
-		};
-	};
 
 		return Switch;
 	});

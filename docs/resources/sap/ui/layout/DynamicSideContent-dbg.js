@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -9,11 +9,10 @@ sap.ui.define([
 	'sap/ui/thirdparty/jquery',
 	'sap/ui/core/Control',
 	'sap/ui/core/ResizeHandler',
-	'sap/ui/core/delegate/ScrollEnablement',
 	'sap/ui/layout/library',
 	'./DynamicSideContentRenderer'
 ],
-	function(jQuery, Control, ResizeHandler, ScrollEnablement, library, DynamicSideContentRenderer) {
+	function(jQuery, Control, ResizeHandler, library, DynamicSideContentRenderer) {
 		"use strict";
 
 		// shortcut for sap.ui.layout.SideContentPosition
@@ -94,7 +93,7 @@ sap.ui.define([
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @public
@@ -145,17 +144,7 @@ sap.ui.define([
 				 * Determines whether the side content is on the left or on the right side of the main content.
 				 * @since 1.36
 				 */
-				sideContentPosition : {type : "sap.ui.layout.SideContentPosition", group : "Appearance", defaultValue : SideContentPosition.End},
-
-				/**
-				 * Defiles the main content span size
-				 */
-				mcSpan: { type: "int", defaultValue: 0, visibility: "hidden" },
-
-				/**
-				 * Defines the side content span size
-				 */
-				scSpan: { type: "int", defaultValue: 0, visibility: "hidden" }
+				sideContentPosition : {type : "sap.ui.layout.SideContentPosition", group : "Appearance", defaultValue : SideContentPosition.End}
 			},
 			defaultAggregation : "mainContent",
 			events : {
@@ -206,11 +195,15 @@ sap.ui.define([
 			M_L_BREAKPOINT = 1024,
 			L_XL_BREAKPOINT = 1440;
 
+		DynamicSideContent.prototype.init = function () {
+			this._bSuppressInitialFireBreakPointChange = true;
+		};
+
 		/**
 		 * Sets the sideContentVisibility property.
 		 * @param {sap.ui.layout.SideContentVisibility} sVisibility Determines on which breakpoints the side content is visible.
 		 * @param {boolean} bSuppressVisualUpdate Determines if the visual state is updated
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.ui.layout.DynamicSideContent} this pointer for chaining
 		 * @override
 		 * @public
 		 */
@@ -228,7 +221,7 @@ sap.ui.define([
 		 * Sets the showSideContent property.
 		 * @param {boolean} bVisible Determines if the side content part is visible
 		 * @param {boolean} bSuppressVisualUpdate Determines if the visual state is updated
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.ui.layout.DynamicSideContent} this pointer for chaining
 		 * @override
 		 * @public
 		 */
@@ -253,7 +246,7 @@ sap.ui.define([
 		 * Sets the showMainContent property.
 		 * @param {boolean} bVisible Determines if the main content part is visible
 		 * @param {boolean} bSuppressVisualUpdate Determines if the visual state is updated
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.ui.layout.DynamicSideContent} this pointer for chaining
 		 * @override
 		 * @public
 		 */
@@ -303,7 +296,7 @@ sap.ui.define([
 		/**
 		 * Sets or unsets the page in equalSplit mode.
 		 * @param {boolean}[bState] Determines if the page is set to equalSplit mode
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.ui.layout.DynamicSideContent} this pointer for chaining
 		 * @override
 		 * @public
 		 */
@@ -322,7 +315,7 @@ sap.ui.define([
 		 * Adds a control to the side content area.
 		 * Only the side content part in the aggregation is re-rendered.
 		 * @param {object} oControl Object to be added in the aggregation
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.ui.layout.DynamicSideContent} this pointer for chaining
 		 * @override
 		 * @public
 		 */
@@ -337,7 +330,7 @@ sap.ui.define([
 		 * Adds a control to the main content area.
 		 * Only the main content part in the aggregation is re-rendered.
 		 * @param {object} oControl Object to be added in the aggregation
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.ui.layout.DynamicSideContent} this pointer for chaining
 		 * @override
 		 * @public
 		 */
@@ -354,7 +347,7 @@ sap.ui.define([
 		 * This helper method is used to implement a button/switch for changing
 		 * between the main and side content areas.
 		 * Only works if the current breakpoint is "S".
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.ui.layout.DynamicSideContent} this pointer for chaining
 		 * @public
 		 */
 		DynamicSideContent.prototype.toggle = function () {
@@ -384,10 +377,7 @@ sap.ui.define([
 
 		/**
 		 * Returns the breakpoint for the current state of the control.
-		 *
-		 * If the control is not rendered yet, this method will return <code>undefined</code>,
-		 * as current break point calculation is based on the parent container width.
-		 * @returns {string} currentBreakpoint
+		 * @returns {String} currentBreakpoint
 		 * @public
 		 */
 		DynamicSideContent.prototype.getCurrentBreakpoint = function () {
@@ -400,11 +390,10 @@ sap.ui.define([
 		 * @override
 		 */
 		DynamicSideContent.prototype.onBeforeRendering = function () {
-			this._bSuppressInitialFireBreakPointChange = true;
 			this._detachContainerResizeListener();
 
-			this._SCVisible = (this._SCVisible === undefined) ? this.getProperty("showSideContent") : this._SCVisible;
-			this._MCVisible = (this._MCVisible === undefined) ? this.getProperty("showMainContent") : this._MCVisible;
+			this._SCVisible = this.getProperty("showSideContent");
+			this._MCVisible = this.getProperty("showMainContent");
 
 			if (!this.getContainerQuery()) {
 				this._iWindowWidth = jQuery(window).width();
@@ -424,18 +413,12 @@ sap.ui.define([
 				this._adjustToScreenSize();
 			} else {
 				var that = this;
-				jQuery(window).on("resize", function() {
+				jQuery(window).resize(function() {
 					that._adjustToScreenSize();
 				});
 			}
 			this._changeGridState();
 			this._initScrolling();
-		};
-
-		DynamicSideContent.prototype.onThemeChanged = function () {
-			if (this.getContainerQuery()) {
-				this._adjustToScreenSize();
-			}
 		};
 
 		/**
@@ -457,54 +440,10 @@ sap.ui.define([
 		};
 
 		/**
-		 * Returns a scroll helper object used to handle scrolling.
-		 * @public
-		 * @param {object} oControl The control instance that requested the scroll helper
-		 * @returns {sap.ui.core.delegate.ScrollEnablement} The scroll helper instance
-		 * @since 1.78
-		 */
-		DynamicSideContent.prototype.getScrollDelegate = function (oControl) {
-			var oControlInQuestion = oControl,
-				oContainerOfDSC = this.getParent(),
-				sBreakpoint = this._getBreakPointFromWidth(),
-				bMCVisible = this.getShowMainContent() && this._MCVisible,
-				bSCVisible = this.getShowSideContent() && this._SCVisible;
-
-			//for cases with main and side content - one above the other - use the scroll delegate of the parent container
-			if (sBreakpoint && sBreakpoint !== L && sBreakpoint !== XL ) {
-				// check whether the control is in visible aggregation; if not - don't get its scrollDelegate
-				if (oControlInQuestion &&
-					((oControlInQuestion.sParentAggregationName === "sideContent" && !bSCVisible) ||
-						(oControlInQuestion.sParentAggregationName === "mainContent" && !bMCVisible)) ){
-					return;
-				} else {
-					while (oContainerOfDSC && (!oContainerOfDSC.getScrollDelegate || !oContainerOfDSC.getScrollDelegate())) {
-						oContainerOfDSC = oContainerOfDSC.getParent();
-					}
-					return oContainerOfDSC.getScrollDelegate();
-				}
-			}
-
-			if (this._oMCScroller && this._oSCScroller) {
-				while (oControlInQuestion && oControlInQuestion.getId() !== this.getId()) {
-					if (oControlInQuestion.sParentAggregationName === "mainContent" && bMCVisible) {
-						return this._oMCScroller;
-					}
-					if (oControlInQuestion.sParentAggregationName === "sideContent" && bSCVisible) {
-						return this._oSCScroller;
-					}
-					oControlInQuestion = oControlInQuestion.getParent();
-				}
-			}
-
-			return;
-		};
-
-		/**
 		 * Re-renders only part of the control that is changed.
 		 * @param {object} aControls Array containing the passed aggregation controls
 		 * @param {object} $domElement DOM reference of the control to be re-rendered
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.ui.layout.DynamicSideContent} this pointer for chaining
 		 * @private
 		 */
 		DynamicSideContent.prototype._rerenderControl = function (aControls, $domElement) {
@@ -527,6 +466,7 @@ sap.ui.define([
 				sMainContentId = sControlId + "-" + MC_GRID_CELL_SELECTOR;
 
 			if (!this._oSCScroller && !this._oMCScroller) {
+				var ScrollEnablement = sap.ui.requireSync("sap/ui/core/delegate/ScrollEnablement");
 				this._oSCScroller = new ScrollEnablement(this, null, {
 					scrollContainerId: sSideContentId,
 					horizontal: false,
@@ -545,11 +485,9 @@ sap.ui.define([
 		 * @private
 		 */
 		DynamicSideContent.prototype._attachContainerResizeListener = function () {
-			// Ensure that the resize listener will be attached to the control,
-			// after rendering handler is executed and DOM reference adjustments are all done
-			setTimeout(function() {
-				this._sContainerResizeListener = ResizeHandler.register(this, this._adjustToScreenSize.bind(this));
-			}.bind(this), 0);
+			if (!this._sContainerResizeListener) {
+				this._sContainerResizeListener = ResizeHandler.register(this, jQuery.proxy(this._adjustToScreenSize, this));
+			}
 		};
 
 		/**
@@ -608,11 +546,20 @@ sap.ui.define([
 				this._iWindowWidth = jQuery(window).width();
 			}
 
-			this._currentBreakpoint = this._getBreakPointFromWidth(this._iWindowWidth);
+			if (this._iWindowWidth !== this._iOldWindowWidth) {
+				this._iOldWindowWidth = this._iWindowWidth;
 
-			this._setResizeData(this._currentBreakpoint, this.getEqualSplit());
-			this._changeGridState();
-			this._setBreakpointFromWidth(this._iWindowWidth);
+				this._oldBreakPoint = this._currentBreakpoint;
+				this._currentBreakpoint = this._getBreakPointFromWidth(this._iWindowWidth);
+
+				if ((this._oldBreakPoint !== this._currentBreakpoint)
+					|| (this._currentBreakpoint === M
+					&& this.getSideContentFallDown() === SideContentFallDown.OnMinimumWidth)) {
+					this._setResizeData(this._currentBreakpoint, this.getEqualSplit());
+					this._changeGridState();
+				}
+				this._setBreakpointFromWidth(this._iWindowWidth);
+			}
 		};
 
 		/**
@@ -620,7 +567,7 @@ sap.ui.define([
 		 * control mode.
 		 * @param {string} sSizeName Possible values S, M, L, XL
 		 * @param {boolean} bComparison Checks if the page is in equalSplit mode
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.ui.layout.DynamicSideContent} this pointer for chaining
 		 * @private
 		 */
 		DynamicSideContent.prototype._setResizeData = function (sSizeName, bComparison) {
@@ -632,7 +579,7 @@ sap.ui.define([
 				switch (sSizeName) {
 					case S:
 						this._setSpanSize(SPAN_SIZE_12, SPAN_SIZE_12);
-						if (this.getProperty("showSideContent") && this.getProperty("showMainContent") && this._MCVisible) {
+						if (this.getProperty("showSideContent") && this.getProperty("showMainContent")) {
 							this._SCVisible = sideContentVisibility === SideContentVisibility.AlwaysShow;
 						}
 						this._bFixedSideContent = false;
@@ -706,7 +653,7 @@ sap.ui.define([
 				bFixedSC,
 				bSCNeverShow;
 
-			bSameLine = (this.getProperty("scSpan") + this.getProperty("mcSpan")) === SPAN_SIZE_12;
+			bSameLine = (this._iScSpan + this._iMcSpan) === SPAN_SIZE_12;
 			bBothVisible = this._MCVisible && this._SCVisible;
 
 			bOnlyScVisible = !this._MCVisible && this._SCVisible;
@@ -740,8 +687,8 @@ sap.ui.define([
 
 			if (this._SCVisible && this._MCVisible && bSideContentVisibleProperty && bMainContentVisibleProperty) {
 				if (!this._bFixedSideContent) {
-					$mainContent.removeClass().addClass("sapUiDSCSpan" + this.getProperty("mcSpan"));
-					$sideContent.removeClass().addClass("sapUiDSCSpan" + this.getProperty("scSpan"));
+					$mainContent.removeClass().addClass("sapUiDSCSpan" + this._iMcSpan);
+					$sideContent.removeClass().addClass("sapUiDSCSpan" + this._iScSpan);
 				}
 				if (this._shouldSetHeight()) {
 					$sideContent.css("height", "100%").css("float", "left");
@@ -763,9 +710,6 @@ sap.ui.define([
 				$mainContent.addClass(HIDDEN_CLASS);
 				$sideContent.addClass(HIDDEN_CLASS);
 			}
-
-			$mainContent.addClass("sapUiDSCM");
-			$sideContent.addClass("sapUiDSCS");
 		};
 
 		/**
@@ -775,8 +719,8 @@ sap.ui.define([
 		 * @private
 		 */
 		DynamicSideContent.prototype._setSpanSize = function (iScSpan, iMcSpan) {
-			this.setProperty("scSpan", iScSpan);
-			this.setProperty("mcSpan", iMcSpan);
+			this._iScSpan = iScSpan;
+			this._iMcSpan = iMcSpan;
 		};
 
 		return DynamicSideContent;

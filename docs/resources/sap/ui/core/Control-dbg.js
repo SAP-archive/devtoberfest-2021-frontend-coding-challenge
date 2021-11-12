@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -77,7 +77,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Element
 	 * @abstract
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @alias sap.ui.core.Control
 	 * @ui5-metamodel This control/element also will be described in the UI5 (legacy) designtime metamodel
 	 */
@@ -250,9 +250,8 @@ sap.ui.define([
 	 * Renderer.apiVersion 2" of the {@link sap.ui.core.RenderManager RenderManager} API documentation are
 	 * fulfilled.
 	 *
-	 * @param {string} sClassName Name of the class to be created
-	 * @param {object} [oClassInfo] Object literal with information about the class
-	 * @param {function} [FNMetaImpl] Constructor function for the metadata object. If not given, it defaults to <code>sap.ui.core.ElementMetadata</code>.
+	 * @param {string} sClassName fully qualified name of the class that is described by this metadata object
+	 * @param {object} oStaticInfo static info to construct the metadata from
 	 * @returns {function} Constructor of the newly created class
 	 *
 	 * @public
@@ -274,7 +273,7 @@ sap.ui.define([
 	 *
 	 * @param {string} [sIdSuffix] a suffix to be appended to the cloned element id
 	 * @param {string[]} [aLocalIds] an array of local IDs within the cloned hierarchy (internally used)
-	 * @returns {this} reference to the newly created clone
+	 * @return {sap.ui.core.Control} reference to the newly created clone
 	 * @public
 	 */
 	Control.prototype.clone = function() {
@@ -301,7 +300,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Control.prototype.isActive = function() {
-		return document.getElementById(this.sId) != null;
+		return ((this.sId ? window.document.getElementById(this.sId) : null)) != null;
 	};
 
 	/**
@@ -399,7 +398,7 @@ sap.ui.define([
 	 * Defines whether the user can select text inside this control.
 	 * Defaults to <code>true</code> as long as this method has not been called.
 	 *
-	 * <b>Note:</b>This only works in Safari; for Firefox the element's style must
+	 * <b>Note:</b>This only works in IE and Safari; for Firefox the element's style must
 	 * be set to:
 	 * <pre>
 	 *   -moz-user-select: none;
@@ -407,7 +406,7 @@ sap.ui.define([
 	 * in order to prevent text selection.
 	 *
 	 * @param {boolean} bAllow whether to allow text selection or not
-	 * @returns {this} Returns <code>this</code> to allow method chaining
+	 * @return {sap.ui.core.Control} Returns <code>this</code> to allow method chaining
 	 * @public
 	 */
 	Control.prototype.allowTextSelection = function(bAllow) {
@@ -445,7 +444,7 @@ sap.ui.define([
 	 * @function
 	 *
 	 * @param {string} sStyleClass the CSS class name to be added
-	 * @returns {this} Returns <code>this</code> to allow method chaining
+	 * @return {sap.ui.core.Control} Returns <code>this</code> to allow method chaining
 	 * @public
 	 */
 
@@ -457,7 +456,7 @@ sap.ui.define([
 	 * @function
 	 *
 	 * @param {string} sStyleClass the style to be removed
-	 * @returns {this} Returns <code>this</code> to allow method chaining
+	 * @return {sap.ui.core.Control} Returns <code>this</code> to allow method chaining
 	 * @public
 	 */
 
@@ -473,8 +472,8 @@ sap.ui.define([
 	 * @function
 	 *
 	 * @param {string} sStyleClass the CSS class name to be added or removed
-	 * @param {boolean} [bAdd] whether sStyleClass should be added (or removed); when this parameter is not given, sStyleClass will be toggled (removed, if present, and added if not present)
-	 * @return {this} Returns <code>this</code> to allow method chaining
+	 * @param {boolean} bAdd whether sStyleClass should be added (or removed); when this parameter is not given, sStyleClass will be toggled (removed, if present, and added if not present)
+	 * @return {sap.ui.core.Control} Returns <code>this</code> to allow method chaining
 	 * @public
 	 */
 
@@ -486,7 +485,8 @@ sap.ui.define([
 	 * @function
 	 *
 	 * @param {string} sStyleClass the style to check for
-	 * @returns {boolean} Whether the given style(s) has been set before
+	 * @type boolean
+	 * @return whether the given style(s) has been set before
 	 * @public
 	 */
 
@@ -511,7 +511,7 @@ sap.ui.define([
 	 * @param {string} [sEventType] A string containing one or more JavaScript event types, such as "click" or "blur".
 	 * @param {function} [fnHandler] A function to execute each time the event is triggered.
 	 * @param {object} [oListener] The object, that wants to be notified, when the event occurs
-	 * @returns {this} Returns <code>this</code> to allow method chaining
+	 * @return {sap.ui.core.Control} Returns <code>this</code> to allow method chaining
 	 * @public
 	 */
 	Control.prototype.attachBrowserEvent = function(sEventType, fnHandler, oListener) {
@@ -535,7 +535,7 @@ sap.ui.define([
 
 				if (!this._sapui_bInAfterRenderingPhase) {
 					// if control is rendered, directly call bind()
-					this.$().on(sEventType, fnProxy);
+					this.$().bind(sEventType, fnProxy);
 				}
 			}
 		}
@@ -553,7 +553,6 @@ sap.ui.define([
 	 * @param {string} [sEventType] A string containing one or more JavaScript event types, such as "click" or "blur".
 	 * @param {function} [fnHandler] The function that is to be no longer executed.
 	 * @param {object} [oListener] The context object that was given in the call to <code>attachBrowserEvent</code>.
-	 * @returns {this} Returns <code>this</code> to allow method chaining
 	 * @public
 	 */
 	Control.prototype.detachBrowserEvent = function(sEventType, fnHandler, oListener) {
@@ -569,7 +568,7 @@ sap.ui.define([
 						if ( oParamSet.sEventType === sEventType  && oParamSet.fnHandler === fnHandler  &&  oParamSet.oListener === oListener ) {
 							this.aBindParameters.splice(i, 1);
 							// if control is rendered, directly call unbind()
-							$.off(sEventType, oParamSet.fnProxy);
+							$.unbind(sEventType, oParamSet.fnProxy);
 						}
 					}
 				}
@@ -615,7 +614,7 @@ sap.ui.define([
 	 *
 	 * @param {string|Element|sap.ui.core.Control} oRef container into which the control should be put
 	 * @param {string|int} [vPosition="last"] Describes the position where the control should be put into the container
-	 * @returns {this} Returns <code>this</code> to allow method chaining
+	 * @return {sap.ui.core.Control} Returns <code>this</code> to allow method chaining
 	 * @public
 	 */
 	Control.prototype.placeAt = function(oRef, vPosition) {
@@ -717,10 +716,9 @@ sap.ui.define([
 	 *
 	 * Subclasses of Control should override this hook to implement any necessary actions before the rendering.
 	 *
-	 * @param {jQuery.Event} oEvent onBeforeRendering event object
 	 * @protected
 	 */
-	Control.prototype.onBeforeRendering = function(oEvent) {
+	Control.prototype.onBeforeRendering = function() {
 		// Before adding any implementation, please remember that this method was first implemented in release 1.54.
 		// Therefore, many subclasses will not call this method at all.
 	};
@@ -732,10 +730,9 @@ sap.ui.define([
 	 *
 	 * Subclasses of Control should override this hook to implement any necessary actions after the rendering.
 	 *
-	 * @param {jQuery.Event} oEvent onAfterRendering event object
 	 * @protected
 	 */
-	Control.prototype.onAfterRendering = function(oEvent) {
+	Control.prototype.onAfterRendering = function() {
 		// Before adding any implementation, please remember that this method was first implemented in release 1.54.
 		// Therefore, many subclasses will not call this method at all.
 	};
@@ -910,6 +907,8 @@ sap.ui.define([
 		var $this = this.$(this._sBusySection);
 
 		$this.removeClass('sapUiLocalBusy');
+		//Unset the actual DOM Element´s 'aria-busy'
+		$this.removeAttr('aria-busy');
 
 		if (this._sBlockSection === this._sBusySection) {
 			if (!this.getBlocked() && !this.getBusy()) {
@@ -939,7 +938,7 @@ sap.ui.define([
 	 * Set the controls block state.
 	 *
 	 * @param {boolean} bBlocked The new blocked state to be set
-	 * @returns {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.core.Control} <code>this</code> to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.core, sap.m, sap.viz
 	 */
@@ -1007,7 +1006,7 @@ sap.ui.define([
 	 * area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr|tr
 	 *
 	 * @param {boolean} bBusy The new busy state to be set
-	 * @returns {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.core.Control} <code>this</code> to allow method chaining
 	 * @public
 	 */
 	Control.prototype.setBusy = function (bBusy, sBusySection /* this is an internal parameter to apply partial local busy indicator for a specific section of the control */) {
@@ -1056,7 +1055,7 @@ sap.ui.define([
 	 *
 	 * @public
 	 * @deprecated As of 1.15, use {@link #getBusy} instead
-	 * @returns {boolean}
+	 * @return boolean
 	 * @function
 	 */
 	Control.prototype.isBusy = Control.prototype.getBusy;
@@ -1066,7 +1065,7 @@ sap.ui.define([
 	 *
 	 * @public
 	 * @param {int} iDelay The delay in ms
-	 * @returns {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.core.Control} <code>this</code> to allow method chaining
 	 */
 	Control.prototype.setBusyIndicatorDelay = function(iDelay) {
 		// should be modeled as a non-invalidating property once we have that
@@ -1168,7 +1167,6 @@ sap.ui.define([
 	 *
 	 * See {@link #attachValidateFieldGroup}.
 	 *
-	 * @param {string[]} aFieldGroupIds IDs of the field groups that should be validated
 	 * @public
 	 */
 	Control.prototype.triggerValidateFieldGroup = function(aFieldGroupIds) {

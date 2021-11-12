@@ -48,10 +48,7 @@ $.widget("ui.droppable", {
 		this.isover = false;
 		this.isout = true;
 
-		// ##### BEGIN: MODIFIED BY SAP
-		// this.accept = $.isFunction(accept) ? accept : function(d) {
-		this.accept = typeof accept === "function" ? accept : function(d) {
-		// ##### END: MODIFIED BY SAP
+		this.accept = $.isFunction(accept) ? accept : function(d) {
 			return d.is(accept);
 		};
 
@@ -94,10 +91,7 @@ $.widget("ui.droppable", {
 	_setOption: function(key, value) {
 
 		if(key === "accept") {
-			// ##### BEGIN: MODIFIED BY SAP
-			// this.accept = $.isFunction(value) ? value : function(d) {
-			this.accept = typeof value === "function" ? value : function(d) {
-			// ##### END: MODIFIED BY SAP
+			this.accept = $.isFunction(value) ? value : function(d) {
 				return d.is(value);
 			};
 		}
@@ -323,10 +317,7 @@ $.ui.ddmanager = {
 	},
 	dragStart: function( draggable, event ) {
 		//Listen for scrolling so that if the dragging causes scrolling the position of the droppables can be recalculated (see #5003)
-			// ##### BEGIN: MODIFIED BY SAP
-			// draggable.element.parentsUntil( "body" ).bind( "scroll.droppable", function() {
-			draggable.element.parentsUntil( "body" ).on( "scroll.droppable", function() {
-			// ##### END: MODIFIED BY SAP
+		draggable.element.parentsUntil( "body" ).bind( "scroll.droppable", function() {
 			if( !draggable.options.refreshPositions ) {
 				$.ui.ddmanager.prepareOffsets( draggable, event );
 			}
@@ -387,10 +378,7 @@ $.ui.ddmanager = {
 
 	},
 	dragStop: function( draggable, event ) {
-		// ##### BEGIN: MODIFIED BY SAP
-		// draggable.element.parentsUntil( "body" ).unbind( "scroll.droppable" );
-		draggable.element.parentsUntil( "body" ).off( "scroll.droppable" );
-		// ##### END: MODIFIED BY SAP
+		draggable.element.parentsUntil( "body" ).unbind( "scroll.droppable" );
 		//Call prepareOffsets one final time since IE does not fire return scroll events when overflow was caused by drag (see #5003)
 		if( !draggable.options.refreshPositions ) {
 			$.ui.ddmanager.prepareOffsets( draggable, event );

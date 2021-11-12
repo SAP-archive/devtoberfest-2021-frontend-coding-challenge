@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,6 +8,9 @@
 sap.ui.define(['sap/ui/core/Renderer', './InputBaseRenderer', 'sap/ui/core/library'],
 	function(Renderer, InputBaseRenderer, coreLibrary) {
 		"use strict";
+
+		// shortcut for sap.ui.core.ValueState
+		var ValueState = coreLibrary.ValueState;
 
 		/**
 		 * TimePicker renderer.
@@ -29,6 +32,27 @@ sap.ui.define(['sap/ui/core/Renderer', './InputBaseRenderer', 'sap/ui/core/libra
 		 */
 		TimePickerRenderer.addOuterClasses = function(oRm, oControl) {
 			oRm.class(TimePickerRenderer.CSS_CLASS);
+		};
+
+		/**
+		 * Adds extra content to the input.
+		 *
+		 * See {@link sap.m.InputBaseRenderer#writeDecorations}.
+		 * @override
+		 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer
+		 * @param {sap.m.TimePicker} oControl The control that should be rendered
+		 */
+		TimePickerRenderer.writeDecorations = function(oRm, oControl) {
+			var oRb = oControl._oResourceBundle,
+				sText = oRb.getText("TIMEPICKER_SCREENREADER_TAG");
+
+			// invisible span with custom role
+			oRm.openStart("span", oControl.getId() + "-descr");
+			oRm.style("visibility", "hidden");
+			oRm.style("display", "none");
+			oRm.openEnd();
+			oRm.text(sText);
+			oRm.close("span");
 		};
 
 		/**
@@ -75,35 +99,44 @@ sap.ui.define(['sap/ui/core/Renderer', './InputBaseRenderer', 'sap/ui/core/libra
 		 * @param {sap.m.TimePicker} oControl An object representation of the control that should be rendered
 		 */
 		TimePickerRenderer.getAccessibilityState = function (oControl) {
-			var mAccessibilityState = InputBaseRenderer.getAccessibilityState.apply(this, arguments);
+			var sAriaLabelledBy = this.getAriaLabelledBy(oControl),
+				sAriaDescribedBy = this.getAriaDescribedBy(oControl),
+				mAccessibilityState = oControl.getAccessibilityInfo();
 
-			mAccessibilityState["roledescription"] = oControl._oResourceBundle.getText("ACC_CTR_TYPE_TIMEINPUT");
-			mAccessibilityState["autocomplete"] = "none";
-			mAccessibilityState["haspopup"] = coreLibrary.aria.HasPopup.Dialog.toLowerCase();
-			mAccessibilityState["expanded"] = "false";
-			mAccessibilityState["disabled"] = null; // aria-disabled not needed if there's already a native 'disabled' attribute
-			mAccessibilityState["owns"] = oControl.getId() + "-clocks";
-			if (oControl._isMobileDevice()) {
-				mAccessibilityState["describedby"] = oControl._oResourceBundle.getText("ACC_CTR_TYPE_TIMEINPUT_MOBILE_DESCRIBEDBY");
+			if (oControl.getValueState() === ValueState.Error) {
+				mAccessibilityState.invalid = true;
+			}
+
+			if (sAriaLabelledBy) {
+				mAccessibilityState.labelledby = {
+					value: sAriaLabelledBy.trim(),
+					append: true
+				};
+			}
+
+			if (sAriaDescribedBy) {
+				mAccessibilityState.describedby = {
+					value: sAriaDescribedBy.trim(),
+					append: true
+				};
 			}
 
 			return mAccessibilityState;
 		};
 
 		/**
-		 * add extra attributes to TimePicker's Input
+		 * Returns the inner aria describedby ids for the accessibility.
 		 *
-		 * @overrides sap.m.InputBaseRenderer.writeInnerAttributes
-		 * @param {sap.ui.core.RenderManager} oRm the RenderManager that can be used for writing to the render output buffer
-		 * @param {sap.ui.core.Control} oControl an object representation of the control that should be rendered
+		 * @override
+		 * @param {sap.ui.core.Control} oControl an object representation of the control.
+		 * @returns {String}
 		 */
-		TimePickerRenderer.writeInnerAttributes = function (oRm, oControl) {
-			if (oControl._isMobileDevice()) {
-				oRm.attr("readonly", "readonly"); // readonly for mobile devices
+		TimePickerRenderer.getAriaDescribedBy = function (oControl) {
+			var oCustomRoleHiddenTextId = oControl.getId() + "-descr ";
+			if (this.getDescribedByAnnouncement(oControl)) {
+				oCustomRoleHiddenTextId += oControl.getId() + "-describedby";
 			}
-			if (oControl.getShowValueStateMessage()) {
-				oRm.attr("autocomplete", "off"); // autocomplete="off" needed so the native browser autocomplete is not shown?
-			}
+			return oCustomRoleHiddenTextId;
 		};
 
 		return TimePickerRenderer;

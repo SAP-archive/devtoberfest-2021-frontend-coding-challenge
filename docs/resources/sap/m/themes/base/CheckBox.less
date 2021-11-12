@@ -14,7 +14,7 @@
 	text-align: left;
 	padding: 0 0 0 3rem;
 
-	&:not(.sapMCbBgDis):not(.sapMCbDisplayOnly) {
+	&:not(.sapMCbBgDis) {
 		&:hover,
 		.sapMCbLabel:hover {
 			cursor: pointer;
@@ -41,6 +41,12 @@
 			}
 		}
 	}
+}
+
+// paddings should be overwriten when checkbox is the only child of toolbar
+.sapMIBar.sapMTB .sapMCb.sapMBarChild.sapMBarFirstVisibleChild.sapMBarLastVisibleChild {
+	padding-left: 3rem;
+	padding-right: 0;
 }
 
 .sapUiForm .sapMCb {
@@ -165,6 +171,11 @@ html[data-sap-ui-browser^=ff] .sapMCbBg > input {
 	position: absolute;
 }
 
+/* this needed for ie9 in multi select list */
+.sapMLIBSelectM > .sapMCb {
+	width: 3rem;
+}
+
 /* Read only */
 .sapMCbRo .sapMCbBg {
 	background-color: @sapUiFieldReadOnlyBackground;
@@ -231,7 +242,7 @@ html[data-sap-ui-browser^=ff] .sapMCbBg > input {
 		height: 0.75rem;
 		width: 0.75rem;
 		line-height: 0.75rem;
-		font-size: 0.75rem;
+		font-size: 0.625rem;
 		border-radius: 0;
 	}
 
@@ -244,6 +255,10 @@ html[data-sap-ui-browser^=ff] .sapMCbBg > input {
 	}
 
 	.sapMCb.sapMCbDisplayOnly:not(.sapMCbBgDis) {
+		padding-left: 2rem;
+	}
+
+	.sapMIBar.sapMTB .sapMCb.sapMBarChild.sapMBarFirstVisibleChild.sapMBarLastVisibleChild {
 		padding-left: 2rem;
 	}
 }

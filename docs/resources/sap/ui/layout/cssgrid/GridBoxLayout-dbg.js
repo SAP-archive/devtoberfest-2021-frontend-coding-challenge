@@ -1,20 +1,16 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 	"sap/ui/layout/cssgrid/GridLayoutBase",
 	"sap/ui/layout/cssgrid/GridSettings",
+	"sap/ui/layout/cssgrid/GridBoxLayoutStyleHelper",
 	"sap/ui/Device",
 	"sap/ui/thirdparty/jquery"
-], function (
-	GridLayoutBase,
-	GridSettings,
-	Device,
-	jQuery
-) {
+], function (GridLayoutBase, GridSettings, GridBoxLayoutStyleHelper, Device, jQuery) {
 	"use strict";
 
 	var SPAN_PATTERN = /^([X][L](?:[1-9]|1[0-2]))? ?([L](?:[1-9]|1[0-2]))? ?([M](?:[1-9]|1[0-2]))? ?([S](?:[1-9]|1[0-2]))?$/i;
@@ -36,8 +32,6 @@ sap.ui.define([
 		"S": "sapUiLayoutCSSGridBoxLayoutSpanS2"
 	};
 
-	var GRID_GAP = "0.5rem";
-
 	/**
 	 * Constructor for a new GridBoxLayout.
 	 *
@@ -48,7 +42,7 @@ sap.ui.define([
 	 * Applies a sap.ui.layout.cssgrid.GridSettings to a provided DOM element or Control.
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @extends sap.ui.layout.cssgrid.GridLayoutBase
 	 *
@@ -75,8 +69,6 @@ sap.ui.define([
 
 				/**
 				 * A string type that defines number of Boxes per row for extra large, large, medium and small screens
-				 *
-				 * <b>Note:</b> When the property <code>boxMinWidth</code> or <code>boxWidth</code> is set this property has no effect.
 				 */
 				boxesPerRowConfig: {type: "sap.ui.layout.BoxesPerRowConfig", group: "Behavior", defaultValue: "XL7 L6 M4 S2"}
 			}
@@ -91,57 +83,56 @@ sap.ui.define([
 	GridBoxLayout.prototype.getActiveGridSettings = function () {
 		return new GridSettings({
 			gridTemplateColumns: this._getTemplateColumns(),
-			gridGap: GRID_GAP + " " + GRID_GAP
+			gridGap: "0.5rem 0.5rem"
 		});
 	};
 
 	/**
-	 * @override
+	 * Apply display:grid styles to the provided HTML element or control based on the currently active GridSettings
+	 *
+	 * @protected
+	 * @param {sap.ui.core.Control|HTMLElement} oElement The element or control on which to apply the display:grid styles
 	 */
 	GridBoxLayout.prototype._applySingleGridLayout = function (oElement) {
-
-		GridLayoutBase.prototype._applySingleGridLayout.call(this, oElement);
-
-		var oGridList = sap.ui.getCore().byId(oElement.parentElement.id);
-
-		if (oGridList && oGridList.isA("sap.f.GridList") && oGridList.isGrouped()) {
-			this._flattenHeight(oGridList);
+		if (this.isGridSupportedByBrowser()) {
+			GridLayoutBase.prototype._applySingleGridLayout.call(this, oElement);
 		}
-
 	};
 
 	/**
-	 * @override
+	 * Render display:grid styles. Used for non-responsive grid layouts.
+	 *
+	 * @param {sap.ui.core.RenderManager} rm The render manager of the Control which wants to render display:grid styles
 	 */
-	GridBoxLayout.prototype.addGridStyles = function (oRM) {
-		GridLayoutBase.prototype.addGridStyles.apply(this, arguments);
-		this._addSpanClasses(oRM);
+	GridBoxLayout.prototype.renderSingleGridLayout = function (rm) {
+		this._addSpanClasses(rm);
 
-		oRM.class("sapUiLayoutCSSGridBoxLayoutContainer");
-
+		if (this.isGridSupportedByBrowser()) {
+			rm.addClass("sapUiLayoutCSSGridBoxLayoutContainer");
+		} else {
+			rm.addClass("sapUiLayoutCSSGridBoxLayoutPolyfill");
+		}
 	};
 
 	/**
 	 * Hook function for the Grid's onAfterRendering
 	 * @param {sap.ui.layout.cssgrid.IGridConfigurable} oGrid The grid
-	 * @override
-	 * @protected
 	 */
 	GridBoxLayout.prototype.onGridAfterRendering = function (oGrid) {
 		// Add a specific class to each grid item
-		// Loops over each element's dom and adds the grid item class
-		oGrid.getGridDomRefs().forEach(function (oDomRef) {
-			if (oDomRef.children){
-				for (var i = 0; i < oDomRef.children.length; i++) {
-					if (!oDomRef.children[i].classList.contains("sapMGHLI") && !oDomRef.children[i].classList.contains("sapUiBlockLayerTabbable")) { // the item is not group header or a block layer tabbable
-						oDomRef.children[i].classList.add("sapUiLayoutCSSGridItem");
-					}
-				}
-			}
-		});
+		GridLayoutBase.prototype.onGridAfterRendering.call(this, oGrid);
 
 		if (!this._hasBoxWidth()) {
 			this._applySizeClass(oGrid);
+		}
+
+		if (!this.isGridSupportedByBrowser()) {
+			this._calcWidth(oGrid);
+			this._flattenHeight(oGrid);
+
+			if (!this._hasBoxWidth()) {
+				this._applyClassForLastItem(oGrid);
+			}
 		}
 
 		if (oGrid.isA("sap.f.GridList") && oGrid.getGrowing()) { // if there is growing of the list new GridListItems are loaded and there could be changes in all GridListItems dimensions
@@ -150,10 +141,48 @@ sap.ui.define([
 			oGrid._oGrowingDelegate._onAfterPageLoaded = function () {
 				fnCopyOfOnAfterPageLoaded.call(oGrid._oGrowingDelegate);
 
-				if (oGrid.isA("sap.f.GridList") && oGrid.isGrouped()) {
-						this._flattenHeight(oGrid);
+				if (!this.isGridSupportedByBrowser()) {
+					this._flattenHeight(oGrid);
+					this._calcWidth(oGrid);
+					this._loopOverGridItems(oGrid, function (oGridItem) {
+						if (!oGridItem.classList.contains("sapMGHLI") && !oGridItem.classList.contains("sapUiBlockLayerTabbable")) { // the item is not group header or a block layer tabbable
+							oGridItem.classList.add("sapUiLayoutCSSGridItem"); // newly loaded items don't have this class
+						}
+					});
+
+					if (!this._hasBoxWidth()) {
+						this._applyClassForLastItem(oGrid);
+					}
+
+				} else if (oGrid.isA("sap.f.GridList") && oGrid.isGrouped()) {
+					this._flattenHeight(oGrid);
 				}
 			}.bind(this);
+		}
+
+		if (!this.isGridSupportedByBrowser() && !this._dndPolyfillAttached) {
+			oGrid.attachEvent("_gridPolyfillAfterDragOver", oGrid, this._polyfillAfterDragOver, this);
+			oGrid.attachEvent("_gridPolyfillAfterDragEnd", oGrid, this._polyfillAfterDragEnd, this);
+			this._dndPolyfillAttached = true;
+			// todo: detach
+		}
+	};
+
+	/**
+	 * Sets all display:grid styles to the provided HTML element
+	 *
+	 * @protected
+	 * @param {HTMLElement} oElement The element to which to apply the grid styles
+	 * @param {sap.ui.layout.cssgrid.GridSettings} oGridSettings The grid settings to apply
+	 */
+	GridBoxLayout.prototype._setGridLayout = function (oElement, oGridSettings) {
+		var oGridList = sap.ui.getCore().byId(oElement.parentElement.id);
+
+		// we need to overwrite this function since after it the GridListItems are with final dimensions and further calculation cold be done.
+		GridLayoutBase.prototype._setGridLayout.call(this, oElement, oGridSettings);
+
+		if (this.isGridSupportedByBrowser() && (oGridList && oGridList.isA("sap.f.GridList") && oGridList.isGrouped())) {
+			this._flattenHeight(oGridList);
 		}
 	};
 
@@ -171,12 +200,15 @@ sap.ui.define([
 	 * - Manually flatten the height of the boxes.
 	 *
 	 * @param {object} oEvent - The event from a resize
-	 * @override
-	 * @protected
+	 * @private
 	 */
 	GridBoxLayout.prototype.onGridResize = function (oEvent) {
-		if (oEvent.control && oEvent.control.isA("sap.f.GridList") && oEvent.control.isGrouped()) {
+		if (!this.isGridSupportedByBrowser() || (oEvent.control && oEvent.control.isA("sap.f.GridList") && oEvent.control.isGrouped())) {
 			this._flattenHeight(oEvent.control);
+		}
+
+		if (!this.isGridSupportedByBrowser() && !this._hasBoxWidth()){
+			this._applyClassForLastItem(oEvent.control);
 		}
 
 		if (oEvent) {
@@ -188,32 +220,71 @@ sap.ui.define([
 	};
 
 	/**
+	 * Make all Elements inside the GridBoxLayout with equal widths specified by one of
+	 * boxMinWidth or boxWidth properties.
+	 * Note: Only needed for IE11.
+	 *
+	 * @param {sap.ui.layout.cssgrid.IGridConfigurable} oControl The grid
+	 * @private
+	 */
+	GridBoxLayout.prototype._calcWidth = function (oControl) {
+		var sWidth;
+		if (this._hasBoxWidth()) {
+			sWidth = this.getBoxWidth() || this.getBoxMinWidth();
+		}
+		this._loopOverGridItems(oControl, function (oGridItem) {
+			if (!oGridItem.classList.contains("sapMGHLI")) { // the item is not group header
+				oGridItem.style.width = sWidth;
+			}
+		});
+	};
+
+	/**
 	 * Make all Elements inside the GridBoxLayout with equal heights
 	 *
 	 * @param {sap.ui.layout.cssgrid.IGridConfigurable} oControl The grid
 	 * @private
 	 */
 	GridBoxLayout.prototype._flattenHeight = function (oControl) {
-		var iMaxHeight = 0,
-			sMaxHeight;
+		var iMaxHeight = 0;
+
+		oControl.$().removeClass('sapUiLayoutCSSGridBoxLayoutFlattenHeight');
 
 		this._loopOverGridItems(oControl, function (oGridItem) {
-			if (!oGridItem.classList.contains("sapMGHLI")) {
-				oGridItem.style.height = "";
+			iMaxHeight = Math.max(jQuery(oGridItem).outerHeight(), iMaxHeight);
+		});
+
+		GridBoxLayoutStyleHelper.setItemHeight(oControl.getId(), iMaxHeight);
+
+		oControl.$().addClass('sapUiLayoutCSSGridBoxLayoutFlattenHeight');
+	};
+
+	GridBoxLayout.prototype._applyClassForLastItem = function (oControl) {
+		var iCurrentNumberPerRow = 0;
+		var aBoxesPerRowConfig = this.getBoxesPerRowConfig().split(" ");
+		var oRange = Device.media.getCurrentRange("StdExt", oControl.$().width());
+		var sSizeClassCode = mSizeClasses[oRange.name].substring("sapUiLayoutCSSGridBoxLayoutSize".length);
+		var iMaxNumberPerRow;
+
+		aBoxesPerRowConfig.forEach(function (element) {
+			// Check if SizeClassCode (for example "XL") is contained inside the element
+			if (element.indexOf(sSizeClassCode) != -1){
+				// This splits the layout size and the maximum number of columns from the string: Example: "XL7" -> 7
+				iMaxNumberPerRow = parseInt(element.substring(sSizeClassCode.length));
 			}
 		});
 
 		this._loopOverGridItems(oControl, function (oGridItem) {
-			if (!oGridItem.classList.contains("sapMGHLI")) {
-				iMaxHeight = Math.max(jQuery(oGridItem).outerHeight(), iMaxHeight);
-			}
-		});
-
-		sMaxHeight = iMaxHeight + "px";
-
-		this._loopOverGridItems(oControl, function (oGridItem) {
-			if (!oGridItem.classList.contains("sapMGHLI")) {
-				oGridItem.style.height = sMaxHeight;
+			if (oGridItem.classList.contains("sapUiLayoutCSSGridItem")) { // the item is not group header or a block layer tabbable, it is an item
+				iCurrentNumberPerRow++;
+				if (iCurrentNumberPerRow == iMaxNumberPerRow) {
+					oGridItem.classList.add("sapUiLayoutCSSGridItemLastOnRow");
+					iCurrentNumberPerRow = 0;
+				} else {
+					oGridItem.classList.remove("sapUiLayoutCSSGridItemLastOnRow");
+				}
+			} else if (oGridItem.classList.contains("sapMGHLI")) { // the item is group header, new row is following
+				iCurrentNumberPerRow = 0;
 			}
 		});
 	};
@@ -277,11 +348,12 @@ sap.ui.define([
 	/**
 	 * Adds the breakpoint classes depending on boxesPerRowConfig property
 	 *
-	 * @param {sap.ui.core.RenderManager} oRM - RenderManager of the layout which will be rendered
+	 * @param {sap.ui.core.RenderManager} rm - RenderManager of the layout which will be rendered
 	 * @private
 	 */
-	GridBoxLayout.prototype._addSpanClasses = function (oRM) {
+	GridBoxLayout.prototype._addSpanClasses = function (rm) {
 		var aSpan,
+			sSpan,
 			sSpanPattern = this.getBoxesPerRowConfig(),
 			sSpanXLargeClass,
 			sSpanLargeClass,
@@ -301,29 +373,29 @@ sap.ui.define([
 
 		if (aSpan) {
 			for (var i = 1; i < aSpan.length; i++) {
-				var sSpan = aSpan[i];
-				if (!sSpan) {
-					continue;
-				}
+				sSpan = aSpan[i];
 
-				sSpan = sSpan.toUpperCase();
-				switch (sSpan.substr(0, 1)) {
-					case "X":
-						if (sSpan.substr(1, 1) === "L") {
-							sSpanXLargeClass = this._getBoxesPerRowClass(sSpan, 2);
-						}
-						break;
-					case "L":
-						sSpanLargeClass = this._getBoxesPerRowClass(sSpan, 1);
-						break;
-					case "M":
-						sSpanMediumClass = this._getBoxesPerRowClass(sSpan, 1);
-						break;
-					case "S":
-						sSpanSmallClass = this._getBoxesPerRowClass(sSpan, 1);
-						break;
-					default:
-						break;
+				if (sSpan) {
+					sSpan = sSpan.toUpperCase();
+
+					switch (sSpan.substr(0, 1)) {
+						case "X":
+							if (sSpan.substr(1, 1) === "L") {
+								sSpanXLargeClass = this._getBoxesPerRowClass(sSpan, 2);
+							}
+							break;
+						case "L":
+							sSpanLargeClass = this._getBoxesPerRowClass(sSpan, 1);
+							break;
+						case "M":
+							sSpanMediumClass = this._getBoxesPerRowClass(sSpan, 1);
+							break;
+						case "S":
+							sSpanSmallClass = this._getBoxesPerRowClass(sSpan, 1);
+							break;
+						default:
+							break;
+					}
 				}
 			}
 		}
@@ -333,10 +405,12 @@ sap.ui.define([
 		sSpanMediumClass = sSpanMediumClass || DEFAULT_SPAN_CLASSES.M;
 		sSpanSmallClass = sSpanSmallClass || DEFAULT_SPAN_CLASSES.S;
 
-		oRM.class(sSpanXLargeClass)
-			.class(sSpanLargeClass)
-			.class(sSpanMediumClass)
-			.class(sSpanSmallClass);
+		rm.addClass([
+			sSpanXLargeClass,
+			sSpanLargeClass,
+			sSpanMediumClass,
+			sSpanSmallClass
+		].join(" "));
 	};
 
 	/**
@@ -372,6 +446,30 @@ sap.ui.define([
 				}
 			}
 		});
+	};
+
+	/**
+	 * Implements polyfill for IE after drag over.
+	 * @param {Object} oEvent After drag over event
+	 * @protected
+	 */
+	GridBoxLayout.prototype._polyfillAfterDragOver = function (oEvent, oGrid) {
+		oEvent.getParameter("indicator").addClass("sapUiLayoutCSSGridItem");
+
+		this._calcWidth(oGrid);
+		this._flattenHeight(oGrid);
+		this._applyClassForLastItem(oGrid);
+	};
+
+	/**
+	 * Implements polyfill for IE after drag end.
+	 * @param {Object} oEvent After drag end event
+	 * @protected
+	 */
+	GridBoxLayout.prototype._polyfillAfterDragEnd = function (oEvent, oGrid) {
+		oEvent.getParameter("indicator").removeClass("sapUiLayoutCSSGridItem");
+
+		this._applyClassForLastItem(oGrid);
 	};
 
 	return GridBoxLayout;

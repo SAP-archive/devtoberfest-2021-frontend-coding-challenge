@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(['sap/ui/Device'], function(Device) {
@@ -34,7 +34,15 @@ sap.ui.define(['sap/ui/Device'], function(Device) {
 		var oParseError;
 		var DomHelper = new DOMParser();
 
-		oXMLDocument = DomHelper.parseFromString(sXMLText, "text/xml");
+		try {
+			oXMLDocument = DomHelper.parseFromString(sXMLText, "text/xml");
+		} catch (e) {
+			oParseError = Helper.getParseError();
+			oParseError.reason = e.message;
+			oXMLDocument = {};
+			oXMLDocument.parseError = oParseError;
+			return oXMLDocument;
+		}
 
 		oParseError = Helper.getParseError(oXMLDocument);
 		if (oParseError) {
@@ -69,8 +77,14 @@ sap.ui.define(['sap/ui/Device'], function(Device) {
 			filepos : -1
 		};
 
-		// Firefox
-		if (Device.browser.firefox && oDocument && oDocument.documentElement
+		// IE
+		if (Device.browser.msie && oDocument && oDocument.parseError
+			&& oDocument.parseError.errorCode != 0) {
+			return oDocument.parseError;
+		}
+
+		// Firefox or Edge
+		if ((Device.browser.firefox || Device.browser.edge) && oDocument && oDocument.documentElement
 			&& oDocument.documentElement.tagName == "parsererror") {
 
 			var sErrorText = oDocument.documentElement.firstChild.nodeValue,

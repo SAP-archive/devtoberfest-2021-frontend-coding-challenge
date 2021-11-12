@@ -1,20 +1,19 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 /**
  * Defines support rules of the SelectDialog control of sap.m library.
  */
-sap.ui.define(["sap/ui/support/library", "sap/m/library"],
-	function(SupportLib, mobileLibrary) {
+sap.ui.define(["sap/ui/support/library"],
+	function(SupportLib) {
 		"use strict";
 
 		// shortcuts
 		var Categories = SupportLib.Categories, // Accessibility, Performance, Memory, ...
 			Severity = SupportLib.Severity,	// Hint, Warning, Error
-			Audiences = SupportLib.Audiences, // Control, Internal, Application
-			ListType = mobileLibrary.ListType;
+			Audiences = SupportLib.Audiences; // Control, Internal, Application
 
 		//**********************************************************
 		// Rule Definitions
@@ -43,7 +42,7 @@ sap.ui.define(["sap/ui/support/library", "sap/m/library"],
 							sListOfInactiveItems = "";
 
 						aListItems.forEach(function(oListItem){
-							if (oListItem.getType() === ListType.Inactive) {
+							if (oListItem.getType() === sap.m.ListType.Inactive) {
 								var sListItemId = oListItem.getId(),
 									sListItemName = oListItem.getMetadata().getElementName();
 

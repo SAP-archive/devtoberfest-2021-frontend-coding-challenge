@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -13,9 +13,7 @@ sap.ui.define([
 	'sap/base/util/ObjectPath',
 	'sap/base/Log',
 	'sap/base/assert',
-	'sap/ui/thirdparty/jquery',
-	'sap/ui/core/tmpl/TemplateControl',
-	'./_parsePath'
+	'sap/ui/thirdparty/jquery'
 ],
 function(
 	ManagedObject,
@@ -25,9 +23,7 @@ function(
 	ObjectPath,
 	Log,
 	assert,
-	jQuery,
-	TemplateControl,
-	parsePath
+	jQuery
 ) {
 	"use strict";
 
@@ -52,7 +48,7 @@ function(
 	 * @extends sap.ui.base.ManagedObject
 	 * @abstract
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @alias sap.ui.core.tmpl.Template
 	 * @since 1.15
 	 * @deprecated since 1.56, use an {@link sap.ui.core.mvc.XMLView XMLView} or {@link sap.ui.core.mvc.JSView JSView} instead.
@@ -124,9 +120,6 @@ function(
 	};
 
 	/**
-	 * Templates don't have a facade and therefore return themselves as their interface.
-	 *
-	 * @returns {this} <code>this</code> as there's no facade for templates
 	 * @see sap.ui.base.Object#getInterface
 	 * @public
 	 */
@@ -174,7 +167,28 @@ function(
 	 * @protected
 	 * @static
 	 */
-	Template.parsePath = parsePath;
+	Template.parsePath = function(sPath) {
+
+		// TODO: wouldn't this be something central in ManagedObject?
+
+		// parse the path
+		var sModelName,
+			iSeparatorPos = sPath.indexOf(">");
+
+		// if a model name is specified in the binding path
+		// we extract this binding path
+		if (iSeparatorPos > 0) {
+			sModelName = sPath.substr(0, iSeparatorPos);
+			sPath = sPath.substr(iSeparatorPos + 1);
+		}
+
+		// returns the path information
+		return {
+			path: sPath,
+			model: sModelName
+		};
+
+	};
 
 	/*
 	 * overridden to prevent instantiation of Template
@@ -223,6 +237,7 @@ function(
 			var oMetadata = this.createMetadata(),
 				fnRenderer = this.createRenderer(),
 				that = this;
+			var TemplateControl = sap.ui.requireSync('sap/ui/core/tmpl/TemplateControl');
 			TemplateControl.extend(sControl, {
 
 				// the new control metadata
@@ -263,6 +278,7 @@ function(
 	Template.prototype.createControl = function(sId, oContext, oView) {
 
 		// create the anonymous control instance
+		var TemplateControl = sap.ui.requireSync('sap/ui/core/tmpl/TemplateControl');
 		var oControl = new TemplateControl({
 			id: sId,
 			template: this,
@@ -317,7 +333,7 @@ function(
 				// but it can be also defined on the root DOM element for inline templates
 				// in case of inline templates we mark them
 				var sContext = $this.attr("data-context");
-				oContext = oContext || sContext && JSON.parse(sContext);
+				oContext = oContext || sContext && jQuery.parseJSON(sContext);
 
 				// mark the template as inline template (to avoid extra DOM for the TemplateControl)
 				// for inline templates the UIArea and the TemplateControl are the same DOM element
@@ -431,7 +447,6 @@ function(
 	 * @deprecated since 1.56, use an {@link sap.ui.core.mvc.XMLView XMLView} or {@link sap.ui.core.mvc.JSView JSView} instead.
 	 * @public
 	 * @static
-	 * @ui5-global-only
 	 */
 	sap.ui.template = function(oTemplate) {
 
@@ -539,7 +554,6 @@ function(
 				// instance if found
 				if (sId) {
 					var theTemplate = sap.ui.getCore().getTemplate(sId);
-					// eslint-disable-next-line no-unsafe-negation
 					if (!theTemplate instanceof Template) {
 						throw new Error("Object for id \"" + sId + "\" is no sap.ui.core.tmpl.Template!");
 					} else {
@@ -578,8 +592,7 @@ function(
 			}
 
 			// require and instantiate the proper template
-			var fnClass = sap.ui.requireSync(sClass.replace(/\./g, "/")); // legacy-relevant: Template is deprecated since 1.56 and XMLView should be used instead
-
+			var fnClass = sap.ui.requireSync(sClass.replace(/\./g, "/"));
 			fnClass = fnClass || ObjectPath.get(sClass || "");
 
 			// create a new instance of the template

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -10,9 +10,9 @@ sap.ui.define([
 	'./sync/Targets',
 	"sap/base/util/UriParameters",
 	"sap/base/Log",
-	"sap/base/util/deepExtend"
+	"sap/ui/thirdparty/jquery"
 ],
-	function(EventProvider, Target, asyncTargets, syncTargets, UriParameters, Log, deepExtend) {
+	function(EventProvider, Target, asyncTargets, syncTargets, UriParameters, Log, jQuery) {
 		"use strict";
 
 		/**
@@ -183,8 +183,9 @@ sap.ui.define([
 		 *
 		 *
 		 * @param {string} [oOptions.targets.anyName.usage] Defines the 'usage' name for 'Component' target which refers to the '/sap.ui5/componentUsages' entry in the owner component's manifest.
-		 * @param {string} [oOptions.targets.anyName.viewType=oOptions.config.viewType] The type of the view that is going to be created. These are the supported types: {@link sap.ui.core.mvc.ViewType}.
-		 * You always have to provide a viewType except if <code>oOptions.config.viewType</code> is set or when using {@link sap.ui.core.routing.Views#setView}.
+		 * @param {string} [oOptions.targets.anyName.viewType]
+		 * The type of the view that is going to be created. These are the supported types: {@link sap.ui.core.mvc.ViewType}.
+		 * You always have to provide a viewType except if you are using {@link sap.ui.core.routing.Views#setView}.
 		 * @param {string} [oOptions.targets.anyName.path]
 		 * A prefix that will be prepended in front of the name.<br/>
 		 * <b>Example:</b> name is set to "myView" and path is set to "myApp" - the created view name will be "myApp.myView".
@@ -296,7 +297,6 @@ sap.ui.define([
 				EventProvider.apply(this);
 
 				this._mTargets = {};
-				this._oLastTitleTarget = {};
 				this._oConfig = oOptions.config;
 				this._oCache = oOptions.cache || oOptions.views;
 
@@ -344,26 +344,9 @@ sap.ui.define([
 			},
 
 			/**
-			 * Associate the Targets with a router. Once the Targets is already connected with a router, futher calls of
-			 * this function is ignored
-			 *
-			 * @param {sap.ui.core.routing.Router} oRouter The router instance
-			 * @returns {this} The Targets itself
-			 * @private
-			 */
-			_setRouter: function(oRouter) {
-				if (!this._oRouter) {
-					this._oRouter = oRouter;
-				} else {
-					Log.warning("The Targets is already connected with a router and this call of _setRouter is ignored");
-				}
-				return this;
-			},
-
-			/**
 			 * Destroys the targets instance and all created targets. Does not destroy the views instance passed to the constructor. It has to be destroyed separately.
 			 * @public
-			 * @returns {this} this for method chaining.
+			 * @returns { sap.ui.core.routing.Targets } this for chaining.
 			 */
 			destroy : function () {
 				var sTargetName;
@@ -384,25 +367,9 @@ sap.ui.define([
 			},
 
 			/**
-			 * @typedef {object} sap.ui.core.routing.TargetInfo
-			 * @description Object containing the target info for displaying targets
-			 * @property {string} name Defines the name of the target that is going to be displayed
-			 * @property {string} [prefix] A prefix that is used for reserving a dedicated section in the browser hash
-			 *  for the router of this target. This needs to be set only for target that has type "Component"
-			 * @property {boolean} [propagateTitle=false] Whether the titleChanged event from this target should be propagated to the parent or not
-			 * @property {boolean} [routeRelevant=false] Whether the target is relevant to the current matched route or not. If 'true', then the dynamic target is linked to the route's life cycle.
-			 *     When switching to a different route, then the dynamic target will be suspended.
-			 * @property {boolean} [ignoreInitialHash=false] Since 1.90. Whether the router of the "Component" target ignores the browser hash when it's re-initialized.
-			 *     This parameter only has effect when the target is of type "Component" and its router is currently stopped. It has no effect on the first call of
-			 *     {link sap.ui.core.routing.Router#initialize}, because this is done by the application and not by the UI5 routing.
-			 * @protected
-			 * @since 1.84.0
-			 */
-
-			/**
 			 * Creates a view and puts it in an aggregation of the specified control.
 			 *
-			 * @param {string|string[]|sap.ui.core.routing.TargetInfo|sap.ui.core.routing.TargetInfo[]} vTargets Either the target name or a target info object. To display multiple targets you may also pass an array of target names or target info objects.
+			 * @param {string|string[]} vTargets Key of the target as specified in the {@link #constructor}. To display multiple targets you may also pass an array of keys.
 			 * @param {object} [oData] an object that will be passed to the display event in the data property. If the target has parents, the data will also be passed to them.
 			 * @param {string} [sTitleTarget] the name of the target from which the title option is taken for firing the {@link sap.ui.core.routing.Targets#event:titleChanged titleChanged} event
 			 * @public
@@ -429,15 +396,10 @@ sap.ui.define([
 			 * Returns a target by its name (if you pass myTarget: { view: "myView" }) in the config myTarget is the name.
 			 *
 			 * @param {string|string[]} vName the name of a single target or the name of multiple targets
-			 * @param {boolean} [bSuppressNotFoundError=false] In case no target is found for the given name, the not found
-			 *  error is supressed when this is set with true
-			 * @return {sap.ui.core.routing.Target|undefined|sap.ui.core.routing.Target[]} The target with the
-			 * coresponding name or undefined. If an array way passed as name this will return an array with all found
-			 * targets. Non existing targets will not be returned and an error is logged when
-			 * <code>bSuppressNotFoundError</code> param isn't set to <code>true</code>.
+			 * @return {sap.ui.core.routing.Target|undefined|sap.ui.core.routing.Target[]} The target with the coresponding name or undefined. If an array way passed as name this will return an array with all found targets. Non existing targets will not be returned but will log an error.
 			 * @public
 			 */
-			getTarget : function (vName, bSuppressNotFoundError) {
+			getTarget : function (vName) {
 				var that = this,
 					aTargetsConfig = this._alignTargetsInfo(vName),
 					aTargets;
@@ -447,7 +409,7 @@ sap.ui.define([
 
 					if (oTarget) {
 						aAcc.push(oTarget);
-					} else if (!bSuppressNotFoundError){
+					} else {
 						Log.error("The target you tried to get \"" + oConfig.name + "\" does not exist!", that);
 					}
 					return aAcc;
@@ -467,12 +429,12 @@ sap.ui.define([
 			 *
 			 * @param {string} sName Name of a target
 			 * @param {object} oTargetOptions Options of a target. The option names are the same as the ones in "oOptions.targets.anyName" of {@link #constructor}.
-			 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+			 * @returns {sap.ui.core.routing.Targets} Reference to <code>this</code> in order to allow method chaining
 			 * @public
 			 *
 			 */
 			addTarget : function (sName, oTargetOptions) {
-				var oOldTarget = this.getTarget(sName, true /* suppress not found error log*/),
+				var oOldTarget = this.getTarget(sName),
 					oTarget;
 
 				if (oOldTarget) {
@@ -500,38 +462,12 @@ sap.ui.define([
 				var aTargetsInfo = this._alignTargetsInfo(vTargets);
 
 				aTargetsInfo.forEach(function(oTargetInfo) {
-					var sTargetName = oTargetInfo.name;
-					var oTarget = this.getTarget(sTargetName);
+					var oTarget = this.getTarget(oTargetInfo.name);
 
 					if (oTarget) {
 						oTarget.suspend();
 					}
-				}.bind(this));
 
-				return this;
-			},
-
-			/**
-			 * Resumes the targets which are specified by the parameter
-			 *
-			 * @param {string|string[]|object|object[]} vTargets The key of the target
-			 *  or an object which has the key of the target under property 'name' as
-			 *  specified in the {@link #constructor}. To suspend multiple targets you
-			 *  may also pass an array of keys or objects which have the key saved
-			 *  under the 'name' property
-			 * @return {sap.ui.core.routing.Targets} The 'this' for call chaining
-			 * @private
-			 */
-			resume : function (vTargets) {
-				var aTargetsInfo = this._alignTargetsInfo(vTargets);
-
-				aTargetsInfo.forEach(function(oTargetInfo) {
-					var sTargetName = oTargetInfo.name;
-					var oTarget = this.getTarget(sTargetName);
-
-					if (oTarget) {
-						oTarget.resume();
-					}
 				}.bind(this));
 
 				return this;
@@ -552,7 +488,6 @@ sap.ui.define([
 			 * @param {object} oEvent.getParameters.config The options object passed to the constructor {@link sap.ui.core.routing.Targets#constructor}
 			 * @param {object} oEvent.getParameters.name The name of the target firing the event
 			 * @param {object} oEvent.getParameters.data The data passed into the {@link sap.ui.core.routing.Targets#display} function
-			 * @param {object} oEvent.getParameters.routeRelevant=false Whether the target is relevant to the matched route or not
 			 * @public
 			 */
 
@@ -572,7 +507,7 @@ sap.ui.define([
 			 *            [oListener] Context object to call the event handler with. Defaults to this
 			 *            <code>sap.ui.core.routing.Targets</code> itself
 			 *
-			 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+			 * @returns {sap.ui.core.routing.Targets} Reference to <code>this</code> in order to allow method chaining
 			 * @public
 			 */
 			attachDisplay : function(oData, fnFunction, oListener) {
@@ -587,7 +522,7 @@ sap.ui.define([
 			 *
 			 * @param {function} fnFunction The function to be called, when the event occurs
 			 * @param {object} [oListener] Context object on which the given function had to be called
-			 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+			 * @returns {sap.ui.core.routing.Targets} Reference to <code>this</code> in order to allow method chaining
 			 * @public
 			 */
 			detachDisplay : function(fnFunction, oListener) {
@@ -598,7 +533,7 @@ sap.ui.define([
 			 * Fires event {@link #event:created created} to attached listeners.
 			 *
 			 * @param {object} [oParameters] Parameters to pass along with the event
-			 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+			 * @returns {sap.ui.core.routing.Targets} Reference to <code>this</code> in order to allow method chaining
 			 * @public
 			 */
 			fireDisplay : function(oParameters) {
@@ -646,7 +581,7 @@ sap.ui.define([
  			 *            [oListener] Context object to call the event handler with. Defaults to this
  			 *            <code>sap.ui.core.routing.Targets</code> itself
  			 *
- 			 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+ 			 * @returns {sap.ui.core.routing.Targets} Reference to <code>this</code> in order to allow method chaining
  			 * @public
  			 */
 			attachTitleChanged : function(oData, fnFunction, oListener) {
@@ -662,7 +597,7 @@ sap.ui.define([
 			 *
 			 * @param {function} fnFunction The function to be called, when the event occurs
 			 * @param {object} [oListener] Context object on which the given function had to be called
-			 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+			 * @returns {sap.ui.core.routing.Targets} Reference to <code>this</code> in order to allow method chaining
 			 * @public
 			 */
 			detachTitleChanged : function(fnFunction, oListener) {
@@ -670,14 +605,13 @@ sap.ui.define([
 			},
 
 			fireTitleChanged : function(oParameters) {
-				// if the new target is different as the last target that changed the title or the title changed, fire a titleChanged event
-				if (this._oLastTitleTarget.name !== oParameters.name || this._oLastTitleTarget.title !== oParameters.title) {
-					// save the current target name
-					this._oLastTitleTarget.name = oParameters.name;
-					// save the current title name
-					this._oLastTitleTarget.title = oParameters.title;
+				// if the new title is different as the previous one, fire a titleChanged event
+				if (oParameters.title !== this._sPreviousTitle) {
+					// save the current title
+					this._sPreviousTitle = oParameters.title;
 					this.fireEvent(this.M_EVENTS.TITLE_CHANGED, oParameters);
 				}
+
 				return this;
 			},
 
@@ -727,17 +661,9 @@ sap.ui.define([
 			 */
 			_createTarget : function (sName, oTargetOptions) {
 				var oTarget,
-					oOptions,
-					oDefaults = {
-						_name: sName
-					};
+					oOptions;
 
-				if (this._vRootViewId) {
-					oDefaults.rootView = this._vRootViewId;
-				}
-
-				oOptions = deepExtend(oDefaults, this._oConfig, oTargetOptions);
-
+				oOptions = jQuery.extend(true, { _name: sName }, this._oConfig, oTargetOptions);
 				oTarget = this._constructTarget(oOptions);
 				oTarget.attachDisplay(function (oEvent) {
 					var oParameters = oEvent.getParameters();
@@ -745,15 +671,12 @@ sap.ui.define([
 					this.fireDisplay({
 						name : sName,
 						view : oParameters.view,
-						object: oParameters.object,
 						control : oParameters.control,
 						config : oParameters.config,
-						data: oParameters.data,
-						routeRelevant: oParameters.routeRelevant
+						data: oParameters.data
 					});
 				}, this);
 				this._mTargets[sName] = oTarget;
-
 				return oTarget;
 			},
 
@@ -810,10 +733,10 @@ sap.ui.define([
 			/**
 			 * Called by the UIComponent since the rootView id is not known in the constructor
 			 *
-			 * @param {string|Promise} vId The id of the root view or a promise which resolves with the id of the root view
+			 * @param {string} sId The id of the root view
 			 * @private
 			 */
-			_setRootViewId: function (vId) {
+			_setRootViewId: function (sId) {
 				var sTargetName,
 					oTargetOptions;
 
@@ -821,13 +744,10 @@ sap.ui.define([
 					if (this._mTargets.hasOwnProperty(sTargetName)) {
 						oTargetOptions = this._mTargets[sTargetName]._oOptions;
 						if (oTargetOptions.rootView === undefined) {
-							oTargetOptions.rootView = vId;
+							oTargetOptions.rootView = sId;
 						}
 					}
 				}
-
-				// save the root view id for later added target
-				this._vRootViewId = vId;
 			},
 
 			/*
@@ -886,14 +806,14 @@ sap.ui.define([
 					oTitleTarget = this.getTarget(sCalculatedTargetName);
 				}
 
-				if (this._oLastDisplayedTitleTarget) {
-					this._oLastDisplayedTitleTarget.detachTitleChanged(this._forwardTitleChanged, this);
-					this._oLastDisplayedTitleTarget._bIsDisplayed = false;
+				if (this._oLastTitleTarget) {
+					this._oLastTitleTarget.detachTitleChanged(this._forwardTitleChanged, this);
+					this._oLastTitleTarget._bIsDisplayed = false;
 				}
 
 				if (oTitleTarget) {
 					oTitleTarget.attachTitleChanged({name:oTitleTarget._oOptions._name}, this._forwardTitleChanged, this);
-					this._oLastDisplayedTitleTarget = oTitleTarget;
+					this._oLastTitleTarget = oTitleTarget;
 				} else if (sTitleTarget) {
 					Log.error("The target with the name \"" + sTitleTarget + "\" where the titleChanged event should be fired does not exist!", this);
 				}

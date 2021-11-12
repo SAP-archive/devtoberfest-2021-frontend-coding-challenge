@@ -14,6 +14,7 @@
 @_sap_m_SuggestionsPopover_TabularGroupItemHeightCompact: 2rem;
 
 .sapMSuggestionsPopover {
+
 	.sapMListUl > .sapMLIB {
 		height: @_sap_m_SuggestionsPopover_ItemHeight;
 	}
@@ -43,12 +44,6 @@ div.sapMSuggestionsPopover {
 	box-shadow: @sapUiShadowLevel1;
 }
 
-.sapMSuggestionsPopover.sapMPopover {
-	max-width: ~"calc(100% - 2rem)";
-	margin-left: 1rem;
-	margin-right: 1rem;
-}
-
 .sapUiSizeCompact {
 	.sapMSuggestionsPopover {
 
@@ -74,6 +69,13 @@ div.sapMSuggestionsPopover {
 			padding-top: 0.25rem;
 			padding-bottom: 0.25rem;
 		}
+	}
+}
+
+.sapMSuggestionsPopover .sapMListUl,
+.sapMSuggestionsPopover .sapMListTbl {
+	.sapMLIBFocusable.sapMLIB-CTX.sapMLIBShowSeparator.sapMInputFocusedHeaderGroup {
+		background-color: @sapUiListSelectionBackgroundColor;
 	}
 }
 

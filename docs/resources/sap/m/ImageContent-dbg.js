@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -33,7 +33,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @since 1.38
 	 *
 	 * @public
@@ -120,7 +120,7 @@ sap.ui.define([
 	 */
 	ImageContent.prototype.ontap = function (oEvent) {
 		if (Device.browser.msie) {
-			this.$().trigger("focus");
+			this.$().focus();
 		}
 		this.firePress();
 	};

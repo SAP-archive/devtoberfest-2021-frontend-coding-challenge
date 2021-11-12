@@ -1,23 +1,22 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define(['./library'],
-		function (library) {
+sap.ui.define([
+	"sap/m/library"
+], function (library) {
 	"use strict";
+
+	// shortcut for sap.m.IconTabFilterDesign
+	var IconTabFilterDesign = library.IconTabFilterDesign;
 
 	/**
 	 * IconTabHeader renderer.
 	 * @namespace
 	 */
-	var IconTabHeaderRenderer = {
-		apiVersion: 2
-	};
-
-	// shortcut for sap.m.TabsOverflowMode
-	var TabsOverflowMode = library.TabsOverflowMode;
+	var IconTabHeaderRenderer = {};
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
@@ -26,113 +25,169 @@ sap.ui.define(['./library'],
 	 * @param {sap.ui.core.Control} oControl an object representation of the control that should be rendered
 	 */
 	IconTabHeaderRenderer.render = function (oRM, oControl) {
+		// return immediately if control is not visible
 		if (!oControl.getVisible()) {
 			return;
 		}
 
-		var sId = oControl.getId(),
-			aItems = oControl.getItems(),
-			iVisibleTabFiltersCount = oControl.getVisibleTabFilters().length,
+		var aItems = oControl.getItems(),
+			iItemsCount = aItems.length,
+			aVisibleTabFilters = oControl.getVisibleTabFilters(),
+			iVisibleTabFiltersCount = aVisibleTabFilters.length,
 			iVisibleTabFilterIndex = 0,
-			bTextOnly = oControl._checkTextOnly(),
+			bTextOnly = oControl._checkTextOnly(aItems),
 			bNoText = oControl._checkNoText(aItems),
-			bInLine = oControl._checkInLine(aItems) || oControl.isInlineMode();
+			bInLine = oControl._checkInLine(aItems) || oControl.isInlineMode(),
+			bShowOverflowSelectList = oControl.getShowOverflowSelectList(),
+			oItem,
+			bIsHorizontalDesign,
+			bHasHorizontalDesign;
 
-		var oIconTabBar = oControl.getParent(),
-			bUpperCase = oIconTabBar && oIconTabBar.isA('sap.m.IconTabBar') && oIconTabBar.getUpperCase(),
-			mAriaTexts = oControl.getAriaTexts() || {};
+		var oIconTabBar = oControl.getParent();
+		var bUpperCase = oIconTabBar && oIconTabBar instanceof sap.m.IconTabBar && oIconTabBar.getUpperCase();
 
 		// render wrapper div
-		oRM.openStart("div", oControl)
-			.class("sapMITH")
-			.class("sapContrastPlus")
-			.class("sapMITHBackgroundDesign" + oControl.getBackgroundDesign());
+		oRM.write("<div");
+		oRM.addClass("sapMITH");
+		oRM.addClass("sapContrastPlus");
+		oRM.addClass("sapMITHBackgroundDesign" + oControl.getBackgroundDesign());
 
-		// Check for upperCase property on IconTabBar
-		if (bUpperCase) {
-			oRM.class("sapMITBTextUpperCase");
+		if (bShowOverflowSelectList) {
+			oRM.addClass("sapMITHOverflowList");
 		}
 
+		if (oControl._scrollable) {
+			oRM.addClass("sapMITBScrollable");
+			if (oControl._bPreviousScrollForward) {
+				oRM.addClass("sapMITBScrollForward");
+			} else {
+				oRM.addClass("sapMITBNoScrollForward");
+			}
+			if (oControl._bPreviousScrollBack) {
+				oRM.addClass("sapMITBScrollBack");
+			} else {
+				oRM.addClass("sapMITBNoScrollBack");
+			}
+		} else {
+			oRM.addClass("sapMITBNotScrollable");
+		}
+		// Check for upperCase property on IconTabBar
+		if (bUpperCase) {
+			oRM.addClass("sapMITBTextUpperCase");
+		}
+		oRM.writeControlData(oControl);
+		oRM.writeClasses();
+		oRM.write(">");
+
+		oRM.write('<div class="sapMITHWrapper">');
+		oRM.write("<div id='" + oControl.getId() + "-scrollContainer' class='sapMITHScrollContainer'>");
+
+		// render left scroll button
+		this._renderArrowButton(oRM, oControl, oControl._ARROWS.Left, bTextOnly, bInLine);
+
+		oRM.write('<div id="' + oControl.getId() + '-scrollContainerInner" class="sapMITHScrollContainerInner">');
+
+		oRM.write("<div id='" + oControl.getId() + "-head' role='tablist' ");
+		oRM.addClass("sapMITBHead");
+
 		if (bTextOnly) {
-			oRM.class("sapMITBTextOnly");
+			oRM.addClass("sapMITBTextOnly");
 		}
 
 		if (bNoText) {
-			oRM.class("sapMITBNoText");
+			oRM.addClass("sapMITBNoText");
 		}
 
 		if (bInLine) {
-			oRM.class("sapMITBInLine");
-			oRM.class("sapMITBTextOnly");
+			oRM.addClass("sapMITBInLine");
 		}
 
-		oRM.accessibilityState(oControl, {
-			role: "navigation"
-		});
+		oRM.writeClasses();
+		oRM.write(">");
 
-		if (mAriaTexts.headerLabel) {
-			oRM.accessibilityState(oControl, {
-				label: mAriaTexts.headerLabel
-			});
-		}
+		for (var i = 0; i < iItemsCount; i++) {
+			oItem = aItems[i];
 
-		oRM.openEnd();
-
-		if (aItems.length && oControl.getTabsOverflowMode() === TabsOverflowMode.StartAndEnd) {
-			oRM.openStart("div")
-				.class("sapMITHStartOverflow")
-				.openEnd();
-
-			oControl._getStartOverflow().render(oRM);
-
-			oRM.close("div");
-		}
-
-		if (mAriaTexts.headerDescription) {
-			oRM.renderControl(oControl._getInvisibleHeadText());
-		}
-
-		oRM.openStart("div", sId + "-head")
-			.class("sapMITBHead");
-
-		oRM.accessibilityState({
-			role: "tablist",
-			orientation: "horizontal"
-		});
-
-		if (mAriaTexts.headerDescription) {
-			oRM.accessibilityState({
-				describedby: oControl._getInvisibleHeadText().getId()
-			});
-		}
-
-		oRM.openEnd();
-
-		for (var i = 0; i < aItems.length; i++) {
-			var oItem = aItems[i];
 			oItem.render(oRM, iVisibleTabFilterIndex, iVisibleTabFiltersCount);
 
-			if (oItem.isA("sap.m.IconTabFilter")) {
+			if (oItem instanceof sap.m.IconTabFilter) {
+				bIsHorizontalDesign = oItem.getDesign() === IconTabFilterDesign.Horizontal;
+				if (bIsHorizontalDesign) {
+					bHasHorizontalDesign = true;
+				}
+
 				if (oItem.getVisible()) {
 					iVisibleTabFilterIndex++;
 				}
 			}
 		}
 
-		oRM.close("div");
+		oRM.write("</div>"); // close head
+		oRM.write("</div>"); // close .sapMITHScrollContainerInner
 
-		if (aItems.length) {
-			oRM.openStart("div")
-				.class("sapMITHEndOverflow")
-				.openEnd();
+		// render right scroll arrow
+		this._renderArrowButton(oRM, oControl, oControl._ARROWS.Right, bTextOnly, bInLine);
 
-			oControl._getOverflow().render(oRM);
-
-			oRM.close("div");
+		// render overflow button
+		if (bShowOverflowSelectList) {
+			this._renderOverflowButton(oRM, oControl, bInLine, bTextOnly, bNoText, bHasHorizontalDesign);
 		}
 
-		oRM.close("div");
+		oRM.write("</div>"); // close scrollContainer
+		oRM.write("</div>"); // close sapMITHWrapper
+
+		oRM.write("</div>"); // close ITH
+	};
+
+	IconTabHeaderRenderer._renderArrowButton = function (oRM, oControl, sDirection, bTextOnly, bInLine) {
+		var sArrowClass = "sapMITBArrowScroll";
+		var oArrowButton = oControl._getScrollButton(sDirection);
+
+		var aCssClasses = ["sapMITBArrowScroll"];
+
+		sArrowClass += sDirection;
+
+		if (bTextOnly) {
+			aCssClasses.push(sArrowClass + "TextOnly");
+		} else {
+			aCssClasses.push(sArrowClass);
+		}
+		if (bInLine || oControl.isInlineMode()) {
+			aCssClasses.push(sArrowClass + "InLine");
+		}
+		oRM.write("<div");
+		oRM.addClass(aCssClasses.join(" "));
+		oRM.writeClasses();
+		oRM.write(">");
+
+		oRM.renderControl(oArrowButton);
+
+		oRM.write("</div>");
+	};
+
+	IconTabHeaderRenderer._renderOverflowButton = function (oRM, oControl, bInLine, bTextOnly, bNoText, bHasHorizontalDesign) {
+
+		oRM.write('<div');
+		oRM.addClass('sapMITHOverflowButton');
+
+		if (bInLine) {
+			oRM.addClass('sapMBtnInline');
+		} else if (bTextOnly) {
+			oRM.addClass('sapMBtnTextOnly');
+		} else if (bNoText || bHasHorizontalDesign) {
+			oRM.addClass('sapMBtnNoText');
+		}
+
+		oRM.writeClasses();
+		oRM.write(">");
+
+		var oOverflowButton = oControl._getOverflowButton();
+
+		oRM.renderControl(oOverflowButton);
+
+		oRM.write('</div>');
 	};
 
 	return IconTabHeaderRenderer;
+
 }, /* bExport= */ true);

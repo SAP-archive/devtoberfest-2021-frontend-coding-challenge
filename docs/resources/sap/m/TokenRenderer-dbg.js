@@ -1,7 +1,7 @@
 /*!
 
 * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
 
 */
@@ -30,14 +30,11 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleText"],
 	 * @param {sap.ui.core.Control} oControl an object representation of the control that should be rendered
 	 */
 	TokenRenderer.render = function(oRm, oControl){
-		var sTooltip = oControl._getTooltip(oControl, oControl.getEditable() && oControl.getProperty("editableParent"));
-		var oDeleteIcon = oControl.getAggregation("deleteIcon");
-		var aAccDescribebyValues = []; // additional accessibility attributes
-		var oAccAttributes = {
-			role: "option"
-		};
-		var vPosinset = oControl.getProperty("posinset");
-		var vSetSize = oControl.getProperty("setsize");
+		var sTooltip = oControl._getTooltip(oControl, oControl.getEditable() && oControl.getProperty("editableParent")),
+			aAccDescribebyValues = [], // additional accessibility attributes
+			oAccAttributes = {
+				role: "option"
+			};
 
 		// write the HTML into the render manager
 		oRm.openStart("div", oControl).attr("tabindex", "-1").class("sapMToken");
@@ -46,20 +43,8 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleText"],
 			oRm.class("sapMTokenSelected");
 		}
 
-		if (vPosinset !== undefined) {
-			oRm.attr("aria-posinset", oControl.getProperty("posinset"));
-		}
-
-		if (vSetSize !== undefined) {
-			oRm.attr("aria-setsize", oControl.getProperty("setsize"));
-		}
-
 		if (!oControl.getEditable()) {
 			oRm.class("sapMTokenReadOnly");
-		}
-
-		if (oControl.getTruncated()) {
-			oRm.class("sapMTokenTruncated");
 		}
 
 		// add tooltip if available
@@ -74,7 +59,9 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleText"],
 			aAccDescribebyValues.push(InvisibleText.getStaticId("sap.m", "TOKEN_ARIA_DELETABLE"));
 		}
 
-		oRm.attr("aria-selected", oControl.getSelected());
+		if (oControl.getSelected()) {
+			aAccDescribebyValues.push(InvisibleText.getStaticId("sap.m", "TOKEN_ARIA_SELECTED"));
+		}
 
 		//ARIA attributes
 		oAccAttributes.describedby = {
@@ -88,8 +75,8 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/InvisibleText"],
 
 		TokenRenderer._renderInnerControl(oRm, oControl);
 
-		if (oControl.getEditable() && oDeleteIcon) {
-			oRm.renderControl(oDeleteIcon);
+		if (oControl.getEditable()) {
+			oRm.renderControl(oControl._deleteIcon);
 		}
 
 		oRm.close("div");

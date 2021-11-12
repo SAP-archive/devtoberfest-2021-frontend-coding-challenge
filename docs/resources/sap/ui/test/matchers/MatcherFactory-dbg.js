@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -10,11 +10,11 @@ sap.ui.define([
 	"sap/ui/test/matchers/Interactable",
 	"sap/ui/test/matchers/Visible",
 	"sap/ui/test/matchers/_Enabled",
-	"sap/ui/test/matchers/_Editable",
+	"sap/base/strings/capitalize",
 	"sap/ui/thirdparty/jquery",
 	"sap/ui/test/_ValidationParameters",
 	"sap/ui/test/matchers/matchers"
-], function (UI5Object, Interactable, Visible, _Enabled, _Editable, jQueryDOM, _ValidationParameters) {
+], function (UI5Object, Interactable, Visible, _Enabled, capitalize, jQueryDOM, _ValidationParameters) {
 	"use strict";
 
 	/**
@@ -25,7 +25,7 @@ sap.ui.define([
 
 		/**
 		 * Retrieve an array of matchers. Each matcher ensures a control is in a desired state.
-		 * Valid states are: visible, interactable, enabled, editable
+		 * Valid states are: enabled, visible, interactable
 		 *
 		 * @param {object} oOptions a plain object of waitFor-style options. fo a full list see {@link sap.ui.test.OpaPlugin#getMatchingControls}
 		 * @return {array} an array of {@link sap.ui.test.matchers.Matcher} instances
@@ -39,9 +39,6 @@ sap.ui.define([
 				// enabled has priority over interactable
 				if (oOptions.enabled) {
 					aMatchers.push(new _Enabled());
-				}
-				if (oOptions.editable) {
-					aMatchers.push(new _Editable());
 				}
 
 				// Interactable uses Visible
@@ -74,7 +71,7 @@ sap.ui.define([
 				if (jQueryDOM.isPlainObject(oOptions.matchers)) {
 					 // oOptions = {matchers: {matcher1: {}, matcher2: {}}..} (as seen in declarative-style options)
 					aMatchers = aMatchers.concat(this._getPlainObjectMatchers(oOptions.matchers));
-				} else if (Array.isArray(oOptions.matchers)) {
+				} else if (jQueryDOM.isArray(oOptions.matchers)) {
 
 					oOptions.matchers.forEach(function (vMatcher) {
 						if (jQueryDOM.isPlainObject(vMatcher)) {
@@ -118,18 +115,18 @@ sap.ui.define([
 				// filter out any properties that don't represent a matcher class
 				return aIgnoredProperties.indexOf(sMatcher) === -1;
 			}).map(function (sMatcher) {
-				if (!aSupportedMatchers[sMatcher]) {
+				if (aSupportedMatchers.indexOf(capitalize(sMatcher)) === -1) {
 					throw new Error("Matcher is not supported! Matcher name: '" + sMatcher + "', arguments: '" + JSON.stringify(mMatchers[sMatcher]) + "'");
 				}
-				var MatcherConstructor = aSupportedMatchers[sMatcher];
+				var MatcherConstructor = sap.ui.test.matchers[capitalize(sMatcher)];
 				// if the matcher params are declared as an array, this means that
 				// a new matcher should be instanciated for each element in this array
-				var aMatcherParams = Array.isArray(mMatchers[sMatcher]) ? mMatchers[sMatcher] : [mMatchers[sMatcher]];
+				var aMatcherParams = jQueryDOM.isArray(mMatchers[sMatcher]) ? mMatchers[sMatcher] : [mMatchers[sMatcher]];
 
 				return aMatcherParams.map(function (mSingleMatcherParams) {
 					// there are two types of matcher contstructors depending on the expected arguments:
 					// some expect an object (e.g. BindingPath) and others - an arguments list (e.g. Ancestor)
-					if (Array.isArray(mSingleMatcherParams)) {
+					if (jQueryDOM.isArray(mSingleMatcherParams)) {
 						return new function() {
 							return MatcherConstructor.apply(this, mSingleMatcherParams);
 						}();
@@ -152,15 +149,10 @@ sap.ui.define([
 		 */
 		_getSupportedMatchers: function (mMatchers) {
 			mMatchers = mMatchers || sap.ui.test.matchers;
-			var mFilteredMatchers = {};
-			Object.keys(mMatchers).forEach(function (sMatcher) {
+			return Object.keys(mMatchers).filter(function (sMatcher) {
 				// filter out private matchers and helpers
-				if (!sMatcher.match(/^(_|matcher)/i)) {
-					var sFilteredMatcher = sMatcher.charAt(0).toLowerCase() + sMatcher.substr(1);
-					mFilteredMatchers[sFilteredMatcher] = mMatchers[sMatcher];
-				}
+				return !sMatcher.match(/^(_|matcher)/i);
 			});
-			return mFilteredMatchers;
 		}
 	});
 

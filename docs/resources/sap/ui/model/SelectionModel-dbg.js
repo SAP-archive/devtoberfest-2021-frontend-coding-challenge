@@ -1,9 +1,9 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-/*eslint-disable max-len */
+
 // Provides class sap.ui.model.SelectionModel
 sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	function(EventProvider, assert) {
@@ -16,11 +16,10 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 * Constructs an instance of an sap.ui.model.SelectionModel.
 	 *
 	 * @class
-	 * This artefact is used by the table controls for handling selections. It is not associated with the model layer of UI5.
 	 * @extends sap.ui.base.EventProvider
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @param {int} iSelectionMode <code>sap.ui.model.SelectionModel.SINGLE_SELECTION</code> or <code>sap.ui.model.SelectionModel.MULTI_SELECTION</code>
 	 *
@@ -51,16 +50,12 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	/**
 	 * SelectionMode: Single Selection
 	 * @public
-	 * @readonly
-	 * @type {int}
 	 */
 	SelectionModel.SINGLE_SELECTION = 0;
 
 	/**
 	 * SelectionMode: Multi Selection
 	 * @public
-	 * @readonly
-	 * @type {int}
 	 */
 	SelectionModel.MULTI_SELECTION = 1;
 
@@ -117,7 +112,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	/**
 	 * Set the lead selection index.
 	 * @param {int} iLeadIndex sets the lead selected index
-	 * @return {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.model.SelectionModel} <code>this</code> to allow method chaining
 	 * @private
 	 */
 	SelectionModel.prototype.setLeadSelectedIndex = function(iLeadIndex) {
@@ -183,7 +178,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 *
 	 * @param {int} iFromIndex one end of the interval.
 	 * @param {int} iToIndex other end of the interval
-	 * @return {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.model.SelectionModel} <code>this</code> to allow method chaining
 	 * @public
 	 */
 	SelectionModel.prototype.setSelectionInterval = function(iFromIndex, iToIndex) {
@@ -238,7 +233,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 *
 	 * @param {int} iFromIndex one end of the interval.
 	 * @param {int} iToIndex other end of the interval
-	 * @return {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.model.SelectionModel} <code>this</code> to allow method chaining
 	 * @public
 	 */
 	SelectionModel.prototype.addSelectionInterval = function(iFromIndex, iToIndex) {
@@ -277,7 +272,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 *
 	 * @param {int} iStartIndex start at this position
 	 * @param {int} iMove
-	 * @return {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.model.SelectionModel} <code>this</code> to allow method chaining
 	 * @public
 	 */
 	SelectionModel.prototype.moveSelectionInterval = function(iStartIndex, iMove) {
@@ -315,7 +310,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 *
 	 * @param {int} iFromIndex one end of the interval.
 	 * @param {int} iToIndex other end of the interval
-	 * @return {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.model.SelectionModel} <code>this</code> to allow method chaining
 	 * @public
 	 */
 	SelectionModel.prototype.removeSelectionInterval = function(iFromIndex, iToIndex) {
@@ -358,7 +353,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 *
 	 * @param {int} iFromIndex one end of the interval.
 	 * @param {int} iToIndex other end of the interval
-	 * @return {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.model.SelectionModel} <code>this</code> to allow method chaining
 	 * @public
 	 */
 	SelectionModel.prototype.sliceSelectionInterval = function(iFromIndex, iToIndex) {
@@ -427,7 +422,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 * If this call results in a change to the current selection or lead selection, then a
 	 * <code>SelectionChanged</code> event is fired.
 	 *
-	 * @return {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.model.SelectionModel} <code>this</code> to allow method chaining
 	 * @public
 	 */
 	SelectionModel.prototype.clearSelection = function() {
@@ -454,7 +449,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 *            [oListener] Context object to call the event handler with. Defaults to this
 	 *            <code>SelectionModel</code> itself
 	 *
-	 * @return {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.model.SelectionModel} <code>this</code> to allow method chaining
 	 * @public
 	 */
 	SelectionModel.prototype.attachSelectionChanged = function(oData, fnFunction, oListener) {
@@ -472,7 +467,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 *            fnFunction The function to be called, when the event occurs
 	 * @param {object}
 	 *            [oListener] Context object on which the given function had to be called
-	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+	 * @returns {sap.ui.model.SelectionModel} Reference to <code>this</code> in order to allow method chaining
 	 * @public
 	 */
 	SelectionModel.prototype.detachSelectionChanged = function(fnFunction, oListener) {
@@ -492,7 +487,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 * @param {object} oParameters Parameters to pass along with the event.
 	 * @param {int} oParameters.leadIndex Lead selection index
 	 * @param {int[]} [oParameters.rowIndices] Other selected indices (if available)
-	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+	 * @returns {sap.ui.model.SelectionModel} Reference to <code>this</code> in order to allow method chaining
 	 * @protected
 	 */
 	SelectionModel.prototype.fireSelectionChanged = function(oParameters) {
@@ -544,7 +539,7 @@ sap.ui.define(['sap/ui/base/EventProvider', "sap/base/assert"],
 	 * <code>SelectionChanged</code> event is fired.
 	 *
 	 * @param {int} iToIndex end of the interval
-	 * @return {this} <code>this</code> to allow method chaining
+	 * @return {sap.ui.model.SelectionModel} <code>this</code> to allow method chaining
 	 * @public
 	 */
 	SelectionModel.prototype.selectAll = function(iToIndex) {

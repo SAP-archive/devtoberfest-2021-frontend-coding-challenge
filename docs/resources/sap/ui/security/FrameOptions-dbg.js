@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 /*
@@ -21,7 +21,7 @@ sap.ui.define(['sap/base/Log'], function(Log) {
 	 * @ui5-restricted sap.ui.core
 	 */
 	var FrameOptions = function(mSettings) {
-		/* mSettings: mode, callback, allowlist, allowlistService, timeout, blockEvents, showBlockLayer, allowSameOrigin */
+		/* mSettings: mode, callback, whitelist, whitelistService, timeout, blockEvents, showBlockLayer, allowSameOrigin */
 		this.mSettings = mSettings || {};
 		this.sMode = this.mSettings.mode || FrameOptions.Mode.ALLOW;
 		this.fnCallback = this.mSettings.callback;
@@ -84,8 +84,7 @@ sap.ui.define(['sap/base/Log'], function(Log) {
 							break;
 						}
 						oParentWindow = oParentWindow.parent;
-					// eslint-disable-next-line no-unmodified-loop-condition
-					} while (bTrue); // TODO: refactor loop condition bTrue
+					} while (bTrue);
 					if (bOk) {
 						this._applyState(true, true);
 					}
@@ -255,12 +254,12 @@ sap.ui.define(['sap/base/Log'], function(Log) {
 		var bTrusted = false;
 		if (this.bAllowSameOrigin && this.sParentOrigin && FrameOptions.__window.document.URL.indexOf(this.sParentOrigin) == 0) {
 			bTrusted = true;
-		} else if (this.mSettings.allowlist && this.mSettings.allowlist.length != 0) {
+		} else if (this.mSettings.whitelist && this.mSettings.whitelist.length != 0) {
 			var sHostName = this.sParentOrigin.split('//')[1];
 			sHostName = sHostName.split(':')[0];
-			for (var i = 0; i < this.mSettings.allowlist.length; i++) {
-				var match = sHostName.indexOf(this.mSettings.allowlist[i]);
-				if (match != -1 && sHostName.substring(match) == this.mSettings.allowlist[i]) {
+			for (var i = 0; i < this.mSettings.whitelist.length; i++) {
+				var match = sHostName.indexOf(this.mSettings.whitelist[i]);
+				if (match != -1 && sHostName.substring(match) == this.mSettings.whitelist[i]) {
 					bTrusted = true;
 					break;
 				}
@@ -268,10 +267,10 @@ sap.ui.define(['sap/base/Log'], function(Log) {
 		}
 		if (bTrusted) {
 			this._applyTrusted(bTrusted);
-		} else if (this.mSettings.allowlistService) {
+		} else if (this.mSettings.whitelistService) {
 			var that = this;
 			var xmlhttp = new XMLHttpRequest();
-			var url = this.mSettings.allowlistService + '?parentOrigin=' + encodeURIComponent(this.sParentOrigin);
+			var url = this.mSettings.whitelistService + '?parentOrigin=' + encodeURIComponent(this.sParentOrigin);
 			xmlhttp.onreadystatechange = function() {
 				if (xmlhttp.readyState == 4) {
 					that._handleXmlHttpResponse(xmlhttp, bParentResponsePending);
@@ -281,7 +280,7 @@ sap.ui.define(['sap/base/Log'], function(Log) {
 			xmlhttp.setRequestHeader('Accept', 'application/json');
 			xmlhttp.send();
 		} else {
-			Log.error("Embedding blocked because the allowlist or the allowlist service is not configured correctly", "", "sap/ui/security/FrameOptions");
+			Log.error("Embedding blocked because the whitelist or the whitelist service is not configured correctly", "", "sap/ui/security/FrameOptions");
 			this._callback(false);
 		}
 	};
@@ -300,12 +299,12 @@ sap.ui.define(['sap/base/Log'], function(Log) {
 					bTrusted = oRuleSet.framing;
 				}
 				if (!bTrusted) {
-					Log.error("Embedding blocked because the allowlist service does not allow framing", "", "sap/ui/security/FrameOptions");
+					Log.error("Embedding blocked because the whitelist service does not allow framing", "", "sap/ui/security/FrameOptions");
 				}
 				this._applyTrusted(bTrusted);
 			}
 		} else {
-			Log.error("The configured allowlist service is not available: " + xmlhttp.status, "", "sap/ui/security/FrameOptions");
+			Log.error("The configured whitelist service is not available: " + xmlhttp.status, "", "sap/ui/security/FrameOptions");
 			this._callback(false);
 		}
 	};
@@ -318,9 +317,9 @@ sap.ui.define(['sap/base/Log'], function(Log) {
 
 	FrameOptions.prototype._sendRequireMessage = function() {
 		FrameOptions.__parent.postMessage('SAPFrameProtection*require-origin', '*');
-		// If not postmessage response was received, send request to allowlist service
+		// If not postmessage response was received, send request to whitelist service
 		// anyway, to check whether frame protection is enabled
-		if (this.mSettings.allowlistService) {
+		if (this.mSettings.whitelistService) {
 			setTimeout(function() {
 				if (!this.bParentResponded) {
 					this._check(true);

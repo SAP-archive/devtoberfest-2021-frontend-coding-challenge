@@ -71,10 +71,7 @@ function createShiftArr(step) {
 	}
 
 	var shift = ['\n']; // array of shifts
-
-	// ##### BEGIN: MODIFIED BY SAP
-	for (var ix = 0; ix < 100; ix++) {
-	// ##### END: MODIFIED BY SAP
+	for(ix=0;ix<100;ix++){
 		shift.push(shift[ix]+space);
 	}
 	return shift;

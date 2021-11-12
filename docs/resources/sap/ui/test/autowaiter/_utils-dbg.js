@@ -1,21 +1,19 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define([
-	'sap/ui/thirdparty/URI',
-	'sap/base/util/isPlainObject'
-], function(URI, isPlainObject) {
+sap.ui.define(['sap/ui/thirdparty/URI', "sap/ui/thirdparty/jquery"], function(URI, jQueryDOM) {
 	"use strict";
+
+	var oUriParams = new URI().search(true);
+	var bForceResolveStackTrace = ["false", undefined].indexOf(oUriParams.opaFrameIEStackTrace) < 0;
 
 	function resolveStackTrace() {
 		var oError = new Error();
-		var sStack = "No stack trace available";
-		var oUriParams = new URI().search(true);
-		var bForceResolveStackTrace = ["false", undefined].indexOf(oUriParams.opaFrameIEStackTrace) < 0;
 
+		var sStack = "No stack trace available";
 		if (oError.stack) {
 			sStack = oError.stack;
 		} else if (bForceResolveStackTrace) {
@@ -32,7 +30,7 @@ sap.ui.define([
 	}
 
 	function functionToString(fn) {
-		return "'" + fn.toString().replace(/\"/g, '\'') + "'";
+		return fn.toString().replace(/\"/g, '\'');
 	}
 
 	function argumentsToString(oArgs) {
@@ -43,14 +41,14 @@ sap.ui.define([
 			return "'" + oArgs + "'";
 		}
 		function argToString(arg) {
-			if (typeof arg === "function") {
-				return functionToString(arg);
+			if (jQueryDOM.isFunction(arg)) {
+				return "'" + functionToString(arg) + "'";
 			}
-			if (Array.isArray(arg)) {
+			if (jQueryDOM.isArray(arg)) {
 				var aValues = Array.prototype.map.call(arg, argToString);
 				return "[" + aValues.join(", ") + "]";
 			}
-			if (isPlainObject(arg)) {
+			if (jQueryDOM.isPlainObject(arg)) {
 				return JSON.stringify(arg);
 			}
 			return "'" + arg.toString() + "'";

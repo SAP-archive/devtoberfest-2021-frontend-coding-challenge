@@ -1,19 +1,16 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides class sap.ui.core.util.ExportColumn
-sap.ui.define([
-	'sap/ui/base/ManagedObject',
-	'./ExportCell' // convenience dependency for legacy code that uses global names
-],
-	function(ManagedObject) {
+sap.ui.define(['sap/ui/base/ManagedObject', './ExportCell'],
+	function(ManagedObject, ExportCell) {
 	'use strict';
 
 	/**
-	 * Constructor for a new ExportColumn.
+	 * Constructor for a new ExportCell.
 	 *
 	 * @param {string} [sId] id for the new control, generated automatically if no id is given
 	 * @param {object} [mSettings] initial settings for the new control
@@ -23,7 +20,7 @@ sap.ui.define([
 	 * @extends sap.ui.base.ManagedObject
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @since 1.22.0
 	 *
 	 * @public

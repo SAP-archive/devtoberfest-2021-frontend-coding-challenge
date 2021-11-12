@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -42,8 +42,7 @@ sap.ui.define(['sap/ui/core/library', 'sap/ui/core/ValueStateSupport', 'sap/ui/D
 			bInWarningState = ValueState.Warning === sValueState,
 			bInSuccessState = ValueState.Success === sValueState,
 			bInInformationState = ValueState.Information === sValueState,
-			bUseEntireWidth = oCheckBox.getUseEntireWidth(),
-			bEditableAndEnabled = bEditable && bEnabled;
+			bUseEntireWidth = oCheckBox.getUseEntireWidth();
 
 		// CheckBox wrapper
 		oRm.openStart("div", oCheckBox);
@@ -69,16 +68,14 @@ sap.ui.define(['sap/ui/core/library', 'sap/ui/core/ValueStateSupport', 'sap/ui/D
 			oRm.class("sapMCbWrapped");
 		}
 
-		if (bEditableAndEnabled) {
-			if (bInErrorState) {
-				oRm.class("sapMCbErr");
-			} else if (bInWarningState) {
-				oRm.class("sapMCbWarn");
-			} else if (bInSuccessState) {
-				oRm.class("sapMCbSucc");
-			} else if (bInInformationState) {
-				oRm.class("sapMCbInfo");
-			}
+		if (bInErrorState) {
+			oRm.class("sapMCbErr");
+		} else if (bInWarningState) {
+			oRm.class("sapMCbWarn");
+		} else if (bInSuccessState) {
+			oRm.class("sapMCbSucc");
+		} else if (bInInformationState) {
+			oRm.class("sapMCbInfo");
 		}
 
 		if (bUseEntireWidth) {
@@ -100,7 +97,7 @@ sap.ui.define(['sap/ui/core/library', 'sap/ui/core/ValueStateSupport', 'sap/ui/D
 			role: "checkbox",
 			selected: null,
 			checked: oCheckBox._getAriaChecked(),
-			describedby: sTooltip && bEditableAndEnabled ? sId + "-Descr" : undefined
+			describedby: sTooltip ? sId + "-Descr" : undefined
 		});
 
 		if (bDisplayOnlyApplied) {
@@ -158,7 +155,7 @@ sap.ui.define(['sap/ui/core/library', 'sap/ui/core/ValueStateSupport', 'sap/ui/D
 		oRm.close("div");
 		oRm.renderControl(oCbLabel);
 
-		if (sTooltip && sap.ui.getCore().getConfiguration().getAccessibility() && bEditableAndEnabled) {
+		if (sTooltip && sap.ui.getCore().getConfiguration().getAccessibility()) {
 			// for ARIA, the tooltip must be in a separate SPAN and assigned via aria-describedby.
 			// otherwise, JAWS does not read it.
 			oRm.openStart("span", sId + "-Descr");
@@ -179,22 +176,13 @@ sap.ui.define(['sap/ui/core/library', 'sap/ui/core/ValueStateSupport', 'sap/ui/D
 	 */
 	CheckBoxRenderer.getTooltipText = function (oCheckBox) {
 		var sValueStateText = oCheckBox.getProperty("valueStateText"),
-			sTooltipText = oCheckBox.getTooltip_AsString(),
-			bEnabled = oCheckBox.getEnabled(),
-			bEditable = oCheckBox.getEditable();
+			sTooltipText = oCheckBox.getTooltip_AsString();
 
 		if (sValueStateText) {
-			// custom value state text is set, concat to tooltip and return
 			return (sTooltipText ? sTooltipText + " - " : "") + sValueStateText;
-		} else if (bEditable && bEnabled) {
-			// the visual value state is only set for editable and enabled checkboxes
-			// the default value state text should only be set in those cases
+		} else {
 			return ValueStateSupport.enrichTooltip(oCheckBox, sTooltipText);
 		}
-
-		// if no value state text is provided or the checkbox
-		// is disabled only the custom tooltip is returned
-		return sTooltipText;
 	};
 
 	return CheckBoxRenderer;

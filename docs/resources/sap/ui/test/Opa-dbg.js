@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -325,9 +325,11 @@ sap.ui.define([
 		// URI params overwrite other config params
 		// if any action, assertion or arrangement is already defined in OPA, it will be overwritten
 		// deep extend is necessary so plain object configs like appParams are properly merged
-		Opa.config = $.extend(true, Opa.config, oOptions, Opa._uriParams);
+		Opa.config = $.extend(true, Opa.config, oOptions, opaUriParams);
 		_OpaLogger.setLevel(Opa.config.logLevel);
 	};
+
+	var opaUriParams = _OpaUriParameterParser._getOpaParams();
 
 	// These browsers are not executing Promises as microtasks so slow down OPA a bit to let mircotasks before other tasks.
 	// TODO: A proper solution would be waiting for all the active timeouts in the synchronization part until then this is a workaround
@@ -338,7 +340,9 @@ sap.ui.define([
 	// I don't have a proper explanation for this.
 	var executionDelayDefault = 0;
 
-	if (Device.browser.safari) {
+	// phantom is flagged as safari but actually we do not want to set the tiemout higher in phantomjs
+	var bIsSafariButNotPhantom = Device.browser.safari && !Device.browser.phantomJS;
+	if (Device.browser.msie || Device.browser.edge || bIsSafariButNotPhantom) {
 		executionDelayDefault = 50;
 	}
 
@@ -378,7 +382,7 @@ sap.ui.define([
 			_stackDropCount : 0, //Internal use. Specify numbers of additional stack frames to remove for logging
 			executionDelay: executionDelayDefault,
 			asyncPolling: false
-		}, Opa._uriParams);
+		},opaUriParams);
 	};
 
 	/**
@@ -459,8 +463,6 @@ sap.ui.define([
 		}
 	};
 
-	Opa._uriParams = _OpaUriParameterParser._getOpaParams();
-
 	//create the default config
 	Opa.resetConfig();
 
@@ -474,12 +476,12 @@ sap.ui.define([
 	 * Contains all methods available on QUnit.assert for the running QUnit version.
 	 * Available assertions are: ok, equal, propEqual, deepEqual, strictEqual and their negative counterparts.
 	 *
-	 * For more information, see  {@link module:sap/ui/test/opaQunit}.
+	 * For more information, see  {@link sap.ui.test.opaQunit}.
 	 *
 	 * @name sap.ui.test.Opa.assert
 	 * @public
 	 * @static
-	 * @type QUnit.Assert
+	 * @type map
 	*/
 
 	Opa.prototype = {
@@ -498,7 +500,7 @@ sap.ui.define([
 		/**
 		 * Queues up a waitFor command for Opa.
 		 * The Queue will not be emptied until {@link sap.ui.test.Opa.emptyQueue} is called.
-		 * If you are using {@link module:sap/ui/test/opaQunit}, emptyQueue will be called by the wrapped tests.
+		 * If you are using {@link sap.ui.test.opaQunit}, emptyQueue will be called by the wrapped tests.
 		 *
 		 * If you are using Opa5, waitFor takes additional parameters.
 		 * They can be found here: {@link sap.ui.test.Opa5#waitFor}.
@@ -616,7 +618,7 @@ sap.ui.define([
 		 * This means that any "thenable" should be acceptable.
 		 * @public
 		 * @param {jQuery.promise|Promise} oPromise promise to schedule on the OPA queue
-		 * @returns {jQuery.promise} promise which is the result of a {@link sap.ui.test.Opa#waitFor}
+		 * @returns {jQuery.promise} promise which is the result of a {@link sap.ui.test.Opa.waitFor}
 		 */
 		iWaitForPromise: function (oPromise) {
 			return this._schedulePromiseOnFlow(oPromise);
@@ -684,7 +686,14 @@ sap.ui.define([
 	};
 
 	/* config values from opa.config that will be used in waitFor */
-	Opa._aConfigValuesForWaitFor = Object.keys(_ValidationParameters.OPA_WAITFOR_CONFIG);
+	Opa._aConfigValuesForWaitFor = [
+		"errorMessage",
+		"timeout",
+		"debugTimeout",
+		"pollingInterval",
+		"_stackDropCount",
+		"asyncPolling"
+	];
 
 
 	return Opa;

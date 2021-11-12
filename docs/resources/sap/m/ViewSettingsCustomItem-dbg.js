@@ -1,12 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.m.ViewSettingsCustomItem.
-sap.ui.define(['./ViewSettingsItem', './library'],
-	function(ViewSettingsItem, library) {
+sap.ui.define(['./ViewSettingsItem', 'sap/ui/base/ManagedObject', './library'],
+	function(ViewSettingsItem, ManagedObject, library) {
 	"use strict";
 
 
@@ -22,7 +22,7 @@ sap.ui.define(['./ViewSettingsItem', './library'],
 	 * @extends sap.m.ViewSettingsItem
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -49,12 +49,6 @@ sap.ui.define(['./ViewSettingsItem', './library'],
 		}
 	}});
 
-	ViewSettingsCustomItem.prototype.init = function () {
-		this.attachEvent("modelContextChange", function() {
-			this._control && this._control.setModel(this.getModel());
-		}.bind(this));
-	};
-
 	/**
 	 * Destroys the control.
 	 * @private
@@ -73,7 +67,7 @@ sap.ui.define(['./ViewSettingsItem', './library'],
 	 * @override
 	 * @public
 	 * @param {sap.ui.core.Control} oControl A control used for filtering purposes
-	 * @return {this} this pointer for chaining
+	 * @return {sap.m.ViewSettingsCustomItem} this pointer for chaining
 	 */
 	ViewSettingsCustomItem.prototype.setCustomControl = function (oControl) {
 		this._control = oControl;
@@ -96,7 +90,7 @@ sap.ui.define(['./ViewSettingsItem', './library'],
 	 * @override
 	 * @param {int} iValue The new value for property filterCount
 	 * @public
-	 * @returns {this} this pointer for chaining
+	 * @return {sap.m.ViewSettingsItem} this pointer for chaining
 	 */
 	ViewSettingsCustomItem.prototype.setFilterCount = function (iValue) {
 		this.setProperty("filterCount", iValue, true);
@@ -108,7 +102,7 @@ sap.ui.define(['./ViewSettingsItem', './library'],
 	 * @override
 	 * @param {boolean} bValue The new value for property selected
 	 * @public
-	 * @returns {this} this pointer for chaining
+	 * @return {sap.m.ViewSettingsItem} this pointer for chaining
 	 */
 	ViewSettingsCustomItem.prototype.setSelected = function (bValue) {
 		this.setProperty("selected", bValue, true);
@@ -120,13 +114,13 @@ sap.ui.define(['./ViewSettingsItem', './library'],
 	 *
 	 * @param {string} [sIdSuffix] a suffix to be appended to the cloned object id
 	 * @param {string[]} [aLocalIds] an array of local IDs within the cloned hierarchy (internally used)
-	 * @param {object} [oOptions] configuration object
-	 * @returns {this} reference to the newly created clone
+	 * @param {Object} [oOptions] configuration object
+	 * @return {sap.ui.base.ManagedObject} reference to the newly created clone
 	 * @public
 	 * @override
 	 */
 	ViewSettingsCustomItem.prototype.clone = function(sIdSuffix, aLocalIds, oOptions) {
-		var oClonedObj = ViewSettingsItem.prototype.clone.apply(this, arguments);
+		var oClonedObj = ManagedObject.prototype.clone.apply(this, arguments);
 		//clones the 'customControl' aggregation instance, as the framework does not know about it
 		oClonedObj._control = this._control.clone();
 		return oClonedObj;

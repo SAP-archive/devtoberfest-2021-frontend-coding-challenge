@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -10,7 +10,6 @@
 	/*eslint no-alert: 0, no-warning-comments: 0 */
 
 	var aFileNames = [], // maps a file's index to its name
-		rParentheses = /[()]/g,
 		oScript = getScriptTag(),
 		aStatistics = [], // maps a file's index to its "hits" array (and statistics record)
 		iThreshold,
@@ -96,12 +95,22 @@
 	 */
 	function instrument(oConfiguration, fnSuccess){
 		var bBranchTracking = blanket.options("branchTracking"),
+			bComment = false, // interested in meta comments?
+			Device,
 			iFileIndex = aFileNames.length,
 			sFileName = oConfiguration.inputFileName,
 			iNoOfOutputLines,
 			sScriptInput = oConfiguration.inputFile,
 			sScriptOutput;
 
+		if (sScriptInput.indexOf("// sap-ui-cover-browser msie") >= 0) {
+			bComment = true; // needed by isDeviceSpecificBlock(), no matter which device
+			Device = sap.ui.require("sap/ui/Device");
+			if (Device && Device.browser.msie) {
+				// no need to call isChildOfIgnoredNode()
+				Device = undefined;
+			}
+		}
 		aFileNames.push(sFileName);
 		aStatistics[iFileIndex] = _$blanket[sFileName] = []; // hits
 		if (bBranchTracking) {
@@ -112,14 +121,14 @@
 		_$blanket[sFileName].warnings = [];
 
 		sScriptOutput = "" + falafel(sScriptInput, {
-//				attachComment : true, // interesting for meta comments!
-//				comment : true,
+				attachComment : bComment,
+				comment : bComment,
 				loc : true,
 				range : true,
 				source : sScriptInput // is simply attached to each Location
 //				tokens : false,
 //				tolerant : false
-			}, visit.bind(null, bBranchTracking, iFileIndex));
+			}, visit.bind(null, bBranchTracking, iFileIndex, Device));
 
 		iNoOfOutputLines = sScriptOutput.split("\n").length + 1; // account for line 0 here as well
 		if (iNoOfOutputLines !== _$blanket[sFileName].source.length) {
@@ -128,6 +137,60 @@
 		}
 
 		fnSuccess(sScriptOutput);
+	}
+
+	/**
+	 * Returns whether the given node or one of its ancestors is device-specific for a device
+	 * other than what the given <code>Device</code> indicates.
+	 *
+	 * @param {sap.ui.Device} Device
+	 *   Device
+	 * @param {object} oNode
+	 *   AST node
+	 * @returns {boolean}
+	 *   Whether the given node or one of its ancestors is device-specific for another device
+	 */
+	function isChildOfIgnoredNode(Device, oNode) {
+		if (!("$ignored" in oNode)) {
+			if (oNode.parent && isChildOfIgnoredNode(Device, oNode.parent)) {
+				oNode.$ignored = true;
+			} else { // ignore device-specific code on other devices
+				oNode.$ignored = oNode.type === "BlockStatement"
+					&& isDeviceSpecificBlock(Device, oNode);
+			}
+		}
+		return oNode.$ignored;
+	}
+
+	/**
+	 * Returns whether the given block statement node is device-specific (in general, or for a
+	 * device other than what the given <code>Device</code> indicates).
+	 *
+	 * @param {sap.ui.Device} [Device]
+	 *   Optional device API; without it, the meta comment alone counts
+	 * @param {object} oNode
+	 *   AST node
+	 * @returns {boolean}
+	 *   Whether the given block statement node is device-specific for another device
+	 */
+	function isDeviceSpecificBlock(Device, oNode) {
+		/*
+		 * Tells whether the given comment is a meta comment for device-specific code (in general,
+		 * if no <code>Device</code> is available, or for a device other than what the available
+		 * <code>Device</code> indicates).
+		 *
+		 * @param {string} oComment
+		 *   A single block or end-of-line comment
+		 * @returns {boolean}
+		 *   Whether the given comment is a meta comment for device-specific code (see above)
+		 */
+		function isNotForDevice(oComment) {
+			return oComment.type === "Line" && oComment.value === " sap-ui-cover-browser msie"
+				&& !(Device && Device.browser.msie);
+		}
+
+		return oNode.body[0] && oNode.body[0].leadingComments
+			&& oNode.body[0].leadingComments.some(isNotForDevice);
 	}
 
 	/**
@@ -156,6 +219,8 @@
 	 *   Whether branch tracking is on
 	 * @param {number} iFileIndex
 	 *   The current file's index
+	 * @param {sap.ui.Device} [Device]
+	 *   Device
 	 * @param {object} oNode
 	 *   AST node
 	 * @returns {boolean}
@@ -163,7 +228,7 @@
 	 *   meant to keep track for future internal usage and is actually ignored by Falafel's
 	 *   <code>walk</code>.
 	 */
-	function visit(bBranchTracking, iFileIndex, oNode) {
+	function visit(bBranchTracking, iFileIndex, Device, oNode) {
 		var aHits = aStatistics[iFileIndex],
 			aBranchTracking = aHits.branchTracking,
 			iLine = oNode.loc.start.line,
@@ -193,17 +258,28 @@
 		}
 
 		/*
-		 * Try to preserve operator's source code incl. comments and line breaks, but avoid leading
-		 * closing or trailing opening parentheses. Note: this also removes parentheses inside a
-		 * comment, but who cares ;-)
+		 * Preserve operator's source code incl. comments and line breaks, but avoid leading closing
+		 * or trailing opening parentheses.
 		 *
 		 * Note: outer parentheses are absorbed by operators and do not appear in operand's source!
 		 *
 		 * @returns {string}
 		 */
 		function operator() {
-			return oNode.loc.source.slice(oNode.left.range[1], oNode.right.range[0])
-				.replace(rParentheses, "");
+			var sSource = oNode.loc.source.slice(oNode.left.range[1], oNode.right.range[0]);
+
+			if (sSource[0] === ")") {
+				sSource = sSource.slice(1);
+			}
+			if (sSource.slice(-1) === "(") {
+				sSource = sSource.slice(0, -1);
+			}
+
+			return sSource;
+		}
+
+		if (Device && isChildOfIgnoredNode(Device, oNode)) {
+			return false;
 		}
 
 		switch (oNode.type) {
@@ -272,7 +348,7 @@
 			case "ForStatement":
 			case "WhileStatement":
 			case "WithStatement":
-				// fall through; Note: we assume block statements only (@see blanket._blockifyIf)
+				// Note: we assume block statements only (@see blanket._blockifyIf)
 			case "BreakStatement":
 			case "ContinueStatement":
 			case "FunctionDeclaration":
@@ -283,6 +359,10 @@
 				return addLineTracking(oNode);
 
 			case "IfStatement":
+				if (isDeviceSpecificBlock(undefined, oNode.consequent)) {
+					// Note: if "then" is device-specific, we cannot expect branch coverage of "if"
+					bBranchTracking = false;
+				}
 				// Note: we assume block statements only (@see blanket._blockifyIf)
 				oNode.test.update("blanket.$b(" + iFileIndex + ", "
 					+ (bBranchTracking ? aBranchTracking.length : -1) + ", "
@@ -414,7 +494,6 @@
 	var bInfo,
 		sClassName = "sap.ui.base.SyncPromise",
 		mFileName2InitialHits = {},
-		sFilter,
 		fnModule,
 		iNo = 0,
 		sTestId,
@@ -486,7 +565,7 @@
 			}
 			mUncaughtById = {};
 
-			//TODO for (let vReason of mUncaughtPromise2Reason.values()) {...}
+			//TODO once IE is gone: for (let vReason of mUncaughtPromise2Reason.values()) {...}
 			if (mUncaughtPromise2Reason && mUncaughtPromise2Reason.size) {
 				itValues = mUncaughtPromise2Reason.values();
 				for (;;) {
@@ -514,7 +593,7 @@
 		 * Listener for "unhandledrejection" events to keep track of "Uncaught (in promise)".
 		 */
 		window.addEventListener("unhandledrejection", function (oEvent) {
-			if (oEvent.reason && oEvent.reason.$uncaughtInPromise) { // ignore exceptional cases
+			if (oEvent.reason.$uncaughtInPromise) { // ignore exceptional cases
 				return;
 			}
 
@@ -582,8 +661,8 @@
 		fnBeforeEach = mHooks.beforeEach || function () {};
 
 		mHooks.after = function (assert) {
-			if (window.blanket && !sFilter && !sTestId && !this.__ignoreIsolatedCoverage__
-					&& iThreshold >= 100 && !assert.test.module.stats.bad) {
+			if (window.blanket && !sTestId && !this.__ignoreIsolatedCoverage__
+					&& iThreshold >= 100) {
 				checkIsolatedCoverage(this, assert);
 			}
 
@@ -648,11 +727,8 @@
 			"sap/base/util/UriParameters",
 			"sap/ui/base/SyncPromise"
 		], function (Log, UriParameters, SyncPromise) {
-			var oUriParameters = UriParameters.fromQuery(window.location.search);
-
 			bInfo = Log.isLoggable(Log.Level.INFO, sClassName);
-			sFilter = oUriParameters.get("filter");
-			sTestId = oUriParameters.get("testId");
+			sTestId = UriParameters.fromQuery(window.location.search).get("testId");
 			SyncPromise.listener = listener;
 		});
 
@@ -662,11 +738,11 @@
 
 			jQuery("#qunit-modulefilter-dropdown-list").css("max-height", "none");
 
-			jQuery("#qunit-modulefilter-dropdown").on("click", function (oMouseEvent) {
+			jQuery("#qunit-modulefilter-dropdown").click(function (oMouseEvent) {
 				if (oMouseEvent.target.tagName === "LABEL") {
 					setTimeout(function () {
 						// click on label instead of checkbox triggers "Apply" automatically
-						jQuery("#qunit-modulefilter-actions").children().first().trigger("click");
+						jQuery("#qunit-modulefilter-actions").children().first().click();
 					});
 				}
 			});

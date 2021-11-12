@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -14,15 +14,11 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/thirdpart
 	// shortcut for sap.m.LoadState
 	var LoadState = library.LoadState;
 
-	var oRb = sap.ui.getCore().getLibraryResourceBundle("sap.m");
-
 	/**
 	 * GenericTileLineMode renderer.
 	 * @namespace
 	 */
-	var GenericTileLineModeRenderer = {
-		apiVersion: 2    // enable in-place DOM patching
-	};
+	var GenericTileLineModeRenderer = {};
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
@@ -34,93 +30,46 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/thirdpart
 		var sTooltipText = oControl._getTooltipText(),
 			bIsScreenLarge = oControl._isScreenLarge(),
 			sAriaText = oControl._getAriaText(),
-			sScope = oControl.getScope(),
-			sScopeClass,
-			bIsSingleAction = false,
-			bHasPress = oControl.hasListeners("press"),
-			sState = oControl.getState(),
-			sAriaRoleDescription = oControl.getAriaRoleDescription(),
-			sAriaRole = oControl.getAriaRole();
-
-		// Render a link when URL is provided, not in action scope and the state is enabled
-		var bRenderLink = oControl.getUrl() && !oControl._isInActionScope() && sState !== LoadState.Disabled;
-
+			sScopeClass = encodeCSS("sapMGTScope" + oControl.getScope()),
+			bHasPress = oControl.hasListeners("press");
 		this._bRTL = sap.ui.getCore().getConfiguration().getRTL();
 
-		if (sScope === GenericTileScope.Actions) {
-			// given class only needs to be added if the tile's state is not disabled
-			if (sState !== LoadState.Disabled) {
-				sScopeClass = encodeCSS("sapMGTScopeActions");
-			}
-		} else if (sScope === GenericTileScope.ActionMore || sScope === GenericTileScope.ActionRemove) {
-
-			bIsSingleAction = true;
-			// given class only needs to be added if the tile's state is not disabled
-			if (sState !== LoadState.Disabled) {
-				sScopeClass = encodeCSS("sapMGTScopeSingleAction");
-			}
-
+		oRm.write("<span");
+		oRm.writeControlData(oControl);
+		oRm.writeAttributeEscaped("aria-label", sAriaText);
+		if (bHasPress) {
+			oRm.writeAttribute("role", "button");
 		} else {
-			sScopeClass = encodeCSS("sapMGTScopeDisplay");
+			oRm.writeAttribute("role", "presentation");
 		}
-
-		if (bRenderLink) {
-			oRm.openStart("a", oControl);
-			oRm.attr("href", oControl.getUrl());
-			oRm.attr("rel", "noopener noreferrer");
-			oRm.attr("draggable", "false"); // <a> elements are draggable per default, use UI5 DnD instead
-		} else {
-			oRm.openStart("span", oControl);
-		}
-		oRm.attr("aria-label", sAriaText);
-		if (sAriaRoleDescription) {
-			oRm.attr("aria-roledescription", sAriaRoleDescription );
-		} else {
-			oRm.attr("aria-roledescription", oRb.getText("GENERIC_TILE_ROLE_DESCRIPTION"));
-		}
-		if (sAriaRole) {
-			oRm.attr("role", sAriaRole);
-		} else if (!bRenderLink) { // buttons only; <a> elements always have the default role
-			oRm.attr("role", bHasPress ? "button" : "presentation");
-		} else {
-			oRm.attr("role", "link");
-		}
-		oRm.class("sapMGT");
-		oRm.class(sScopeClass);
-		if (sScope ===  GenericTileScope.ActionMore) {
-				oRm.style("padding-right", "2.25rem");
-		}
-		oRm.class("sapMGTLineMode");
+		oRm.addClass("sapMGT");
+		oRm.addClass(sScopeClass);
+		oRm.addClass("sapMGTLineMode");
 		this._writeDirection(oRm);
 		if (sTooltipText) {
-			oRm.attr("title", sTooltipText);
+			oRm.writeAttributeEscaped("title", sTooltipText);
 		}
 
+		var sState = oControl.getState();
 		if (sState !== LoadState.Disabled) {
-			if (!oControl.isInActionRemoveScope()) {
-				oRm.class("sapMPointer");
-				oRm.style("pointer-events", "auto");
-			}
-			oRm.attr("tabindex", "0");
+			oRm.addClass("sapMPointer");
+			oRm.writeAttribute("tabindex", "0");
 		} else {
-			oRm.class("sapMGTDisabled");
+			oRm.addClass("sapMGTDisabled");
 		}
 		if (sState === LoadState.Failed) {
-			oRm.class("sapMGTFailed");
+			oRm.addClass("sapMGTFailed");
 		}
-		oRm.openEnd();
-		// focus div was only getting rendered when screen size was small
-		// which in turn was not rendering active state when screen size was large and thus default browser active state would suffice
-		// in the new line tile visualisation we need active state same as other generic tiles
-		if (oControl.getState() !== LoadState.Disabled) {
-			this._renderFocusDiv(oRm, oControl);
-		}
+		oRm.writeClasses();
+		oRm.write(">");
+
 		if (bIsScreenLarge) {
 			//large
-			oRm.openStart("div", oControl.getId() + "-startMarker");
-			oRm.class("sapMGTStartMarker");
-			oRm.openEnd();
-			oRm.close("div");
+			oRm.write("<div");
+			oRm.writeAttribute("id", oControl.getId() + "-startMarker");
+			oRm.addClass("sapMGTStartMarker");
+			oRm.writeClasses();
+			oRm.write("></div>");
 
 			this._renderFailedIcon(oRm, oControl);
 			this._renderHeader(oRm, oControl);
@@ -128,57 +77,64 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/thirdpart
 				this._renderSubheader(oRm, oControl);
 			}
 
-			oRm.openStart("div", oControl.getId() + "-endMarker");
-			oRm.class("sapMGTEndMarker");
-			oRm.openEnd();
+			oRm.write("<div");
+			oRm.writeAttribute("id", oControl.getId() + "-endMarker");
+			oRm.addClass("sapMGTEndMarker");
+			oRm.writeClasses();
+			oRm.write(">");
 
-			if (oControl._isInActionScope()) {
-				this._renderActionsScope(oRm, oControl, bIsSingleAction);
+			if (oControl.getScope() === GenericTileScope.Actions) {
+				this._renderActionsScope(oRm, oControl);
 			}
 
-			oRm.close("div");
+			oRm.write("</div>");
 
 			//hover and press style helper
-			oRm.openStart("div", oControl.getId() + "-styleHelper");
-			oRm.class("sapMGTStyleHelper");
-			oRm.openEnd();
-			oRm.close("div");
+			oRm.write("<div");
+			oRm.writeAttribute("id", oControl.getId() + "-styleHelper");
+			oRm.addClass("sapMGTStyleHelper");
+			oRm.writeClasses();
+			oRm.write("></div>");
 
 		} else {
-			oRm.openStart("div", oControl.getId() + "-touchArea");
-			oRm.class("sapMGTTouchArea");
-			oRm.openEnd();
+			// small
+			if (oControl.getState() !== LoadState.Disabled) {
+				this._renderFocusDiv(oRm, oControl);
+			}
+
+			oRm.write("<div");
+			oRm.writeAttribute("id", oControl.getId() + "-touchArea");
+			oRm.addClass("sapMGTTouchArea");
+			oRm.writeClasses();
+			oRm.write(">");
 
 			this._renderFailedIcon(oRm, oControl);
 
-			oRm.openStart("span",oControl.getId() + "-lineModeHelpContainer");
-			oRm.class("sapMGTLineModeHelpContainer");
-			oRm.openEnd();
+			oRm.write("<span");
+			oRm.writeAttribute("id", oControl.getId() + "-lineModeHelpContainer");
+			oRm.addClass("sapMGTLineModeHelpContainer");
+			oRm.writeClasses();
+			oRm.write(">");
 
 			this._renderHeader(oRm, oControl);
 
 			if (oControl.getSubheader()) {
 				this._renderSubheader(oRm, oControl);
 			}
-			oRm.close("span"); //.sapMGTLineModeHelpContainer
+			oRm.write("</span>"); //.sapMGTLineModeHelpContainer
 
-			if (oControl._isInActionScope()) {
-				this._renderActionsScope(oRm, oControl, bIsSingleAction);
+			if (oControl.getScope() === GenericTileScope.Actions) {
+				this._renderActionsScope(oRm, oControl);
 			}
 
-			oRm.close("div"); //.sapMGTTouchArea
+			oRm.write("</div>"); //.sapMGTTouchArea
 		}
-
-		if (bRenderLink) {
-			oRm.close("a");
-		} else {
-			oRm.close("span"); //.sapMGT
-		}
+		oRm.write("</span>"); //.sapMGT
 	};
 
 	GenericTileLineModeRenderer._writeDirection = function(oRm) {
 		if (this._bRTL) {
-			oRm.attr("dir", "rtl");
+			oRm.writeAttribute("dir", "rtl");
 		}
 	};
 
@@ -194,38 +150,39 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/thirdpart
 	};
 
 	GenericTileLineModeRenderer._renderHeader = function(oRm, oControl) {
-		oRm.openStart("span",  oControl.getId() + "-hdr-text");
+		oRm.write("<span");
 		this._writeDirection(oRm);
-		oRm.class("sapMGTHdrTxt");
-		oRm.openEnd();
-		oRm.text(oControl._oTitle.getText());
-		oRm.close("span");
+		oRm.addClass("sapMGTHdrTxt");
+		oRm.writeClasses();
+		oRm.writeAttribute("id", oControl.getId() + "-hdr-text");
+		oRm.write(">");
+		oRm.writeEscaped(oControl._oTitle.getText());
+		oRm.write("</span>");
 	};
 
 	GenericTileLineModeRenderer._renderSubheader = function(oRm, oControl) {
-		oRm.openStart("span",oControl.getId() + "-subHdr-text");
+		oRm.write("<span");
 		this._writeDirection(oRm);
-		oRm.class("sapMGTSubHdrTxt");
-		oRm.openEnd();
-		oRm.text(oControl._oSubTitle.getText());
-		oRm.close("span");
+		oRm.addClass("sapMGTSubHdrTxt");
+		oRm.writeClasses();
+		oRm.writeAttribute("id", oControl.getId() + "-subHdr-text");
+		oRm.write(">");
+		oRm.writeEscaped(oControl._oSubTitle.getText());
+		oRm.write("</span>");
 	};
 
-	GenericTileLineModeRenderer._renderActionsScope = function(oRm, oControl, bIsSingleAction) {
+	GenericTileLineModeRenderer._renderActionsScope = function(oRm, oControl) {
 		if (oControl.getState() !== LoadState.Disabled) {
-			oRm.openStart("span", oControl.getId() + "-actions");
-			oRm.class("sapMGTActionsContainer");
-
-			if (bIsSingleAction) {
-				oRm.class("sapMGTScopeSingleActionContainer");
-			}
-
-			oRm.openEnd();
+			oRm.write("<span");
+			oRm.writeAttribute("id", oControl.getId() + "-actions");
+			oRm.addClass("sapMGTActionsContainer");
+			oRm.writeClasses();
+			oRm.write(">");
 
 			oRm.renderControl(oControl._oMoreIcon);
 			oRm.renderControl(oControl._oRemoveButton);
 
-			oRm.close("span");
+			oRm.write("</span>");
 		}
 	};
 
@@ -256,7 +213,7 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/thirdpart
 		for (i; i < this._oStyleData.lines.length; i++) {
 			oLine = this._oStyleData.lines[i];
 
-			var $Rect = jQuery("<div class='sapMGTLineStyleHelper'><div class='sapMGTLineStyleHelperInner'></div></div>");
+			var $Rect = jQuery("<div class='sapMGTLineStyleHelper'><div class='sapMGTLineStyleHelperInner' /></div>");
 			if (this._oStyleData.rtl) {
 				$Rect.css("right", oLine.offset.x + "px");
 			} else {
@@ -264,7 +221,8 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/thirdpart
 			}
 			$Rect.css({
 				top: oLine.offset.y + "px",
-				width: oLine.width + "px"
+				width: oLine.width + "px",
+				height: oLine.height
 			});
 
 			sHelpers += $Rect.get(0).outerHTML.trim();
@@ -279,10 +237,12 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS", "sap/ui/thirdpart
 	 * @private
 	 */
 	GenericTileLineModeRenderer._renderFocusDiv = function(oRm, oControl) {
-		oRm.openStart("div", oControl.getId() + "-focus");
-		oRm.class("sapMGTFocusDiv");
-		oRm.openEnd();
-		oRm.close("div");
+		oRm.write("<div");
+		oRm.writeAttribute("id", oControl.getId() + "-focus");
+		oRm.addClass("sapMGTFocusDiv");
+		oRm.writeClasses();
+		oRm.write(">");
+		oRm.write("</div>");
 	};
 
 	/**

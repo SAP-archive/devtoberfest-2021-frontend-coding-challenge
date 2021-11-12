@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -13,9 +13,7 @@ sap.ui.define([
 	 * UploadSet renderer.
 	 * @namespace
 	 */
-	var UploadSetRenderer = {
-		apiVersion: 2    // enable in-place DOM patching
-	};
+	var UploadSetRenderer = {};
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
@@ -24,25 +22,29 @@ sap.ui.define([
 	 * @param {sap.ui.core.Control} oControl an object representation of the control that should be rendered.
 	 */
 	UploadSetRenderer.render = function (oRm, oControl) {
-		oRm.openStart("div",oControl);
-
-		oRm.class("sapMUC");
-		oRm.openEnd();
+		oRm.write("<div");
+		oRm.writeControlData(oControl);
+		oRm.addClass("sapMUC");
+		oRm.writeClasses();
+		oRm.write(">");
 		this.renderDragDropOverlay(oRm, oControl);
 		this.renderList(oRm, oControl);
-		oRm.close("div");
+		oRm.write("</div>");
 	};
 
 	UploadSetRenderer.renderDragDropOverlay = function (oRm, oControl) {
-		oRm.openStart("div", oControl.getId() + "-drag-drop-area");
-		oRm.class("sapMUCDragDropOverlay");
-		oRm.class("sapMUCDragDropOverlayHide");
-		oRm.openEnd();
-		oRm.openStart("div");
-		oRm.class("sapMUCDragDropIndicator");
-		oRm.openEnd();
-		oRm.close("div");
-		oRm.close("div");
+		oRm.write("<div");
+		oRm.writeAttribute("id", oControl.getId() + "-drag-drop-area");
+		oRm.addClass("sapMUCDragDropOverlay");
+		oRm.addClass("sapMUCDragDropOverlayHide");
+		oRm.writeClasses();
+		oRm.write(">");
+		oRm.write("<div");
+		oRm.addClass("sapMUCDragDropIndicator");
+		oRm.writeClasses();
+		oRm.write(">");
+		oRm.write("</div>");
+		oRm.write("</div>");
 	};
 
 	UploadSetRenderer.renderList = function (oRm, oControl) {
@@ -54,28 +56,34 @@ sap.ui.define([
 
 	UploadSetRenderer.renderNoData = function(oRm, oControl) {
 		var oUploadSet = oControl.getParent();
-		oRm.openStart("li", oUploadSet.getList().getId("nodata"));
-		oRm.attr("tabindex", 0);
-		oRm.class("sapMLIB").class("sapMUCNoDataPage");
+		oRm.write("<li");
+		oRm.writeAttribute("tabindex", 0);
+		oRm.writeAttribute("id", oUploadSet.getList().getId("nodata"));
+		oRm.addClass("sapMLIB sapMUCNoDataPage");
 		ListItemBaseRenderer.addFocusableClasses.call(ListItemBaseRenderer, oRm);
-		oRm.openEnd();
+		oRm.writeClasses();
+		oRm.write(">");
 
 		oRm.renderControl(oUploadSet._oNoDataIcon);
 
-		oRm.openStart("div", oUploadSet.getId() + "-no-data-text");
-		oRm.class("sapMUCNoDataText");
-		oRm.openEnd();
-		oRm.text(oUploadSet.getNoDataText());
-		oRm.close("div");
+		oRm.write("<div");
+		oRm.writeAttribute("id", oUploadSet.getId() + "-no-data-text");
+		oRm.addClass("sapMUCNoDataText");
+		oRm.writeClasses();
+		oRm.write(">");
+		oRm.writeEscaped(oUploadSet.getNoDataText());
+		oRm.write("</div>");
 
 		if (oUploadSet.getUploadEnabled()) {
-			oRm.openStart("div" , oUploadSet.getId() + "-no-data-description");
-			oRm.class("sapMUCNoDataDescription");
-			oRm.openEnd();
-			oRm.text(oUploadSet.getNoDataDescription());
-			oRm.close("div");
+			oRm.write("<div");
+			oRm.writeAttribute("id", oUploadSet.getId() + "-no-data-description");
+			oRm.addClass("sapMUCNoDataDescription");
+			oRm.writeClasses();
+			oRm.write(">");
+			oRm.writeEscaped(oUploadSet.getNoDataDescription());
+			oRm.write("</div>");
 		}
-		oRm.close("li");
+		oRm.write("</li>");
 	};
 
 	return UploadSetRenderer;

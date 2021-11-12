@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -27,7 +27,7 @@ sap.ui.define([
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @private
@@ -83,7 +83,7 @@ sap.ui.define([
 					collapsed: {}
 				}
 			},
-			renderer: TimePickerSliderRenderer
+			renderer: TimePickerSliderRenderer.render
 		});
 
 		var SCROLL_ANIMATION_DURATION = sap.ui.getCore().getConfiguration().getAnimation() ? 200 : 0;
@@ -121,8 +121,6 @@ sap.ui.define([
 		};
 
 		TimePickerSlider.prototype.exit = function() {
-			this._detachEvents();
-
 			var $Slider = this._getSliderContainerDomRef();
 
 			if ($Slider) {
@@ -133,13 +131,6 @@ sap.ui.define([
 				clearInterval(this._intervalId);
 				this._intervalId = null;
 			}
-		};
-
-		/**
-		 * Called before the control is rendered.
-		 */
-		TimePickerSlider.prototype.onBeforeRendering = function () {
-			this._detachEvents();
 		};
 
 		/**
@@ -263,7 +254,7 @@ sap.ui.define([
 		 * @override
 		 * @param {boolean} bValue True or false
 		 * @param {boolean} suppressEvent Whether to suppress event firing
-		 * @returns {this} this instance, used for chaining
+		 * @returns {sap.m.TimePickerSlider} this instance, used for chaining
 		 * @public
 		 */
 		TimePickerSlider.prototype.setIsExpanded = function(bValue, suppressEvent) {
@@ -978,7 +969,7 @@ sap.ui.define([
 
 			$aItems.eq(this._iSelectedItemIndex).addClass("sapMTimePickerItemSelected");
 			//WAI-ARIA region
-			oDescriptionElement = this.getDomRef("valDescription");
+			oDescriptionElement = document.getElementById(this.getId() + "-valDescription");
 			if (oDescriptionElement.innerHTML !== sAriaLabel) {
 				oDescriptionElement.innerHTML = sAriaLabel;
 			}
@@ -1032,10 +1023,8 @@ sap.ui.define([
 		 * @private
 		 */
 		TimePickerSlider.prototype._detachEvents = function () {
-			var oElement = this._getSliderContainerDomRef()[0];
-			if ( oElement == null ) {
-				return;
-			}
+			var oElement = this.getDomRef();
+
 			if (Device.system.combi) {
 				//Detach touch events
 				oElement.removeEventListener("touchstart", jQuery.proxy(onTouchStart, this), false);
@@ -1159,15 +1148,13 @@ sap.ui.define([
 		};
 
 		TimePickerSlider.prototype._initArrows = function() {
-			var that = this, oArrowUp, oArrowDown,
-				oRB = sap.ui.getCore().getLibraryResourceBundle("sap.m");
+			var that = this, oArrowUp, oArrowDown;
 
 			oArrowUp = new Button({
 				icon: IconPool.getIconURI("slim-arrow-up"),
 				press: function (oEvent) {
 					that._offsetValue(-1);
 				},
-				tooltip: oRB.getText("TIMEPICKER_TOOLTIP_UP"),
 				type: 'Transparent'
 			});
 			oArrowUp.addEventDelegate({
@@ -1183,7 +1170,6 @@ sap.ui.define([
 				press: function (oEvent) {
 					that._offsetValue(1);
 				},
-				tooltip: oRB.getText("TIMEPICKER_TOOLTIP_DOWN"),
 				type: 'Transparent'
 			});
 
@@ -1369,7 +1355,7 @@ sap.ui.define([
 
 		/**
 		 * Gets only the visible items.
-		 * @returns {sap.m.VisibleItem[]} the visible sap.m.TimePickerSlider items
+		 * @returns {sap.m.TimePickerSlider} the visible sap.m.TimePickerSlider items
 		 * @private
 		 */
 		TimePickerSlider.prototype._getVisibleItems = function() {

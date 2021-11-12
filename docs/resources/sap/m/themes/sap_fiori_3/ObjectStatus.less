@@ -1,0 +1,29 @@
+/* =================================== */
+/* CSS for control sap.m/ObjectStatus  */
+/* Fiori 3 theme                       */
+/* =================================== */
+
+@_sap_m_ObjectStatus_TextShadowColor: none;
+
+.sapMObjStatus .sapMObjStatusText,
+.sapMObjStatus .sapMObjStatusIcon {
+	text-shadow: @_sap_m_ObjectStatus_TextShadowColor;
+}
+
+.sapMObjectStatusLarge {
+	.sapMObjStatusTitle,
+	.sapMObjStatusText,
+	.sapMObjStatusIcon {
+		font-size: 1.5rem;
+	}
+	.sapMObjStatusIcon > .sapUiIcon {
+		font-size: 1.5rem;
+	}
+}
+
+.sapMObjectStatusLarge.sapMObjStatusInverted {
+	.sapMObjStatusIcon > .sapUiIcon {
+		vertical-align: baseline;
+		font-size: 1.25rem;
+	}
+}

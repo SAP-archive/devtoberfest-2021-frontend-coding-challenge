@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -124,16 +124,15 @@ sap.ui.define([
      */
     test: function(args) {
 
-      // args is mandatory
-      if (!args || typeof args !== "object") {
+      if ($.type(args) !== "object") {
         throw new Error("opa5TestHarness.test: input all arguments via a single object");
       }
 
-      if (typeof args.featurePath !== "string" && !(args.featurePath instanceof String)) {
+      if ($.type(args.featurePath) !== "string") {
         throw new Error("opa5TestHarness.test: parameter 'featurePath' must be a valid string");
       }
 
-      if (args.steps && ((typeof args.steps !== "function") || !((new args.steps())._generateTestStep))) {
+      if (args.steps && (($.type(args.steps) !== "function") || !((new args.steps())._generateTestStep))) {
         throw new Error("opa5TestHarness.test: if specified, parameter 'steps' must be a valid StepDefinitions constructor");
       }
 
@@ -141,7 +140,7 @@ sap.ui.define([
         throw new Error("opa5TestHarness.test: if parameter 'generateMissingSteps' is not true then parameter 'steps' must be a valid StepDefinitions constructor");
       }
 
-      if (args.generateMissingSteps && (typeof args.generateMissingSteps !== "boolean")) {
+      if (args.generateMissingSteps && ($.type(args.generateMissingSteps) !== "boolean")) {
         throw new Error("opa5TestHarness.test: if specified, parameter 'generateMissingSteps' must be a valid boolean");
       }
 

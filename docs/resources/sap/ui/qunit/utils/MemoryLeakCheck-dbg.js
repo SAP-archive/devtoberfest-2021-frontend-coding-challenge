@@ -1,21 +1,23 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 /*global QUnit*/
 
-sap.ui.define([ 'sap/ui/core/Element', 'sap/ui/core/Control', 'sap/ui/core/Core' /* provides sap.ui.getCore() */ ],
-		function(Element, Control) {
+sap.ui.define([ 'jquery.sap.global', 'sap/ui/core/Core', 'sap/ui/base/Object', 'sap/ui/core/Element', 'sap/ui/core/Control' ],
+		function(jQuery, Core, BaseObject, Element, Control) {
 	"use strict";
 
-	if ( typeof QUnit === "undefined" ) {
-		sap.ui.requireSync("sap/ui/qunit/qunit-css"); // legacy-relevant - sync fallback when caller did not load QUnit
-		sap.ui.requireSync("sap/ui/thirdparty/qunit"); // legacy-relevant - sync fallback when caller did not load QUnit
-		sap.ui.requireSync("sap/ui/qunit/qunit-junit"); // legacy-relevant - sync fallback when caller did not load QUnit
-		sap.ui.requireSync("sap/ui/qunit/qunit-coverage"); // legacy-relevant - sync fallback when caller did not load QUnit
-	}
+	//TODO: global jquery call found
+	jQuery.sap.require("sap.ui.qunit.qunit-css");
+	//TODO: global jquery call found
+	jQuery.sap.require("sap.ui.thirdparty.qunit");
+	//TODO: global jquery call found
+	jQuery.sap.require("sap.ui.qunit.qunit-junit");
+	//TODO: global jquery call found
+	jQuery.sap.require("sap.ui.qunit.qunit-coverage");
 
 	QUnit.config.reorder = false;   // make sure results are consistent/stable and the "statistics" test in the end is actually run in the end
 
@@ -27,7 +29,7 @@ sap.ui.define([ 'sap/ui/core/Element', 'sap/ui/core/Control', 'sap/ui/core/Core'
 	 * @namespace
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @public
 	 * @since 1.48.0

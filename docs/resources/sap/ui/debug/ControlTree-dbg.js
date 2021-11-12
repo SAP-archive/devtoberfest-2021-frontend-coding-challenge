@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,9 +11,10 @@ sap.ui.define('sap/ui/debug/ControlTree', [
 	'sap/ui/core/UIArea',
 	'./Highlighter',
 	"sap/ui/dom/getOwnerWindow",
-	"sap/base/Log"
+	"sap/base/Log",
+	"sap/ui/thirdparty/jquery"
 ],
-	function(EventProvider, Element, UIArea, Highlighter, getOwnerWindow, Log) {
+	function(EventProvider, Element, UIArea, Highlighter, getOwnerWindow, Log, jQuery) {
 	"use strict";
 
 
@@ -33,7 +34,7 @@ sap.ui.define('sap/ui/debug/ControlTree', [
 	 * @class Control Tree used for the Debug Environment
 	 * @extends sap.ui.base.EventProvider
 	 * @author Martin Schaus, Frank Weigel
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @alias sap.ui.debug.ControlTree
 	 * @private
 	 */
@@ -47,18 +48,20 @@ sap.ui.define('sap/ui/debug/ControlTree', [
 			this.oParentDomRef = oParentDomRef;
 			this.oSelectionHighlighter = new Highlighter("sap-ui-testsuite-SelectionHighlighter");
 			this.oHoverHighlighter = new Highlighter("sap-ui-testsuite-HoverHighlighter", true, '#c8f', 1);
-			// create bound variants of the generic methods
-			this.onclick = ControlTree.prototype.onclick.bind(this);
-			this.onmouseover = ControlTree.prototype.onmouseover.bind(this);
-			this.onmouseout = ControlTree.prototype.onmouseout.bind(this);
-			this.oParentDomRef.addEventListener("click", this.onclick);
-			this.oParentDomRef.addEventListener("mouseover", this.onmouseover);
-			this.oParentDomRef.addEventListener("mouseout", this.onmouseout);
+			var that = this;
+			jQuery(oParentDomRef).bind("click",function(evt) {
+				that.onclick(evt);
+			})
+			.bind("mouseover",function(evt) {
+				that.onmouseover(evt);
+			})
+			.bind("mouseout",function(evt) {
+				that.onmouseout(evt);
+			});
 			this.enableInplaceControlSelection();// see below...
 			this.oCore.attachUIUpdated(this.renderDelayed, this);
 			this.sSelectedNodeId = "";
-			// Note: window.top is assumed to refer to the app window in embedded mode or to the testsuite window otherwise
-			this.sResourcePath = window.top.sap.ui.require.toUrl("") + "/";
+			this.sResourcePath = bRunsEmbedded ? sap.ui.require.toUrl("") + "/" : (window.top.testfwk.sResourceRoot || "../");
 			this.sTestResourcePath = this.sResourcePath + "../test-resources/";
 			this.sSpaceUrl = this.sResourcePath + "sap/ui/debug/images/space.gif";
 			this.sMinusUrl = this.sResourcePath + "sap/ui/debug/images/minus.gif";
@@ -77,10 +80,8 @@ sap.ui.define('sap/ui/debug/ControlTree', [
 	 * @private
 	 */
 	ControlTree.prototype.exit = function() {
-		document.removeEventListener("mouseover", this.selectControlInTree);
-		this.oParentDomRef.removeEventListener("click", this.onclick);
-		this.oParentDomRef.removeEventListener("mouseover", this.onmouseover);
-		this.oParentDomRef.removeEventListener("mouseout", this.onmouseout);
+		jQuery(document).unbind();
+		jQuery(this.oParentDomRef).unbind();
 	};
 
 	/**
@@ -89,9 +90,9 @@ sap.ui.define('sap/ui/debug/ControlTree', [
 	 */
 	ControlTree.prototype.renderDelayed = function() {
 		if (this.oTimer) {
-			this.oWindow.clearTimeout(this.oTimer);
+			this.oWindow.jQuery.sap.clearDelayedCall(this.oTimer);
 		}
-		this.oTimer = this.oWindow.setTimeout(this.render.bind(this), 0);
+		this.oTimer = this.oWindow.jQuery.sap.delayedCall(0,this,"render");
 	};
 
 	/**
@@ -123,9 +124,7 @@ sap.ui.define('sap/ui/debug/ControlTree', [
 		var oDomNode = this.oParentDomRef.ownerDocument.createElement("DIV");
 		oDomNode.setAttribute("id","sap-debug-controltree-" + sId);
 		var sShortType = sType.substring(sType.lastIndexOf(".") >  -1 ? sType.lastIndexOf(".") + 1 : 0);
-		oDomNode.innerHTML = "<img src='" + this.sSpaceUrl + "' align='absmiddle'><img src='" + sIcon + "' align='absmiddle'>&nbsp;<span>" + sShortType + " - " + sId + "</span>";
-		oDomNode.firstChild.style = "height:12px;width:12px;display:none;";
-		oDomNode.firstChild.nextSibling.style = "height:16px;width:16px;";
+		oDomNode.innerHTML = "<img style='height:12px;width:12px;display:none' src='" + this.sSpaceUrl + "' align='absmiddle'/><img style='height:16px;width:16px' src='" + sIcon + "' align='absmiddle'/>&nbsp;<span>" + sShortType + " - " + sId + "</span>";
 		oDomNode.style.overflow = "hidden";
 		oDomNode.style.whiteSpace = "nowrap";
 		oDomNode.style.textOverflow = "ellipsis";
@@ -148,10 +147,7 @@ sap.ui.define('sap/ui/debug/ControlTree', [
 		var oDomNode = this.oParentDomRef.ownerDocument.createElement("DIV");
 		oDomNode.setAttribute("id","sap-debug-controltreelink-" + sId);
 		var sShortType = sType ? sType.substring(sType.lastIndexOf(".") >  -1 ? sType.lastIndexOf(".") + 1 : 0) : "";
-		oDomNode.innerHTML = "<img src='" + this.sSpaceUrl + "' align='absmiddle'><img src='" + this.sLinkUrl + "' align='absmiddle'>&nbsp;<span>" + (sShortType ? sShortType + " - " : "") + sId + "</span>";
-		oDomNode.firstChild.style = "height:12px;width:12px;display:none;";
-		oDomNode.firstChild.nextSibling.style = "height:12px;width:12px;";
-		oDomNode.lastChild.style = "color:#888;border-bottom:1px dotted #888;";
+		oDomNode.innerHTML = "<img style='height:12px;width:12px;display:none' src='" + this.sSpaceUrl + "' align='absmiddle'/><img style='height:12px;width:12px' src='" + this.sLinkUrl + "' align='absmiddle'/>&nbsp;<span style='color:#888;border-bottom:1px dotted #888;'>" + (sShortType ? sShortType + " - " : "") + sId + "</span>";
 		oDomNode.style.overflow = "hidden";
 		oDomNode.style.whiteSpace = "nowrap";
 		oDomNode.style.textOverflow = "ellipsis";
@@ -381,18 +377,20 @@ sap.ui.define('sap/ui/debug/ControlTree', [
 	 * @private
 	 */
 	ControlTree.prototype.enableInplaceControlSelection = function() {
-		this.selectControlInTree = ControlTree.prototype.selectControlInTree.bind(this);
-		document.addEventListener("mouseover", this.selectControlInTree);
+		var that = this;
+		jQuery(document).bind("mouseover" , function (oEvt) {
+			that.selectControlInTree(oEvt);
+		});
 	};
 
 	ControlTree.prototype.selectControlInTree = function( oEvt ) {
 		if ( oEvt ) {
 		  if ( oEvt.ctrlKey && oEvt.shiftKey && !oEvt.altKey ) {
 			  var oControl = oEvt.srcElement || oEvt.target;
-			  while (oControl && (!oControl.id || !this.oCore.byId(oControl.id)) ) {
+			  while (oControl && (!oControl.id || !this.oCore.getControl(oControl.id )) ) {
 				oControl = oControl.parentNode;
 			}
-			 if ( oControl && oControl.id && this.oCore.byId(oControl.id) ) {
+			 if ( oControl && oControl.id && this.oCore.getControl(oControl.id ) ) {
 				this.oHoverHighlighter.highlight(oControl);
 			 } else {
 			// this.selectControlInTreeByCtrlId(sId);

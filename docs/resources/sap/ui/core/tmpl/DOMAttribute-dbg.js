@@ -1,13 +1,14 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.ui.core.tmpl.DOMAttribute.
 sap.ui.define(['sap/ui/core/Element', 'sap/ui/core/library'],
-	function(Element) {
+	function(Element, library) {
 	"use strict";
+
 
 
 	/**
@@ -19,7 +20,7 @@ sap.ui.define(['sap/ui/core/Element', 'sap/ui/core/library'],
 	 * @class
 	 * Represents a DOM attribute of a DOM element.
 	 * @extends sap.ui.core.Element
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @public
 	 * @since 1.15

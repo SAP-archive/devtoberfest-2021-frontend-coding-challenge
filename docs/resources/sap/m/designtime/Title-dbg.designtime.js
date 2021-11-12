@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -20,11 +20,6 @@ sap.ui.define([],
 					svg: "sap/m/designtime/Title.icon.svg"
 				}
 			},
-			aggregations: {
-                content: {
-                    ignore: true
-                }
-            },
 			actions: {
 				remove: {
 					changeType: "hideControl"
@@ -32,8 +27,7 @@ sap.ui.define([],
 				rename: {
 					changeType: "rename",
 					domRef: function (oControl) {
-						var oLink = oControl.$().find("span .sapMLnk");
-						return oLink.length ? oLink[0] : oControl.$().find("span")[0];
+						return oControl.$().find("span")[0];
 					}
 				},
 				reveal: {

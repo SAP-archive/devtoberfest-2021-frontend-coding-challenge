@@ -1,26 +1,11 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define([
-	'sap/ui/unified/calendar/CalendarDate',
-	'sap/ui/unified/calendar/CalendarUtils',
-	'sap/ui/core/date/UniversalDate',
-	'sap/ui/core/IconPool',
-	'sap/ui/core/InvisibleText',
-	'./PlanningCalendarLegend',
-	'sap/ui/unified/library'
-	],
-	function(
-		CalendarDate,
-		CalendarUtils,
-		UniversalDate,
-		IconPool,
-		InvisibleText,
-		PlanningCalendarLegend,
-		unifiedLibrary) {
+sap.ui.define(['sap/ui/unified/calendar/CalendarDate', 'sap/ui/unified/calendar/CalendarUtils', 'sap/ui/core/date/UniversalDate', 'sap/ui/core/InvisibleText', './PlanningCalendarLegend', 'sap/ui/unified/library'],
+	function(CalendarDate, CalendarUtils, UniversalDate, InvisibleText, PlanningCalendarLegend, unifiedLibrary) {
 		"use strict";
 
 		var iVerticalPaddingBetweenAppointments = 2;
@@ -68,7 +53,7 @@ sap.ui.define([
 				// hackie thing to calculate the container width. When we have more than 1 line of blockers - we must add 3 px in order to render the blockers visually in the container.
 				iContainerHeight = (iMaxLevel + 1) * oControl._getBlockerRowHeight() + 3,
 				oFormat = oControl._getDateFormatter(),
-				aSpecialDates = oControl._getSpecialDates(),
+				aSpecialDates = oControl.getSpecialDates(),
 				oCalendarDate = CalendarDate.fromLocalJSDate(oStartDate),
 				aDayTypes = oControl._getColumnHeaders()._getDateTypes(oCalendarDate),
 				oType,
@@ -144,7 +129,7 @@ sap.ui.define([
 				oBlockersList = oControl._getBlockersToRender().oBlockersList;
 
 			oRm.openStart("div");
-			oRm.attr("role", "list");
+			oRm.attr("role", "grid");
 			oRm.attr("aria-labelledby", InvisibleText.getStaticId("sap.m", "SPC_BLOCKERS"));
 			oRm.class("sapMSinglePCBlockers");
 			oRm.class("sapUiCalendarRowVisFilled"); // TODO: when refactor the CSS of appointments maybe we won't need this class
@@ -175,13 +160,13 @@ sap.ui.define([
 				sIcon = oBlocker.getIcon(),
 				sId = oBlocker.getId(),
 				mAccProps = {
-					role: "listitem",
+					role: "gridcell",
 					labelledby: {
 						value: InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT"),
 						append: true
 					},
-					// Prevents aria-selected from being added on the Blocker appointment
-					selected: null
+					// Setting aria-selected attribute to all blockers
+					selected: !!oBlocker.getSelected()
 				},
 				aAriaLabels = oControl.getAriaLabelledBy(),
 				iLeftPosition = iStartDayDiff * (100 / iColumns),
@@ -206,10 +191,6 @@ sap.ui.define([
 
 			if (oBlocker.getTentative()) {
 				mAccProps["labelledby"].value = mAccProps["labelledby"].value + " " + InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT_TENTATIVE");
-			}
-
-			if (oBlocker.getSelected()) {
-				mAccProps["labelledby"].value = mAccProps["labelledby"].value + " " + InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT_SELECTED");
 			}
 
 			oRm.openStart("div", oBlocker);
@@ -361,7 +342,6 @@ sap.ui.define([
 					sDate = oFormat.format(oColumnCalDate.toLocalJSDate());
 
 				oRm.openStart("div");
-				oRm.attr("role", "row");
 				oRm.attr("data-sap-day", sDate);
 				oRm.class("sapMSinglePCColumn");
 
@@ -378,7 +358,7 @@ sap.ui.define([
 				this.renderDndPlaceholders(oRm, oControl, oControl._dndPlaceholdersMap[oColumnCalDate]);
 
 				this.renderRows(oRm, oControl, sDate);
-				this.renderAppointments(oRm, oControl, oAppointmentsToRender[sDate], oColumnCalDate, i);
+				this.renderAppointments(oRm, oControl, oAppointmentsToRender[sDate], oColumnCalDate);
 				oRm.close("div"); // END .sapMSinglePCColumn
 			}
 
@@ -389,7 +369,7 @@ sap.ui.define([
 			oRm.openStart("div");
 			oRm.class("sapMSinglePCOverlay");
 			oRm.openEnd(); // span element
-			aPlaceholders.forEach(oRm.renderControl, oRm);
+			aPlaceholders.forEach(oRm.renderControl);
 			oRm.close("div");
 		};
 
@@ -405,7 +385,6 @@ sap.ui.define([
 				oCellEndDate = new Date(oCellStartDate.getFullYear(), oCellStartDate.getMonth(), oCellStartDate.getDate(), oCellStartDate.getHours() + 1);
 
 				oRm.openStart("div");
-				oRm.attr("role", "gridcell");
 				oRm.class("sapMSinglePCRow");
 
 				if (!oControl._isVisibleHour(i)) {
@@ -429,13 +408,11 @@ sap.ui.define([
 			}
 		};
 
-		SinglePlanningCalendarGridRenderer.renderAppointments = function (oRm, oControl, oAppointmentsByDate, oColumnDate, iColumn) {
-			var that = this,
-				iIndex = 0;
+		SinglePlanningCalendarGridRenderer.renderAppointments = function (oRm, oControl, oAppointmentsByDate, oColumnDate) {
+			var that = this;
 
 			if (oAppointmentsByDate) {
 				oRm.openStart("div");
-				oRm.attr("role", "list");
 				oRm.class("sapMSinglePCAppointments");
 				oRm.class("sapUiCalendarRowVisFilled"); // TODO: when refactor the CSS of appointments maybe we won't need this class
 
@@ -446,14 +423,13 @@ sap.ui.define([
 						iWidth = oAppointmentNode.width,
 						oAppointment = oAppointmentNode.getData();
 
-					that.renderAppointment(oRm, oControl, iMaxLevel, iLevel, iWidth, oAppointment, oColumnDate, iColumn, iIndex);
-					iIndex++;
+					that.renderAppointment(oRm, oControl, iMaxLevel, iLevel, iWidth, oAppointment, oColumnDate);
 				});
 				oRm.close("div");
 			}
 		};
 
-		SinglePlanningCalendarGridRenderer.renderAppointment = function(oRm, oControl, iMaxLevel, iAppointmentLevel, iAppointmentWidth, oAppointment, oColumnDate, iColumn, iIndex) {
+		SinglePlanningCalendarGridRenderer.renderAppointment = function(oRm, oControl, iMaxLevel, iAppointmentLevel, iAppointmentWidth, oAppointment, oColumnDate) {
 			var oGridCalStart = CalendarDate.fromLocalJSDate(oControl.getStartDate()),
 				oGridCalEnd = new CalendarDate(oGridCalStart),
 				iRowHeight = oControl._getRowHeight(),
@@ -472,13 +448,13 @@ sap.ui.define([
 				sId = oAppointment.getId(),
 				sLineClamp = this._getLineClamp(oAppStartDate, oAppEndDate),
 				mAccProps = {
-					role: "listitem",
+					role: "gridcell",
 					labelledby: {
 						value: InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT"),
 						append: true
 					},
-					// Prevents aria-selected from being added on the appointment
-					selected: null
+					// Setting aria-selected attribute to all appointments
+					selected: !!oAppointment.getSelected()
 				},
 				aAriaLabels = oControl.getAriaLabelledBy(),
 				bAppStartIsOutsideVisibleStartHour = oColumnStartDateAndHour.getTime() > oAppStartDate.getTime(),
@@ -486,7 +462,6 @@ sap.ui.define([
 				iAppTop = bAppStartIsOutsideVisibleStartHour ? 0 : oControl._calculateTopPosition(oAppStartDate),
 				iAppBottom = bAppEndIsOutsideVisibleEndHour ? 0 : oControl._calculateBottomPosition(oAppEndDate),
 				iAppChunkWidth = 100 / (iMaxLevel + 1),
-				bDraggable = oAppointment.getParent().getEnableAppointmentsDragAndDrop(),
 				iStartDayDiff,
 				iEndDayDiff,
 				bArrowLeft,
@@ -518,14 +493,7 @@ sap.ui.define([
 				mAccProps["labelledby"].value = mAccProps["labelledby"].value + " " + InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT_TENTATIVE");
 			}
 
-			if (oAppointment.getSelected()) {
-				mAccProps["labelledby"].value = mAccProps["labelledby"].value + " " + InvisibleText.getStaticId("sap.ui.unified", "APPOINTMENT_SELECTED");
-			}
-
-			oRm.openStart("div", oAppointment.getId() + "-" + iColumn + "_" + iIndex);
-			oRm.attr("draggable", bDraggable);
-			oRm.attr("data-sap-ui-draggable", bDraggable);
-			oRm.attr("data-sap-ui-related", oAppointment.getId());
+			oRm.openStart("div", oAppointment);
 			oRm.attr("data-sap-level", iAppointmentLevel);
 			oRm.attr("data-sap-width", iAppointmentWidth);
 			oRm.attr("tabindex", 0);
@@ -665,8 +633,10 @@ sap.ui.define([
 
 			oRm.close("div");
 
-			if (oControl.getEnableAppointmentsResize()) {
-				this.renderResizeHandles(oRm, !bAppStartIsOutsideVisibleStartHour, !bAppEndIsOutsideVisibleEndHour);
+			if (oControl.getEnableAppointmentsResize()
+				&& !bAppStartIsOutsideVisibleStartHour
+				&& !bAppEndIsOutsideVisibleEndHour) {
+				this.renderResizeHandles(oRm);
 			}
 
 			oRm.close("div");
@@ -700,19 +670,15 @@ sap.ui.define([
 			oRm.close("div"); // END .sapMSinglePCNowMarker
 		};
 
-		SinglePlanningCalendarGridRenderer.renderResizeHandles = function(oRm, bRenderTop, bRenderBottom) {
-			if (bRenderBottom) {
-				oRm.openStart("span");
-				oRm.class("sapMSinglePCAppResizeHandleBottom");
-				oRm.openEnd();
-				oRm.close("span");
-			}
-			if (bRenderTop) {
-				oRm.openStart("span");
-				oRm.class("sapMSinglePCAppResizeHandleTop");
-				oRm.openEnd();
-				oRm.close("span");
-			}
+		SinglePlanningCalendarGridRenderer.renderResizeHandles = function(oRm) {
+			oRm.openStart("span");
+			oRm.class("sapMSinglePCAppResizeHandleBottom");
+			oRm.openEnd();
+			oRm.close("span");
+			oRm.openStart("span");
+			oRm.class("sapMSinglePCAppResizeHandleTop");
+			oRm.openEnd();
+			oRm.close("span");
 		};
 
 		/**

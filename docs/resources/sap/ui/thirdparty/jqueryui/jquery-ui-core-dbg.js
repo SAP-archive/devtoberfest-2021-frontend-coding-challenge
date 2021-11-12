@@ -25,7 +25,7 @@ $.fn.enableSelection = undefined;
 $.fn.disableSelection = undefined;
 
 // sap/ui/dom/jquery/Selectors
-$.expr.pseudos.focusable = undefined;
+$.expr[ ":" ].focusable = undefined;
 
 // ##### END: MODIFIED BY SAP
 
@@ -72,10 +72,7 @@ $.fn.extend({
 				this.each(function() {
 					var elem = this;
 					setTimeout(function() {
-						// ##### BEGIN: MODIFIED BY SAP
-						// $( elem ).focus();
-						$( elem ).trigger("focus");
-						// ##### END: MODIFIED BY SAP
+						$( elem ).focus();
 						if ( fn ) {
 							fn.call( elem );
 						}
@@ -177,10 +174,7 @@ function visible( element ) {
 		}).length;
 }
 
-// ##### BEGIN: MODIFIED BY SAP
-// $.extend( $.expr[ ":" ], {
-$.extend( $.expr.pseudos, {
-// ##### END: MODIFIED BY SAP
+$.extend( $.expr[ ":" ], {
 	data: $.expr.createPseudo ?
 		$.expr.createPseudo(function( dataName ) {
 			return function( elem ) {
@@ -282,20 +276,14 @@ $.ui.ie = !!/msie [\w.]+/.exec( navigator.userAgent.toLowerCase() );
 $.support.selectstart = "onselectstart" in document.createElement( "div" );
 $.fn.extend({
 	disableSelection: function() {
-		// ##### BEGIN: MODIFIED BY SAP
-		// return this.bind( ( $.support.selectstart ? "selectstart" : "mousedown" ) +
-		return this.on( ( $.support.selectstart ? "selectstart" : "mousedown" ) +
-		// ##### END: MODIFIED BY SAP
+		return this.bind( ( $.support.selectstart ? "selectstart" : "mousedown" ) +
 			".ui-disableSelection", function( event ) {
 				event.preventDefault();
 			});
 	},
 
 	enableSelection: function() {
-		// ##### BEGIN: MODIFIED BY SAP
-		// return this.unbind( ".ui-disableSelection" );
-		return this.off( ".ui-disableSelection" );
-		// ##### END: MODIFIED BY SAP
+		return this.unbind( ".ui-disableSelection" );
 	}
 });
 

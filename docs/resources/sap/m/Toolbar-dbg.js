@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -13,8 +13,7 @@ sap.ui.define([
 	'sap/ui/core/Control',
 	'sap/ui/core/EnabledPropagator',
 	"sap/ui/events/KeyCodes",
-	'./ToolbarRenderer',
-	"sap/ui/core/library"
+	'./ToolbarRenderer'
 ],
 function(
 	BarInPageEnabler,
@@ -24,8 +23,7 @@ function(
 	Control,
 	EnabledPropagator,
 	KeyCodes,
-	ToolbarRenderer,
-	coreLibrary
+	ToolbarRenderer
 ) {
 	"use strict";
 
@@ -72,7 +70,7 @@ function(
 	 * @implements sap.ui.core.Toolbar,sap.m.IBar
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -130,24 +128,7 @@ function(
 			 * <b>Note:</b> The visual styles are theme-dependent.
 			 * @since 1.54
 			 */
-			style : {type : "sap.m.ToolbarStyle", group : "Appearance", defaultValue : ToolbarStyle.Standard},
-
-			/**
-			 * Defines the aria-haspopup attribute of the <code>Toolbar</code>. if the active <code>design</code> is true.
-			 *
-			 * <b>Guidance for choosing appropriate value:</b>
-			 * <ul>
-			 * <li> We recommend that you use the {@link sap.ui.core.aria.HasPopup} enumeration.</li>
-			 * <li> If you use controls based on <code>sap.m.Popover</code> or <code>sap.m.Dialog</code>,
-			 * then you must use <code>AriaHasPopup.Dialog</code> (both <code>sap.m.Popover</code> and
-			 * <code>sap.m.Dialog</code> have role "dialog" assigned internally).</li>
-			 * <li> If you use other controls, or directly <code>sap.ui.core.Popup</code>, you need to check
-			 * the container role/type and map the value of <code>ariaHasPopup</code> accordingly.</li>
-			 * </ul>
-			 *
-			 * @since 1.79.0
-			 */
-			ariaHasPopup : {type: "string", group : "Accessibility", defaultValue : null}
+			style : {type : "sap.m.ToolbarStyle", group : "Appearance", defaultValue : ToolbarStyle.Standard}
 		},
 		defaultAggregation : "content",
 		aggregations : {
@@ -268,22 +249,6 @@ function(
 		}
 	};
 
-	 /**
-	 * Sets the accessibility enablement
-	 * @param {string} bEnabled
-	 * @returns {sap.m.IBar} this for chaining
-	 * @private
-	 */
-	Toolbar.prototype._setEnableAccessibilty = function (bEnabled) {
-		var bFastGroupValue = bEnabled ? "true" : "false",
-			sRoleValue = bEnabled ? "toolbar" : "none";
-
-		this.data("sap-ui-fastnavgroup", bFastGroupValue, bEnabled);
-		this._setRootAccessibilityRole(sRoleValue);
-
-		return this;
-	};
-
 	Toolbar.prototype.init = function() {
 		// define group for F6 handling
 		this.data("sap-ui-fastnavgroup", "true", true);
@@ -294,8 +259,44 @@ function(
 		};
 	};
 
+	Toolbar.prototype._markFirstLastVisibleItems = function (sSelector) {
+		var $domRef = this.$(),
+			$firstVisible = $domRef.find(sSelector + ":first")[0],
+			$lastVisible = $domRef.find(sSelector + ":last")[0],
+			sIdFirstVisible = $firstVisible ? $firstVisible.id : "",
+			sIdLastVisible = $lastVisible ? $lastVisible.id : "",
+			oFirstVisibleItem = sap.ui.getCore().byId(sIdFirstVisible),
+			oLastVisibleItem = sap.ui.getCore().byId(sIdLastVisible);
+
+			this._markControlAsVisibleItem(oFirstVisibleItem, "sapMBarFirstVisibleChild");
+			this._markControlAsVisibleItem(oLastVisibleItem, "sapMBarLastVisibleChild");
+
+			this._oFirstVisibleItem = oFirstVisibleItem;
+			this._oLastVisibleItem = oLastVisibleItem;
+	};
+
+	Toolbar.prototype._markControlAsVisibleItem = function (oControl, sClassPrefix) {
+		if (oControl) {
+			oControl.addStyleClass(sClassPrefix);
+		}
+	};
+
+	Toolbar.prototype.onBeforeRendering = function () {
+		//unmark as first item to make the calculations correctly
+		if (this._oFirstVisibleItem) {
+			this._oFirstVisibleItem.removeStyleClass("sapMBarFirstVisibleChild");
+		}
+
+		//unmark as last item to make the calculations correctly
+		if (this._oLastVisibleItem) {
+			this._oLastVisibleItem.removeStyleClass("sapMBarLastVisibleChild");
+		}
+	};
+
 	Toolbar.prototype.onAfterRendering = function() {
 		this._checkContents();
+
+		this._markFirstLastVisibleItems(".sapMBarChild:visible");
 	};
 
 	Toolbar.prototype.onLayoutDataChange = function() {
@@ -426,7 +427,7 @@ function(
 	 *
 	 * @param {sap.m.ToolbarDesign} sDesign The design for the Toolbar.
 	 * @param {boolean} [bSetAutoDesign] Determines auto design context
-	 * @returns {this}
+	 * @returns {sap.m.Toolbar}
 	 */
 	Toolbar.prototype.setDesign = function(sDesign, bSetAutoDesign) {
 		if (!bSetAutoDesign) {
@@ -476,7 +477,7 @@ function(
 	/**
 	 * Returns the first sap.m.Title control id inside the toolbar for the accessibility
 	 *
-	 * @returns {sap.ui.core.ID} The <code>sap.m.Title</code> ID
+	 * @returns {String} The <code>sap.m.Title</code> ID
 	 * @since 1.28
 	 * @protected
 	 */

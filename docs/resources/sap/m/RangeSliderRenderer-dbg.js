@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -45,7 +45,11 @@ sap.ui.define(["sap/ui/core/Renderer", "./SliderRenderer", "sap/ui/core/Invisibl
 			bEnabled = oControl.getEnabled(),
 			bRTL = sap.ui.getCore().getConfiguration().getRTL();
 
-		oRM.openStart("span", mOptions && mOptions.id);
+		oRM.openStart("span");
+
+		if (mOptions && (mOptions.id !== undefined)) {
+			oRM.attr("id", mOptions.id);
+		}
 		if (mOptions && (mOptions.position !== undefined)) {
 			fValue = aRange[mOptions.position === "start" ? 0 : 1];
 
@@ -54,7 +58,6 @@ sap.ui.define(["sap/ui/core/Renderer", "./SliderRenderer", "sap/ui/core/Invisibl
 
 			if (oControl.getInputsAsTooltips()) {
 				oRM.attr("aria-describedby", InvisibleText.getStaticId("sap.m", "SLIDER_INPUT_TOOLTIP"));
-				bEnabled && oRM.attr("aria-keyshortcuts", "F2");
 			}
 		}
 		if (oControl.getShowHandleTooltip() && !oControl.getShowAdvancedTooltip()) {
@@ -148,16 +151,14 @@ sap.ui.define(["sap/ui/core/Renderer", "./SliderRenderer", "sap/ui/core/Invisibl
 	 * @param {sap.ui.core.Control} oControl An object representation of the slider that should be rendered.
 	 */
 	RangeSliderRenderer.renderLabels = function (oRM, oControl) {
-		if (!oControl.getEnableTickmarks()) {
-			oRM.openStart("div")
-				.class(SliderRenderer.CSS_CLASS + "Labels")
-				.openEnd();
+		oRM.openStart("div")
+			.class(SliderRenderer.CSS_CLASS + "Labels")
+			.openEnd();
 
-			this.renderStartLabel(oRM, oControl);
-			this.renderEndLabel(oRM, oControl);
+		this.renderStartLabel(oRM, oControl);
+		this.renderEndLabel(oRM, oControl);
 
-			oRM.close("div");
-		}
+		oRM.close("div");
 	};
 
 	RangeSliderRenderer.renderProgressIndicator = function(oRm, oSlider, sForwardedLabels) {
@@ -165,8 +166,6 @@ sap.ui.define(["sap/ui/core/Renderer", "./SliderRenderer", "sap/ui/core/Invisibl
 
 		aRange[0] = oSlider.toFixed(aRange[0], oSlider._iDecimalPrecision);
 		aRange[1] = oSlider.toFixed(aRange[1], oSlider._iDecimalPrecision);
-
-		var iValueNow = Math.abs(aRange[1] - aRange[0]);
 
 		oRm.openStart("div", oSlider.getId() + "-progress");
 		if (oSlider.getEnabled()) {
@@ -180,7 +179,6 @@ sap.ui.define(["sap/ui/core/Renderer", "./SliderRenderer", "sap/ui/core/Invisibl
 			orientation: "horizontal",
 			valuemin: oSlider.toFixed(oSlider.getMin()),
 			valuemax: oSlider.toFixed(oSlider.getMax()),
-			valuenow: iValueNow,
 			valuetext: oSlider._oResourceBundle.getText('RANGE_SLIDER_RANGE_ANNOUNCEMENT', aRange.map(oSlider._formatValueByCustomElement, oSlider)),
 			labelledby: (sForwardedLabels + " " + oSlider.getAggregation("_handlesLabels")[2].getId()).trim() // range label
 		}).openEnd().close("div");

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -12,9 +12,7 @@ sap.ui.define([],
 	 * FeedContent renderer.
 	 * @namespace
 	 */
-	var FeedContentRenderer = {
-		apiVersion: 2
-	};
+	var FeedContentRenderer = {};
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
@@ -30,50 +28,57 @@ sap.ui.define([],
 			sTooltip = "";
 		}
 
-		oRm.openStart("div", oControl);
+		oRm.write("<div");
+		oRm.writeControlData(oControl);
 
-		oRm.attr("role", "presentation");
-		oRm.attr("aria-label", sTooltip);
+		oRm.writeAttribute("role", "presentation");
+		oRm.writeAttributeEscaped("aria-label", sTooltip);
 
-		oRm.class("sapMFC");
+		oRm.addClass("sapMFC");
 		if (oControl.hasListeners("press")) {
-			oRm.attr("tabindex", "0");
-			oRm.class("sapMPointer");
+			oRm.writeAttribute("tabindex", "0");
+			oRm.addClass("sapMPointer");
 		}
-		oRm.openEnd();
+		oRm.writeClasses();
+		oRm.write(">");
 
 		if (sValue) {
-			oRm.openStart("div", oControl.getId() + "-value");
-			oRm.class("sapMFCValue");
-			oRm.class(oControl.getValueColor());
-			oRm.openEnd();
+			oRm.write("<div");
+			oRm.writeAttribute("id", oControl.getId() + "-value");
+			oRm.addClass("sapMFCValue");
+			oRm.addClass(oControl.getValueColor());
+			oRm.writeClasses();
+			oRm.write(">");
 
 			var iChar = oControl.getTruncateValueTo();
 			//Control shows only iChar characters. If the last shown character is decimal separator -
 			//show only first N-1 characters. So "144.5" is shown like "144" and not like "144.".
 			if (sValue.length >= iChar && (sValue[iChar - 1] === "." || sValue[iChar - 1] === ",")) {
-				oRm.text(sValue.substring(0, iChar - 1));
+				oRm.writeEscaped(sValue.substring(0, iChar - 1));
 			} else if (sValue) {
-				oRm.text(sValue.substring(0, iChar));
+				oRm.writeEscaped(sValue.substring(0, iChar));
 			} else {
-				oRm.text("");
+				oRm.writeEscaped("");
 			}
-			oRm.close("div");
+			oRm.write("</div>");
 		}
 
-		oRm.openStart("div");
-		oRm.class("sapMFCCTxt");
-		oRm.openEnd();
+		oRm.write("<div");
+		oRm.addClass("sapMFCCTxt");
+		oRm.writeClasses();
+		oRm.write(">");
 		oRm.renderControl(oControl._oContentText);
-		oRm.close("div");
+		oRm.write("</div>");
 
-		oRm.openStart("div", oControl.getId() + "-subheader");
-		oRm.class("sapMFCSbh");
-		oRm.openEnd();
-		oRm.text(sSubheader);
-		oRm.close("div");
+		oRm.write("<div");
+		oRm.writeAttribute("id", oControl.getId() + "-subheader");
+		oRm.addClass("sapMFCSbh");
+		oRm.writeClasses();
+		oRm.write(">");
+		oRm.writeEscaped(sSubheader);
+		oRm.write("</div>");
 
-		oRm.close("div"); /* sapMFC */
+		oRm.write("</div>"); /* sapMFC */
 	};
 
 	return FeedContentRenderer;

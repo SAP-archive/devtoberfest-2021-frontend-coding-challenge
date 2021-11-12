@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -11,10 +11,9 @@ sap.ui.define([
 	"sap/base/Log",
 	'sap/m/Link',
 	'sap/m/Text',
-	"sap/ui/thirdparty/jquery",
-	"sap/ui/util/defaultLinkTypes"
+	"sap/ui/thirdparty/jquery"
 ],
-	function(Control, coreLibrary, library, Device, Log, Link, Text, jQuery, defaultLinkTypes) {
+	function(Control, coreLibrary, library, Device, Log, Link, Text, jQuery) {
 	"use strict";
 
 
@@ -490,13 +489,13 @@ sap.ui.define([
 					oRM.attr("href", oOH.getTitleHref());
 					if (oOH.getTitleTarget()) {
 						oRM.attr("target", oOH.getTitleTarget());
-						oRM.attr("rel", defaultLinkTypes('', oOH.getTitleTarget()));
 					}
 				}
 
 				//ARIA attributes
 				oRM.accessibilityState({
-					role: "link"
+					role: "link",
+					haspopup: !oOH.getTitleHref()
 				});
 			} else {
 				oRM.openStart("div", oOH.getId() + "-title"); // Start Title Text container
@@ -698,17 +697,15 @@ sap.ui.define([
 		if (sTooltip) {
 			oRM.attr("title", sTooltip);
 		}
-
 		// ARIA attributes
-		var mAccProps = {
-			role: "region"
-		};
+		oRM.accessibilityState({
+			role : "region",
+			labelledby: {
+				value: oOH.getId() + "-titleText-inner",
+				append: true
+			}
+		});
 
-		if (oOH.getTitle()) {
-			mAccProps.labelledby = { value: oOH.getId() + "-titleText-inner", append: true };
-		}
-
-		oRM.accessibilityState(oOH, mAccProps);
 		oRM.openEnd();
 
 		if (bCondensed) {
@@ -1286,14 +1283,14 @@ sap.ui.define([
 				oRM.attr("href", oOH.getTitleHref());
 				if (oOH.getTitleTarget()) {
 					oRM.attr("target", oOH.getTitleTarget());
-					oRM.attr("rel", defaultLinkTypes('', oOH.getTitleTarget()));
 				}
 			}
 
 			oRM.attr("tabindex", "0");
 			//ARIA attributes
 			oRM.accessibilityState({
-				role: "link"
+				role: "link",
+				haspopup: !oOH.getTitleHref()
 			});
 		} else {
 			oRM.openStart("span", oOH.getId() + "-txt");

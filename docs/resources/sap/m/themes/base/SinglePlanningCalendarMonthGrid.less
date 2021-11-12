@@ -1,7 +1,4 @@
-/* ====================================================== */
-/* CSS for control sap.m/SinglePlanningCalendarMonthGrid  */
-/* Base theme                                             */
-/* ====================================================== */
+@_sap_ui_unified_Calendar_ItemColor: lighten(@sapUiContentForegroundColor,7);
 
 .sapMSPCMonthGrid > :not(.sapMSinglePCGridContent) {
 	margin-left: 4rem;
@@ -35,7 +32,7 @@
 	font-family: @sapUiFontFamily;
 	font-size: @sapMFontMediumSize;
 
-	background-color: lighten(@sapUiContentForegroundColor,7);
+	background-color: @_sap_ui_unified_Calendar_ItemColor;
 }
 
 .sapMSPCMonthDay {
@@ -60,7 +57,6 @@
 	position: absolute;
 	top: 0;
 	right: 0;
-	margin: 0.063rem;
 }
 
 .sapMSPCMonthGrid .sapMSPCMonthDayNames {
@@ -72,32 +68,7 @@
 }
 
 .sapMSPCMonthDay.nonWorkingTimeframe {
-	background-color: @sapUiListAlternatingBackground;
-}
-
-.sapMSPCMonthNowMarker {
-	border: 0.125rem solid @sapUiLegendCurrentDateTime;
-	height: inherit;
-	.sapMSPCMonthDayNumber {
-		padding-top: 0.4rem;
-	}
-}
-
-html.sap-desktop .sapMSPCMonthDay.sapMSPCMonthDayToday:focus .sapMSPCMonthNowMarker::after {
-	content: "";
-	position: absolute;
-	top: 0.125rem;
-	left: 0.125rem;
-	right: 0.125rem;
-	bottom: 0.125rem;
-	border: 0.0625rem dotted @sapUiContentFocusColor;
-	pointer-events: none;
-	z-index: 3;
-}
-
-.sapMSPCMonthDay.sapMSPCMonthDayToday .specialDateIndicator {
-	top: 0.125rem;
-	right: 0.125rem;
+	background-color: darken(@sapUiListBackground, 3);
 }
 
 .sapMSPCMonthDayNumber {
@@ -162,7 +133,7 @@ html.sap-desktop .sapMSPCMonthDay.sapMSPCMonthDayToday:focus .sapMSPCMonthNowMar
 	top: initial;
 }
 
-html.sap-desktop .sapMSPCMonthDay:not(.sapMSPCMonthDayToday):focus::after {
+html.sap-desktop .sapMSPCMonthDay:focus::after {
   content: "";
   position: absolute;
   top: 0;

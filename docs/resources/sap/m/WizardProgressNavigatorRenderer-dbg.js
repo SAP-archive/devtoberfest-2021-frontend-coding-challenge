@@ -1,15 +1,10 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define([
-	"sap/ui/core/InvisibleText",
-	"sap/ui/core/IconPool"
-], function (
-	InvisibleText, IconPool
-) {
+sap.ui.define([], function () {
 	"use strict";
 
 	var CLASSES = {
@@ -34,11 +29,8 @@ sap.ui.define([
 		OPEN_STEP: "data-sap-ui-wpn-step-open",
 		OPEN_STEP_PREV: "data-sap-ui-wpn-step-open-prev",
 		OPEN_STEP_NEXT: "data-sap-ui-wpn-step-open-next",
-		ARIA_CURRENT: "aria-current",
-		ARIA_LABEL: "aria-label",
-		ARIA_HASPOPUP: "aria-haspopup",
-		ARIA_DISABLED: "aria-disabled",
-		ARIA_DESCRIBEDBY: "aria-describedby"
+		ARIA_SELECTED: "aria-selected",
+		ARIA_DISABLED: "aria-disabled"
 	};
 
 	var WizardProgressNavigatorRenderer = {
@@ -57,14 +49,15 @@ sap.ui.define([
 	};
 
 	WizardProgressNavigatorRenderer.startNavigator = function (oRm, oControl) {
-		var sWizardAriaLabelText = oResourceBundle.getText("WIZARD_PROGRESS_NAVIGATOR_ARIA_LABEL");
+		var sWizardLabelText = oResourceBundle.getText("WIZARD_LABEL");
 
 		oRm.openStart("nav", oControl)
 			.class(CLASSES.NAVIGATION)
 			.class("sapContrastPlus")
 			.attr(ATTRIBUTES.STEP_COUNT, oControl.getStepCount())
 			.accessibilityState({
-				label: sWizardAriaLabelText
+				role: "navigation",
+				label: sWizardLabelText
 			})
 			.openEnd();
 	};
@@ -77,7 +70,6 @@ sap.ui.define([
 
 	WizardProgressNavigatorRenderer.startList = function (oRm, oControl) {
 		var aStepTitles = oControl.getStepTitles();
-		var sWizardAriaLabelText = oResourceBundle.getText("WIZARD_PROGRESS_NAVIGATOR_LIST_ARIA_LABEL");
 
 		oRm.openStart("ul");
 		if (oControl.getVaryingStepCount()) {
@@ -91,10 +83,7 @@ sap.ui.define([
 		}
 
 		oRm.accessibilityState({
-			role: "list",
-			label: sWizardAriaLabelText,
-			controls: oControl.getParent().sId + "-step-container",
-			describedby: InvisibleText.getStaticId("sap.m", "WIZARD_PROGRESS_NAVIGATOR_LIST_ARIA_DESCRIBEDBY")
+			role: "list"
 		});
 
 		oRm.openEnd();
@@ -115,37 +104,27 @@ sap.ui.define([
 	};
 
 	WizardProgressNavigatorRenderer.startStep = function (oRm, oControl, iStepNumber, sStepTitle, sIconUri, sOptionalLabel) {
-		var aSteps = oControl._aCachedSteps;
-		var	oCurrentStep = aSteps[iStepNumber - 1];
-		var bCurrentStepActive = oControl._isActiveStep(iStepNumber);
-		var sStepActive = bCurrentStepActive ? "ACTIVE" : "INACTIVE";
-		var sValueText = oResourceBundle.getText("WIZARD_STEP_" + sStepActive + "_LABEL", [iStepNumber, sStepTitle, sOptionalLabel]);
-		var mACCOptions = {
-			role: "listitem",
-			label: sValueText
-		};
+		var aSteps = oControl._aCachedSteps,
+			oCurrentStep = aSteps[iStepNumber];
 
 		oRm.openStart("li")
 			.class(CLASSES.STEP)
 			.attr(ATTRIBUTES.STEP, iStepNumber)
 			.attr("tabindex", "-1")
-			.accessibilityState(mACCOptions);
+			.accessibilityState({
+				role: "listitem"
+			});
 
-		if (!oCurrentStep || parseInt(oCurrentStep.style.zIndex)) {
+		if (!oCurrentStep || !!parseInt(oCurrentStep.style.zIndex)) {
 			oRm.attr("aria-disabled", "true");
 		}
 
-		oRm.attr("aria-posinset", iStepNumber);
-
-		if (!oControl.getVaryingStepCount()) {
-			oRm.attr("aria-setsize", oControl.getStepCount());
-		} else {
-			oRm.attr("aria-setsize", "-1");
-		}
-
+		this.writeStepTooltip(oRm, sStepTitle, sOptionalLabel, iStepNumber);
 		oRm.openEnd();
 
-		oRm.openStart("div").class("sapMWizardProgressNavStepContainer");
+		oRm.openStart("div")
+			.class("sapMWizardProgressNavStepContainer");
+
 		oRm.openEnd();
 
 		// render step circle
@@ -173,6 +152,24 @@ sap.ui.define([
 		oRm.close("span");
 	};
 
+	WizardProgressNavigatorRenderer.writeStepTooltip = function (oRm, sStepTitle, sOptionalLabel, iStepNumber) {
+		var sStepText = oResourceBundle.getText("WIZARD_PROG_NAV_STEP_TITLE"),
+			sTitleAttribute;
+
+		if (sStepTitle) {
+			sTitleAttribute = iStepNumber + ". " + sStepTitle;
+		} else {
+			sTitleAttribute = sStepText + " " + iStepNumber;
+		}
+
+		// add optional label
+		if (sOptionalLabel) {
+			sTitleAttribute += " (" + sOptionalLabel + ")";
+		}
+
+		oRm.attr("aria-label", sTitleAttribute);
+	};
+
 	WizardProgressNavigatorRenderer.renderStepTitle = function (oRm, sStepTitle, sOptionalLabel) {
 		oRm.openStart("span")
 			.class(CLASSES.STEP_TITLE_CONTAINER)
@@ -190,7 +187,7 @@ sap.ui.define([
 		if (sOptionalLabel) {
 			oRm.openStart("span")
 				.class(CLASSES.STEP_TITLE_OPTIONAL_LABEL)
-				.openEnd()
+				.openEnd(">")
 				.text("(" + sOptionalLabel + ")")
 				.close("span");
 		}

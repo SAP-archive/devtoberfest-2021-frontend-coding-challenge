@@ -29,7 +29,9 @@
 	white-space: normal;
 }
 
-html[data-sap-ui-browser^="ff"] {
+html[data-sap-ui-browser^="ff"],
+html[data-sap-ui-browser^='ed'],
+html[data-sap-ui-browser^='ie'] {
 	.sapMObjectIdentifierTitle .sapMLnk,
 	.sapMObjectIdentifierTitle .sapMText {
 		display: inline-block;
@@ -85,10 +87,6 @@ html[data-sap-ui-browser^="ff"] {
 	display: inline;
 }
 
-.sapMObjectIdentifier .sapMEmptyIndicator.sapMEmptyIndicatorAuto {
-	display: none;
-}
-
-.sapMShowEmpty-CTX .sapMObjectIdentifier .sapMEmptyIndicator.sapMEmptyIndicatorAuto {
-	display: inline-block;
+html[data-sap-ui-browser^='ie'].sap-desktop .sapMObjectIdentifier :not(.sapMLnkDsbl).sapMLnk:focus::before {
+	top: auto;
 }

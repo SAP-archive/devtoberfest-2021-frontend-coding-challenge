@@ -1,19 +1,17 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-sap.ui.define([],
-	function() {
+sap.ui.define(['sap/ui/core/Renderer', 'sap/m/ButtonRenderer'],
+	function(Renderer, ButtonRenderer) {
 	"use strict";
 
 	/**
 	 * SelectionDetails renderer.
 	 * @namespace
 	 */
-	var SelectionDetailsRenderer = {
-		apiVersion: 2
-	};
+	var SelectionDetailsRenderer = Renderer.extend(ButtonRenderer);
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
@@ -24,12 +22,13 @@ sap.ui.define([],
 	 */
 	SelectionDetailsRenderer.render = function(oRm, oControl) {
 		var oButton = oControl.getAggregation("_button");
-		oRm.openStart("div", oControl);
-		oRm.openEnd();
+		oRm.write("<div");
+		oRm.writeControlData(oControl);
+		oRm.write(">");
 
 		oRm.renderControl(oButton);
 
-		oRm.close("div");
+		oRm.write("</div>");
 	};
 
 	return SelectionDetailsRenderer;

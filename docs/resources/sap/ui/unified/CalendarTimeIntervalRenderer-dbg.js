@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -25,8 +25,11 @@ sap.ui.define([],
 	 */
 	CalendarTimeIntervalRenderer.render = function(oRm, oCal){
 
+		oCal._iMode = 0; // it's rendered always as TimesRow
+
 		var sId = oCal.getId();
 		var sTooltip = oCal.getTooltip_AsString();
+		var oTimesRow = oCal.getAggregation("timesRow");
 
 		oRm.openStart("div", oCal);
 		oRm.class("sapUiCal");
@@ -65,7 +68,7 @@ sap.ui.define([],
 		oRm.openStart("div", sId + "-content");
 		oRm.class("sapUiCalContent");
 		oRm.openEnd();
-		oRm.renderControl(oCal.getAggregation(oCal.getProperty("_currentPicker")));
+		oRm.renderControl(oTimesRow);
 
 		oRm.close("div");
 

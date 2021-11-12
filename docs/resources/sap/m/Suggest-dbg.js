@@ -1,32 +1,11 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define([
-	"./Toolbar",
-	"./Button",
-	"./Dialog",
-	"./Popover",
-	"./SuggestionsList",
-	"./SuggestionItem",
-	"sap/ui/Device",
-	"sap/m/library",
-	"sap/ui/core/Core",
-	"sap/ui/core/InvisibleText"
-], function (
-	Toolbar,
-	Button,
-	Dialog,
-	Popover,
-	SuggestionsList,
-	SuggestionItem,
-	Device,
-	library,
-	Core,
-	InvisibleText
-) {
+sap.ui.define(['jquery.sap.global', './Toolbar', './Button', './SuggestionsList', './SuggestionItem', 'sap/ui/Device', 'sap/m/library', 'sap/ui/core/Core'],
+	function(jQuery, Toolbar, Button, SuggestionsList, SuggestionItem, Device, library, Core) {
 	"use strict";
 
 	// shortcut for sap.m.PlacementType
@@ -58,6 +37,11 @@ sap.ui.define([
 			bUseDialog = Device.system.phone,
 			self = this;
 
+		// 1. Conditional loading depending on the device type.
+		// 2. Resolve circular dependency Dialog -> OverflowToolbar -> SearchField:
+		//TODO: global jquery call found
+		jQuery.sap.require(bUseDialog ? "sap.m.Dialog" : "sap.m.Popover");
+
 		/* =========================================================== */
 		/* events processing                                           */
 		/* =========================================================== */
@@ -71,8 +55,7 @@ sap.ui.define([
 				self._suggestionItemTapped = true;
 				picker.close();
 				window.setTimeout(function() {
-					oInput._updateValue(value);
-					oInput._fireChangeEvent();
+					oInput.setValue(value);
 					oInput.fireSearch({
 						query: value,
 						suggestionItem: item,
@@ -99,7 +82,7 @@ sap.ui.define([
 			dialogSearchField = new (sap.ui.require('sap/m/SearchField'))({
 				liveChange : function (oEvent) {
 					var value = oEvent.getParameter("newValue");
-					oInput._updateValue(value);
+					oInput.setValue(value);
 					oInput.fireLiveChange({newValue: value});
 					oInput.fireSuggest({suggestValue: value});
 					self.update();
@@ -118,7 +101,7 @@ sap.ui.define([
 					dialog._oCloseTrigger = true;
 					dialog.close();
 
-					oInput._updateValue(originalValue);
+					oInput.setValue(originalValue);
 				}
 			});
 
@@ -133,22 +116,18 @@ sap.ui.define([
 				}
 			});
 
-			dialog = new Dialog({
+			dialog = new (sap.ui.require('sap/m/Dialog'))({
 				stretch: true,
 				customHeader: customHeader,
 				content: getList(),
 				beginButton : okButton,
-				beforeClose: function () {
-					oInput._bSuggestionSuppressed = true;
-				},
 				beforeOpen: function() {
 					originalValue = oInput.getValue();
-					dialogSearchField._updateValue(originalValue);
+					dialogSearchField.setValue(originalValue);
 				},
 				afterClose: function(oEvent) {
 					if (!self._cancelButtonTapped  // fire the search event if not cancelled
 						&& !self._suggestionItemTapped) { // and if not closed from item tap
-						oInput._fireChangeEvent();
 						oInput.fireSearch({
 							query: oInput.getValue(),
 							refreshButtonPressed: false,
@@ -164,7 +143,7 @@ sap.ui.define([
 		}
 
 		function createPopover() {
-			var popover = self._oPopover = new Popover({
+			var popover = self._oPopover =  new (sap.ui.require('sap/m/Popover'))({
 				showArrow: false,
 				showHeader: false,
 				horizontalScrolling: false,
@@ -173,12 +152,12 @@ sap.ui.define([
 				offsetY: 0,
 				initialFocus: parent,
 				bounce: false,
-				ariaLabelledBy: InvisibleText.getStaticId("sap.m", "INPUT_AVALIABLE_VALUES"),
 				afterOpen: function () {
+					oInput.$("I").attr("aria-autocomplete","list").attr("aria-haspopup","true");
 					oInput._applySuggestionAcc();
 				},
 				beforeClose: function() {
-					oInput.$("I").removeAttr("aria-activedescendant");
+					oInput.$("I").attr("aria-haspopup","false").removeAttr("aria-activedescendant");
 					oInput.$("SuggDescr").text("");
 				},
 				content: getList()

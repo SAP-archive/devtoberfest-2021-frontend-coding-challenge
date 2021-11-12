@@ -1,11 +1,11 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(
-	["sap/ui/core/IconPool", "sap/ui/Device", "sap/ui/core/Core"],
-	function(IconPool, Device, Core) {
+	["sap/ui/core/IconPool", "sap/ui/Device"],
+	function(IconPool, Device) {
 		"use strict";
 
 		/* =========================================================== */
@@ -33,6 +33,7 @@ sap.ui.define(
 
 			this.initSharedState(oControl);
 			this.renderControlContainer(oRm, oControl, function() {
+				that.renderAriaLabel(oRm, oControl);
 				that.renderSelectedItems(oRm, oControl);
 				that.renderUnselectedItems(oRm, oControl);
 				that.renderHoverItems(oRm, oControl);
@@ -104,14 +105,25 @@ sap.ui.define(
 		};
 
 		RatingIndicatorRenderer.writeAccessibility = function(oRm, oControl) {
-			var oResourceBundle = Core.getLibraryResourceBundle("sap.m");
 			oRm.accessibilityState(oControl, {
 				role: "slider",
 				orientation: "horizontal",
 				valuemin: 0,
+				readonly: null,
 				disabled: !oControl.getEnabled() || oControl.getDisplayOnly(),
-				roledescription: oResourceBundle.getText("RATING_INDICATOR_ARIA_ROLEDESCRIPTION")
+				labelledby: {
+					value: this._sLabelID,
+					append: true
+				}
 			});
+		};
+
+		RatingIndicatorRenderer.renderAriaLabel = function(oRm, oControl) {
+			oRm.openStart("span", this._sLabelID).class("sapUiInvisibleText");
+			oRm.attr("aria-hidden", "true");
+			oRm.openEnd();
+			oRm.text(oControl._oResourceBundle.getText("RATING_ARIA_NAME"));
+			oRm.close("span");
 		};
 
 		RatingIndicatorRenderer.renderSelectedItems = function(oRm, oControl) {
@@ -253,6 +265,7 @@ sap.ui.define(
 					} else {
 						return oControl.getIconUnselected() || IconPool.getIconURI("favorite");
 					}
+					break;
 				case "HOVERED":
 					return oControl.getIconHovered() || IconPool.getIconURI("favorite");
 			}

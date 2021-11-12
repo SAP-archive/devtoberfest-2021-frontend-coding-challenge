@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -218,11 +218,7 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/Core", "sap/ui/core/Renderer"
 		rm.style("min-width", oLI._getInfoTextMinWidth(fWidth));
 
 		rm.openEnd();
-		if (oLI.getWrapping() && !bInfoStateInverted) {
-			this.renderWrapping(rm, oLI, "info");
-		} else {
-			rm.text(oLI.getInfo());
-		}
+		rm.text(oLI.getInfo());
 		rm.close("div");
 	};
 
@@ -259,33 +255,25 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/Core", "sap/ui/core/Renderer"
 	 */
 	StandardListItemRenderer.renderWrapping = function(rm, oLI, sWrapArea) {
 		var sId = oLI.getId(),
-			iMaxCharacters = oLI._getWrapCharLimit(),
-			sText, bTextExpanded;
-
-		if (sWrapArea === "title") {
-			sText = oLI.getTitle();
-			bTextExpanded = oLI._bTitleTextExpanded;
-		} else if (sWrapArea === "description") {
-			sText = oLI.getDescription();
-			bTextExpanded = oLI._bDescriptionTextExpanded;
-		} else {
-			sText = oLI.getInfo();
-		}
+			bTitle = sWrapArea == "title" ? true : false,
+			sText = bTitle ? oLI.getTitle() : oLI.getDescription(),
+			bTextExpanded = bTitle ? oLI._bTitleTextExpanded : oLI._bDescriptionTextExpanded,
+			iMaxCharacters = Device.system.phone ? 100 : 300;
 
 		rm.openStart("span", sId + "-" + sWrapArea + "Text").attr("aria-live", "polite").openEnd();
 
-		if (!bTextExpanded && sWrapArea !== "info") {
+		if (!bTextExpanded) {
 			var sCollapsedText = oLI._getCollapsedText(sText);
 			rm.text(sCollapsedText);
-		} else if (sWrapArea == "title") {
+		} else if (bTitle) {
 			this.renderTitle(rm, oLI);
 		} else {
-			rm.text(sText);
+			rm.text(oLI.getDescription());
 		}
 
 		rm.close("span");
 
-		if (sText.length > iMaxCharacters && sWrapArea !== "info") {
+		if (sText.length > iMaxCharacters) {
 			this.renderExpandCollapse(rm, oLI, sWrapArea);
 		}
 	};

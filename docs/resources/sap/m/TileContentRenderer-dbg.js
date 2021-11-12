@@ -1,24 +1,18 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define(["./library", "sap/base/security/encodeCSS", "sap/m/GenericTile", "sap/ui/core/library"],
-	function(library, encodeCSS, GenericTile, Core) {
+sap.ui.define(["sap/base/security/encodeCSS"],
+	function(encodeCSS) {
 	"use strict";
-
-	var GenericTileMode = library.GenericTileMode,
-		FrameType = library.FrameType,
-		Priority = Core.Priority;
 
 	/**
 	 * TileContent renderer.
 	 * @namespace
 	 */
-	var TileContentRenderer = {
-		apiVersion: 2    // enable in-place DOM patching
-	};
+	var TileContentRenderer = {};
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
@@ -35,18 +29,20 @@ sap.ui.define(["./library", "sap/base/security/encodeCSS", "sap/m/GenericTile", 
 		}
 		var sFrameTypeClass = encodeCSS("sapMFrameType" + oControl.getFrameType());
 
-		oRm.openStart("div", oControl);
-		oRm.class("sapMTileCnt");
-		oRm.class(sContentTypeClass);
-		oRm.class(sFrameTypeClass);
+		oRm.write("<div");
+		oRm.writeControlData(oControl);
+		oRm.addClass("sapMTileCnt");
+		oRm.addClass(sContentTypeClass);
+		oRm.addClass(sFrameTypeClass);
 		if (sTooltip.trim()) { // trim check needed since IE11 renders white spaces
-			oRm.attr("title", sTooltip);
+			oRm.writeAttributeEscaped("title", sTooltip);
 		}
-		oRm.openEnd();
+		oRm.writeClasses();
+		oRm.write(">");
 		this._renderContent(oRm, oControl);
 		this._renderFooter(oRm, oControl);
 
-		oRm.close("div");
+		oRm.write("</div>");
 	};
 
 	/**
@@ -61,53 +57,18 @@ sap.ui.define(["./library", "sap/base/security/encodeCSS", "sap/m/GenericTile", 
 			return;
 		}
 
-		var oContent = oControl.getContent(),
-			oPriority = oControl.getPriority(),
-			oTile = oControl.getParent(),
-			bIsActionMode = oTile instanceof GenericTile && oTile.getMode() === GenericTileMode.ActionMode && oTile.getFrameType() === FrameType.TwoByOne,
-			bRenderPriority = bIsActionMode && oPriority && oPriority !== Priority.None;
-
+		var oContent = oControl.getContent();
 		if (oContent) {
-			if (bRenderPriority) {
-				oRm.openStart("div", oControl.getId() + "-content-container");
-				oRm.class("sapMTileContainer");
-				oRm.openEnd();
-				//Priority Container
-				oRm.openStart("div", oControl.getId() + "-priority");
-				oRm.class("sapMTilePriority");
-				oRm.class(oPriority);
-				oRm.openEnd();
-				//Inner Container
-				oRm.openStart("div", oControl.getId() + "-priority-content");
-				oRm.class("sapMTilePriorityCnt");
-				oRm.openEnd();
-				//Border
-				oRm.openStart("div", oControl.getId() + "-priority-border");
-				oRm.class("sapMTilePriorityBorder");
-				oRm.openEnd();
-				oRm.close("div");
-				//Value
-				oRm.openStart("span", oControl.getId() + "-priority-value");
-				oRm.class("sapMTilePriorityValue");
-				oRm.openEnd();
-				oRm.text(oControl._getPriorityText(oPriority));
-				oRm.close("span");
-				oRm.close("div");
-				oRm.close("div");
-			}
-
-			oRm.openStart("div", oControl.getId() + "-content");
-			oRm.class("sapMTileCntContent");
-			oRm.openEnd();
+			oRm.write("<div");
+			oRm.addClass("sapMTileCntContent");
+			oRm.writeClasses();
+			oRm.writeAttribute("id", oControl.getId() + "-content");
+			oRm.write(">");
 			if (!oContent.hasStyleClass("sapMTcInnerMarker")) {
 				oContent.addStyleClass("sapMTcInnerMarker");
 			}
 			oRm.renderControl(oContent);
-			oRm.close("div");
-
-			if (bRenderPriority) {
-				oRm.close("div");
-			}
+			oRm.write("</div>");
 		}
 	};
 
@@ -124,42 +85,21 @@ sap.ui.define(["./library", "sap/base/security/encodeCSS", "sap/m/GenericTile", 
 			return;
 		}
 
-		var sColorClass = "sapMTileCntFooterTextColor" + oControl.getFooterColor(),
-			sFooterTxt = oControl._getFooterText(oRm, oControl),
-			oTile = oControl.getParent();
-
-		if (oTile instanceof GenericTile && (oTile._isNavigateActionEnabled() || oTile._isActionMode())) {
-			oRm.openStart("div", oTile.getId() + "-footer-container");
-			oRm.class("sapMTileFtrCnt");
-			oRm.openEnd();
-		}
-
+		var sColorClass = "sapMTileCntFooterTextColor" + oControl.getFooterColor();
+		var sTooltip = oControl.getTooltip_AsString();
+		var sFooterTxt = oControl._getFooterText(oRm, oControl);
 		// footer text div
-		oRm.openStart("div", oControl.getId() + "-footer-text");
-		oRm.class("sapMTileCntFtrTxt");
-		oRm.class(encodeCSS(sColorClass));
-		oRm.openEnd();
-		oRm.text(sFooterTxt);
-		oRm.close("div");
-
-		if (oTile instanceof GenericTile && oTile._isActionMode()) {
-			//Render Action Buttons, only in ActionMode and in TwoByOne frame type
-			oRm.openStart("div", oTile.getId() + "-actionButtons");
-			oRm.class("sapMGTActionModeContainer");
-			oRm.openEnd();
-			oTile.getActionButtons().forEach(function (oActionButton) {
-				oRm.renderControl(oActionButton);
-			});
-			oRm.close("div");
-			oRm.close("div");
-		} else if (oTile instanceof GenericTile && oTile._isNavigateActionEnabled()) {
-			oRm.openStart("div", oTile.getId() + "-navigateActionContainer");
-			oRm.class("sapMTileNavContainer");
-			oRm.openEnd();
-			oRm.renderControl(oTile._getNavigateAction());
-			oRm.close("div");
-			oRm.close("div");
+		oRm.write("<div");
+		oRm.addClass("sapMTileCntFtrTxt");
+		oRm.addClass(encodeCSS(sColorClass));
+		oRm.writeClasses();
+		oRm.writeAttribute("id", oControl.getId() + "-footer-text");
+		if (sTooltip.trim()) { // check for white space(s) needed since the IE11 renders it
+			oRm.writeAttributeEscaped("title", sTooltip);
 		}
+		oRm.write(">");
+		oRm.writeEscaped(sFooterTxt);
+		oRm.write("</div>");
 	};
 
 	return TileContentRenderer;

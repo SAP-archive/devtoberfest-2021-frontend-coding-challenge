@@ -1,12 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/ShortcutHintsMixin"],
+sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText"],
 
-	function(library, InvisibleText, ShortcutHintsMixin) {
+	function(library, InvisibleText) {
 		"use strict";
 
 		// shortcut for sap.m.ButtonType
@@ -16,9 +16,7 @@ sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/Shortc
 		 * <code>SplitButton</code> renderer.
 		 * @namespace
 		 */
-		var SplitButtonRenderer = {
-			apiVersion: 2
-		};
+		var SplitButtonRenderer = {};
 
 		SplitButtonRenderer.CSS_CLASS = "sapMSB";
 
@@ -36,67 +34,57 @@ sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/Shortc
 			var sWidth = oButton.getWidth(),
 				sType = oButton.getType(),
 				bEnabled = oButton.getEnabled(),
-				sTitleAttribute = oButton.getTitleAttributeValue(),
-				sTooltipId;
+				sTitleAttribute = oButton.getTitleAttributeValue();
 
 			//write root DOM element
-			oRm.openStart("div", oButton)
-				.class(SplitButtonRenderer.CSS_CLASS);
+			oRm.write("<div");
+			oRm.writeControlData(oButton);
 
+			//classes
+			oRm.addClass(SplitButtonRenderer.CSS_CLASS);
 			if (oButton.getIcon()) {
-				oRm.class(SplitButtonRenderer.CSS_CLASS + "HasIcon");
+				oRm.addClass(SplitButtonRenderer.CSS_CLASS + "HasIcon");
 			}
 			if (sType === ButtonType.Accept
 				|| sType === ButtonType.Reject
 				|| sType === ButtonType.Emphasized
-				|| sType === ButtonType.Transparent
-				|| sType === ButtonType.Attention
-				|| sType === ButtonType.Neutral
-				|| sType === ButtonType.Critical
-				|| sType === ButtonType.Success
-				|| sType === ButtonType.Negative) {
-				oRm.class(SplitButtonRenderer.CSS_CLASS + sType);
+				|| sType === ButtonType.Transparent) {
+				oRm.addClass(SplitButtonRenderer.CSS_CLASS + sType);
 			}
 
+			oRm.writeClasses();
+
 			this.writeAriaAttributes(oRm, oButton);
-			oRm.attr("tabindex", bEnabled ? "0" : "-1");
+			oRm.writeAttribute("tabindex", bEnabled ? "0" : "-1");
 
 			// add tooltip if available
-			if (sTitleAttribute && !ShortcutHintsMixin.isDOMIDRegistered(oButton.getId())) {
-				oRm.attr("title", sTitleAttribute);
+			if (sTitleAttribute) {
+				oRm.writeAttributeEscaped("title", sTitleAttribute);
 			}
 
 			// set user defined width
 			if (sWidth != "" || sWidth.toLowerCase() === "auto") {
-				oRm.style("width", sWidth);
+				oRm.addStyle("width", sWidth);
+				oRm.writeStyles();
 			}
 
-			oRm.openEnd();
+			oRm.write(">");
 
-			oRm.openStart("div")
-				.class("sapMSBInner");
+			oRm.write("<div");
+			oRm.addClass("sapMSBInner");
 
 			if (!bEnabled) {
-				oRm.class("sapMSBInnerDisabled");
+				oRm.addClass("sapMSBInnerDisabled");
 			}
 
-			oRm.openEnd();
+			oRm.writeClasses();
+			oRm.write(">");
 
 			oRm.renderControl(oButton._getTextButton());
 			oRm.renderControl(oButton._getArrowButton());
 
-			oRm.close("div");
-
-			if (sTitleAttribute) {
-				sTooltipId = oButton.getId() + "-tooltip";
-				oRm.openStart("span", sTooltipId);
-				oRm.class("sapUiInvisibleText");
-				oRm.openEnd();
-				oRm.text(sTitleAttribute);
-				oRm.close("span");
-			}
-
-			oRm.close("div");
+			oRm.write("</div>");
+			oRm.write("</div>");
 		};
 
 		SplitButtonRenderer.writeAriaAttributes = function(oRm, oButton) {
@@ -105,7 +93,7 @@ sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/Shortc
 			this.writeAriaRole(oButton, mAccProps);
 			this.writeAriaLabelledBy(oButton, mAccProps);
 
-			oRm.accessibilityState(oButton, mAccProps);
+			oRm.writeAccessibilityState(oButton, mAccProps);
 		};
 
 		SplitButtonRenderer.writeAriaRole = function(oButton, mAccProperties) {
@@ -114,9 +102,7 @@ sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/Shortc
 
 		SplitButtonRenderer.writeAriaLabelledBy = function(oButton, mAccProperties) {
 			var sAriaLabelledByValue = "",
-				oButtonTypeAriaLabelId = oButton.getButtonTypeAriaLabelId(),
-				sTitleAttribute = oButton.getTitleAttributeValue(),
-				sTooltipId;
+				oButtonTypeAriaLabelId = oButton.getButtonTypeAriaLabelId();
 
 			if (oButton.getText()) {
 				sAriaLabelledByValue += oButton._getTextButton().getId() + "-content";
@@ -128,14 +114,9 @@ sap.ui.define(["sap/m/library", "sap/ui/core/InvisibleText", "sap/ui/core/Shortc
 				sAriaLabelledByValue += " ";
 			}
 
-			if (sTitleAttribute) {
-				sTooltipId = oButton.getId() + "-tooltip";
-				sAriaLabelledByValue += sTooltipId + " ";
-			}
+			sAriaLabelledByValue += InvisibleText.getStaticId("sap.m", "SPLIT_BUTTON_DESCRIPTION");
 
-			sAriaLabelledByValue += InvisibleText.getStaticId("sap.m", "SPLIT_BUTTON_DESCRIPTION") + " ";
-
-			sAriaLabelledByValue += InvisibleText.getStaticId("sap.m", "SPLIT_BUTTON_KEYBOARD_HINT");
+			sAriaLabelledByValue += " " + InvisibleText.getStaticId("sap.m", "SPLIT_BUTTON_KEYBOARD_HINT");
 
 			mAccProperties["labelledby"] = {value: sAriaLabelledByValue, append: true };
 		};

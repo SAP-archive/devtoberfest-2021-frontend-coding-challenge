@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -65,7 +65,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -533,6 +533,8 @@ sap.ui.define([
 		// set gradient prefix depending of the browser
 		if (Device.browser.firefox) {
 			sBrowserPrefix = "-moz-linear-gradient";
+		} else if (Device.browser.msie) {
+			sBrowserPrefix = "-ms-linear-gradient";
 		} else if (Device.browser.webkit) {
 			sBrowserPrefix = "-webkit-linear-gradient";
 		} else {
@@ -1241,7 +1243,7 @@ sap.ui.define([
 			this.oAlphaField2.setValue(this.Color.a);
 		}
 
-		this._updateColorStringProperty(false, false);
+		this._updateColorStringProperty(true, true);
 	};
 
 	/**
@@ -1283,10 +1285,18 @@ sap.ui.define([
 		// update the new value
 		this.Color.a = this.oAlphaSlider.getValue();
 
-		this.oAlphaField.setValue(this.Color.a);
-		this.oAlphaField2.setValue(this.Color.a);
+		// Update Alpha Field if needed - it's visible only in HSL mode
+		if (this._bHSLMode) {
+			this.oAlphaField.setValue(this.Color.a);
+			this.oAlphaField2.setValue(this.Color.a);
+		}
 
-		this._updateSelColorBackground();
+		// process changes
+		if (!this.Color.formatHSL) {
+			this._processRGBChanges();
+		} else {
+			this._processChanges();
+		}
 		this._updateColorStringProperty(oData === "change", oData === "liveChange");
 	};
 
@@ -1592,7 +1602,6 @@ sap.ui.define([
 
 		this._updateGradientBoxBackground(this.Color.h);
 		this._updateCursorPosition();
-		this._updateAlphaBackground();
 		this._updateSelColorBackground();
 	};
 
@@ -1688,7 +1697,6 @@ sap.ui.define([
 
 		this._updateGradientBoxBackground(this.Color.h);
 		this._updateCursorPosition();
-		this._updateAlphaBackground();
 		this._updateSelColorBackground();
 		this._updateColorStringProperty(true, true);
 	};
@@ -1722,8 +1730,13 @@ sap.ui.define([
 		var sRGB = [this.Color.r, this.Color.g, this.Color.b].join(","),
 			newBG = sBrowserPrefix + "(left,rgba(" + sRGB + ",0),rgba(" + sRGB + ",1)),url(" + sBgSrc + ")";
 
-		this.oAlphaSlider.$().find(this.bResponsive ? ".sapMSliderInner" : ".sapUiSliBar")
-			.css("background-image", newBG); // stop flicker
+		if (this.lastAlphaSliderGradient !== newBG) { // check against cached value to prevent flicker
+			this.oAlphaSlider.$().find(this.bResponsive ? ".sapMSliderInner" : ".sapUiSliBar")
+				.css("background-image", newBG); // stop flicker
+
+			// cache last value to prevent flicker
+			this.lastAlphaSliderGradient = newBG;
+		}
 	};
 
 	/**
@@ -1758,6 +1771,16 @@ sap.ui.define([
 
 		// set the new cursor position
 		this.$CPCur.css("left", iX).css("top", iY);
+
+		// fixes Edge rendering glitches on (x50%) zoom: 50%, 150%, 250%, etc...
+		if (sap.ui.Device.browser.edge) {
+			var oBox = document.getElementById(this.oCPBox.getId());
+			oBox.style.verticalAlign = "top";
+			setTimeout( function() {
+				oBox.style.verticalAlign = "initial";
+			}, 0);
+		}
+
 	};
 
 	/**
@@ -2390,7 +2413,10 @@ sap.ui.define([
 		this._iCPBoxSize = this.oCPBox.getWidth();
 		this._updateCursorPosition();
 
-		this._updateAlphaBackground();
+		// update alpha slider background only in HSL mode
+		if (this._bHSLMode) {
+			this._updateAlphaBackground();
+		}
 		this.oSlider.iShiftGrip = Math.round(jQuery(this.oSlider.oGrip).outerWidth() / 2);
 		this.oAlphaSlider.iShiftGrip = Math.round(jQuery(this.oAlphaSlider.oGrip).outerWidth() / 2);
 

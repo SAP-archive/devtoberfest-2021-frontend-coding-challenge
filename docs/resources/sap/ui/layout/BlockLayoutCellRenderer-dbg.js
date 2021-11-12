@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,9 +11,7 @@ sap.ui.define(['./library', 'sap/ui/core/library', "sap/base/Log"],
 		// shortcut for sap.ui.core.TitleLevel
 		var TitleLevel = coreLibrary.TitleLevel;
 
-		var BlockLayoutCellRenderer = {
-			apiVersion: 2
-		};
+		var BlockLayoutCellRenderer = {};
 
 		BlockLayoutCellRenderer.render = function (rm, blockLayoutCell) {
 			this.startCell(rm, blockLayoutCell);
@@ -24,12 +22,15 @@ sap.ui.define(['./library', 'sap/ui/core/library', "sap/base/Log"],
 		BlockLayoutCellRenderer.startCell = function (oRm, oBlockLayoutCell) {
 			var sCellColor = this.getCellColor(oRm, oBlockLayoutCell);
 
-			oRm.openStart("div", oBlockLayoutCell)
-				.class("sapUiBlockLayoutCell");
-			sCellColor && oRm.class(sCellColor); // Set any of the predefined cell colors
+			oRm.write("<div");
+			oRm.writeControlData(oBlockLayoutCell);
+			oRm.addClass("sapUiBlockLayoutCell");
+			sCellColor && oRm.addClass(sCellColor); // Set any of the predefined cell colors
 			this.setWidth(oRm, oBlockLayoutCell);
 
-			oRm.openEnd();
+			oRm.writeStyles();
+			oRm.writeClasses();
+			oRm.write(">");
 		};
 
 		BlockLayoutCellRenderer.getCellColor = function (oRm, oBlockLayoutCell) {
@@ -51,21 +52,20 @@ sap.ui.define(['./library', 'sap/ui/core/library', "sap/base/Log"],
 		};
 
 		BlockLayoutCellRenderer.setWidth = function (rm, blockLayoutCell) {
-			var width = blockLayoutCell.getWidth();
 			if (blockLayoutCell._getParentRowScrollable()) {
+				var width = blockLayoutCell.getWidth();
 				if (width !== 0) {
-					rm.style("width", width + "%");
+					rm.addStyle("width", width + "%");
 				}
 			} else {
 				this.addFlex(rm, blockLayoutCell._getFlexWidth());
 			}
-
 		};
 
 		BlockLayoutCellRenderer.addFlex = function (rm, flex) {
-			rm.style("-webkit-flex", flex);
-			rm.style("-ms-flex", flex);
-			rm.style("flex", flex);
+			rm.addStyle("-webkit-flex", flex);
+			rm.addStyle("-ms-flex", flex);
+			rm.addStyle("flex", flex);
 		};
 
 		BlockLayoutCellRenderer.addTitle = function (rm, blockLayoutCell) {
@@ -86,23 +86,15 @@ sap.ui.define(['./library', 'sap/ui/core/library', "sap/base/Log"],
 					autoLevel = level === TitleLevel.Auto,
 					tag = autoLevel ? "h2" : level;
 
-				var aTitleClassesSeparated = titleClass.split(" ");
-
-				rm.openStart(tag, this.getTitleId(blockLayoutCell));
-
-				for (var index = 0; index < aTitleClassesSeparated.length; index++) {
-					rm.class(aTitleClassesSeparated[index]);
-				}
-
-				rm.openEnd();
+				rm.write("<" + tag + " id='" + this.getTitleId(blockLayoutCell) + "' class='" + titleClass + "'>");
 
 				if (oTitleLink) {
 					rm.renderControl(oTitleLink);
 				} else {
-					rm.text(sTitleText);
+					rm.writeEscaped(sTitleText);
 				}
 
-				rm.close(tag);
+				rm.write("</" + tag + ">");
 			}
 		};
 
@@ -118,29 +110,31 @@ sap.ui.define(['./library', 'sap/ui/core/library', "sap/base/Log"],
 			var content = blockLayoutCell.getContent(),
 				bHasTitle = this.hasTitle(blockLayoutCell);
 
-			rm.openStart("div")
-				.class("sapUiBlockCellContent");
+			rm.write("<div");
+			rm.addClass("sapUiBlockCellContent");
 
 			if (blockLayoutCell.getTitleAlignment() === "Center") {
-				rm.class("sapUiBlockCellCenteredContent");
+				rm.addClass("sapUiBlockCellCenteredContent");
 			}
+
+			rm.writeClasses();
 
 			if (bHasTitle) {
-				rm.attr("aria-labelledby", this.getTitleId(blockLayoutCell));
+				rm.writeAttribute("aria-labelledby", this.getTitleId(blockLayoutCell));
 			}
 
-			rm.openEnd();
+			rm.write(">");
 
 			if (bHasTitle) {
 				this.addTitle(rm, blockLayoutCell);
 			}
 
 			content.forEach(rm.renderControl, rm);
-			rm.close("div");
+			rm.write("</div>");
 		};
 
 		BlockLayoutCellRenderer.endCell = function (rm) {
-			rm.close("div");
+			rm.write("</div>");
 		};
 
 		return BlockLayoutCellRenderer;

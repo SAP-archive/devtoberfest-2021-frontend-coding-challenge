@@ -1,48 +1,46 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
+	'./Dialog',
 	'./ComboBoxTextField',
-	'./ComboBoxBaseRenderer',
+	'./Input',
+	'./GroupHeaderListItem',
 	'./SuggestionsPopover',
-	'sap/ui/base/ManagedObjectObserver',
 	'sap/ui/core/SeparatorItem',
 	'sap/ui/core/InvisibleText',
-	'sap/ui/base/ManagedObject',
 	'sap/base/Log',
 	'./library',
 	'sap/ui/Device',
+	'sap/ui/core/library',
+	'./ComboBoxBaseRenderer',
 	"sap/ui/dom/containsOrEquals",
 	"sap/ui/events/KeyCodes",
 	"sap/ui/thirdparty/jquery",
 	"sap/base/security/encodeXML",
-	"sap/base/strings/escapeRegExp",
-	"sap/m/inputUtils/forwardItemProperties",
-	"sap/m/inputUtils/highlightDOMElements",
-	"sap/m/inputUtils/ListHelpers"
+	"sap/base/strings/escapeRegExp"
 ],
 	function(
+		Dialog,
 		ComboBoxTextField,
-		ComboBoxBaseRenderer,
+		Input,
+		GroupHeaderListItem,
 		SuggestionsPopover,
-		ManagedObjectObserver,
 		SeparatorItem,
 		InvisibleText,
-		ManagedObject,
 		Log,
 		library,
 		Device,
+		coreLibrary,
+		ComboBoxBaseRenderer,
 		containsOrEquals,
 		KeyCodes,
 		jQuery,
 		encodeXML,
-		escapeRegExp,
-		forwardItemProperties,
-		highlightDOMElements,
-		ListHelpers
+		escapeRegExp
 	) {
 		"use strict";
 
@@ -64,7 +62,7 @@ sap.ui.define([
 		 * @abstract
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @public
@@ -87,23 +85,12 @@ sap.ui.define([
 						type: "boolean",
 						group: "Misc",
 						defaultValue: false
-					},
-
-					/**
-					 * Indicates whether the picker is opened.
-					 *
-					 * @private
-					 */
-					 open: {
-						type: "boolean",
-						defaultValue: false,
-						hidden: true
 					}
 				},
 				aggregations: {
 
 					/**
-					 * Defines the items contained within this control. <b>Note:</b> Disabled items are not visualized in the list with the available options, however they can still be accessed through the aggregation.
+					 * Defines the items contained within this control.
 					 */
 					items: {
 						type: "sap.ui.core.Item",
@@ -142,9 +129,40 @@ sap.ui.define([
 					loadItems: {}
 				},
 				dnd: { draggable: false, droppable: true }
-			},
-			renderer: ComboBoxBaseRenderer
+			}
 		});
+
+		/**
+		 * Default filtering function for items.
+		 *
+		 * @param {string} sInputValue Current value of the input field.
+		 * @param {sap.ui.core.Item} oItem Item to be matched
+		 * @param {string} sPropertyGetter A Getter for property of an item (could be getText or getAdditionalText)
+		 * @static
+		 * @since 1.58
+		 */
+		ComboBoxBase.DEFAULT_TEXT_FILTER = function (sInputValue, oItem, sPropertyGetter) {
+			var sLowerCaseText, sInputLowerCaseValue, oMatchingTextRegex;
+
+			if (!oItem[sPropertyGetter]) {
+				return false;
+			}
+
+			sLowerCaseText = oItem[sPropertyGetter]().toLowerCase();
+			sInputLowerCaseValue = sInputValue.toLowerCase();
+			oMatchingTextRegex = new RegExp('(^|\\s)' + escapeRegExp(sInputLowerCaseValue) + ".*", 'g');
+
+			return oMatchingTextRegex.test(sLowerCaseText);
+		};
+
+		/**
+		 * Called when the composition of a passage of text is started.
+		 *
+		 * @protected
+		 */
+		ComboBoxBase.prototype.oncompositionstart = function () {
+			this._bIsComposingCharacter = true;
+		};
 
 		/**
 		 * Called when the composition of a passage of text has been completed or cancelled.
@@ -153,13 +171,26 @@ sap.ui.define([
 		 * @protected
 		 */
 		ComboBoxBase.prototype.oncompositionend = function (oEvent) {
-			ComboBoxTextField.prototype.oncompositionend.apply(this, arguments);
+			this._bIsComposingCharacter = false;
+			this._sComposition = oEvent.target.value;
 
-			// In Firefox the events are fired correctly
+			// In Firefox and Edge the events are fired correctly
 			// http://blog.evanyou.me/2014/01/03/composition-event/
-			if (!Device.browser.firefox) {
+			if (!Device.browser.edge && !Device.browser.firefox) {
+				ComboBoxTextField.prototype.handleInput.apply(this, arguments);
 				this.handleInputValidation(oEvent, this.isComposingCharacter());
 			}
+		};
+
+		/**
+		 * indicating if a character is currently composing.
+		 *
+		 * @returns {boolean} Whether or not a character is composing.
+		 * True if after "compositionstart" event and before "compositionend" event.
+		 * @protected
+		 */
+		ComboBoxBase.prototype.isComposingCharacter = function() {
+			return this._bIsComposingCharacter;
 		};
 
 		/* =========================================================== */
@@ -181,12 +212,6 @@ sap.ui.define([
 			this.bItemsUpdated = true;
 
 			if (this.hasLoadItemsEventListeners()) {
-
-				if (this.isOpen()) {
-					ListHelpers.fillList(this.getItems(), this._getList(), this._mapItemToListItem.bind(this));
-					this.setRecreateItems(false);
-				}
-
 				this.onItemsLoaded();
 			}
 		};
@@ -200,7 +225,7 @@ sap.ui.define([
 		 *
 		 * @public
 		 * @param {function} fnFilter A callback function called when typing in a ComboBoxBase control or ancestor.
-		 * @returns {this} <code>this</code> to allow method chaining.
+		 * @returns {sap.m.ComboBoxBase} <code>this</code> to allow method chaining.
 		 * @since 1.58
 		 */
 		ComboBoxBase.prototype.setFilterFunction = function(fnFilter) {
@@ -220,31 +245,55 @@ sap.ui.define([
 		};
 
 		/**
+		 * Highlights Dom Refs based on a value of the input and text of an item
+		 *
+		 * @param {string} sValue Currently typed value of the input
+		 * @param {object[]} aItemsDomRefs Array of objects with information for dom ref and text to be highlighted
+		 * @param {function} fnBold Method for bolding the text
+		 *
+		 * @protected
+		 * @since 1.58
+		 */
+		ComboBoxBase.prototype.highLightList = function (sValue, aItemsDomRefs, fnBold) {
+			if (fnBold && typeof fnBold === "function") {
+				fnBold(aItemsDomRefs, sValue);
+			} else {
+				this._oSuggestionPopover.highlightSuggestionItems(aItemsDomRefs, sValue, true);
+			}
+		};
+
+		/**
 		 * Handles highlighting of items after filtering.
 		 *
 		 * @param {string} sValue The value of the item
 		 * @protected
 		 */
-		ComboBoxBase.prototype.highlightList = function (sValue) {
-			var aListItemsDOM = [];
+		ComboBoxBase.prototype._highlightList = function (sValue) {
+			var aListItemsDOM = [],
+				aListItemAdditionalText = [],
+				oItemAdditionalTextRef, oItemDomRef, oItemTitleDomRef;
 
-			aListItemsDOM = this._getList().$().find('.sapMSLIInfo, .sapMSLITitleOnly');
+			this._getList().getItems().forEach(function (oItem) {
+				oItemDomRef = oItem.getDomRef();
+				oItemTitleDomRef = oItemDomRef && oItemDomRef.getElementsByClassName("sapMSLITitleOnly")[0];
 
-			highlightDOMElements(aListItemsDOM, sValue);
+				if (oItemTitleDomRef) {
+					aListItemsDOM.push(oItemTitleDomRef);
+
+					oItemAdditionalTextRef = oItemDomRef.querySelector(".sapMSLIInfo");
+
+					if (oItemAdditionalTextRef && oItem.getInfo) {
+						aListItemAdditionalText.push(oItemAdditionalTextRef);
+					}
+				}
+			});
+
+			this.highLightList(sValue, aListItemsDOM);
+			this.highLightList(sValue, aListItemAdditionalText);
 		};
 
-		/**
-		 * Decorates the Input
-		 *
-		 * @param oInput {sap.m.InputBase}
-		 * @returns {*}
-		 * @private
-		 * @ui5-restricted
-		 */
-		ComboBoxBase.prototype._decoratePopupInput = function (oInput) {
-			if (oInput) {
-				this.setTextFieldHandler(oInput);
-			}
+		ComboBoxBase.prototype._modifyPopupInput = function (oInput) {
+			this.setTextFieldHandler(oInput);
 			return oInput;
 		};
 
@@ -417,6 +466,38 @@ sap.ui.define([
 			return this._oGroupHeaderInvisibleText;
 		};
 
+
+		/**
+		 * Gets the item corresponding to given list item.
+		 *
+		 * @param {sap.m.StandardListItem | null} oListItem The given list item
+		 * @return {sap.ui.core.Item} The corresponding item
+		 * @private
+		 */
+		ComboBoxBase.prototype._getItemByListItem = function(oListItem) {
+			return this._getItemBy(oListItem, "ListItem");
+		};
+
+		/**
+		 * Gets the item corresponding to given data object.
+		 *
+		 * @param {Object | null} oDataObject The given object
+		 * @param {string} sDataName The data name
+		 * @return {sap.ui.core.Item} The corresponding item
+		 * @private
+		 */
+		ComboBoxBase.prototype._getItemBy = function(oDataObject, sDataName) {
+			sDataName = this.getRenderer().CSS_CLASS_COMBOBOXBASE + sDataName;
+
+			for ( var i = 0, aItems = this.getItems(), iItemsLength = aItems.length; i < iItemsLength; i++) {
+				if (aItems[i].data(sDataName) === oDataObject) {
+					return aItems[i];
+				}
+			}
+
+			return null;
+		};
+
 		/**
 		 * Checks if the list is in suggestions mode.
 		 *
@@ -425,8 +506,19 @@ sap.ui.define([
 		 */
 		ComboBoxBase.prototype._isListInSuggestMode = function() {
 			return this._getList().getItems().some(function(oListItem) {
-				return !oListItem.getVisible() && ListHelpers.getItemByListItem(this.getItems(), oListItem).getEnabled();
+				return !oListItem.getVisible() && this._getItemByListItem(oListItem).getEnabled();
 			}, this);
+		};
+
+		/**
+		 * Gets the control's ListItem.
+		 *
+		 * @param {sap.ui.core.Item} oItem The item
+		 * @returns {sap.m.StandardListItem | null} The ListItem
+		 * @private
+		 */
+		ComboBoxBase.prototype.getListItem = function(oItem) {
+			return oItem ? oItem.data(this.getRenderer().CSS_CLASS_COMBOBOXBASE + "ListItem") : null;
 		};
 
 		/**
@@ -471,6 +563,7 @@ sap.ui.define([
 			// indicates if the picker should be closed when toggling the opener icon
 			this._bShouldClosePicker = false;
 
+			this._oPickerValueStateText = null;
 			this.bProcessingLoadItemsEvent = false;
 			this.iLoadItemsEventInitialProcessingTimeoutID = -1;
 			this.aMessageQueue = [];
@@ -485,88 +578,16 @@ sap.ui.define([
 				}
 			}, this);
 
-			this.getIcon().attachPress(this._handlePopupOpenAndItemsLoad.bind(this, true, this));
+			this.getIcon().attachPress(this._handlePopupOpenAndItemsLoad.bind(this, true));
+
+			// handle composition events & validation of composition symbols
+			this._sComposition = "";
 
 			// a method to define whether an item should be filtered in the picker
 			this.fnFilter = null;
-
-			var oItemsAggregationObserver = new ManagedObjectObserver(function(oChange) {
-				var sMutation = oChange.mutation;
-				var oItem = oChange.child;
-				var oEventMapping = {
-					"remove": "detachEvent",
-					"insert": "attachEvent"
-				};
-				var callbackMapping = {
-					"remove": "handleItemRemoval",
-					"insert": "handleItemInsertion"
-				};
-
-				if (!oItem[oEventMapping[sMutation]] || !this[callbackMapping[sMutation]]) {
-					return;
-				}
-
-				// attach / detach a _change event to items on insert / remove events
-				oItem[oEventMapping[sMutation]]("_change", this.onItemChange, this);
-
-				// mark the list items to be recreated
-				this.setRecreateItems(true);
-
-				// call handle Inserttion / Removal of items
-				this[callbackMapping[sMutation]](oItem);
-			}.bind(this));
-
-			oItemsAggregationObserver.observe(this, { aggregations: ["items"] });
 		};
 
-		/**
-		 * Fires when an object gets removed from the items aggregation
-		 *
-		 * @protected
-		 */
-		ComboBoxBase.prototype.handleItemRemoval = function (oItem) {};
-
-		/**
-		 * Fires when an object gets inserted in the items aggregation
-		 *
-		 * @protected
-		 */
-		ComboBoxBase.prototype.handleItemInsertion = function (oItem) {};
-
-		/**
-		 * Sets whether the list items should be recreated
-		 * @protected
-		 */
-		ComboBoxBase.prototype.setRecreateItems = function (bRecreate) {
-			this._bRecreateItems = bRecreate;
-		};
-
-		/**
-		 * Gets the flag indicating whether the list items should be recreated
-		 * @protected
-		 */
-		ComboBoxBase.prototype.getRecreateItems = function () {
-			return this._bRecreateItems;
-		};
-
-		ComboBoxBase.prototype.onBeforeRendering = function () {
-			var bSuggestionsPopoverIsOpen =  this.isOpen(),
-			sValueStateHeaderText = bSuggestionsPopoverIsOpen ?  this._getSuggestionsPopover()._getValueStateHeader().getText() : null,
-			sValueStateHeaderValueState = bSuggestionsPopoverIsOpen ?  this._getSuggestionsPopover()._getValueStateHeader().getValueState() : null;
-
-			ComboBoxTextField.prototype.onBeforeRendering.apply(this, arguments);
-
-			if (bSuggestionsPopoverIsOpen && ((this.getValueStateText() && sValueStateHeaderText !== this.getValueStateText()) ||
-				(this.getValueState() !== sValueStateHeaderValueState) || this.getFormattedValueStateText())) {
-				/* If new value state, value state plain text or FormattedText is set
-				while the suggestions popover is open update the value state header.
-				If the input has FormattedText aggregation while the suggestions popover is open then
-				it's new, because the old is already switched to have the value state header as parent */
-				this._updateSuggestionsPopoverValueState();
-			}
-		};
-
-		ComboBoxBase.prototype._handlePopupOpenAndItemsLoad = function (bOpenOnInteraction, oObjectToFocus) {
+		ComboBoxBase.prototype._handlePopupOpenAndItemsLoad = function (bOpenOnInteraction) {
 			var oPicker;
 
 			// in case of a non-editable or disabled combo box, the picker popup cannot be opened
@@ -603,25 +624,20 @@ sap.ui.define([
 				oPicker.setInitialFocus(oPicker);
 			}
 
-			if (oObjectToFocus) {
-				oPicker = this.getPicker();
-				oPicker && oPicker.setInitialFocus(oObjectToFocus);
-			}
-
 			this.open();
 		};
 
 		ComboBoxBase.prototype.exit = function() {
 			ComboBoxTextField.prototype.exit.apply(this, arguments);
 
+			if (this._getList()) {
+				this._getList().destroy();
+				this._oList = null;
+			}
+
 			if (this._getGroupHeaderInvisibleText()) {
 				this._getGroupHeaderInvisibleText().destroy();
 				this._oGroupHeaderInvisibleText = null;
-			}
-
-			if (this._oSuggestionPopover) {
-				this._oSuggestionPopover.destroy();
-				this._oSuggestionPopover = null;
 			}
 
 			clearTimeout(this.iLoadItemsEventInitialProcessingTimeoutID);
@@ -787,13 +803,11 @@ sap.ui.define([
 		 * @private
 		 */
 		ComboBoxBase.prototype._getList = function() {
-			var oList = this._oSuggestionPopover && this._oSuggestionPopover.getItemsContainer();
-
-			if (this.bIsDestroyed || !oList) {
+			if (this.bIsDestroyed) {
 				return null;
 			}
 
-			return oList;
+			return this._oList;
 		};
 
 		/**
@@ -823,23 +837,53 @@ sap.ui.define([
 		 */
 		ComboBoxBase.prototype._updateSuggestionsPopoverValueState = function() {
 			var oSuggestionsPopover = this._getSuggestionsPopover();
-			if (!oSuggestionsPopover) {
-				return;
+			if (oSuggestionsPopover) {
+				oSuggestionsPopover.updateValueState(this.getValueState(), this.getValueStateText(), this.getShowValueStateMessage());
 			}
+		};
 
-			var	sValueState = this.getValueState(),
-				bNewValueState = this.getValueState() !== oSuggestionsPopover._getValueStateHeader().getValueState(),
-				oNewFormattedValueStateText = this.getFormattedValueStateText(),
-				sValueStateText = this.getValueStateText(),
-				bShouldPopoverBeUpdated = oNewFormattedValueStateText || bNewValueState;
+		/**
+		 * Sets the visualization of the validation state of the control,
+		 * e.g. <code>Error</code>, <code>Warning</code>, <code>Success</code>.
+		 *
+		 * @param {sap.ui.core.ValueState} [sValueState] The new value state
+		 * @returns {sap.m.InputBase} this for chaining
+		 *
+		 * @public
+		 */
+		ComboBoxBase.prototype.setValueState = function(sValueState) {
+			ComboBoxTextField.prototype.setValueState.apply(this, arguments);
+			this._updateSuggestionsPopoverValueState();
 
-			/* If open and no new FormattedText or value state is set to the Input then this is called
-			onBeforeClose of the SuggestionsPopover. Switch the value state aggregation's
-			parent from the ValueStateHeader to the ComboBox */
-			if (oSuggestionsPopover.isOpen() && !bShouldPopoverBeUpdated) {
-				this.setFormattedValueStateText(oSuggestionsPopover._getValueStateHeader().getFormattedText());
-			}
-			oSuggestionsPopover.updateValueState(sValueState, (oNewFormattedValueStateText || sValueStateText), this.getShowValueStateMessage());
+			return this;
+		};
+
+		/**
+		 * Sets the value state text
+		 *
+		 * @param {string} [sValueStateText] The new value state text
+		 * @returns {sap.m.InputBase} this for chaining
+		 *
+		 * @public
+		 */
+		ComboBoxBase.prototype.setValueStateText = function(sValueStateText) {
+			ComboBoxTextField.prototype.setValueStateText.apply(this, arguments);
+			this._updateSuggestionsPopoverValueState();
+			return this;
+		};
+
+		/**
+		 * Sets whether the value state message should be shown or not
+		 *
+		 * @param {boolean} [bShow] The new value state text
+		 * @returns {sap.m.InputBase} this for chaining
+		 *
+		 * @public
+		 */
+		ComboBoxBase.prototype.setShowValueStateMessage = function(bShow) {
+			ComboBoxTextField.prototype.setShowValueStateMessage.apply(this, arguments);
+			this._updateSuggestionsPopoverValueState();
+			return this;
 		};
 
 		ComboBoxBase.prototype.shouldValueStateMessageBeOpened = function() {
@@ -896,6 +940,21 @@ sap.ui.define([
 			return bTablet;
 		};
 
+		/**
+		 * Creates an instance of <code>sap.m.ComboBoxTextField</code>.
+		 *
+		 * @returns {sap.m.ComboBoxTextField} The TextField instance
+		 * @private
+		 */
+		ComboBoxBase.prototype.createPickerTextField = function() {
+			var oInput = new Input({
+				width: "100%",
+				showValueStateMessage: false
+			});
+
+			return oInput;
+		};
+
 		/*
 		 * Gets the dropdown default settings.
 		 * @returns {object} A map object with the default settings
@@ -936,7 +995,7 @@ sap.ui.define([
 			}
 
 			this._oSuggestionPopover = this._createSuggestionsPopover();
-			oPicker = this._oSuggestionPopover.getPopover();
+			oPicker = this._oSuggestionPopover._oPopover;
 			// define a parent-child relationship between the control's and the picker pop-up (Popover or Dialog)
 			this.setAggregation("picker", oPicker, true);
 
@@ -964,16 +1023,27 @@ sap.ui.define([
 		 * @private
 		 */
 		ComboBoxBase.prototype._createSuggestionsPopover = function () {
-			var oSuggPopover = new SuggestionsPopover(this);
+			var bUseDialog = this.isPickerDialog(),
+				oSuggPopover;
 
-			oSuggPopover.decorateParent(this);
+			oSuggPopover = new SuggestionsPopover(this);
+
+			if (bUseDialog) {
+				var oInput = this.createPickerTextField();
+				oSuggPopover._oPopupInput = this._modifyPopupInput(oInput);
+			}
+
 			// Creates the internal controls of the <code>SuggestionsPopover</code>
-			oSuggPopover.createSuggestionPopup(this, {showSelectedButton: this._hasShowSelectedButton()});
-			this._decoratePopupInput(oSuggPopover.getInput());
-			oSuggPopover.initContent(this.getId());
-			this.forwardEventHandlersToSuggPopover(oSuggPopover);
+			oSuggPopover._createSuggestionPopup({showSelectedButton: this._hasShowSelectedButton()});
+			oSuggPopover._createSuggestionPopupContent(false);
 
-			this._configureList(oSuggPopover.getItemsContainer());
+			this.forwardEventHandlersToSuggPopover(oSuggPopover);
+			this._updateSuggestionsPopoverValueState();
+
+			// Amends the suggestions popovers list
+			// this._oList is used by the ComboBoxBase
+			this._oList = oSuggPopover._oList;
+			this._configureList(this._oList);
 
 			return oSuggPopover;
 		};
@@ -1012,7 +1082,7 @@ sap.ui.define([
 			}
 
 			oItem._bSelectable = bSelectable;
-			var oListItem = ListHelpers.getListItem(oItem);
+			var oListItem = this.getListItem(oItem);
 
 			if (oListItem) {
 				oListItem.setVisible(bSelectable);
@@ -1024,7 +1094,6 @@ sap.ui.define([
 		 *
 		 */
 		ComboBoxBase.prototype.onBeforeOpen = function () {
-			this._updateSuggestionsPopoverValueState();
 			if (!this._getItemsShownWithFilter()) {
 				this.toggleIconPressedStyle(true);
 			}
@@ -1038,7 +1107,6 @@ sap.ui.define([
 			// reset opener
 			this.bOpenedByKeyboardOrButton = false;
 			this._setItemsShownWithFilter(false);
-			this._updateSuggestionsPopoverValueState();
 		};
 
 		/**
@@ -1061,24 +1129,12 @@ sap.ui.define([
 		/**
 		 * Gets the control's suggestions popover.
 		 *
-		 * @returns {sap.m.SuggestionsPopover} The SuggestionsPopover instance.
+		 * @returns {sap.m.SuggestionsPopover} The SuggestionsPopover instance, creating it if necessary by calling
+		 * the <code>createPicker()</code> method.
 		 * @private
 		 */
 		ComboBoxBase.prototype._getSuggestionsPopover = function() {
 			return this._oSuggestionPopover;
-		};
-
-		/**
-		 *
-		 * @return {array} <code>sap.m.FormattedText</code> links in the value state message
-		 * @private
-		 */
-		ComboBoxBase.prototype.getValueStateLinks = function() {
-			var bHasFormattedTextValueState = this.getPicker() && this.getPicker().getCustomHeader() && typeof this.getPicker().getCustomHeader().getFormattedText === "function",
-				oFormattedTextValueState = bHasFormattedTextValueState && this.getPicker().getCustomHeader().getFormattedText(),
-				aValueStateLinks = oFormattedTextValueState && oFormattedTextValueState.getControls();
-
-			return aValueStateLinks || [];
 		};
 
 		/**
@@ -1088,9 +1144,10 @@ sap.ui.define([
 		 * @protected
 		 * @since 1.42
 		 */
-		ComboBoxBase.prototype.getPickerTextField = function () {
-			var oSuggestionsPopover = this._getSuggestionsPopover();
-			return oSuggestionsPopover ? oSuggestionsPopover.getInput() : null;
+		ComboBoxBase.prototype.getPickerTextField = function() {
+			var oPicker = this.getPicker(),
+				oSubHeader = oPicker && oPicker.getSubHeader();
+			return oSubHeader && oSubHeader.getContent()[0] || null;
 		};
 
 		/*
@@ -1133,21 +1190,50 @@ sap.ui.define([
 		 * Creates picker if doesn't exist yet and sync with Control items
 		 * To be overwritten by subclasses.
 		 *
-		 * @returns {sap.ui.core.Control}
 		 * @protected
 		 */
 		ComboBoxBase.prototype.syncPickerContent = function () {};
 
 		/**
+		 * Retrieves the first enabled item from the aggregation named <code>items</code>.
+		 *
+		 * @param {array} [aItems] The items array
+		 * @returns {sap.ui.core.Item | null} The first enabled item
+		 */
+		ComboBoxBase.prototype.findFirstEnabledItem = function(aItems) {
+			aItems = aItems || this.getItems();
+
+			for (var i = 0; i < aItems.length; i++) {
+				if (aItems[i].getEnabled()) {
+					return aItems[i];
+				}
+			}
+
+			return null;
+		};
+
+		/**
+		 * Retrieves the last enabled item from the aggregation named <code>items</code>.
+		 *
+		 * @param {array} [aItems] The items array
+		 * @returns {sap.ui.core.Item | null} The last enabled item
+		 */
+		ComboBoxBase.prototype.findLastEnabledItem = function(aItems) {
+			aItems = aItems || this.getItems();
+			return this.findFirstEnabledItem(aItems.reverse());
+		};
+
+		/**
 		 * Opens the control's picker popup.
 		 *
-		 * @returns {this} <code>this</code> to allow method chaining.
+		 * @returns {sap.m.ComboBoxBase} <code>this</code> to allow method chaining.
 		 * @protected
 		 */
 		ComboBoxBase.prototype.open = function() {
 			var oPicker = this.getPicker();
 
 			if (oPicker) {
+				this._updateSuggestionsPopoverValueState();
 				oPicker.open();
 			}
 
@@ -1161,7 +1247,15 @@ sap.ui.define([
 		 * @protected
 		 */
 		ComboBoxBase.prototype.getVisibleItems = function() {
-			return ListHelpers.getVisibleItems(this.getItems());
+			for (var i = 0, oListItem, aItems = this.getItems(), aVisibleItems = []; i < aItems.length; i++) {
+				oListItem = this.getListItem(aItems[i]);
+
+				if (oListItem && oListItem.getVisible()) {
+					aVisibleItems.push(aItems[i]);
+				}
+			}
+
+			return aVisibleItems;
 		};
 
 		/*
@@ -1191,6 +1285,15 @@ sap.ui.define([
 			}
 
 			return aKeys;
+		};
+
+		/**
+		 * Gets the selectable items from the aggregation named <code>items</code>.
+		 *
+		 * @returns {sap.ui.core.Item[]} An array containing the selectables items.
+		 */
+		ComboBoxBase.prototype.getSelectableItems = function() {
+			return this.getEnabledItems(this.getVisibleItems());
 		};
 
 		/**
@@ -1233,7 +1336,7 @@ sap.ui.define([
 		 */
 		ComboBoxBase.prototype.clearFilter = function() {
 			this.getItems().forEach(function(oItem) {
-				var oListItem = ListHelpers.getListItem(oItem);
+				var oListItem = this.getListItem(oItem);
 
 				if (oListItem) {
 					oListItem.setVisible(oItem.getEnabled() && this.getSelectable(oItem));
@@ -1243,19 +1346,13 @@ sap.ui.define([
 
 		/**
 		 * Handles properties' changes of items in the aggregation named <code>items</code>.
+		 * To be overwritten by subclasses.
 		 *
-		 * @protected
+		 * @experimental
 		 * @param {sap.ui.base.Event} oControlEvent The change event
-		 * @param {boolean} bShowSecondaryValues Indicates whether second values should be shown
-		 * @since 1.90
+		 * @since 1.30
 		 */
-		ComboBoxBase.prototype.onItemChange = function(oControlEvent, bShowSecondaryValues) {
-			forwardItemProperties({
-				item: oControlEvent.getSource(),
-				propName: oControlEvent.getParameter("name"),
-				propValue: oControlEvent.getParameter("newValue")
-			}, bShowSecondaryValues);
-		};
+		ComboBoxBase.prototype.onItemChange = function(oControlEvent) {};
 
 		/**
 		 * Clears the selection.
@@ -1278,6 +1375,52 @@ sap.ui.define([
 		/* ----------------------------------------------------------- */
 		/* public methods                                              */
 		/* ----------------------------------------------------------- */
+
+		/**
+		 * Adds an item to the aggregation named <code>items</code>.
+		 *
+		 * @param {sap.ui.core.Item} oItem The item to be added; if empty, nothing is added.
+		 * @returns {sap.m.ComboBoxBase} <code>this</code> to allow method chaining.
+		 * @public
+		 */
+		ComboBoxBase.prototype.addItem = function(oItem) {
+			this.addAggregation("items", oItem);
+
+			if (oItem) {
+				oItem.attachEvent("_change", this.onItemChange, this);
+			}
+
+			if (this._getList()) {
+				this._getList().addItem(this._mapItemToListItem(oItem));
+			}
+
+			return this;
+		};
+
+		/**
+		 * Inserts an item into the aggregation named <code>items</code>.
+		 *
+		 * @param {sap.ui.core.Item} oItem The item to be inserted; if empty, nothing is inserted.
+		 * @param {int} iIndex The <code>0</code>-based index the item should be inserted at; for
+		 *             a negative value of <code>iIndex</code>, the item is inserted at position 0; for a value
+		 *             greater than the current size of the aggregation, the item is inserted at the last position.
+		 * @returns {sap.m.ComboBoxBase} <code>this</code> to allow method chaining.
+		 * @public
+		 */
+		ComboBoxBase.prototype.insertItem = function(oItem, iIndex) {
+			this.insertAggregation("items", oItem, iIndex, true);
+
+			if (oItem) {
+				oItem.attachEvent("_change", this.onItemChange, this);
+			}
+
+			if (this._getList()) {
+				this._getList().insertItem(this._mapItemToListItem(oItem), iIndex);
+			}
+
+			this._scheduleOnItemsLoadedOnce();
+			return this;
+		};
 
 		/**
 		 * Gets the item from the aggregation named <code>items</code> at the given 0-based index.
@@ -1317,11 +1460,13 @@ sap.ui.define([
 		 * @param {sap.ui.core.Item[]} [aItems=getItems()] Items to filter.
 		 * @returns {sap.ui.core.Item[]} An array containing the enabled items.
 		 * @public
-		 * @deprecated As of version 1.86. The enabled items should be managed by the application.
 		 */
 		ComboBoxBase.prototype.getEnabledItems = function(aItems) {
-			// for backward compatibility
-			return ListHelpers.getEnabledItems(aItems || this.getItems());
+			aItems = aItems || this.getItems();
+
+			return aItems.filter(function(oItem) {
+				return oItem.getEnabled();
+			});
 		};
 
 		/**
@@ -1347,9 +1492,7 @@ sap.ui.define([
 		 */
 		ComboBoxBase.prototype.addItemGroup = function(oGroup, oHeader, bSuppressInvalidate) {
 			oHeader = oHeader || new SeparatorItem({
-				// The SeparatorItem does not escape those settings, so we need to take care of that.
-				// This will ensure that values containing curly braces do not break the code.
-				text: ManagedObject.escapeSettingsValue(oGroup.text) || ManagedObject.escapeSettingsValue(oGroup.key)
+				text: oGroup.text || oGroup.key
 			});
 
 			this.addAggregation("items", oHeader, bSuppressInvalidate);
@@ -1359,6 +1502,28 @@ sap.ui.define([
 			}
 
 			return oHeader;
+		};
+
+		/**
+		 * Maps an item type of sap.ui.core.SeparatorItem to an item type of sap.m.GroupHeaderListItem.
+		 *
+		 * @param {sap.ui.core.SeparatorItem} oSeparatorItem The item to be matched
+		 * @param {sap.ui.core.Renderer} oControlRenderer The controls renderer
+		 * @returns {sap.m.GroupHeaderListItem} The matched GroupHeaderListItem
+		 * @private
+		 */
+		ComboBoxBase.prototype._mapSeparatorItemToGroupHeader = function (oSeparatorItem, oControlRenderer) {
+			var oGroupHeaderListItem = new GroupHeaderListItem({
+				title: oSeparatorItem.getText(),
+				ariaLabelledBy: this._getGroupHeaderInvisibleText().getId()
+			});
+
+			oGroupHeaderListItem.addStyleClass(oControlRenderer.CSS_CLASS_COMBOBOXBASE + "NonInteractiveItem");
+			if (oSeparatorItem.getText && !oSeparatorItem.getText()) {
+				oGroupHeaderListItem.addStyleClass(oControlRenderer.CSS_CLASS_COMBOBOXBASE + "SeparatorItemNoText");
+			}
+
+			return oGroupHeaderListItem;
 		};
 
 		/**
@@ -1376,7 +1541,7 @@ sap.ui.define([
 		/**
 		 * Closes the control's picker popup.
 		 *
-		 * @returns {this} <code>this</code> to allow method chaining.
+		 * @returns {sap.m.ComboBoxBase} <code>this</code> to allow method chaining.
 		 * @public
 		 */
 		ComboBoxBase.prototype.close = function() {
@@ -1396,6 +1561,35 @@ sap.ui.define([
 		 * @returns {sap.ui.core.Item} The removed item or null.
 		 * @public
 		 */
+		ComboBoxBase.prototype.removeItem = function(vItem) {
+			vItem = this.removeAggregation("items", vItem);
+
+			if (vItem) {
+				vItem.detachEvent("_change", this.onItemChange, this);
+			}
+
+			return vItem;
+		};
+
+		/**
+		 * Removes all the controls in the aggregation named <code>items</code>.
+		 * Additionally unregisters them from the hosting UIArea and clears the selection.
+		 *
+		 * @returns {sap.ui.core.Item[]} An array of the removed items (might be empty).
+		 * @public
+		 */
+		ComboBoxBase.prototype.removeAllItems = function() {
+			var aItems = this.removeAllAggregation("items");
+
+			// clear the selection
+			this.clearSelection();
+
+			for (var i = 0; i < aItems.length; i++) {
+				aItems[i].detachEvent("_change", this.onItemChange, this);
+			}
+
+			return aItems;
+		};
 
 		/**
 		 * Finds the common items of two arrays
@@ -1437,7 +1631,7 @@ sap.ui.define([
 					});
 
 					this.applyShowItemsFilters(); // Apply control specific filtering
-					this._handlePopupOpenAndItemsLoad(false, this);
+					this._handlePopupOpenAndItemsLoad(false);
 					this.setFilterFunction(fnFilterStore); // Restore filtering function
 				}.bind(this);
 

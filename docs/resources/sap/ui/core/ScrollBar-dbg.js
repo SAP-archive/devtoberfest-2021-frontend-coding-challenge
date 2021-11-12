@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -44,77 +44,74 @@ sap.ui.define([
 	 * The ScrollBar control can be used for virtual scrolling of a certain area.
 	 * This means: to simulate a very large scrollable area when technically the area is small and the control takes care of displaying the respective part only. E.g. a Table control can take care of only rendering the currently visible rows and use this ScrollBar control to make the user think he actually scrolls through a long list.
 	 * @extends sap.ui.core.Control
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @public
 	 * @deprecated as of version 1.56
 	 * @alias sap.ui.core.ScrollBar
 	 * @ui5-metamodel This control/element also will be described in the UI5 (legacy) designtime metamodel
 	 */
-	var ScrollBar = Control.extend("sap.ui.core.ScrollBar", /** @lends sap.ui.core.ScrollBar.prototype */ {
-		metadata : {
+	var ScrollBar = Control.extend("sap.ui.core.ScrollBar", /** @lends sap.ui.core.ScrollBar.prototype */ { metadata : {
 
-			library : "sap.ui.core",
-			properties : {
+		library : "sap.ui.core",
+		properties : {
 
-				/**
-				 * Orientation. Defines if the Scrollbar is vertical or horizontal.
-				 */
-				vertical : {type : "boolean", group : "Behavior", defaultValue : true},
+			/**
+			 * Orientation. Defines if the Scrollbar is vertical or horizontal.
+			 */
+			vertical : {type : "boolean", group : "Behavior", defaultValue : true},
 
-				/**
-				 * Scroll position in steps or pixels.
-				 */
-				scrollPosition : {type : "int", group : "Behavior", defaultValue : null},
+			/**
+			 * Scroll position in steps or pixels.
+			 */
+			scrollPosition : {type : "int", group : "Behavior", defaultValue : null},
 
-				/**
-				 * Size of the Scrollbar (in pixels).
-				 */
-				size : {type : "sap.ui.core.CSSSize", group : "Dimension", defaultValue : null},
+			/**
+			 * Size of the Scrollbar (in pixels).
+			 */
+			size : {type : "sap.ui.core.CSSSize", group : "Dimension", defaultValue : null},
 
-				/**
-				 * Size of the scrollable content (in pixels).
-				 */
-				contentSize : {type : "sap.ui.core.CSSSize", group : "Dimension", defaultValue : null},
+			/**
+			 * Size of the scrollable content (in pixels).
+			 */
+			contentSize : {type : "sap.ui.core.CSSSize", group : "Dimension", defaultValue : null},
 
-				/**
-				 * Number of steps to scroll. Used if the size of the content is not known as the data is loaded dynamically.
-				 */
-				steps : {type : "int", group : "Dimension", defaultValue : null}
-			},
-			events : {
+			/**
+			 * Number of steps to scroll. Used if the size of the content is not known as the data is loaded dynamically.
+			 */
+			steps : {type : "int", group : "Dimension", defaultValue : null}
+		},
+		events : {
 
-				/**
-				 * Scroll event.
-				 */
-				scroll : {
-					parameters : {
+			/**
+			 * Scroll event.
+			 */
+			scroll : {
+				parameters : {
 
-						/**
-						 * Actions are: Click on track, button, drag of thumb, or mouse wheel click.
-						 */
-						action : {type : "sap.ui.core.ScrollBarAction"},
+					/**
+					 * Actions are: Click on track, button, drag of thumb, or mouse wheel click.
+					 */
+					action : {type : "sap.ui.core.ScrollBarAction"},
 
-						/**
-						 * Direction of scrolling: back (up) or forward (down).
-						 */
-						forward : {type : "boolean"},
+					/**
+					 * Direction of scrolling: back (up) or forward (down).
+					 */
+					forward : {type : "boolean"},
 
-						/**
-						 * Current Scroll position either in pixels or in steps.
-						 */
-						newScrollPos : {type : "int"},
+					/**
+					 * Current Scroll position either in pixels or in steps.
+					 */
+					newScrollPos : {type : "int"},
 
-						/**
-						 * Old Scroll position - can be in pixels or in steps.
-						 */
-						oldScrollPos : {type : "int"}
-					}
+					/**
+					 * Old Scroll position - can be in pixels or in steps.
+					 */
+					oldScrollPos : {type : "int"}
 				}
 			}
-		},
-		renderer: ScrollBarRenderer
-	});
+		}
+	}});
 
 
 	// =============================================================================
@@ -148,7 +145,7 @@ sap.ui.define([
 		this._iMaxContentDivSize = 1000000;  // small value that all browsers still can render without any problems
 
 		if (EventSimulation.touchEventMode === "ON") {
-			sap.ui.requireSync("sap/ui/thirdparty/zyngascroll"); // legacy-relevant: sap.ui.core.ScrollBar is deprecated
+			sap.ui.requireSync("sap/ui/thirdparty/zyngascroll");
 
 			// Remember last touch scroller position to prevent unneeded rendering
 			this._iLastTouchScrollerPosition = null;
@@ -172,7 +169,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ScrollBar.prototype.onBeforeRendering = function() {
-		this.$("sb").off("scroll", this.onscroll);
+		this.$("sb").unbind("scroll", this.onscroll);
 	};
 
 
@@ -271,7 +268,7 @@ sap.ui.define([
 
 		this.setCheckedScrollPosition(this.getScrollPosition() ? this.getScrollPosition() : 0, true);
 
-		this._$ScrollDomRef.on("scroll", jQuery.proxy(this.onscroll, this));
+		this._$ScrollDomRef.bind("scroll", jQuery.proxy(this.onscroll, this));
 
 		if (EventSimulation.touchEventMode === "ON") {
 			this._bSkipTouchHandling = true;
@@ -446,6 +443,15 @@ sap.ui.define([
 		if (this._bLargeDataScrolling && eAction === ScrollBarAction.Drag) {
 			this._eAction = eAction;
 			this._bForward = bForward;
+			if (Device.browser.msie) {
+				if (this._scrollTimeout) {
+					window.clearTimeout(this._scrollTimeout);
+				}
+				this._scrollTimeout = window.setTimeout(
+					this._onScrollTimeout.bind(this),
+					300
+				);
+			}
 		} else {
 			this._doScroll(eAction, bForward);
 		}
@@ -455,7 +461,6 @@ sap.ui.define([
 		return false;
 	};
 
-	// TODO: IE removal ==> check if still needed
 	ScrollBar.prototype._onScrollTimeout = function(){
 		this._scrollTimeout = undefined;
 		this._doScroll(this._eAction, this._bForward);
@@ -465,7 +470,7 @@ sap.ui.define([
 	};
 
 	ScrollBar.prototype.onmouseup = function() {
-		if (this._bLargeDataScrolling && (this._eAction || this._bForward || this._bTouchScroll)) {
+		if (this._bLargeDataScrolling && (this._eAction || this._bForward || this._bTouchScroll) && !Device.browser.msie) {
 			this._doScroll(this._eAction, this._bForward);
 			this._eAction = undefined;
 			this._bForward = undefined;
@@ -523,14 +528,14 @@ sap.ui.define([
 		if (oOwnerDomRef) {
 			this._$OwnerDomRef = jQuery(oOwnerDomRef);
 			if (this.getVertical()) {
-				this._$OwnerDomRef.off(Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", this.onmousewheel);
+				this._$OwnerDomRef.unbind(Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", this.onmousewheel);
 			}
 
 			if (EventSimulation.touchEventMode === "ON") {
-				this._$OwnerDomRef.off(this._getTouchEventType("touchstart"), jQuery.proxy(this.ontouchstart, this));
-				this._$OwnerDomRef.off(this._getTouchEventType("touchmove"), jQuery.proxy(this.ontouchmove, this));
-				this._$OwnerDomRef.off(this._getTouchEventType("touchend"), jQuery.proxy(this.ontouchend, this));
-				this._$OwnerDomRef.off(this._getTouchEventType("touchcancel"), jQuery.proxy(this.ontouchcancel, this));
+				this._$OwnerDomRef.unbind(this._getTouchEventType("touchstart"), jQuery.proxy(this.ontouchstart, this));
+				this._$OwnerDomRef.unbind(this._getTouchEventType("touchmove"), jQuery.proxy(this.ontouchmove, this));
+				this._$OwnerDomRef.unbind(this._getTouchEventType("touchend"), jQuery.proxy(this.ontouchend, this));
+				this._$OwnerDomRef.unbind(this._getTouchEventType("touchcancel"), jQuery.proxy(this.ontouchcancel, this));
 			}
 		}
 	};
@@ -547,14 +552,14 @@ sap.ui.define([
 		if (oOwnerDomRef) {
 			this._$OwnerDomRef = jQuery(oOwnerDomRef);
 			if (this.getVertical()) {
-				this._$OwnerDomRef.on(Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", jQuery.proxy(this.onmousewheel, this));
+				this._$OwnerDomRef.bind(Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", jQuery.proxy(this.onmousewheel, this));
 			}
 
 			if (EventSimulation.touchEventMode === "ON") {
-				this._$OwnerDomRef.on(this._getTouchEventType("touchstart"), jQuery.proxy(this.ontouchstart, this));
-				this._$OwnerDomRef.on(this._getTouchEventType("touchmove"), jQuery.proxy(this.ontouchmove, this));
-				this._$OwnerDomRef.on(this._getTouchEventType("touchend"), jQuery.proxy(this.ontouchend, this));
-				this._$OwnerDomRef.on(this._getTouchEventType("touchcancel"), jQuery.proxy(this.ontouchcancel, this));
+				this._$OwnerDomRef.bind(this._getTouchEventType("touchstart"), jQuery.proxy(this.ontouchstart, this));
+				this._$OwnerDomRef.bind(this._getTouchEventType("touchmove"), jQuery.proxy(this.ontouchmove, this));
+				this._$OwnerDomRef.bind(this._getTouchEventType("touchend"), jQuery.proxy(this.ontouchend, this));
+				this._$OwnerDomRef.bind(this._getTouchEventType("touchcancel"), jQuery.proxy(this.ontouchcancel, this));
 			}
 		}
 	};
@@ -688,6 +693,7 @@ sap.ui.define([
 	 * @private
 	 */
 	ScrollBar.prototype._doScroll = function(sAction, bForward) {
+
 		// Get new scroll position
 		var iScrollPos = null;
 		if (this._$ScrollDomRef) {
@@ -729,7 +735,10 @@ sap.ui.define([
 			Log.debug("-----PIXELMODE-----: New ScrollPos: " + iScrollPos + " --- Old ScrollPos: " +  this._iOldScrollPos + " --- Action: " + sAction + " --- Direction is forward: " + bForward);
 			this.fireScroll({ action: sAction, forward: bForward, newScrollPos: iScrollPos, oldScrollPos: this._iOldScrollPos});
 		}
-		this._bSuppressScroll = false;
+		// rounding errors in IE lead to infinite scrolling
+		if (Math.round(this._iFactor) == this._iFactor || !Device.browser.msie) {
+			this._bSuppressScroll = false;
+		}
 		this._iOldScrollPos = iScrollPos;
 		this._bMouseWheel = false;
 

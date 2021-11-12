@@ -1,18 +1,19 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-/*eslint-disable max-len */
+
 // Provides class sap.ui.model.odata.v2.ODataAnnotations
 sap.ui.define([
+	'sap/ui/model/odata/AnnotationParser',
+	'sap/ui/Device',
+	'sap/ui/base/EventProvider',
+	'sap/ui/core/cache/CacheManager',
 	"sap/base/assert",
-	"sap/base/util/extend",
-	"sap/ui/base/EventProvider",
-	"sap/ui/core/cache/CacheManager",
-	"sap/ui/model/odata/AnnotationParser",
 	"sap/ui/thirdparty/jquery"
-], function(assert, extend, EventProvider, CacheManager, AnnotationParser, jQuery) {
+],
+	function(AnnotationParser, Device, EventProvider, CacheManager, assert, jQuery) {
 	"use strict";
 
 	///////////////////////////////////////////////// Class Definition /////////////////////////////////////////////////
@@ -35,7 +36,7 @@ sap.ui.define([
 	 * @class Annotation loader for OData V2 services
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @public
 	 * @since 1.37.0
@@ -164,7 +165,7 @@ sap.ui.define([
 	 * @returns {Object<string,string>} A map of all custom headers.
 	 */
 	ODataAnnotations.prototype.getHeaders = function() {
-		return extend({}, this._mCustomHeaders);
+		return jQuery.extend({}, this._mCustomHeaders);
 	};
 
 	/**
@@ -179,7 +180,7 @@ sap.ui.define([
 	 */
 	ODataAnnotations.prototype.setHeaders = function(mHeaders) {
 		// Copy headers (don't use reference to mHeaders map)
-		this._mCustomHeaders = extend({}, mHeaders);
+		this._mCustomHeaders = jQuery.extend({}, mHeaders);
 	};
 
 	/**
@@ -327,7 +328,7 @@ sap.ui.define([
 	 * @param {object}
 	 *            [oListener] Context object to call the event handler with, defaults to this
 	 *            <code>ODataAnnotations</code> itself
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.attachSuccess = function(oData, fnFunction, oListener) {
@@ -341,7 +342,7 @@ sap.ui.define([
 	 *
 	 * @param {function} fnFunction The function to be called, when the event occurs
 	 * @param {object} [oListener] Context object on which the given function had to be called
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.detachSuccess = function(fnFunction, oListener) {
@@ -388,7 +389,7 @@ sap.ui.define([
 	 * @param {object}
 	 *            [oListener] Context object to call the event handler with, defaults to this
 	 *            <code>ODataAnnotations</code> itself
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.attachError = function(oData, fnFunction, oListener) {
@@ -402,7 +403,7 @@ sap.ui.define([
 	 *
 	 * @param {function} fnFunction The function to be called, when the event occurs
 	 * @param {object} [oListener] Context object on which the given function had to be called
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.detachError = function(fnFunction, oListener) {
@@ -449,7 +450,7 @@ sap.ui.define([
 	 * @param {object}
 	 *            [oListener] Context object to call the event handler with, defaults to this
 	 *            <code>ODataAnnotations</code> itself
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.attachLoaded = function(oData, fnFunction, oListener) {
@@ -463,7 +464,7 @@ sap.ui.define([
 	 *
 	 * @param {function} fnFunction The function to be called, when the event occurs
 	 * @param {object} [oListener] Context object on which the given function had to be called
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.detachLoaded = function(fnFunction, oListener) {
@@ -509,7 +510,7 @@ sap.ui.define([
 	 * @param {object}
 	 *            [oListener] Context object to call the event handler with, defaults to this
 	 *            <code>ODataAnnotations</code> itself
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.attachFailed = function(oData, fnFunction, oListener) {
@@ -523,7 +524,7 @@ sap.ui.define([
 	 *
 	 * @param {function} fnFunction The function to be called, when the event occurs
 	 * @param {object} [oListener] Context object on which the given function had to be called
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.detachFailed = function(fnFunction, oListener) {
@@ -549,7 +550,7 @@ sap.ui.define([
 	 * @param {object}
 	 *            [oListener] Context object to call the event handler with, defaults to this
 	 *            <code>ODataAnnotations</code> itself
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.attachSomeLoaded = function(oData, fnFunction, oListener) {
@@ -563,7 +564,7 @@ sap.ui.define([
 	 *
 	 * @param {function} fnFunction The function to be called, when the event occurs
 	 * @param {object} [oListener] Context object on which the given function had to be called
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.detachSomeLoaded = function(fnFunction, oListener) {
@@ -589,7 +590,7 @@ sap.ui.define([
 	 * @param {object}
 	 *            [oListener] Context object to call the event handler with, defaults to this
 	 *            <code>ODataAnnotations</code> itself
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.attachAllFailed = function(oData, fnFunction, oListener) {
@@ -603,7 +604,7 @@ sap.ui.define([
 	 *
 	 * @param {function} fnFunction The function to be called, when the event occurs
 	 * @param {object} [oListener] Context object on which the given function had to be called
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @public
 	 */
 	ODataAnnotations.prototype.detachAllFailed = function(fnFunction, oListener) {
@@ -618,7 +619,7 @@ sap.ui.define([
 	 * data.
 	 *
 	 * @param {Object} mResult The filled source-map of the successful loading and parsing
-	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @returns {sap.ui.model.odata.v2.ODataAnnotations} Reference to <code>this</code> to allow method chaining
 	 * @private
 	 */
 	ODataAnnotations.prototype._fireSuccess = function(mResult) {
@@ -630,7 +631,7 @@ sap.ui.define([
 	 * data.
 	 *
 	 * @param {Error} oError The error that occurred.
-	 * @return {this} Returns <code>this</code> to allow method chaining.
+	 * @return {sap.ui.model.odata.v2.ODataAnnotations} Returns <code>this</code> to allow method chaining.
 	 * @private
 	 */
 	ODataAnnotations.prototype._fireError = function(oError) {
@@ -642,7 +643,7 @@ sap.ui.define([
 	 * Fires the <code>loaded</code> event with an array of results in the result-parameter of the event.
 	 *
 	 * @param {sap.ui.model.odata.v2.ODataAnnotations.Source[]} aResults An array of results
-	 * @return {this} Returns <code>this</code> to allow method chaining.
+	 * @return {sap.ui.model.odata.v2.ODataAnnotations} Returns <code>this</code> to allow method chaining.
 	 * @private
 	 */
 	ODataAnnotations.prototype._fireLoaded = function(aResults) {
@@ -653,7 +654,7 @@ sap.ui.define([
 	 * Fires the <code>failed</code> event with an array of results and errors in the result-parameter of the event.
 	 *
 	 * @param {Error[]} aErrors An array of Errors
-	 * @return {this} Returns <code>this</code> to allow method chaining.
+	 * @return {sap.ui.model.odata.v2.ODataAnnotations} Returns <code>this</code> to allow method chaining.
 	 * @private
 	 */
 	ODataAnnotations.prototype._fireFailed = function(aErrors) {
@@ -664,7 +665,7 @@ sap.ui.define([
 	 * Fires the <code>someLoaded</code> event with an array of results and errors in the result-parameter of the event.
 	 *
 	 * @param {sap.ui.model.odata.v2.ODataAnnotations.Source[]|Error[]|any} aResults An array of results and Errors
-	 * @return {this} Returns <code>this</code> to allow method chaining.
+	 * @return {sap.ui.model.odata.v2.ODataAnnotations} Returns <code>this</code> to allow method chaining.
 	 * @private
 	 */
 	ODataAnnotations.prototype._fireSomeLoaded = function(aResults) {
@@ -675,7 +676,7 @@ sap.ui.define([
 	 * Fires the <code>failed</code> event with an array of errors in the result-parameter of the event.
 	 *
 	 * @param {Error[]} aErrors An array of Errors
-	 * @return {this} Returns <code>this</code> to allow method chaining.
+	 * @return {sap.ui.model.odata.v2.ODataAnnotations} Returns <code>this</code> to allow method chaining.
 	 * @private
 	 */
 	ODataAnnotations.prototype._fireAllFailed = function(aErrors) {
@@ -684,7 +685,7 @@ sap.ui.define([
 
 	/**
 	 * Loads a given source (sap.ui.model.odata.v2.ODataAnnotations.Source) if necessary and returns a promise that resolves
-	 * if the source could be loaded or no loading is necessary. In case the source type is neither "xml" nor "url" or
+	 * if the source could be loaded or no laoding is necessary. In case the source type is neither "xml" nor "url" or
 	 * the loading of the source fails, the promise rejects.
 	 *
 	 * @param {sap.ui.model.odata.v2.ODataAnnotations.Source} mSource The source to be loaded
@@ -774,11 +775,41 @@ sap.ui.define([
 		assert(typeof mSource.xml === "string", "Source must contain XML string in order to be parsed");
 
 		return new Promise(function(fnResolve, fnReject) {
-			var oXMLDocument = new DOMParser().parseFromString(mSource.xml, 'application/xml');
+			var oXMLDocument;
+			if (Device.browser.msie) {
+				// IE is a special case: Even though it supports DOMParser with the latest versions, the resulting
+				// document does not support the 'evaluate' method, which leads to a different kind of XPath implementation
+				// being used in the AnnotationParser. Thus IE (the MSXML implementation) must always be handled separately.
+				oXMLDocument = new window.ActiveXObject("Microsoft.XMLDOM");
+				oXMLDocument.preserveWhiteSpace = true;
 
-			// Check for errors
-			if (oXMLDocument.getElementsByTagName("parsererror").length > 0) {
-				var oError = new Error("There were errors parsing the XML.");
+				// The MSXML implementation does not parse documents with the technically correct "xmlns:xml"-attribute
+				// So if a document contains 'xmlns:xml="http://www.w3.org/XML/1998/namespace"', IE will stop working.
+				// This hack removes the XML namespace declaration which is then implicitly set to the default one.
+				var sXMLContent = mSource.xml;
+				if (sXMLContent.indexOf(" xmlns:xml=") > -1) {
+					sXMLContent = sXMLContent
+						.replace(' xmlns:xml="http://www.w3.org/XML/1998/namespace"', "")
+						.replace(" xmlns:xml='http://www.w3.org/XML/1998/namespace'", "");
+				}
+
+				oXMLDocument.loadXML(sXMLContent);
+			} else if (window.DOMParser) {
+				oXMLDocument = new DOMParser().parseFromString(mSource.xml, 'application/xml');
+			}
+
+			var oError;
+			if (!oXMLDocument) {
+				oError = new Error("The browser does not support XML parsing. Annotations are not available.");
+				oError.source = mSource;
+				fnReject(oError);
+			} else if (
+				// Check for errors: All browsers including IE
+				oXMLDocument.getElementsByTagName("parsererror").length > 0 ||
+				// Check for errors: IE 11 special case
+				(oXMLDocument.parseError && oXMLDocument.parseError.errorCode !== 0)
+			) {
+				oError = new Error("There were errors parsing the XML.");
 				oError.source = {
 					type: mSource.type,
 					data: mSource.data,
@@ -802,6 +833,9 @@ sap.ui.define([
 	 * @private
 	 */
 	ODataAnnotations.prototype._parseSource = function(mSource) {
+		// On IE we have a special format for the XML documents on every other browser it must be a "Document" object.
+		assert(mSource.document instanceof window.Document || Device.browser.msie, "Source must contain a parsed XML document converted to an annotation object");
+
 		return this._oMetadata.loaded()
 			.then(function() {
 				mSource.annotations
@@ -835,7 +869,7 @@ sap.ui.define([
 	 */
 	ODataAnnotations.prototype._getHeaders = function() {
 		//The 'sap-cancel-on-close' header marks the OData annotation request as cancelable. This helps to save resources at the back-end.
-		return extend({"sap-cancel-on-close": true}, this.getHeaders(), {
+		return jQuery.extend({"sap-cancel-on-close": true}, this.getHeaders(), {
 			"Accept-Language": sap.ui.getCore().getConfiguration().getLanguageTag() // Always overwrite
 		});
 	};

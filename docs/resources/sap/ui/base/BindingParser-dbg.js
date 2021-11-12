@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,6 +11,7 @@ sap.ui.define([
 	'sap/ui/model/Filter',
 	'sap/ui/model/Sorter',
 	"sap/base/Log",
+	'sap/base/util/ObjectPath',
 	"sap/base/util/JSTokenizer",
 	"sap/base/util/resolveReference"
 ], function(
@@ -19,6 +20,7 @@ sap.ui.define([
 		Filter,
 		Sorter,
 		Log,
+		ObjectPath,
 		JSTokenizer,
 		resolveReference
 	) {
@@ -208,9 +210,8 @@ sap.ui.define([
 		 */
 		function resolveType(o) {
 			var FNType;
-			var sType = o.type;
-			if (typeof sType === "string" ) {
-				FNType = resolveReference(sType, mVariables, {
+			if (typeof o.type === "string" ) {
+				FNType = resolveReference(o.type, mVariables, {
 					bindContext: false
 				});
 
@@ -220,11 +221,6 @@ sap.ui.define([
 				} else {
 					o.type = FNType;
 				}
-
-				if (!o.type) {
-					Log.error("Failed to resolve type '" + sType + "'. Maybe not loaded or a typo?");
-				}
-
 				// TODO why are formatOptions and constraints also removed for an already instantiated type?
 				// TODO why is a value of type object not validated (instanceof Type)
 				delete o.formatOptions;

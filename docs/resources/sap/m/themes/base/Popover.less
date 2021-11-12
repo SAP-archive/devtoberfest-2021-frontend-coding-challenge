@@ -80,7 +80,7 @@ html[data-sap-ui-animation='on'] .sapMPopover {
 
 
 .sapMPopoverHeader .sapMTitle {
-	font-size: @sapMFontHeader5Size;
+	font-size: .865rem;
 }
 
 .sapMPopover .sapMPopoverCont {
@@ -97,6 +97,7 @@ html[data-sap-ui-animation='on'] .sapMPopover {
 	vertical-align: middle;
 	min-width: 100%;
 	box-sizing: border-box;
+	overflow-y: hidden;
 }
 
 .sapMPopover.sapUiPopupWithPadding .sapMPopoverScroll {
@@ -263,6 +264,14 @@ html[data-sap-ui-browser^="sf"] .sapMPopover {
 	}
 }
 
+/* TODO remove after the end of support for Internet Explorer */
+/* Outer width of the Popover's content is wrong in IE */
+html[data-sap-ui-browser^="ie"] {
+	.sapMPopover .sapMPopoverScroll {
+		display: block;
+	}
+}
+
 .sapMPopover.sapUiSizeCompact {
 	.sapMPopoverArrLeft:before,
 	.sapMPopoverArrRight:before {
@@ -313,6 +322,7 @@ html[data-sap-ui-browser^="sf"] .sapMPopover {
 .sapMPopoverResizing * {
 	-moz-user-select: none !important;
 	-webkit-user-select: none !important;
+	-ms-user-select: none !important;
 	user-select: none !important;
 }
 

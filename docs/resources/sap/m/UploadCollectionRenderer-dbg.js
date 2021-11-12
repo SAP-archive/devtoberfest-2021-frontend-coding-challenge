@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(['./ListItemBaseRenderer'], function(ListItemBaseRenderer) {
@@ -10,9 +10,7 @@ sap.ui.define(['./ListItemBaseRenderer'], function(ListItemBaseRenderer) {
 	 * UploadCollection renderer.
 	 * @namespace
 	 */
-	var UploadCollectionRenderer = {
-		apiVersion: 2 // enable in-place DOM patching
-	};
+	var UploadCollectionRenderer = {};
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
@@ -22,55 +20,65 @@ sap.ui.define(['./ListItemBaseRenderer'], function(ListItemBaseRenderer) {
 	 */
 	UploadCollectionRenderer.render = function(oRm, oControl) {
 		// write the HTML into the render manager
-		oRm.openStart("div", oControl);
-		oRm.class("sapMUC");
-		oRm.openEnd();
+		oRm.write("<div");
+		oRm.writeControlData(oControl);
+		oRm.addClass("sapMUC");
+		oRm.writeClasses();
+		oRm.write(">");
 		this.renderDragDropOverlay(oRm, oControl);
 		this.renderList(oRm, oControl);
-		oRm.close("div");
+		oRm.write("</div>");
 	};
 
 	UploadCollectionRenderer.renderNoData = function(oRm, oControl) {
 		// If noDataText or noDataDescription property are set by user, the user's text will be rendered.
 		// If it is not set, the default no data text or description from resource bundle will be rendered.
 		var oUploadCollection = oControl.getParent();
-		oRm.openStart("li", oUploadCollection._oList.getId("nodata"));
-		oRm.attr("tabindex", "0");
+		oRm.write("<li");
+		oRm.writeAttribute("tabindex", 0);
+		oRm.writeAttribute("id", oUploadCollection._oList.getId("nodata"));
+		oRm.addClass("sapMLIB sapMUCNoDataPage");
 		ListItemBaseRenderer.addFocusableClasses.call(ListItemBaseRenderer, oRm);
-		oRm.class("sapMLIB");
-		oRm.class("sapMUCNoDataPage");
-		oRm.openEnd();
+		oRm.writeClasses();
+		oRm.write(">");
 
 		oRm.renderControl(oUploadCollection.getAggregation("_noDataIcon"));
 
-		oRm.openStart("div", oUploadCollection.getId() + "-no-data-text");
-		oRm.class("sapMUCNoDataText");
-		oRm.openEnd();
-		oRm.text(oUploadCollection.getNoDataText());
-		oRm.close("div");
+		oRm.write("<div");
+		oRm.writeAttribute("id", oUploadCollection.getId() + "-no-data-text");
+		oRm.addClass("sapMUCNoDataText");
+		oRm.writeClasses();
+		oRm.write(">");
+		oRm.writeEscaped(oUploadCollection.getNoDataText());
+		oRm.write("</div>");
 
 		if (oUploadCollection.getUploadEnabled()) {
-			oRm.openStart("div", oUploadCollection.getId() + "-no-data-description");
-			oRm.class("sapMUCNoDataDescription");
-			oRm.openEnd();
-			oRm.text(oUploadCollection.getNoDataDescription());
-			oRm.close("div");
+			oRm.write("<div");
+			oRm.writeAttribute("id", oUploadCollection.getId() + "-no-data-description");
+			oRm.addClass("sapMUCNoDataDescription");
+			oRm.writeClasses();
+			oRm.write(">");
+			oRm.writeEscaped(oUploadCollection.getNoDataDescription());
+			oRm.write("</div>");
 		}
-		oRm.close("li");
+		oRm.write("</li>");
 	};
 
 	UploadCollectionRenderer.renderDragDropOverlay = function(oRm, oControl) {
-		oRm.openStart("div", oControl.getId() + "-drag-drop-area");
-		oRm.class("sapMUCDragDropOverlay");
-		oRm.class("sapMUCDragDropOverlayHide");
-		oRm.openEnd();
-		oRm.openStart("div");
-		oRm.class("sapMUCDragDropIndicator");
-		oRm.openEnd();
+		oRm.write("<div");
+		oRm.writeAttribute("id", oControl.getId() + "-drag-drop-area");
+		oRm.addClass("sapMUCDragDropOverlay");
+		oRm.addClass("sapMUCDragDropOverlayHide");
+		oRm.writeClasses();
+		oRm.write(">");
+		oRm.write("<div");
+		oRm.addClass("sapMUCDragDropIndicator");
+		oRm.writeClasses();
+		oRm.write(">");
 		oRm.renderControl(oControl.getAggregation("_dragDropIcon"));
 		oRm.renderControl(oControl.getAggregation("_dragDropText"));
-		oRm.close("div");
-		oRm.close("div");
+		oRm.write("</div>");
+		oRm.write("</div>");
 	};
 
 	UploadCollectionRenderer.renderList = function(oRm, oControl) {

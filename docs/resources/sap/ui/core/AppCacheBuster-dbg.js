@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,15 +11,13 @@
  */
 sap.ui.define([
 	'sap/ui/base/ManagedObject',
+	'./Core',
 	'sap/ui/thirdparty/URI',
-	'sap/base/Log',
-	'sap/base/util/extend',
-	'sap/base/strings/escapeRegExp',
-	'sap/ui/thirdparty/jquery',
-	'sap/ui/core/_IconRegistry',
-	'./Core' // provides sap.ui.getCore()
+	"sap/base/Log",
+	"sap/base/strings/escapeRegExp",
+	"sap/ui/thirdparty/jquery"
 ],
-	function(ManagedObject, URI, Log, extend, escapeRegExp, jQuery, _IconRegistry/*, Core */) {
+	function(ManagedObject, Core, URI, Log, escapeRegExp, jQuery) {
 	"use strict";
 
 	/*
@@ -166,7 +164,7 @@ sap.ui.define([
 							// notify that the content has been loaded
 							AppCacheBuster.onIndexLoaded(sUrl, data);
 							// add the index file to the index map
-							extend(mIndex, data);
+							jQuery.extend(mIndex, data);
 						},
 						error: function() {
 							Log.error("Failed to batch load AppCacheBuster index file from: \"" + sUrl + "\".");
@@ -233,7 +231,7 @@ sap.ui.define([
 				if (oRequest.async) {
 					var iSyncPoint = oSyncPoint.startTask("load " + sUrl);
 					var fnSuccess = oRequest.success, fnError = oRequest.error;
-					Object.assign(oRequest, {
+					jQuery.extend(oRequest, {
 						success: function(data) {
 							fnSuccess.apply(this, arguments);
 							oSyncPoint.finishTask(iSyncPoint);
@@ -329,7 +327,6 @@ sap.ui.define([
 			 * <li><code>HTMLScriptElement.prototype.src</code></li>
 			 * <li><code>HTMLLinkElement.prototype.href</code></li>
 			 * <li><code>sap.ui.base.ManagedObject.prototype.validateProperty</code></li>
-			 * <li><code>IconPool._convertUrl</code></li>
 			 * </ul>
 			 *
 			 * @private
@@ -389,10 +386,6 @@ sap.ui.define([
 					return fnValidateProperty.apply(this, oArgs || arguments);
 				};
 
-				_IconRegistry._convertUrl = function(sUrl) {
-					return fnConvertUrl(sUrl);
-				};
-
 				// create an interceptor description which validates the value
 				// of the setter whether to rewrite the URL or not
 				var fnCreateInterceptorDescriptor = function(descriptor) {
@@ -444,9 +437,6 @@ sap.ui.define([
 
 				// remove the function interceptions
 				ManagedObject.prototype.validateProperty = fnValidateProperty;
-
-				// remove the function from IconPool
-				delete _IconRegistry._convertUrl;
 
 				// only remove xhr interception if xhr#open was not modified meanwhile
 				if (XMLHttpRequest.prototype.open === fnEnhancedXhrOpen) {

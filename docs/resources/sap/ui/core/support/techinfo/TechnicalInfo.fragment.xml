@@ -33,7 +33,6 @@
 			adjustLabelSpan="false"
 			ariaLabelledBy="title"
 			layout="ResponsiveGridLayout"
-			core:require="{RGL:'sap/ui/layout/form/ResponsiveGridLayout'}"
 			editable="true">
 			<f:content>
 				<!-- Product Version info -->
@@ -99,17 +98,13 @@
 		<buttons>
 			<Button
 				text="{i18n>TechnInfo.DiagnosticsButton.Text}"
-				press="onOpenDiagnostics">
-				<layoutData>
-					<OverflowToolbarLayoutData priority="Low"/>
-				</layoutData>
-			</Button>
+				press="onOpenDiagnostics"/>
 			<Button
 				id="startTestRecorderButton"
 				text="{i18n>TechnInfo.TestRecorderButton.Text}"
 				press="onOpenTestRecorderInIFrame">
 				<layoutData>
-					<OverflowToolbarLayoutData priority="Low"/>
+					<OverflowToolbarLayoutData priority="NeverOverflow"/>
 				</layoutData>
 			</Button>
 			<Button
@@ -119,7 +114,7 @@
 				class="sapUiDebugTechnicalInfoAssistantButton"
 				type="Emphasized">
 				<layoutData>
-					<OverflowToolbarLayoutData priority="High"/>
+					<OverflowToolbarLayoutData priority="NeverOverflow"/>
 				</layoutData>
 			</Button>
 			<Button
@@ -130,7 +125,7 @@
 				class="sapUiDebugTechnicalInfoAssistantSettingsButton"
 				type="Emphasized">
 				<layoutData>
-					<OverflowToolbarLayoutData priority="High"/>
+					<OverflowToolbarLayoutData priority="NeverOverflow"/>
 				</layoutData>
 			</Button>
 			<Button

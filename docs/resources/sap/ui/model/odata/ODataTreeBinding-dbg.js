@@ -1,17 +1,19 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-/*eslint-disable max-len */
+
 // Provides the OData model implementation of a tree binding
 sap.ui.define([
-	"./CountMode",
+	'sap/ui/model/TreeBinding',
+	'./CountMode',
 	"sap/base/Log",
-	"sap/base/util/each",
-	"sap/ui/model/TreeBinding"
-], function(CountMode, Log, each, TreeBinding) {
+	"sap/ui/thirdparty/jquery"
+],
+	function(TreeBinding, CountMode, Log, jQuery) {
 	"use strict";
+
 
 	/**
 	 *
@@ -60,13 +62,11 @@ sap.ui.define([
 	});
 
 	/**
-	 * Return root contexts for the tree.
-	 *
-	 * @param {int} iStartIndex The start index of the requested contexts
-	 * @param {int} iLength The requested amount of contexts
-	 * @param {int} [iThreshold] Unused
-	 *
-	 * @return {Array} The contexts array
+	 * Return root contexts for the tree
+	 * @param {int} iStartIndex the start index of the requested contexts
+	 * @param {int} iLength the requested amount of contexts
+	 * @param {int} iThreshold
+	 * @return {Array} the contexts array
 	 * @protected
 	 */
 	ODataTreeBinding.prototype.getRootContexts = function(iStartIndex, iLength, iThreshold) {
@@ -89,7 +89,7 @@ sap.ui.define([
 
 			if (mRequestParameters.numberOfExpandedLevels > 0) {
 				var sAbsPath = sNodeId;
-				for (var i = 0; i < mRequestParameters.numberOfExpandedLevels; i++) {
+				for (var i = 0; i < mRequestParameters.numberOfExpandedLevels;i++) {
 					var sNewNavPath = this._getNavPath(sAbsPath);
 					mRequestParameters.navPath += "/" + sNewNavPath;
 					sAbsPath += "/" + sNewNavPath;
@@ -135,14 +135,11 @@ sap.ui.define([
 	};
 
 	/**
-	 * Return node contexts for the tree.
-	 *
-	 * @param {sap.ui.model.Context} oContext the context for which the child nodes should be retrieved
+	 * Return node contexts for the tree
 	 * @param {int} iStartIndex the start index of the requested contexts
 	 * @param {int} iLength the requested amount of contexts
-	 * @param {int} [iThreshold] Unused
-	 *
-	 * @return {sap.ui.model.Context[]} the contexts array
+	 * @param {int} iThreshold
+	 * @return {Array} the contexts array
 	 * @protected
 	 */
 	ODataTreeBinding.prototype.getNodeContexts = function(oContext, iStartIndex, iLength, iThreshold) {
@@ -229,12 +226,11 @@ sap.ui.define([
 	/**
 	 * Gets or loads all contexts for a specified node id (dependent on mode)
 	 *
-	 * @param {string} sNodeId The absolute path to be loaded
-	 * @param {int} [iStartIndex=0] The first node to get the context of
-	 * @param {int} [iLength=iSizeLimit] The number of nodes to get the context of
-	 * @param {int} [iThreshold=0] Unused
-	 * @param {object} mParameters Additional parameters for this function
-	 *
+	 * @param {string} sNodeId the absolute path to be loaded
+	 * @param {int} iStartIndex
+	 * @param {int} iLength
+	 * @param {int} iThreshold
+	 * @param {object} mParameters
 	 * @return {array} Array of contexts
 	 *
 	 * @private
@@ -295,8 +291,10 @@ sap.ui.define([
 					} else {
 						aParams.push("$filter=" + this.oTreeProperties["hierarchy-level-for"] + " eq '0" + mParameters.level + "' and " + this.oTreeProperties["hierarchy-parent-node-for"] + " eq '" + sNodeId + "'");
 					}
-				} else if (mParameters.navPath) {
-					aParams.push("$expand=" + mParameters.navPath);
+				} else {
+					if (mParameters.navPath) {
+						aParams.push("$expand=" + mParameters.navPath);
+					}
 				}
 				this._loadSubNodes(sNodeId, iStartIndex, iLength, iThreshold, aParams, mParameters);
 			}
@@ -346,14 +344,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Load list data from the server.
-	 *
-	 * @param {string} sNodeId The id of the node which sub nodes should be loaded
-	 * @param {number} iStartIndex The index of the first node to load
-	 * @param {number} iLength The number of nodes to load
-	 * @param {number} iThreshold Unused
-	 * @param {string[]} aParams A list containing additional query parameters
-	 * @param {object} mParameters An object containing a <code>navPath</code>
+	 * Load list data from the server
 	 */
 	ODataTreeBinding.prototype._loadSubNodes = function(sNodeId, iStartIndex, iLength, iThreshold, aParams, mParameters) {
 		var that = this,
@@ -369,7 +360,6 @@ sap.ui.define([
 		}
 
 		function fnSuccess(oData) {
-			var oEntry, i;
 
 			// Collecting contexts
 			if (oData.results) {
@@ -379,13 +369,15 @@ sap.ui.define([
 					if (bInlineCountRequested && oData.__count) {
 						that.oLengths[sNodeId] = parseInt(oData.__count);
 						that.oFinalLengths[sNodeId] = true;
-					} else if (that.oModel.isCountSupported()) {
-						that._getCountForNodeId(sNodeId);
+					} else {
+						if (that.oModel.isCountSupported()) {
+							that._getCountForNodeId(sNodeId);
+						}
 					}
 
 					that.oKeys[sNodeId] = [];
-					for (i = 0; i < oData.results.length; i++) {
-						oEntry = oData.results[i];
+					for (var i = 0; i < oData.results.length; i++) {
+						var oEntry = oData.results[i];
 						var sKey = that.oModel._getKey(oEntry);
 						that._processODataObject(oEntry, "/" + sKey, mParameters.navPath);
 						that.oKeys[sNodeId][i + iStartIndex] = sKey;
@@ -393,8 +385,8 @@ sap.ui.define([
 				} else {
 					var mLastNodeIdIndices = {};
 
-					for (i = 0; i < oData.results.length; i++) {
-						oEntry = oData.results[i];
+					for (var i = 0; i < oData.results.length; i++) {
+						var oEntry = oData.results[i];
 
 						sNodeId = oEntry[that.oTreeProperties["hierarchy-parent-node-for"]];
 
@@ -457,9 +449,7 @@ sap.ui.define([
 	};
 
 	/**
-	 * Resets the current list data and length.
-	 *
-	 * @param {sap.ui.model.Context} [oContext] Only reset specific content matching the context
+	 * Resets the current list data and length
 	 *
 	 * @private
 	 */
@@ -480,17 +470,14 @@ sap.ui.define([
 	};
 
 	/**
-	 * Refreshes the binding, checks whether the model data has been changed and fires change event
+	 * Refreshes the binding, check whether the model data has been changed and fire change event
 	 * if this is the case. For server side models this should refetch the data from the server.
 	 * To update a control, even if no data has been changed, e.g. to reset a control after failed
 	 * validation, use the parameter <code>bForceUpdate</code>.
 	 *
-	 * @param {boolean} [bForceUpdate]
-	 *   Update the bound control even if no data has been changed
+	 * @param {boolean} [bForceUpdate] Update the bound control even if no data has been changed
 	 * @param {object} [mChangedEntities]
-	 *   A map of changed entities
 	 * @param {string} [mEntityTypes]
-	 *   Entity types; if this models entity type is contained, a change event will be fired
 	 *
 	 * @public
 	 */
@@ -505,20 +492,16 @@ sap.ui.define([
 				}
 			}
 			if (mChangedEntities && !bChangeDetected) {
-				each(this.oKeys, function(i, aNodeKeys) {
-					each(aNodeKeys, function(i, sKey) {
+				jQuery.each(this.oKeys, function(i, aNodeKeys) {
+					jQuery.each(aNodeKeys, function(i, sKey) {
 						if (sKey in mChangedEntities) {
 							bChangeDetected = true;
 							return false;
 						}
-
-						return true;
 					});
 					if (bChangeDetected) {
 						return false;
 					}
-
-					return true;
 				});
 			}
 			if (!mChangedEntities && !mEntityTypes) { // default
@@ -534,11 +517,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Not functional.
-	 *
-	 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter} aFilters Unused
-	 *
-	 * @returns {this} A reference to itself to allow chaining
+	 * @param {sap.ui.model.Filter[]|sap.ui.model.Filter} aFilters
+	 * @see sap.ui.model.TreeBinding.prototype.filter
 	 * @public
 	 */
 	ODataTreeBinding.prototype.filter = function(aFilters){
@@ -551,9 +531,6 @@ sap.ui.define([
 	 * inform interested parties about this.
 	 *
 	 * @param {boolean} bForceUpdate
-	 *   Whether a change event should be fired regardles of this bindings state
-	 * @param {object} [mChangedEntities]
-	 *   A map of changed entities to check if an update is necessary.
 	 *
 	 */
 	ODataTreeBinding.prototype.checkUpdate = function(bForceUpdate, mChangedEntities){
@@ -562,20 +539,16 @@ sap.ui.define([
 			if (this.bNeedsUpdate || !mChangedEntities) {
 				bChangeDetected = true;
 			} else {
-				each(this.oKeys, function(i, aNodeKeys) {
-					each(aNodeKeys, function(i, sKey) {
+				jQuery.each(this.oKeys, function(i, aNodeKeys) {
+					jQuery.each(aNodeKeys, function(i, sKey) {
 						if (sKey in mChangedEntities) {
 							bChangeDetected = true;
 							return false;
 						}
-
-						return true;
 					});
 					if (bChangeDetected) {
 						return false;
 					}
-
-					return true;
 				});
 			}
 		}
@@ -590,7 +563,7 @@ sap.ui.define([
 		var sAbsolutePath = this.oModel.resolve(sPath, this.getContext());
 
 		if (!sAbsolutePath) {
-			return undefined;
+			return;
 		}
 
 		var aPathParts = sAbsolutePath.split("/"),
@@ -657,11 +630,11 @@ sap.ui.define([
 		}
 
 		//Check if all required proeprties are available
-		each(oEntityType.property, function(iIndex, oProperty) {
+		jQuery.each(oEntityType.property, function(iIndex, oProperty) {
 			if (!oProperty.extensions) {
 				return true;
 			}
-			each(oProperty.extensions, function(iIndex, oExtension) {
+			jQuery.each(oProperty.extensions, function(iIndex, oExtension) {
 				var sName = oExtension.name;
 				if (oExtension.namespace === sTreeAnnotationNamespace &&
 						sName in that.oTreeProperties &&
@@ -669,18 +642,14 @@ sap.ui.define([
 					that.oTreeProperties[sName] = oProperty.name;
 				}
 			});
-
-			return true;
 		});
 
 		var bMissing = false;
-		each(this.oTreeProperties, function(iIndex, oTreeProperty) {
+		jQuery.each(this.oTreeProperties, function(iIndex, oTreeProperty) {
 			if (!oTreeProperty) {
 				bMissing = true;
 				return false;
 			}
-
-			return true;
 		});
 
 		return !bMissing;

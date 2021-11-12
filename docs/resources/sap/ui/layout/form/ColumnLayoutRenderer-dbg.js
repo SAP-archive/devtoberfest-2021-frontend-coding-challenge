@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -17,8 +17,6 @@ sap.ui.define([
 	 */
 	var ColumnLayoutRenderer = Renderer.extend(FormLayoutRenderer);
 
-	ColumnLayoutRenderer.apiVersion = 2;
-
 	ColumnLayoutRenderer.getMainClass = function(){
 
 		return "sapUiFormCL";
@@ -27,22 +25,22 @@ sap.ui.define([
 
 	ColumnLayoutRenderer.renderContainers = function(oRm, oLayout, oForm){
 
+		var iColumnsM = oLayout.getColumnsM();
+		var iColumnsL = oLayout.getColumnsL();
+		var iColumnsXL = oLayout.getColumnsXL();
 		var aContainers = oForm.getVisibleFormContainers();
 		var iContainers = aContainers.length;
 
 		if (iContainers > 0) {
-			var bOneContainerFullSize = iContainers === 1 && !oLayout.getLayoutDataForElement(aContainers[0], "sap.ui.layout.form.ColumnContainerData");
-			if (!bOneContainerFullSize) {
-				// if more that one container or one container is not full size render a DIV around containers
-				var iColumnsM = oLayout.getColumnsM();
-				var iColumnsL = oLayout.getColumnsL();
-				var iColumnsXL = oLayout.getColumnsXL();
-				oRm.openStart("div");
-				oRm.class("sapUiFormCLContent");
-				oRm.class("sapUiFormCLColumnsM" + iColumnsM);
-				oRm.class("sapUiFormCLColumnsL" + iColumnsL);
-				oRm.class("sapUiFormCLColumnsXL" + iColumnsXL);
-				oRm.openEnd();
+			// if more that one container render a DIV around containers
+			if (iContainers > 1 || oLayout.getLayoutDataForElement(aContainers[0], "sap.ui.layout.form.ColumnContainerData")) {
+				oRm.write("<div");
+				oRm.addClass("sapUiFormCLContent");
+				oRm.addClass("sapUiFormCLColumnsM" + iColumnsM);
+				oRm.addClass("sapUiFormCLColumnsL" + iColumnsL);
+				oRm.addClass("sapUiFormCLColumnsXL" + iColumnsXL);
+				oRm.writeClasses();
+				oRm.write(">");
 			}
 
 			for (var i = 0; i < iContainers; i++) {
@@ -50,8 +48,8 @@ sap.ui.define([
 				this.renderContainer(oRm, oLayout, oContainer);
 			}
 
-			if (!bOneContainerFullSize) {
-				oRm.close("div");
+			if (iContainers > 1) {
+				oRm.write("</div>");
 			}
 		}
 
@@ -66,74 +64,74 @@ sap.ui.define([
 
 		oContainer._checkProperties();
 
-		oRm.openStart("section", oContainer);
-		oRm.class("sapUiFormCLContainer");
-		oRm.class("sapUiFormCLContainerS" + oOptions.S.Size);
-		oRm.class("sapUiFormCLContainerM" + oOptions.M.Size);
-		oRm.class("sapUiFormCLContainerL" + oOptions.L.Size);
-		oRm.class("sapUiFormCLContainerXL" + oOptions.XL.Size);
+		oRm.write("<section");
+		oRm.writeElementData(oContainer);
+		oRm.addClass("sapUiFormCLContainer");
+		oRm.addClass("sapUiFormCLContainerS" + oOptions.S.Size);
+		oRm.addClass("sapUiFormCLContainerM" + oOptions.M.Size);
+		oRm.addClass("sapUiFormCLContainerL" + oOptions.L.Size);
+		oRm.addClass("sapUiFormCLContainerXL" + oOptions.XL.Size);
 		// S-Break not needed as there is no float possible
 		if (oOptions.M.Break) {
-			oRm.class("sapUiFormCLContainerMBreak");
+			oRm.addClass("sapUiFormCLContainerMBreak");
 		}
 		if (oOptions.L.Break) {
-			oRm.class("sapUiFormCLContainerLBreak");
+			oRm.addClass("sapUiFormCLContainerLBreak");
 		}
 		if (oOptions.XL.Break) {
-			oRm.class("sapUiFormCLContainerXLBreak");
+			oRm.addClass("sapUiFormCLContainerXLBreak");
 		}
 		if (oOptions.S.FirstRow) {
-			oRm.class("sapUiFormCLContainerSFirstRow");
+			oRm.addClass("sapUiFormCLContainerSFirstRow");
 		}
 		if (oOptions.M.FirstRow) {
-			oRm.class("sapUiFormCLContainerMFirstRow");
+			oRm.addClass("sapUiFormCLContainerMFirstRow");
 		}
 		if (oOptions.L.FirstRow) {
-			oRm.class("sapUiFormCLContainerLFirstRow");
+			oRm.addClass("sapUiFormCLContainerLFirstRow");
 		}
 		if (oOptions.XL.FirstRow) {
-			oRm.class("sapUiFormCLContainerXLFirstRow");
+			oRm.addClass("sapUiFormCLContainerXLFirstRow");
 		}
 
 		if (oToolbar) {
-			oRm.class("sapUiFormContainerToolbar");
+			oRm.addClass("sapUiFormContainerToolbar");
 		} else if (oTitle) {
-			oRm.class("sapUiFormContainerTitle");
+			oRm.addClass("sapUiFormContainerTitle");
 		}
 
 		if (!oContainer.getExpanded()) {
-			oRm.class("sapUiFormCLContainerColl");
+			oRm.addClass("sapUiFormCLContainerColl");
 		}
 
 		if (oContainer.getTooltip_AsString()) {
-			oRm.attr('title', oContainer.getTooltip_AsString());
+			oRm.writeAttributeEscaped('title', oContainer.getTooltip_AsString());
 		}
+		oRm.writeClasses();
 
 		this.writeAccessibilityStateContainer(oRm, oContainer);
 
-		oRm.openEnd();
+		oRm.write(">");
 
-		this.renderHeader(oRm, oToolbar, oTitle, oContainer._oExpandButton, bExpandable, oLayout._sFormSubTitleSize, oContainer.getId());
+		this.renderHeader(oRm, oToolbar, oTitle, oContainer._oExpandButton, bExpandable, false, oContainer.getId());
 
-		oRm.openStart("div", oContainer.getId() + "-content")
-			.class("sapUiFormCLContainerCont")
-			.openEnd();
+		oRm.write("<div id=\"" + oContainer.getId() + "-content\" class=\"sapUiFormCLContainerCont\">");
 
 		var aElements = oContainer.getVisibleFormElements();
 		for (var i = 0; i < aElements.length; i++) {
 			var oElement = aElements[i];
 			this.renderElement(oRm, oLayout, oElement);
 
-			if (Device.browser.chrome && i < oOptions.XL.Size - 1 && aElements.length > 1 && aElements.length <= oOptions.XL.Size) {
+			if (Device.browser.chrome && i < oOptions.XL.Size && aElements.length > 1 && aElements.length <= oOptions.XL.Size) {
 				// in Chrome columns are not filled properly for less elements -> an invisible dummy DIV helps
 				// with this logic the result is near to the other browsers
 				// this "work around" don't work for other browsers
-				oRm.openStart("div").class("sapUiFormCLElementDummy").openEnd().close("div");
+				oRm.write("<div class=\"sapUiFormCLElementDummy\"></div>");
 			}
 		}
 
-		oRm.close("div");
-		oRm.close("section");
+		oRm.write("</div>");
+		oRm.write("</section>");
 
 	};
 
@@ -142,24 +140,27 @@ sap.ui.define([
 		var oLabel = oElement.getLabelControl();
 		var oOptions;
 
-		oRm.openStart("div", oElement);
-		oRm.class("sapUiFormCLElement");
+		oRm.write("<div");
+		oRm.writeElementData(oElement);
+		oRm.addClass("sapUiFormCLElement");
 		if (oElement.getTooltip_AsString()) {
-			oRm.attr('title', oElement.getTooltip_AsString());
+			oRm.writeAttributeEscaped('title', oElement.getTooltip_AsString());
 		}
-		oRm.openEnd();
+		oRm.writeClasses();
+		oRm.write(">");
 
 		if (oLabel) {
 			oOptions = oLayout._getFieldSize(oLabel);
-			oRm.openStart("div")
-				.class("sapUiFormElementLbl")
-				.class("sapUiFormCLCellsS" + oOptions.S.Size)
-				.class("sapUiFormCLCellsL" + oOptions.L.Size)
-				.openEnd();
+			oRm.write("<div");
+			oRm.addClass("sapUiFormElementLbl");
+			oRm.addClass("sapUiFormCLCellsS" + oOptions.S.Size);
+			oRm.addClass("sapUiFormCLCellsL" + oOptions.L.Size);
+			oRm.writeClasses();
+			oRm.write(">");
 
 			oRm.renderControl(oLabel);
 
-			oRm.close("div");
+			oRm.write("</div>");
 		}
 
 		var aFields = oElement.getFieldsForRendering();
@@ -170,29 +171,30 @@ sap.ui.define([
 					throw new Error(oField + " is not a valid Form content! Only use valid content in " + oLayout);
 				}
 				oOptions = oLayout._getFieldSize(oField);
-				oRm.openStart("div");
-				oRm.class("sapUiFormCLCellsS" + oOptions.S.Size);
-				oRm.class("sapUiFormCLCellsL" + oOptions.L.Size);
+				oRm.write("<div");
+				oRm.addClass("sapUiFormCLCellsS" + oOptions.S.Size);
+				oRm.addClass("sapUiFormCLCellsL" + oOptions.L.Size);
 				if (oOptions.S.Break) {
-					oRm.class("sapUiFormCLCellSBreak");
+					oRm.addClass("sapUiFormCLCellSBreak");
 				}
 				if (oOptions.L.Break) {
-					oRm.class("sapUiFormCLCellLBreak");
+					oRm.addClass("sapUiFormCLCellLBreak");
 				}
 				if (oOptions.S.Space) {
-					oRm.class("sapUiFormCLCellSSpace" + oOptions.S.Space);
+					oRm.addClass("sapUiFormCLCellSSpace" + oOptions.S.Space);
 				}
 				if (oOptions.L.Space) {
-					oRm.class("sapUiFormCLCellLSpace" + oOptions.L.Space);
+					oRm.addClass("sapUiFormCLCellLSpace" + oOptions.L.Space);
 				}
-				oRm.openEnd();
+				oRm.writeClasses();
+				oRm.write(">");
 
 				oRm.renderControl(oField);
 
-				oRm.close("div");
+				oRm.write("</div>");
 			}
 		}
-		oRm.close("div");
+		oRm.write("</div>");
 
 	};
 

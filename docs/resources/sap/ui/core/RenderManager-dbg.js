@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -17,7 +17,6 @@ sap.ui.define([
 	"sap/base/assert",
 	"sap/ui/performance/Measurement",
 	"sap/base/Log",
-	"sap/base/util/extend",
 	"./InvisibleRenderer",
 	"./Patcher"
 ], function(
@@ -32,13 +31,11 @@ sap.ui.define([
 	assert,
 	Measurement,
 	Log,
-	extend,
 	InvisibleRenderer,
 	Patcher
 ) {
 
 	"use strict";
-	/*global SVGElement*/
 
 	var aCommonMethods = ["renderControl", "cleanupControlWithoutRendering", "accessibilityState", "icon"];
 
@@ -49,10 +46,6 @@ sap.ui.define([
 	var aDomInterfaceMethods = ["openStart", "voidStart", "attr", "class", "style", "openEnd", "voidEnd", "text", "unsafeHtml", "close"];
 
 	var aNonRendererMethods = ["render", "flush", "destroy"];
-
-	var oTemplate = document.createElement("template");
-
-	var ATTR_STYLE_KEY_MARKER = "data-sap-ui-stylekey";
 
 	/**
 	 * Creates an instance of the RenderManager.
@@ -83,7 +76,7 @@ sap.ui.define([
 	 * suffix 'Renderer'. So for a control <code>sap.m.Input</code> the default renderer will be searched
 	 * for under the global name <code>sap.m.Input<i>Renderer</i></code>.
 	 *
-	 * <h3>Semantic Rendering</h3>
+	 * <h3>In-place DOM patching</h3>
 	 * As of 1.67, <code>RenderManager</code> provides a set of new APIs to describe the structure of the DOM that can be used by the control renderers.
 	 *
 	 * <pre>
@@ -123,7 +116,7 @@ sap.ui.define([
 	 * <pre>
 	 *
 	 *   var myButtonRenderer = {
-	 *       apiVersion: 2    // enable semantic rendering
+	 *       apiVersion: 2    // enable in-place DOM patching
 	 *   };
 	 *
 	 *   myButtonRenderer.render = function(rm, oButton) {
@@ -180,9 +173,12 @@ sap.ui.define([
 	 * @see sap.ui.core.Core
 	 * @see sap.ui.getCore
 	 *
+	 * @borrows sap.ui.core.RenderManager#writeAccessibilityState as #accessibilityState
+	 * @borrows sap.ui.core.RenderManager#writeIcon as #icon
+	 *
 	 * @extends Object
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @alias sap.ui.core.RenderManager
 	 * @public
 	 */
@@ -200,11 +196,7 @@ sap.ui.define([
 			bDomInterface,                 // specifies the rendering interface that is used by the control renderers
 			sLegacyRendererControlId = "", // stores the id of the control that has a legacy renderer while its parent has the new semantic renderer
 			oStringInterface = {},         // holds old string based rendering API and the string implementation of the new semantic rendering API
-			oDomInterface = {},            // semantic rendering API for the controls whose renderer provides apiVersion=2 marker
-			aRenderingStyles = [],         // during string-based rendering, stores the styles that couldn't be set via style attribute due to CSP restrictions
-			oPatcher = new Patcher(),      // the Patcher instance to handle in-place DOM patching
-			sLastStyleMethod,
-			sLastClassMethod;
+			oDomInterface = {};            // semantic rendering API for the controls whose renderer provides apiVersion=2 marker
 
 		/**
 		 * Sets the focus handler to be used by the RenderManager.
@@ -221,7 +213,6 @@ sap.ui.define([
 		 * Reset all rendering related buffers.
 		 */
 		function reset() {
-			assert(!(sLastStyleMethod = sLastClassMethod = ""));
 			aBuffer = that.aBuffer = [];
 			aRenderedControls = that.aRenderedControls = [];
 			aStyleStack = that.aStyleStack = [{}];
@@ -250,21 +241,14 @@ sap.ui.define([
 
 		function assertValidAttr(sAttr) {
 			assertValidName(sAttr, "attr");
-			assert((sAttr != "class" || sLastClassMethod != "class" && (sLastClassMethod = "attr"))
-				&& (sAttr != "style" || sLastStyleMethod != "style" && (sLastStyleMethod = "attr")),
-				"Attributes 'class' and 'style' must not be written when the methods with the same name"
-				+ " have been called for the same element already");
+			assert(sAttr != "class" && sAttr != "style", "Attributes 'class' and 'style' must not be written, instead use dedicated 'class' or 'style' method");
 		}
 
 		function assertValidClass(sClass) {
-			assert(sLastClassMethod != "attr" && (sLastClassMethod = "class"),
-				"Method class() must not be called after the 'class' attribute has been written for the same element");
 			assert(typeof sClass == "string" && !/\s/.test(sClass) && arguments.length === 1, "Method 'class' must be called with exactly one class name");
 		}
 
 		function assertValidStyle(sStyle) {
-			assert(sLastStyleMethod != "attr" && (sLastStyleMethod = "style"),
-				"Method style() must not be called after the 'style' attribute has been written for the same element");
 			assert(sStyle && typeof sStyle == "string" && !/\s/.test(sStyle), "Method 'style' must be called with a non-empty string name");
 		}
 
@@ -274,27 +258,10 @@ sap.ui.define([
 		//#################################################################################################
 
 		/**
-		 * Write the given texts to the buffer.
+		 * Write the given texts to the buffer
 		 * @param {...string|number} sText (can be a number too)
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
-		 * @deprecated Since 1.92. Instead, use the {@link sap.ui.core.RenderManager Semantic Rendering API}.
-		 *   There is no 1:1 replacement for <code>write</code>. Typically, <code>write</code> is used to create
-		 *   a longer sequence of HTML markup (e.g. an element with attributes and children) in a single call.
-		 *   Such a markup sequence has to be split into the individual calls of the Semantic Rendering API.
-		 *
-		 *   <br><br>Example:<br>
-		 *     oRm.write("&lt;span id=\"" + oCtrl.getId() + "-outer\" class=\"myCtrlOuter\"&gt;"
-		 *        + "&amp;nbsp;" + oResourceBundle.getText("TEXT_KEY") + "&amp;nbsp;&lt;/span&gt;");
-		 *   <br><br>
-		 *   has to be transformed to
-		 *   <br><br>
-		 *   oRm.openStart("span", oCtrl.getId() + "-outer").class("myCtrlOuter").openEnd().text("\u00a0" + oResourceBundle.getText("TEXT_KEY") + "\u00a0").close("span");
-		 *   <br><br>
-		 *   Note that "&amp;nbsp;" was replaced with "\u00a0" (no-break-space). In general, HTML entities
-		 *   have to be replaced by the corresponding Unicode character escapes. A mapping table can be found
-		 *   at {@link https://html.spec.whatwg.org/multipage/named-characters.html#named-character-references}.
-		 *
 		 * @SecSink {*|XSS}
 		 */
 		this.write = function(/** string|number */ sText /* ... */) {
@@ -309,10 +276,9 @@ sap.ui.define([
 		 * For details about the escaping refer to {@link jQuery.sap.encodeHTML}
 		 *
 		 * @param {any} sText the text to escape
-		 * @param {boolean} [bLineBreaks=false] Whether to convert line breaks into <br> tags
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @param {boolean} bLineBreaks Whether to convert line breaks into <br> tags
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
-		 * @deprecated Since 1.92. Instead use {@link sap.ui.core.RenderManager#text} of the {@link sap.ui.core.RenderManager Semantic Rendering API}.
 		 */
 		this.writeEscaped = function(sText, bLineBreaks) {
 			if ( sText != null ) {
@@ -332,9 +298,8 @@ sap.ui.define([
 		 *
 		 * @param {string} sName Name of the attribute
 		 * @param {string | number | boolean} vValue Value of the attribute
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
-		 * @deprecated Since 1.92. Instead use {@link sap.ui.core.RenderManager#attr} of the {@link sap.ui.core.RenderManager Semantic Rendering API}.
 		 * @SecSink {0 1|XSS} Attributes are written to HTML without validation
 		 */
 		this.writeAttribute = function(sName, vValue) {
@@ -351,9 +316,8 @@ sap.ui.define([
 		 *
 		 * @param {string} sName Name of the attribute
 		 * @param {any} vValue Value of the attribute
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
-		 * @deprecated Since 1.92. Instead use {@link sap.ui.core.RenderManager#attr} of the {@link sap.ui.core.RenderManager Semantic Rendering API}.
 		 * @SecSink {0|XSS}
 		 */
 		this.writeAttributeEscaped = function(sName, vValue) {
@@ -368,9 +332,8 @@ sap.ui.define([
 		 *
 		 * @param {string} sName Name of the CSS property to write
 		 * @param {string|float|int} vValue Value to write
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
-		 * @deprecated Since 1.92. Instead use {@link sap.ui.core.RenderManager#style} of the {@link sap.ui.core.RenderManager Semantic Rendering API}.
 		 * @SecSink {0 1|XSS} Styles are written to HTML without validation
 		 */
 		this.addStyle = function(sName, vValue) {
@@ -388,17 +351,13 @@ sap.ui.define([
 
 		/**
 		 * Writes and flushes the style collection
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
-		 * @deprecated Since 1.92. Not longer needed, when using the {@link sap.ui.core.RenderManager Semantic Rendering API}
-		 *  the actual writing of styles happens when {@link sap.ui.core.RenderManager#openEnd} or {@link sap.ui.core.RenderManager#voidEnd} are used.
 		 */
 		this.writeStyles = function() {
 			var oStyle = aStyleStack[aStyleStack.length - 1];
 			if (oStyle.aStyle && oStyle.aStyle.length) {
-				// Due to possible CSP restrictions we do not write styles into the HTML buffer. Instead, we store the styles in the aRenderingStyles array
-				// and add a ATTR_STYLE_KEY_MARKER attribute marker for which the value references the original style index in the aRenderingStyles array.
-				this.writeAttribute(ATTR_STYLE_KEY_MARKER, aRenderingStyles.push(oStyle.aStyle.join(" ")) - 1);
+				this.writeAttribute("style", oStyle.aStyle.join(" "));
 			}
 			oStyle.aStyle = null;
 			return this;
@@ -409,9 +368,8 @@ sap.ui.define([
 		 * The class collection is flushed if it is written to the buffer using {@link #writeClasses}
 		 *
 		 * @param {string} sName name of the class to be added; null values are ignored
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
-		 * @deprecated Since 1.92. Instead use {@link sap.ui.core.RenderManager#class} of the {@link sap.ui.core.RenderManager Semantic Rendering API}.
 		 * @SecSink {0|XSS} Classes are written to HTML without validation
 		 */
 		this.addClass = function(sName) {
@@ -433,10 +391,8 @@ sap.ui.define([
 		 * classes are added instead. If oElement === false, no custom style classes are added.
 		 *
 		 * @param {sap.ui.core.Element | boolean} [oElement] an Element from which to add custom style classes (instead of adding from the control itself)
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
-		 * @deprecated Since 1.92. Not longer needed, when using the {@link sap.ui.core.RenderManager Semantic Rendering API}
-		 *  the actual writing of classes happens when {@link sap.ui.core.RenderManager#openEnd} or {@link sap.ui.core.RenderManager#voidEnd} are used.
 		 */
 		this.writeClasses = function(oElement) {
 			assert(!oElement || typeof oElement === "boolean" || BaseObject.isA(oElement, 'sap.ui.core.Element'), "oElement must be empty, a boolean, or an sap.ui.core.Element");
@@ -481,7 +437,7 @@ sap.ui.define([
 		 *
 		 * @param {string} sTagName Tag name of the HTML element
 	 	 * @param {sap.ui.core.Element|sap.ui.core.ID} [vControlOrId] Control instance or ID to identify the element
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 *
 		 * @public
 		 * @since 1.67
@@ -489,7 +445,6 @@ sap.ui.define([
 		this.openStart = function(sTagName, vControlOrId) {
 			assertValidName(sTagName, "tag");
 			assertOpenTagHasEnded();
-			assert(!(sLastStyleMethod = sLastClassMethod = ""));
 			sOpenTag = sTagName;
 
 			this.write("<" + sTagName);
@@ -509,17 +464,16 @@ sap.ui.define([
 		 *
 		 * This indicates that there are no more attributes to set to the open tag.
 		 *
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 * @since 1.67
 		 */
 		this.openEnd = function(bExludeStyleClasses /* private */) {
 			assertOpenTagHasStarted("openEnd");
 			assertOpenTagHasEnded(!bVoidOpen);
-			assert(bExludeStyleClasses === undefined || bExludeStyleClasses === true, "The private parameter bExludeStyleClasses must be true or omitted!");
 			sOpenTag = "";
 
-			this.writeClasses(bExludeStyleClasses === true ? false : undefined);
+			this.writeClasses(bExludeStyleClasses ? false : undefined);
 			this.writeStyles();
 			this.write(">");
 			return this;
@@ -531,7 +485,7 @@ sap.ui.define([
 		 * This indicates that there are no more children to append to the open tag.
 		 *
 		 * @param {string} sTagName Tag name of the HTML element
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 * @since 1.67
 		 */
@@ -553,7 +507,7 @@ sap.ui.define([
 		 *
 		 * @param {string} sTagName Tag name of the HTML element
 		 * @param {sap.ui.core.Element|sap.ui.core.ID} [vControlOrId] Control instance or ID to identify the element
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 * @since 1.67
 		 */
@@ -570,7 +524,7 @@ sap.ui.define([
 		 * This indicates that there are no more attributes to set to the open tag.
 		 * For self-closing tags <code>close</code> must not be called.
 		 *
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 * @since 1.67
 		 */
@@ -592,7 +546,7 @@ sap.ui.define([
 		 * This must not be used for plain texts; use the <code>text</code> method instead.
 		 *
 		 * @param {string} sHtml Well-formed, valid HTML markup
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 * @since 1.67
 		 * @SecSink {*|XSS}
@@ -607,17 +561,8 @@ sap.ui.define([
 		/**
 		 * Sets the text content with the given text.
 		 *
-		 * Line breaks are not supported by this method, use CSS
-		 * {@link https://www.w3.org/TR/CSS2/text.html#white-space-prop white-space: pre-line}
-		 * option to implement line breaks.
-		 *
-		 * HTML entities are not supported by this method,
-		 * use unicode escaping or the unicode character to implement HTML entities.
-		 * For further information see
-		 * {@link https://html.spec.whatwg.org/multipage/named-characters.html#named-character-references}.
-		 *
 		 * @param {string} sText The text to be written
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 * @since 1.67
 		 */
@@ -638,25 +583,16 @@ sap.ui.define([
 		 * For HTML elements, {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes attribute names} must all be set in lowercase.
 		 * For foreign elements, such as SVG, {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute attribute names} can be set in upper camel case (e.g. viewBox).
 		 *
-		 * HTML entities are not supported by this method,
-		 * use unicode escaping or the unicode character to implement HTML entities.
-		 * For further information see
-		 * {@link https://html.spec.whatwg.org/multipage/named-characters.html#named-character-references}.
-		 *
 		 * @param {string} sName Name of the attribute
 		 * @param {*} vValue Value of the attribute
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 * @since 1.67
 		 */
 		this.attr = function(sName, vValue) {
 			assertValidAttr(sName);
 
-			if (sName == "style") {
-				aStyleStack[aStyleStack.length - 1].aStyle = [vValue];
-			} else {
-				this.writeAttributeEscaped(sName, vValue);
-			}
+			this.writeAttributeEscaped(sName, vValue);
 			return this;
 		};
 
@@ -667,7 +603,7 @@ sap.ui.define([
 		 * Class name must not contain any whitespace.
 		 *
 		 * @param {string} sClass Class name to be written
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 * @since 1.67
 		 */
@@ -684,13 +620,10 @@ sap.ui.define([
 		 * Adds a style name-value pair to the style collection of the last open HTML element.
 		 *
 		 * This is only valid when called between <code>openStart/voidStart</code> and <code>openEnd/voidEnd</code>.
-		 * To allow a more efficient DOM update, the CSS property names and values have to be used in their canonical form.
-		 * In general, CSS properties are lower-cased in their canonical form, except for parts that are not under the control of CSS.
-		 * For more information, see {@link https://www.w3.org/TR/CSS/#indices}.
 		 *
 		 * @param {string} sName Name of the style property
 		 * @param {string} sValue Value of the style property
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 * @since 1.67
 		 */
@@ -701,104 +634,10 @@ sap.ui.define([
 			return this;
 		};
 
-		/**
-		 * Collects accessibility related attributes for an <code>Element</code> and renders them as part of
-		 * the currently rendered DOM element.
-		 *
-		 * See the WAI-ARIA specification for a general description of the accessibility related attributes.
-		 * Attributes are only rendered when the accessibility feature is activated in the UI5 runtime configuration.
-		 *
-		 * The values for the attributes are collected from the following sources (last one wins):
-		 * <ol>
-		 * <li>from the properties and associations of the given <code>oElement</code>, using a heuristic mapping
-		 *     (described below)</li>
-		 * <li>from the <code>mProps</code> parameter, as provided by the caller</li>
-		 * <li>from the parent of the given <code>oElement</code>, if it has a parent and if the parent implements
-		 *     the method {@link sap.ui.core.Element#enhanceAccessibilityState enhanceAccessibilityState}</li>
-		 * </ol>
-		 * If no <code>oElement</code> is given, only <code>mProps</code> will be taken into account.
-		 *
-		 *
-		 * <h3>Heuristic Mapping</h3>
-		 * The following mapping from properties/values to ARIA attributes is used (if the element does have such properties):
-		 * <ul>
-		 * <li><code>editable===false</code> => <code>aria-readonly="true"</code></li>
-		 * <li><code>enabled===false</code> => <code>aria-disabled="true"</code></li>
-		 * <li><code>visible===false</code> => <code>aria-hidden="true"</code></li>
-		 * <li><code>required===true</code> => <code>aria-required="true"</code></li>
-		 * <li><code>selected===true</code> => <code>aria-selected="true"</code></li>
-		 * <li><code>checked===true</code> => <code>aria-checked="true"</code></li>
-		 * </ul>
-		 *
-		 * In case of the <code>required</code> property, all label controls which reference the given element
-		 * in their <code>labelFor</code> relation are additionally taken into account when determining the
-		 * value for the <code>aria-required</code> attribute.
-		 *
-		 * Additionally, the associations <code>ariaDescribedBy</code> and <code>ariaLabelledBy</code> are used to
-		 * determine the lists of IDs for the ARIA attributes <code>aria-describedby</code> and
-		 * <code>aria-labelledby</code>.
-		 *
-		 * Label controls that reference the given element in their <code>labelFor</code> relation are automatically
-		 * added to the <code>aria-labelledby</code> attribute.
-		 *
-		 * Note: This function is only a heuristic of a control property to ARIA attribute mapping. Control developers
-		 * have to check whether it fulfills their requirements. In case of problems (for example the <code>RadioButton</code> has a
-		 * <code>selected</code> property but must provide an <code>aria-checked</code> attribute) the auto-generated
-		 * result of this function can be influenced via the parameter <code>mProps</code> as described below.
-		 *
-		 * The parameter <code>mProps</code> can be used to either provide additional attributes which should be rendered
-		 * and/or to avoid the automatic generation of single ARIA attributes. The 'aria-' prefix will be prepended
-		 * automatically to the keys (Exception: Attribute <code>role</code> does not get the prefix 'aria-').
-		 *
-		 *
-		 * Examples:<br>
-		 * <code>{hidden : true}</code> results in <code>aria-hidden="true"</code> independent of the presence or
-		 * absence of the visibility property.<br>
-		 * <code>{hidden : null}</code> ensures that no <code>aria-hidden</code> attribute is written independent
-		 * of the presence or absence of the visibility property.<br>
-		 *
-		 * The function behaves in the same way for the associations <code>ariaDescribedBy</code> and <code>ariaLabelledBy</code>.
-		 * To append additional values to the auto-generated <code>aria-describedby</code> and <code>aria-labelledby</code>
-		 * attributes, the following format can be used:
-		 * <pre>
-		 *   {describedby : {value: "id1 id2", append: true}} =>  aria-describedby = "ida idb id1 id2"
-		 * </pre>
-		 * (assuming that "ida idb" is the auto-generated part based on the association <code>ariaDescribedBy</code>).
-		 *
-		 * @param {sap.ui.core.Element}
-		 *            [oElement] The <code>Element</code> whose accessibility state should be rendered
-		 * @param {object}
-		 *            [mProps] A map of additional properties that should be added or changed.
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
-		 * @public
-		 * @function
-		 */
+		// @borrows sap.ui.core.RenderManager#writeAccessibilityState as accessibilityState
 		this.accessibilityState = this.writeAccessibilityState;
 
-		/**
-		 * Writes either an &lt;img&gt; tag for normal URI or a &lt;span&gt; tag with needed properties for an icon URI.
-		 *
-		 * Additional classes and attributes can be added to the tag with the second and third parameter.
-		 * All of the given attributes are escaped when necessary for security consideration.
-		 *
-		 * When an &lt;img&gt; tag is rendered, the following two attributes are added by default
-		 * and can be overwritten with corresponding values in the <code>mAttributes</code> parameter:
-		 * <ul>
-		 * <li><code>role: "presentation"</code></Li>
-		 * <li><code>alt: ""</code></li>
-		 * </ul>
-		 *
-		 * <b>Note:</b> This function requires the {@link sap.ui.core.IconPool} module. Ensure that the module is
-		 * loaded before this function is called to avoid syncXHRs.
-		 *
-		 * @param {sap.ui.core.URI} sURI URI of an image or of an icon registered in {@link sap.ui.core.IconPool}
-		 * @param {array|string} [aClasses] Additional classes that are added to the rendered tag
-		 * @param {object} [mAttributes] Additional attributes that will be added to the rendered tag.
-		 * Currently the attributes <code>class</code> and <code>style</code> are not allowed
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
-		 * @public
-		 * @function
-		 */
+		// @borrows sap.ui.core.RenderManager#writeIcon as icon
 		this.icon = this.writeIcon;
 
 
@@ -810,15 +649,14 @@ sap.ui.define([
 		oDomInterface.openStart = function(sTagName, vControlOrId) {
 			assertValidName(sTagName, "tag");
 			assertOpenTagHasEnded();
-			assert(!(sLastStyleMethod = sLastClassMethod = ""));
 			sOpenTag = sTagName;
 
 			if (!vControlOrId) {
-				oPatcher.openStart(sTagName);
+				Patcher.openStart(sTagName);
 			} else if (typeof vControlOrId == "string") {
-				oPatcher.openStart(sTagName, vControlOrId);
+				Patcher.openStart(sTagName, vControlOrId);
 			} else {
-				oPatcher.openStart(sTagName, vControlOrId.getId());
+				Patcher.openStart(sTagName, vControlOrId.getId());
 				renderElementData(this, vControlOrId);
 			}
 
@@ -838,7 +676,7 @@ sap.ui.define([
 			assertValidAttr(sName);
 			assertOpenTagHasStarted("attr");
 
-			oPatcher.attr(sName, vValue);
+			Patcher.attr(sName, vValue);
 			return this;
 		};
 
@@ -848,7 +686,7 @@ sap.ui.define([
 				assertValidClass.apply(this, arguments);
 				assertOpenTagHasStarted("class");
 
-				oPatcher.class(sClass);
+				Patcher.class(sClass);
 			}
 
 			return this;
@@ -859,27 +697,26 @@ sap.ui.define([
 			assertValidStyle(sName);
 			assertOpenTagHasStarted("style");
 
-			oPatcher.style(sName, vValue);
+			Patcher.style(sName, vValue);
 			return this;
 		};
 
 		// @see sap.ui.core.RenderManager#openEnd
 		oDomInterface.openEnd = function(bExludeStyleClasses /* private */) {
-			if (bExludeStyleClasses !== true) {
+			if (!bExludeStyleClasses) {
 				var oStyle = aStyleStack[aStyleStack.length - 1];
 				var aStyleClasses = oStyle.aCustomStyleClasses;
 				if (aStyleClasses) {
-					aStyleClasses.forEach(oPatcher.class, oPatcher);
+					aStyleClasses.forEach(Patcher.class, Patcher);
 					oStyle.aCustomStyleClasses = null;
 				}
 			}
 
 			assertOpenTagHasStarted("openEnd");
 			assertOpenTagHasEnded(!bVoidOpen);
-			assert(bExludeStyleClasses === undefined || bExludeStyleClasses === true, "The private parameter bExludeStyleClasses must be true or omitted!");
 			sOpenTag = "";
 
-			oPatcher.openEnd();
+			Patcher.openEnd();
 			return this;
 		};
 
@@ -889,7 +726,7 @@ sap.ui.define([
 				var oStyle = aStyleStack[aStyleStack.length - 1];
 				var aStyleClasses = oStyle.aCustomStyleClasses;
 				if (aStyleClasses) {
-					aStyleClasses.forEach(oPatcher.class, oPatcher);
+					aStyleClasses.forEach(Patcher.class, Patcher);
 					oStyle.aCustomStyleClasses = null;
 				}
 			}
@@ -899,7 +736,7 @@ sap.ui.define([
 			bVoidOpen = false;
 			sOpenTag = "";
 
-			oPatcher.voidEnd();
+			Patcher.voidEnd();
 			return this;
 		};
 
@@ -908,7 +745,7 @@ sap.ui.define([
 			assertOpenTagHasEnded();
 
 			if (sText != null) {
-				oPatcher.text(sText);
+				Patcher.text(sText);
 			}
 
 			return this;
@@ -918,7 +755,7 @@ sap.ui.define([
 		oDomInterface.unsafeHtml = function(sHtml) {
 			assertOpenTagHasEnded();
 
-			oPatcher.unsafeHtml(sHtml);
+			Patcher.unsafeHtml(sHtml);
 			return this;
 		};
 
@@ -927,7 +764,7 @@ sap.ui.define([
 			assertValidName(sTagName, "tag");
 			assertOpenTagHasEnded();
 
-			oPatcher.close(sTagName);
+			Patcher.close(sTagName);
 			return this;
 		};
 
@@ -936,7 +773,7 @@ sap.ui.define([
 		function triggerBeforeRendering(oControl){
 			bLocked = true;
 			try {
-				var oEvent = new jQuery.Event("BeforeRendering");
+				var oEvent = jQuery.Event("BeforeRendering");
 				// store the element on the event (aligned with jQuery syntax)
 				oEvent.srcControl = oControl;
 				oControl._handleEvent(oEvent);
@@ -1017,9 +854,6 @@ sap.ui.define([
 				// Call beforeRendering to allow cleanup
 				triggerBeforeRendering(oControl);
 
-				// as children are not visited during rendering, their DOM has to be preserved here
-				RenderManager.preserveContent(oDomRef, /* bPreserveRoot */ false, /* bPreserveNodesWithId */ false);
-
 				// Preserved controls still need to be alive
 				if (!oDomRef.hasAttribute(ATTR_PRESERVE_MARKER)) {
 					oControl.bOutput = false;
@@ -1034,7 +868,7 @@ sap.ui.define([
 		 * If the given control is undefined or null, then nothing is rendered.
 		 *
 		 * @param {sap.ui.core.Control} oControl the control that should be rendered
-		 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+		 * @returns {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 		 * @public
 		 */
 		this.renderControl = function(oControl) {
@@ -1095,14 +929,14 @@ sap.ui.define([
 			Measurement.resume(oControl.getId() + "---renderControl");
 
 			// unbind any generically bound browser event handlers
-			var aBindings = oControl.aBindParameters,
-				oDomRef;
-			// if we have stored bind calls and we have a DomRef
-			if (aBindings && aBindings.length > 0 && (oDomRef = oControl.getDomRef())) {
-				var $DomRef = jQuery(oDomRef);
-				for (var i = 0; i < aBindings.length; i++) {
-					var oParams = aBindings[i];
-					$DomRef.off(oParams.sEventType, oParams.fnProxy);
+			var aBindings = oControl.aBindParameters;
+			if (aBindings && aBindings.length > 0) { // if we have stored bind calls...
+				var jDomRef = jQuery(oControl.getDomRef());
+				if (jDomRef && jDomRef[0]) { // ...and we have a DomRef
+					for (var i = 0; i < aBindings.length; i++) {
+						var oParams = aBindings[i];
+						jDomRef.unbind(oParams.sEventType, oParams.fnProxy);
+					}
 				}
 			}
 
@@ -1118,26 +952,24 @@ sap.ui.define([
 				} else if (bDomInterface === undefined) {
 
 					// rendering interface must be determined for the root control once per rendering
-					if (RenderManager.getApiVersion(oRenderer) == 2) {
+					// depending on the DOM reference of the control within the DOM tree
+					var oDomRef = oControl.getDomRef();
+					if (!oDomRef && !bVisible) {
+						oDomRef = document.getElementById(InvisibleRenderer.createInvisiblePlaceholderId(oControl));
+					}
 
-						// get the visible or invisible DOM element of the control
-						oDomRef = oDomRef || oControl.getDomRef() || InvisibleRenderer.getDomRef(oControl);
+					// DOM based rendering is valid only for the controls that are already rendered and providing apiVersion=2 marker.
+					// If the control is in the preserved area then we should not use DOM rendering interface to avoid patching of preserved nodes.
+					if (oDomRef && RenderManager.getApiVersion(oRenderer) == 2 && !RenderManager.isPreservedContent(oDomRef)) {
 
-						// If the control is in the preserved area then we should not use the DOM-based rendering to avoid patching of preserved nodes
-						if (RenderManager.isPreservedContent(oDomRef)) {
-							bDomInterface = false;
-						} else {
-							// patching will happen during the control renderer calls therefore we need to get the focus info before the patching
-							if (oDomRef && oFocusHandler) {
-								oFocusHandler.storePatchingControlFocusInfo(oDomRef);
-							}
+						// patching will happen during the control renderer calls therefore we need to get the focus info before the patching
+						oFocusHandler && oFocusHandler.storePatchingControlFocusInfo(oDomRef);
 
-							// set the starting point of the Patcher
-							oPatcher.setRootNode(oDomRef);
+						// set the starting point of the Patcher
+						Patcher.setRootNode(oDomRef);
 
-							// remember that we are using DOM based rendering interface
-							bDomInterface = true;
-						}
+						// remember that we are using DOM based rendering interface
+						bDomInterface = true;
 
 					} else {
 
@@ -1169,17 +1001,17 @@ sap.ui.define([
 				if (bDomInterface) {
 
 					// remember the cursor of the Patcher before the control renderer is executed
-					var oCurrentNode = oPatcher.getCurrentNode();
+					var oCurrentNode = Patcher.getCurrentNode();
 
 					// execute the control renderer with DOM rendering interface
 					oRenderer.render(oDomInterface, oControl);
 
 					// during the rendering the cursor of the Patcher should move to the next element when openStart or voidStart is called
 					// compare after rendering cursor with before rendering cursor to determine whether the control produced any output
-					if (oPatcher.getCurrentNode() == oCurrentNode) {
+					if (Patcher.getCurrentNode() == oCurrentNode) {
 
 						// we need to remove the control DOM if there is no output produced
-						oPatcher.unsafeHtml("", oControl.getId());
+						Patcher.unsafeHtml("", oControl.getId());
 						oControl.bOutput = false;
 					} else {
 						oControl.bOutput = true;
@@ -1202,7 +1034,7 @@ sap.ui.define([
 
 				// at the end of the rendering apply the rendering buffer of the control that is forced to render string interface
 				if (sLegacyRendererControlId && sLegacyRendererControlId === oControl.getId()) {
-					oPatcher.unsafeHtml(aBuffer.join(""), sLegacyRendererControlId, restoreStyles);
+					Patcher.unsafeHtml(aBuffer.join(""), sLegacyRendererControlId);
 					sLegacyRendererControlId = "";
 					bDomInterface = true;
 					aBuffer = [];
@@ -1216,9 +1048,8 @@ sap.ui.define([
 
 			// let the UIArea know that this control has been rendered
 			// FIXME: RenderManager (RM) should not need to know about UIArea. Maybe UIArea should delegate rendering to RM
-			var oUIArea = oControl.getUIArea();
-			if (oUIArea) {
-				oUIArea._onControlRendered(oControl);
+			if (oControl.getUIArea && oControl.getUIArea()) {
+				oControl.getUIArea()._onControlRendered(oControl);
 			}
 
 			// Special case: If an invisible placeholder was rendered, use a non-boolean value
@@ -1247,7 +1078,7 @@ sap.ui.define([
 		 *
 		 * @param {sap.ui.core.Control}
 		 *            oControl the Control whose HTML should be returned.
-		 * @returns {string} the resulting HTML of the provided control
+		 * @return {string} the resulting HTML of the provided control
 		 * @deprecated Since version 0.15.0. Use <code>flush()</code> instead render content outside the rendering phase.
 		 * @public
 		 */
@@ -1277,7 +1108,7 @@ sap.ui.define([
 				for (i = 0; i < size; i++) {
 					var oControl = aRenderedControls[i];
 					if (oControl.bOutput && oControl.bOutput !== "invisible") {
-						var oEvent = new jQuery.Event("AfterRendering");
+						var oEvent = jQuery.Event("AfterRendering");
 						// store the element on the event (aligned with jQuery syntax)
 						oEvent.srcControl = oControl;
 						// start performance measurement
@@ -1305,66 +1136,29 @@ sap.ui.define([
 			// Re-bind any generically bound browser event handlers (must happen after restoring focus to avoid focus event)
 			for (i = 0; i < size; i++) {
 				var oControl = aRenderedControls[i],
-					aBindings = oControl.aBindParameters,
-					oDomRef;
+					aBindings = oControl.aBindParameters;
 
-				// if we have stored bind calls and we have a DomRef
-				if (aBindings && aBindings.length > 0 && (oDomRef = oControl.getDomRef())) {
-					var $DomRef = jQuery(oDomRef);
-					for (var j = 0; j < aBindings.length; j++) {
-						var oParams = aBindings[j];
-						$DomRef.on(oParams.sEventType, oParams.fnProxy);
+				if (aBindings && aBindings.length > 0) { // if we have stored bind calls...
+					var jDomRef = jQuery(oControl.getDomRef());
+					if (jDomRef && jDomRef[0]) { // ...and we have a DomRef - TODO: this check should not be required right after rendering...
+						for (var j = 0; j < aBindings.length; j++) {
+							var oParams = aBindings[j];
+							jDomRef.bind(oParams.sEventType, oParams.fnProxy);
+						}
 					}
 				}
 			}
 		}
 
-		function flushInternal(fnPutIntoDom, fnDone, oTargetDomNode) {
+		function flushInternal(fnPutIntoDom, fnDone) {
 
 			var oStoredFocusInfo;
 			if (!bDomInterface) {
-				// DOM-based rendering was not possible we are in the string-based initial rendering or re-rendering phase
 				oStoredFocusInfo = oFocusHandler && oFocusHandler.getControlFocusInfo();
-				var sHtml = aBuffer.join("");
-				if (sHtml && aRenderingStyles.length) {
-					// During the string-based rendering, RM#writeStyles method is not writing the styles into the HTML buffer due to possible CSP restrictions.
-					// Instead, we store the styles in the aRenderingStyles array and add an ATTR_STYLE_KEY_MARKER attribute marker for which the value
-					// references the original style index in this array.
-					// Not to violate the CSP, we need to bring the original styles via HTMLElement.style API. Here we are converting the HTML buffer of
-					// string-based rendering to DOM nodes so that we can restore the orginal styles before we inject the rendering output to the DOM tree.
-					if (oTargetDomNode instanceof SVGElement && oTargetDomNode.localName != "foreignObject") {
-						oTemplate.innerHTML = "<svg>" + sHtml + "</svg>";
-						oTemplate.replaceWith.apply(oTemplate.content.firstChild, oTemplate.content.firstChild.childNodes);
-					} else {
-						oTemplate.innerHTML = sHtml;
-					}
-
-					restoreStyles(oTemplate.content.childNodes);
-					fnPutIntoDom(oTemplate.content);
-				} else {
-					fnPutIntoDom(sHtml);
-				}
+				fnPutIntoDom(aBuffer.join(""));
 			} else {
-				// get the root node of the Patcher to determine whether we are in the initial rendering or the re-rendering phase
-				var oRootNode = oPatcher.getRootNode();
-
-				// in case of DOM-based initial rendering, the Patcher creates a DocumentFragment to assemble all created control DOM nodes within it
-				if (oRootNode.nodeType == 11 /* Node.DOCUMENT_FRAGMENT_NODE */) {
-					// even though we are in the initial rendering phase a control within the control tree might has been already rendered before
-					// therefore we need to store the currectly focused control info before we inject the DocumentFragment into the real DOM tree
-					oStoredFocusInfo = oFocusHandler && oFocusHandler.getControlFocusInfo();
-
-					// controls are not necessarily need to produce output during their rendering
-					// in case of output is produced, let the callback injects the DocumentFragment
-					fnPutIntoDom(oRootNode.lastChild ? oRootNode : "");
-				} else {
-					// in case of DOM-based re-rendering, the root node of the Patcher must be an existing HTMLElement
-					// since the re-rendering happens during the control renderer APIs are executed here we get the stored focus info before the patching
-					oStoredFocusInfo = oFocusHandler && oFocusHandler.getPatchingControlFocusInfo();
-				}
-
-				// make the Patcher ready for the next patching
-				oPatcher.reset();
+				oStoredFocusInfo = oFocusHandler && oFocusHandler.getPatchingControlFocusInfo();
+				Patcher.reset();
 			}
 
 			finalizeRendering(oStoredFocusInfo);
@@ -1376,34 +1170,6 @@ sap.ui.define([
 			if (fnDone) {
 				fnDone();
 			}
-		}
-
-		function restoreStyle(oElement, iDomIndex) {
-			var sStyleIndex = oElement.getAttribute(ATTR_STYLE_KEY_MARKER);
-			if (sStyleIndex != iDomIndex) {
-				return 0;
-			}
-
-			oElement.style = aRenderingStyles[iDomIndex];
-			oElement.removeAttribute(ATTR_STYLE_KEY_MARKER);
-			return 1;
-		}
-
-		function restoreStyles(aDomNodes) {
-			if (!aRenderingStyles.length) {
-				return;
-			}
-
-			var iDomIndex = 0;
-			aDomNodes.forEach(function(oDomNode) {
-				if (oDomNode.nodeType == 1 /* Node.ELEMENT_NODE */) {
-					iDomIndex += restoreStyle(oDomNode, iDomIndex);
-					oDomNode.querySelectorAll("[" + ATTR_STYLE_KEY_MARKER + "]").forEach(function(oElement) {
-						iDomIndex += restoreStyle(oElement, iDomIndex);
-					});
-				}
-			});
-			aRenderingStyles = [];
 		}
 
 		/**
@@ -1448,7 +1214,7 @@ sap.ui.define([
 				RenderManager.preserveContent(oTargetDomNode);
 			}
 
-			flushInternal(function(vHTML) {
+			flushInternal(function(sHTML) {
 
 				for (var i = 0; i < aRenderedControls.length; i++) {
 					//TODO It would be enough to loop over the controls for which renderControl was initially called but for this
@@ -1464,24 +1230,24 @@ sap.ui.define([
 				}
 				if (typeof vInsert === "number") {
 					if (vInsert <= 0) { // new HTML should be inserted at the beginning
-						insertAdjacent(oTargetDomNode, "prepend", vHTML);
+						jQuery(oTargetDomNode).prepend(sHTML);
 					} else { // new element should be inserted at a certain position > 0
-						var oPredecessor = oTargetDomNode.children[vInsert - 1]; // find the element which should be directly before the new one
-						if (oPredecessor) {
+						var $predecessor = jQuery(oTargetDomNode).children().eq(vInsert - 1); // find the element which should be directly before the new one
+						if ($predecessor.length === 1) {
 							// element found - put the HTML in after this element
-							insertAdjacent(oPredecessor, "after", vHTML);
+							$predecessor.after(sHTML);
 						} else {
 							// element not found (this should not happen when properly used), append the new HTML
-							insertAdjacent(oTargetDomNode, "append", vHTML);
+							jQuery(oTargetDomNode).append(sHTML);
 						}
 					}
 				} else if (!vInsert) {
-					jQuery(oTargetDomNode).html(vHTML); // Put the HTML into the given DOM Node
+					jQuery(oTargetDomNode).html(sHTML); // Put the HTML into the given DOM Node
 				} else {
-					insertAdjacent(oTargetDomNode, "append", vHTML); // Append the HTML into the given DOM Node
+					jQuery(oTargetDomNode).append(sHTML); // Append the HTML into the given DOM Node
 				}
 
-			}, fnDone, oTargetDomNode);
+			}, fnDone);
 
 		};
 
@@ -1517,17 +1283,26 @@ sap.ui.define([
 			// FIXME: MULTIPLE ROOTS
 			// The implementation of this method doesn't support multiple roots for a control.
 			// Affects all places where 'oldDomNode' is used
-			flushInternal(function(vHTML) {
+			flushInternal(function(sHTML) {
 
 				if (oControl && oTargetDomNode) {
 
 					var oldDomNode = oControl.getDomRef();
 					if ( !oldDomNode || RenderManager.isPreservedContent(oldDomNode) ) {
 						// In case no old DOM node was found or only preserved DOM, search for a placeholder (invisible or preserved DOM placeholder)
-						oldDomNode = InvisibleRenderer.getDomRef(oControl) || document.getElementById(RenderPrefixes.Dummy + oControl.getId());
+						oldDomNode = document.getElementById(InvisibleRenderer.createInvisiblePlaceholderId(oControl)) || document.getElementById(RenderPrefixes.Dummy + oControl.getId());
 					}
 
 					var bNewTarget = oldDomNode && oldDomNode.parentNode != oTargetDomNode;
+
+					var fAppend = function(){
+						var jTarget = jQuery(oTargetDomNode);
+						if (oTargetDomNode.innerHTML == "") {
+							jTarget.html(sHTML);
+						} else {
+							jTarget.append(sHTML);
+						}
+					};
 
 					if (bNewTarget) { //Control was rendered already and is now moved to different location
 
@@ -1539,22 +1314,21 @@ sap.ui.define([
 							}
 						}
 
-						if (vHTML) {
-							insertAdjacent(oTargetDomNode, "append", vHTML);
+						if (sHTML) {
+							fAppend();
 						}
 
 					} else { //Control either rendered initially or rerendered at the same location
 
-						if (vHTML) {
+						if (sHTML) {
 							if (oldDomNode) {
 								if (RenderManager.isInlineTemplate(oldDomNode)) {
-									jQuery(oldDomNode).html(vHTML);
+									jQuery(oldDomNode).html(sHTML);
 								} else {
-									insertAdjacent(oldDomNode, "after", vHTML);
-									jQuery(oldDomNode).remove();
+									jQuery(oldDomNode).replaceWith(sHTML);
 								}
 							} else {
-								insertAdjacent(oTargetDomNode, "append", vHTML);
+								fAppend();
 							}
 						} else {
 							if (RenderManager.isInlineTemplate(oldDomNode)) {
@@ -1573,7 +1347,7 @@ sap.ui.define([
 					}
 
 				}
-			}, fnDone, oTargetDomNode);
+			}, fnDone);
 		};
 
 		/**
@@ -1609,7 +1383,7 @@ sap.ui.define([
 		/**
 		 * Returns the public interface of the RenderManager which can be used by Renderers.
 		 *
-		 * @returns {sap.ui.base.Interface} the interface
+		 * @return {sap.ui.base.Interface} the interface
 		 * @private
 		 */
 		this.getRendererInterface = function() {
@@ -1626,9 +1400,8 @@ sap.ui.define([
 	/**
 	 * Returns the configuration object
 	 * Shortcut for <code>sap.ui.getCore().getConfiguration()</code>
-	 * @returns {sap.ui.core.Configuration} the configuration object
+	 * @return {sap.ui.core.Configuration} the configuration object
 	 * @public
-	 * @deprecated Since 1.92. Instead, use the {@link sap.ui.core.Core#getConfiguration} API.
 	 */
 	RenderManager.prototype.getConfiguration = function() {
 		return sap.ui.getCore().getConfiguration();
@@ -1645,7 +1418,7 @@ sap.ui.define([
 
 	/**
 	 * @deprecated As of version 1.1, never has been implemented - DO NOT USE
-	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+	 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 	 * @public
 	 */
 	RenderManager.prototype.writeAcceleratorKey = function() {
@@ -1664,10 +1437,8 @@ sap.ui.define([
 	 * Writes the controls data into the HTML.
 	 * Control Data consists at least of the id of a control
 	 * @param {sap.ui.core.Control} oControl the control whose identifying information should be written to the buffer
-	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+	 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 	 * @public
-	 * @deprecated Since 1.92. Instead use {@link sap.ui.core.RenderManager#openStart} or {@link sap.ui.core.RenderManager#voidStart}
-	 *  of the {@link sap.ui.core.RenderManager Semantic Rendering API} and pass the desired control data as the second parameter to the new API.
 	 */
 	RenderManager.prototype.writeControlData = function(oControl) {
 		assert(oControl && BaseObject.isA(oControl, 'sap.ui.core.Control'), "oControl must be an sap.ui.core.Control");
@@ -1679,10 +1450,8 @@ sap.ui.define([
 	 * Writes the elements data into the HTML.
 	 * Element Data consists at least of the id of an element
 	 * @param {sap.ui.core.Element} oElement the element whose identifying information should be written to the buffer
-	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+	 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 	 * @public
-	 * @deprecated Since 1.92. Instead use {@link sap.ui.core.RenderManager#openStart} or {@link sap.ui.core.RenderManager#voidStart}
-	 *  of the {@link sap.ui.core.RenderManager Semantic Rendering API} and pass the desired element data as the second parameter to the new API.
 	 */
 	RenderManager.prototype.writeElementData = function(oElement) {
 		assert(oElement && BaseObject.isA(oElement, 'sap.ui.core.Element'), "oElement must be an sap.ui.core.Element");
@@ -1694,25 +1463,12 @@ sap.ui.define([
 	};
 
 	/**
-	 * Collects accessibility related attributes for an <code>Element</code> and renders them as part of
-	 * the currently rendered DOM element.
+	 * Writes the accessibility state (see WAI-ARIA specification) of the provided element into the HTML
+	 * based on the element's properties and associations.
 	 *
-	 * See the WAI-ARIA specification for a general description of the accessibility related attributes.
-	 * Attributes are only rendered when the accessibility feature is activated in the UI5 runtime configuration.
+	 * The ARIA properties are only written when the accessibility feature is activated in the UI5 configuration.
 	 *
-	 * The values for the attributes are collected from the following sources (last one wins):
-	 * <ol>
-	 * <li>from the properties and associations of the given <code>oElement</code>, using a heuristic mapping
-	 *     (described below)</li>
-	 * <li>from the <code>mProps</code> parameter, as provided by the caller</li>
-	 * <li>from the parent of the given <code>oElement</code>, if it has a parent and if the parent implements
-	 *     the method {@link sap.ui.core.Element#enhanceAccessibilityState enhanceAccessibilityState}</li>
-	 * </ol>
-	 * If no <code>oElement</code> is given, only <code>mProps</code> will be taken into account.
-	 *
-	 *
-	 * <h3>Heuristic Mapping</h3>
-	 * The following mapping from properties/values to ARIA attributes is used (if the element does have such properties):
+	 * The following properties/values to ARIA attribute mappings are done (if the element does have such properties):
 	 * <ul>
 	 * <li><code>editable===false</code> => <code>aria-readonly="true"</code></li>
 	 * <li><code>enabled===false</code> => <code>aria-disabled="true"</code></li>
@@ -1722,48 +1478,41 @@ sap.ui.define([
 	 * <li><code>checked===true</code> => <code>aria-checked="true"</code></li>
 	 * </ul>
 	 *
-	 * In case of the <code>required</code> property, all label controls which reference the given element
-	 * in their <code>labelFor</code> relation are additionally taken into account when determining the
-	 * value for the <code>aria-required</code> attribute.
+	 * In case of the required attribute also the Label controls which referencing the given element in their 'for' relation
+	 * are taken into account to compute the <code>aria-required</code> attribute.
 	 *
-	 * Additionally, the associations <code>ariaDescribedBy</code> and <code>ariaLabelledBy</code> are used to
-	 * determine the lists of IDs for the ARIA attributes <code>aria-describedby</code> and
-	 * <code>aria-labelledby</code>.
+	 * Additionally, the association <code>ariaDescribedBy</code> and <code>ariaLabelledBy</code> are used to write
+	 * the ID lists of the ARIA attributes <code>aria-describedby</code> and <code>aria-labelledby</code>.
 	 *
-	 * Label controls that reference the given element in their <code>labelFor</code> relation are automatically
-	 * added to the <code>aria-labelledby</code> attributes.
+	 * Label controls that reference the given element in their 'for' relation are automatically added to the
+	 * <code>aria-labelledby</code> attributes.
 	 *
 	 * Note: This function is only a heuristic of a control property to ARIA attribute mapping. Control developers
-	 * have to check whether it fulfills their requirements. In case of problems (for example the <code>RadioButton</code> has a
+	 * have to check whether it fulfills their requirements. In case of problems (for example the RadioButton has a
 	 * <code>selected</code> property but must provide an <code>aria-checked</code> attribute) the auto-generated
 	 * result of this function can be influenced via the parameter <code>mProps</code> as described below.
 	 *
-	 * The parameter <code>mProps</code> can be used to either provide additional attributes which should be rendered
-	 * and/or to avoid the automatic generation of single ARIA attributes. The 'aria-' prefix will be prepended
-	 * automatically to the keys (Exception: Attribute <code>role</code> does not get the prefix 'aria-').
+	 * The parameter <code>mProps</code> can be used to either provide additional attributes which should be added and/or
+	 * to avoid the automatic generation of single ARIA attributes. The 'aria-' prefix will be prepended automatically to the keys
+	 * (Exception: Attribute 'role' does not get the prefix 'aria-').
 	 *
-	 *
-	 * Examples:<br>
-	 * <code>{hidden : true}</code> results in <code>aria-hidden="true"</code> independent of the presence or
-	 * absence of the visibility property.<br>
-	 * <code>{hidden : null}</code> ensures that no <code>aria-hidden</code> attribute is written independent
-	 * of the presence or absence of the visibility property.<br>
-	 *
+	 * Examples:
+	 * <code>{hidden : true}</code> results in <code>aria-hidden="true"</code> independent of the presence or absence of
+	 * the visibility property.
+	 * <code>{hidden : null}</code> ensures that no <code>aria-hidden</code> attribute is written independent of the presence
+	 * or absence of the visibility property.
 	 * The function behaves in the same way for the associations <code>ariaDescribedBy</code> and <code>ariaLabelledBy</code>.
-	 * To append additional values to the auto-generated <code>aria-describedby</code> and <code>aria-labelledby</code>
-	 * attributes, the following format can be used:
-	 * <pre>
-	 *   {describedby : {value: "id1 id2", append: true}} =>  aria-describedby = "ida idb id1 id2"
-	 * </pre>
-	 * (assuming that "ida idb" is the auto-generated part based on the association <code>ariaDescribedBy</code>).
+	 * To append additional values to the auto-generated <code>aria-describedby</code> and <code>aria-labelledby</code> attributes
+	 * the following format can be used:
+	 * <code>{describedby : {value: "id1 id2", append: true}}</code> => <code>aria-describedby="ida idb id1 id2"</code> (assuming that "ida idb"
+	 * is the auto-generated part based on the association <code>ariaDescribedBy</code>).
 	 *
 	 * @param {sap.ui.core.Element}
-	 *            [oElement] The <code>Element</code> whose accessibility state should be rendered
-	 * @param {object}
-	 *            [mProps] A map of additional properties that should be added or changed.
-	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+	 *            [oElement] the element whose accessibility state should be rendered
+	 * @param {Object}
+	 *            [mProps] a map of properties that should be added additionally or changed.
+	 * @return {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 	 * @public
-	 * @deprecated Since 1.92. Instead use {@link sap.ui.core.RenderManager#accessibilityState} of the {@link sap.ui.core.RenderManager Semantic Rendering API}.
 	 */
 	RenderManager.prototype.writeAccessibilityState = function(oElement, mProps) {
 		if (!sap.ui.getCore().getConfiguration().getAccessibility()) {
@@ -1826,7 +1575,7 @@ sap.ui.define([
 		if (mProps) {
 			var checkValue = function(v){
 				var type = typeof (v);
-				return v === null || type === "number" || type === "string" || type === "boolean";
+				return v === null || v === "" || type === "number" || type === "string" || type === "boolean";
 			};
 
 			var prop = {};
@@ -1846,7 +1595,7 @@ sap.ui.define([
 			}
 
 			//The auto-generated values above can be overridden or reset (via null)
-			Object.assign(mAriaProps, prop);
+			jQuery.extend(mAriaProps, prop);
 		}
 
 		// allow parent (e.g. FormElement) to overwrite or enhance aria attributes
@@ -1880,24 +1629,12 @@ sap.ui.define([
 	 * @param {sap.ui.core.URI} sURI URI of an image or of an icon registered in {@link sap.ui.core.IconPool}
 	 * @param {array|string} [aClasses] Additional classes that are added to the rendered tag
 	 * @param {object} [mAttributes] Additional attributes that will be added to the rendered tag
-	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
+	 * @returns {sap.ui.core.RenderManager} Reference to <code>this</code> in order to allow method chaining
 	 * @public
-	 * @deprecated Since 1.92. Instead use {@link sap.ui.core.RenderManager#icon} of the {@link sap.ui.core.RenderManager Semantic Rendering API}.
 	 */
 	RenderManager.prototype.writeIcon = function(sURI, aClasses, mAttributes){
-		var IconPool = sap.ui.require("sap/ui/core/IconPool");
-		if (!IconPool) {
-			Log.warning("Synchronous loading of IconPool due to sap.ui.core.RenderManager#icon call. " +
-				"Ensure that 'sap/ui/core/IconPool is loaded before this function is called" , "SyncXHR", null, function() {
-				return {
-					type: "SyncXHR",
-					name: "rendermanager-icon"
-				};
-			});
-			IconPool = sap.ui.requireSync("sap/ui/core/IconPool"); // legacy-relevant: Sync fallback
-		}
-
-		var bIconURI = IconPool.isIconURI(sURI),
+		var IconPool = sap.ui.requireSync("sap/ui/core/IconPool"),
+			bIconURI = IconPool.isIconURI(sURI),
 			bAriaLabelledBy = false,
 			sProp, oIconInfo, mDefaultAttributes, sLabel, sInvTextId;
 
@@ -1950,7 +1687,7 @@ sap.ui.define([
 			};
 		}
 
-		mAttributes = extend(mDefaultAttributes, mAttributes);
+		mAttributes = jQuery.extend(mDefaultAttributes, mAttributes);
 
 		if (!mAttributes.id) {
 			mAttributes.id = uid();
@@ -1987,7 +1724,7 @@ sap.ui.define([
 				this.openStart("span");
 				this.style("display", "none");
 				this.attr("id", sInvTextId);
-				this.openEnd();
+				this.openEnd("span");
 				this.text(sLabel);
 				this.close("span");
 			}
@@ -2004,7 +1741,7 @@ sap.ui.define([
 	 * Returns the renderer class for a given control instance
 	 *
 	 * @param {sap.ui.core.Control} oControl the control that should be rendered
-	 * @returns {object} the renderer class for a given control instance
+	 * @return {object} the renderer class for a given control instance
 	 * @public
 	 */
 	RenderManager.prototype.getRenderer = function(oControl) {
@@ -2059,7 +1796,7 @@ sap.ui.define([
 	 * @param {sap.ui.core.Control}
 	 *            oControl the control that should be rendered
 	 * @type function
-	 * @returns {object} the renderer class for a given control instance
+	 * @return {object} the renderer class for a given control instance
 	 * @static
 	 * @public
 	 */
@@ -2086,7 +1823,7 @@ sap.ui.define([
 			var sOriginalDisplay = oDomNode.style.display;
 			var oActiveElement = document.activeElement;
 			oDomNode.style.display = "none";
-			oDomNode.offsetHeight; // force repaint
+			oDomNode.offsetHeight;
 			oDomNode.style.display = sOriginalDisplay;
 			if (document.activeElement !== oActiveElement && oActiveElement) {
 				oActiveElement.focus();
@@ -2121,7 +1858,7 @@ sap.ui.define([
 	function getPreserveArea() {
 		var $preserve = jQuery(document.getElementById(ID_PRESERVE_AREA));
 		if ($preserve.length === 0) {
-			$preserve = jQuery("<div></div>",{"aria-hidden":"true",id:ID_PRESERVE_AREA}).
+			$preserve = jQuery("<DIV/>",{"aria-hidden":"true",id:ID_PRESERVE_AREA}).
 				addClass("sapUiHidden").addClass("sapUiForcedHidden").css("width", "0").css("height", "0").css("overflow", "hidden").
 				appendTo(document.body);
 		}
@@ -2133,7 +1870,7 @@ sap.ui.define([
 	 * Create a placeholder node for the given node (which must have an ID) and insert it before the node
 	 */
 	function makePlaceholder(node) {
-		jQuery("<div></div>", { id: RenderPrefixes.Dummy + node.id}).addClass("sapUiHidden").insertBefore(node);
+		jQuery("<DIV/>", { id: RenderPrefixes.Dummy + node.id}).addClass("sapUiHidden").insertBefore(node);
 	}
 
 	// Stores {@link sap.ui.core.RenderManager.preserveContent} listener as objects with following structure:
@@ -2279,7 +2016,7 @@ sap.ui.define([
 					// a move to the preserveArea will modify the sibling relationship!
 					candidate = next;
 					next = next.nextSibling;
-					if ( candidate.nodeType === 1 /* Node.ELEMENT_NODE */ ) {
+					if ( candidate.nodeType === 1 /* Node.ELEMENT */ ) {
 						check(candidate);
 					}
 				}
@@ -2302,7 +2039,7 @@ sap.ui.define([
 	 * Searches "to-be-preserved" nodes for the given control id.
 	 *
 	 * @param {string} sId control id to search content for.
-	 * @returns {jQuery} a jQuery collection representing the found content
+	 * @return {jQuery} a jQuery collection representing the found content
 	 * @public
 	 * @static
 	 */
@@ -2329,7 +2066,7 @@ sap.ui.define([
 	 * Checks whether the given DOM element is part of the 'preserve' area.
 	 *
 	 * @param {Element} oElement DOM element to check
-	 * @returns {boolean} Whether element is part of 'preserve' area
+	 * @return {boolean} Whether element is part of 'preserve' area
 	 * @private
 	 * @static
 	 */
@@ -2340,7 +2077,7 @@ sap.ui.define([
 	/**
 	 * Returns the hidden area reference belonging to the current window instance.
 	 *
-	 * @returns {Element} The hidden area reference belonging to the current window instance.
+	 * @return {Element} The hidden area reference belonging to the current window instance.
 	 * @public
 	 * @static
 	 */
@@ -2365,7 +2102,7 @@ sap.ui.define([
 	 * Checks whether the given DOM node is an 'inline template' area.
 	 *
 	 * @param {Element} oDomNode dom node which is checked
-	 * @returns {boolean} whether node is an 'inline template' area
+	 * @return {boolean} whether node is an 'inline template' area
 	 * @private
 	 * @static
 	 */
@@ -2379,7 +2116,7 @@ sap.ui.define([
 	 * The inherited <code>apiVersion</code> value is not taken into account, <code>apiVersion</code> must be defined explicitly as an own property of the renderer.
 	 *
 	 * @param {sap.ui.core.Renderer} oRenderer The renderer of the control
-	 * @returns {int} API version of the Renderer
+	 * @return {int} API version of the Renderer
 	 * @private
 	 * @static
 	 */
@@ -2406,10 +2143,6 @@ sap.ui.define([
 		// render data attribute
 		var sId = oElement.getId();
 		oRm.attr("data-sap-ui", sId);
-
-		if (oElement.__slot) {
-			oRm.attr("slot", oElement.__slot);
-		}
 
 		// render custom data
 		oElement.getCustomData().forEach(function(oData) {
@@ -2440,33 +2173,6 @@ sap.ui.define([
 		}
 
 		return this;
-	}
-
-
-
-	/**
-	 * Inserts a given Node or HTML string at a given position relative to the provided HTML element.
-	 *
-	 * <!-- before : beforebegin -->
-	 * <p>
-	 *     <!-- prepend : afterbegin -->
-	 *     foo
-	 *     <!-- append : beforeend -->
-	 * </p>
-	 * <!-- after : afterend -->
-	 *
-	 * @param {HTMLElement} oElement The reference HTML element which the API is invoked upon
-	 * @param {string} sPosition The insertion position "before", "after", "append", "prepend"
-	 * @param {string|Node} vHTMLorNode The Node or HTML string to be inserted
-	 * @private
-	 */
-	var mAdjacentMap = { before: "beforebegin", prepend: "afterbegin", append: "beforeend", after: "afterend" };
-	function insertAdjacent(oElement, sPosition, vHTMLorNode) {
-		if (typeof vHTMLorNode == "string")  {
-			oElement.insertAdjacentHTML(mAdjacentMap[sPosition], vHTMLorNode);
-		} else {
-			oElement[sPosition](vHTMLorNode);
-		}
 	}
 
 	return RenderManager;

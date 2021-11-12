@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 /*
@@ -92,28 +92,46 @@ sap.ui.define(["sap/ui/thirdparty/jquery", "sap/ui/events/PseudoEvents"
 		};
 
 		/**
-		 * Returns OffsetX of Event.
+		 * Returns OffsetX of Event. In jQuery there is a bug. In IE the value is in offsetX, in FF in layerX
 		 *
 		 * @returns {int} offsetX
 		 * @public
 		 */
 		jQuery.Event.prototype.getOffsetX = function() {
-			if (this.type == 'click' && this.offsetX) {
-				return this.offsetX;
+
+			if (this.type == 'click') {
+				if (this.offsetX) {
+					return this.offsetX;
+				}
+				if (this.layerX) {
+					return this.layerX;
+				}
+				if (this.originalEvent.layerX) {
+					return this.originalEvent.layerX;
+				}
 			}
 			// nothing defined -> offset = 0
 			return 0;
 		};
 
 		/**
-		 * Returns OffsetY of Event.
+		 * Returns OffsetY of Event. In jQuery there is a bug. in IE the value is in offsetY, in FF in layerY.
 		 *
 		 * @returns {int} offsetY
 		 * @public
 		 */
 		jQuery.Event.prototype.getOffsetY = function() {
-			if (this.type == 'click' && this.offsetY) {
-				return this.offsetY;
+
+			if (this.type == 'click') {
+				if (this.offsetY) {
+					return this.offsetY;
+				}
+				if (this.layerY) {
+					return this.layerY;
+				}
+				if (this.originalEvent.layerY) {
+					return this.originalEvent.layerY;
+				}
 			}
 			// nothing defined -> offset = 0
 			return 0;

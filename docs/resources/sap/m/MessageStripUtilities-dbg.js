@@ -1,14 +1,10 @@
 /*!
 * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
 */
 
-sap.ui.define([
-	'sap/ui/core/IconPool'
-], function (
-	IconPool
-) {
+sap.ui.define(function () {
 	"use strict";
 
 	/**
@@ -18,7 +14,7 @@ sap.ui.define([
 	var MessageStripUtilities = {};
 
 	MessageStripUtilities.MESSAGES = {
-		TYPE_NOT_SUPPORTED: "Value 'sap.ui.core.MessageType.None' for property 'type' is not supported. " +
+		TYPE_NOT_SUPPORTED: "Value 'sap.ui.core.MessageType.None' for property 'type' is not supported." +
 		"Defaulting to 'sap.ui.core.MessageType.Information'"
 	};
 
@@ -47,16 +43,7 @@ sap.ui.define([
 	MessageStripUtilities.getIconURI = function () {
 		var sType = this.getType(),
 			sCustomIconURI = this.getCustomIcon(),
-			sIconURI;
-
-		var oIconsMapping = {
-			"Error": "error",
-			"Warning": "alert",
-			"Success": "sys-enter-2",
-			"Information": "information"
-		};
-
-		sIconURI = IconPool.getIconURI(oIconsMapping[sType]);
+			sIconURI = "sap-icon://message-" + sType.toLowerCase();
 
 		return sCustomIconURI || sIconURI;
 	};
@@ -70,6 +57,12 @@ sap.ui.define([
 		}
 
 		return sAriaText;
+	};
+
+	MessageStripUtilities.handleMSCloseButtonInteraction = function (oEvent) {
+		if (MessageStripUtilities.isMSCloseButtonPressed(oEvent.target)) {
+			this.close();
+		}
 	};
 
 	MessageStripUtilities.isMSCloseButtonPressed = function (oTarget) {

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -25,7 +25,6 @@ sap.ui.define([
 	'./TabStripRenderer',
 	"sap/base/Log",
 	"sap/ui/thirdparty/jquery",
-	"sap/ui/events/KeyCodes",
 	// jQuery Plugin "control"
 	"sap/ui/dom/jquery/control",
 	// jQuery Plugin "scrollLeftRTL"
@@ -51,8 +50,7 @@ function(
 	SelectListRenderer,
 	TabStripRenderer,
 	Log,
-	jQuery,
-	KeyCodes
+	jQuery
 ) {
 		"use strict";
 
@@ -73,7 +71,7 @@ function(
 		 * space is exceeded, a horizontal scrollbar appears.
 		 *
 		 * @extends sap.ui.core.Control
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @private
@@ -193,7 +191,7 @@ function(
 		/**
 		 * Library internationalization resource bundle.
 		 *
-		 * @type {module:sap/base/i18n/ResourceBundle}
+		 * @type {jQuery.sap.util.ResourceBundle}
 		 */
 		var oRb = sap.ui.getCore().getLibraryResourceBundle("sap.m");
 
@@ -206,7 +204,7 @@ function(
 		TabStrip.ICON_BUTTONS = {
 			LeftArrowButton: "slim-arrow-left",
 			RightArrowButton: "slim-arrow-right",
-			DownArrowButton: Device.system.phone ? "navigation-down-arrow" : "slim-arrow-down",
+			DownArrowButton: "slim-arrow-down",
 			AddButton: "add"
 		};
 
@@ -325,8 +323,6 @@ function(
 				}
 
 				this._sResizeListenerId = ResizeHandler.register(this.getDomRef(),  jQuery.proxy(this._adjustScrolling, this));
-			} else {
-				this.$().toggleClass("sapUiSelectable", this.getItems().length > 1);
 			}
 		};
 
@@ -337,9 +333,9 @@ function(
 		 * @private
 		 */
 		TabStrip.prototype._handleInititalScrollToItem = function() {
-			var oItem = sap.ui.getCore().byId(this.getSelectedItem());
-			if (oItem && oItem.$().length > 0) { // check if the item is already in the DOM
-				this._scrollIntoView(oItem, 500);
+			var $oItem = sap.ui.getCore().byId(this.getSelectedItem());
+			if ($oItem && $oItem.$().length > 0) { // check if the item is already in the DOM
+				this._scrollIntoView($oItem, 500);
 			}
 			sap.ui.getCore().detachThemeChanged(this._handleInititalScrollToItem, this);
 		};
@@ -370,7 +366,7 @@ function(
 		 */
 		TabStrip.prototype.applyFocusInfo = function (oFocusInfo) {
 			if (oFocusInfo.focusDomRef) {
-				jQuery(oFocusInfo.focusDomRef).trigger("focus");
+				jQuery(oFocusInfo.focusDomRef).focus();
 			}
 		};
 
@@ -422,13 +418,6 @@ function(
 			this.$().toggleClass("sapMTSScrollable", bScrollNeeded);
 
 			return bScrollNeeded;
-		};
-
-		TabStrip.prototype.onkeyup = function (oEvent){
-			if (oEvent && oEvent.keyCode === KeyCodes.ARROW_LEFT || oEvent.keyCode === KeyCodes.ARROW_RIGHT) {
-				var oTarget = jQuery(oEvent.target).control(0);
-				this._scrollIntoView(oTarget, 500);
-			}
 		};
 
 		TabStrip.prototype._handleOverflowButtons = function() {
@@ -570,9 +559,10 @@ function(
 		 */
 		TabStrip.prototype._scroll = function(iDelta, iDuration) {
 			var iScrollLeft = this.getDomRef("tabsContainer").scrollLeft,
+				bIE_Edge = Device.browser.internet_explorer || Device.browser.edge,// TODO remove after the end of support for Internet Explorer
 				iScrollTarget;
 
-			if (this._bRtl) {
+			if (this._bRtl && !bIE_Edge) {// TODO remove after the end of support for Internet Explorer
 				iScrollTarget = iScrollLeft - iDelta;
 
 				if (Device.browser.firefox) {
@@ -609,31 +599,38 @@ function(
 		TabStrip.prototype._scrollIntoView = function (oItem, iDuration) {
 			var $tabs = this.$("tabs"),
 				$item = oItem.$(),
-				iLeftButtonWidth = this.$("leftOverflowButtons") ? this.$("leftOverflowButtons").width() : 0,
-				iRigtButtonWidth = this.$("rightOverflowButtons") ? this.$("rightOverflowButtons").width() : 0,
 				iTabsPaddingWidth = $tabs.innerWidth() - $tabs.width(),
 				iItemWidth = $item.outerWidth(true),
 				iItemPosLeft = $item.position().left - iTabsPaddingWidth / 2,
 				oTabsContainerDomRef = this.getDomRef("tabsContainer"),
 				iScrollLeft = oTabsContainerDomRef.scrollLeft,
 				iContainerWidth = this.$("tabsContainer").width(),
-				iNewScrollLeft = iScrollLeft;
+				iNewScrollLeft = iScrollLeft,
+				bIE_Edge = Device.browser.internet_explorer || Device.browser.edge;
 
 			// check if item is outside of viewport
-			if (iItemPosLeft < iLeftButtonWidth || iItemPosLeft + iRigtButtonWidth > iContainerWidth - iItemWidth) {
+			if (iItemPosLeft < 0 || iItemPosLeft > iContainerWidth - iItemWidth) {
+
 				if (this._bRtl && Device.browser.firefox) {
-					if (iItemPosLeft > iLeftButtonWidth) { // right side: make this the last item
-						iNewScrollLeft += iItemPosLeft + iItemWidth - iContainerWidth + iRigtButtonWidth;
+					if (iItemPosLeft < 0) { // right side: make this the last item
+						iNewScrollLeft += iItemPosLeft + iItemWidth - iContainerWidth;
 					} else { // left side: make this the first item
-						iNewScrollLeft += iItemPosLeft - iLeftButtonWidth;
+						iNewScrollLeft += iItemPosLeft;
+					}
+				} else if (this._bRtl && bIE_Edge) {
+					if (iItemPosLeft < 0) { // right side: make this the first item
+						iNewScrollLeft -= iItemPosLeft;
+					} else { // left side: make this the last item
+						iNewScrollLeft -= iItemPosLeft + iItemWidth - iContainerWidth;
 					}
 				} else {
-					if (iItemPosLeft < iLeftButtonWidth) { // left side: make this the first item
-						iNewScrollLeft += iItemPosLeft - iRigtButtonWidth;
+					if (iItemPosLeft < 0) { // left side: make this the first item
+						iNewScrollLeft += iItemPosLeft;
 					} else { // right side: make this the last item
-						iNewScrollLeft += iItemPosLeft + iItemWidth - iContainerWidth + iLeftButtonWidth;
+						iNewScrollLeft += iItemPosLeft + iItemWidth - iContainerWidth;
 					}
 				}
+
 				// store current scroll state to set it after re-rendering
 				this._iCurrentScrollLeft = iNewScrollLeft;
 				this._oScroller.scrollTo(iNewScrollLeft, 0, iDuration);
@@ -654,9 +651,9 @@ function(
 				oSelectedSelectItem,
 				oSelectedTabStripItem,
 				oConstructorSettings = {
-					type: SelectType.IconOnly,
+					type: Device.system.phone ? SelectType.Default : SelectType.IconOnly,
 					autoAdjustWidth : true,
-					maxWidth: "2.5rem",
+					maxWidth: Device.system.phone ? "100%" : "2.5rem",
 					icon: IconPool.getIconURI(TabStrip.ICON_BUTTONS.DownArrowButton),
 					tooltip: oRb.getText("TABSTRIP_OPENED_TABS"),
 					change: function (oEvent) {
@@ -766,7 +763,7 @@ function(
 		 * @param {string} sAggregationName The name of the aggregation where the new entity is to be added
 		 * @param {any} oObject The value of the aggregation to be added
 		 * @param {boolean} bSuppressInvalidate Whether to suppress invalidation
-		 * @returns {this} <code>this</code> pointer for chaining
+		 * @returns {sap.m.TabStrip} <code>this</code> pointer for chaining
 		 * @override
 		 */
 		TabStrip.prototype.addAggregation = function(sAggregationName, oObject, bSuppressInvalidate) {
@@ -783,7 +780,7 @@ function(
 		 * @param {any} oObject The value of the aggregation to be inserted
 		 * @param {int} iIndex The index to be inserted in
 		 * @param {boolean} bSuppressInvalidate Whether to suppress invalidation
-		 * @returns {this} <code>this</code> pointer for chaining
+		 * @returns {sap.m.TabStrip} <code>this</code> pointer for chaining
 		 * @override
 		 */
 		TabStrip.prototype.insertAggregation = function(sAggregationName, oObject, iIndex, bSuppressInvalidate) {
@@ -799,7 +796,7 @@ function(
 		 * @param {string} sAggregationName The name of the aggregation
 		 * @param {any} oObject The value of aggregation to be removed
 		 * @param {boolean} bSuppressInvalidate Whether to suppress invalidation
-		 * @returns {sap.ui.base.ManagedObject} The removed aggregated item
+		 * @returns {sap.m.TabStrip} <code>this</code> pointer for chaining
 		 * @override
 		 */
 		TabStrip.prototype.removeAggregation = function(sAggregationName, oObject, bSuppressInvalidate) {
@@ -814,7 +811,7 @@ function(
 		 *
 		 * @param {string} sAggregationName The name of aggregation
 		 * @param {boolean} bSuppressInvalidate Whether to suppress invalidation
-		 * @returns {sap.ui.base.ManagedObject[]} the removed aggregated items
+		 * @returns {sap.m.TabStrip} <code>this</code> pointer for chaining
 		 * @override
 		 */
 		TabStrip.prototype.removeAllAggregation = function(sAggregationName, bSuppressInvalidate) {
@@ -829,7 +826,7 @@ function(
 		 *
 		 * @param {string} sAggregationName The name of aggregation
 		 * @param {boolean} bSuppressInvalidate Whether to suppress invalidation
-		 * @returns {this} <code>this</code> pointer for chaining
+		 * @returns {sap.m.TabStrip} <code>this</code> pointer for chaining
 		 * @override
 		 */
 		TabStrip.prototype.destroyAggregation = function(sAggregationName, bSuppressInvalidate) {
@@ -843,24 +840,20 @@ function(
 		 * Sets a <code>TabStripItem</code> as current.
 		 *
 		 * @param {sap.m.TabStripItem} oSelectedItem the item that should be set as current
-		 * @returns {this} <code>this</code> pointer for chaining
+		 * @returns {sap.m.TabStrip} <code>this</code> pointer for chaining
 		 * @override
 		 */
 		TabStrip.prototype.setSelectedItem = function(oSelectedItem) {
-			var bNotMobile = !Device.system.phone;
-
 			if (!oSelectedItem) {
 				return this;
 			}
 
-			if (oSelectedItem.$().length > 0 && bNotMobile) {
+			if (oSelectedItem.$().length > 0) {
 				this._scrollIntoView(oSelectedItem, 500);
 			}
 
-			if (bNotMobile) {
-				this._updateAriaSelectedAttributes(this.getItems(), oSelectedItem);
-				this._updateSelectedItemClasses(oSelectedItem.getId());
-			}
+			this._updateAriaSelectedAttributes(this.getItems(), oSelectedItem);
+			this._updateSelectedItemClasses(oSelectedItem.getId());
 
 			// propagate the selection change to the select aggregation
 			if (this.getHasSelect()) {
@@ -868,7 +861,7 @@ function(
 				this.getAggregation('_select').setSelectedItem(oSelectItem);
 			}
 
-			return this.setAssociation("selectedItem", oSelectedItem, bNotMobile);
+			return this.setAssociation("selectedItem", oSelectedItem, true); //render manually;
 		};
 
 		/**
@@ -877,7 +870,7 @@ function(
 		 * @param {string} sPropertyName The property name to be set
 		 * @param {any} vValue The property value to be set
 		 * @param {boolean} bSuppressInvalidate Whether to suppress invalidation
-		 * @returns {this} <code>this</code> pointer for chaining
+		 * @returns {sap.m.TabStrip} <code>this</code> pointer for chaining
 		 * @override
 		 */
 		TabStrip.prototype.setProperty = function(sPropertyName, vValue, bSuppressInvalidate) {
@@ -1005,7 +998,7 @@ function(
 		 *
 		 * @param {array} aArgs
 		 * @param {boolean} bIsAdding
-		 * @returns {this} <code>this</code> instance for chaining
+		 * @returns {sap.m.TabStrip} <code>this</code> instance for chaining
 		 */
 		TabStrip.prototype._handleItemsAggregation = function (aArgs, bIsAdding) {
 			var sAggregationName = 'items', // name of the aggregation in CustomSelect
@@ -1300,7 +1293,7 @@ function(
 		/*
 		 * Destroys all <code>TabStripItem</code> entities from the <code>items</code> aggregation of the <code>TabStrip</code>.
 		 *
-		 * @returns {this} This instance for chaining
+		 * @returns {sap.m.TabStrip} This instance for chaining
 		 * @override
 		 */
 		TabStrip.prototype.destroyItems = function() {

@@ -1,12 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides the implementation for the ControlControlMessageProcessor implementations
-sap.ui.define(['sap/ui/core/message/MessageProcessor'],
-	function(MessageProcessor) {
+sap.ui.define(['sap/ui/core/message/MessageProcessor', "sap/ui/thirdparty/jquery"],
+	function(MessageProcessor, jQuery) {
 	"use strict";
 
 
@@ -29,7 +29,7 @@ sap.ui.define(['sap/ui/core/message/MessageProcessor'],
 	 * @extends sap.ui.core.message.MessageProcessor
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @public
 	 * @alias sap.ui.core.message.ControlMessageProcessor
@@ -68,18 +68,18 @@ sap.ui.define(['sap/ui/core/message/MessageProcessor'],
 	 */
 	ControlMessageProcessor.prototype.checkMessages = function() {
 		var aMessages,
-			sTarget,
-			mMessages = Object.assign({}, this.mMessages);
+			that = this,
+			mMessages = jQuery.extend(this.mMessages, {});
 
 		//add targets to clear from mOldMessages to the mMessages to check
-		for (sTarget in this.mOldMessages) {
+		jQuery.each(this.mOldMessages, function(sTarget) {
 			if (!(sTarget in mMessages)) {
 				mMessages[sTarget] = [];
 			}
-		}
+		});
 
 		//check messages
-		for (sTarget in mMessages) {
+		jQuery.each(mMessages, function(sTarget) {
 			var oBinding,
 				oControl,
 				aParts = sTarget.split('/');
@@ -91,12 +91,12 @@ sap.ui.define(['sap/ui/core/message/MessageProcessor'],
 			oControl = sap.ui.getCore().byId(aParts[0]);
 
 			//if control does not exist: nothing to do
-			if  (!oControl || oControl._bIsBeingDestroyed) {
+			if  (!oControl) {
 				return;
 			}
 
 			oBinding = oControl.getBinding(aParts[1]);
-			aMessages = mMessages[sTarget] ? mMessages[sTarget] : [];
+			aMessages = that.mMessages[sTarget] ? that.mMessages[sTarget] : [];
 			if (oBinding) {
 				var oDataState = oBinding.getDataState();
 				oDataState.setControlMessages(aMessages);
@@ -105,7 +105,7 @@ sap.ui.define(['sap/ui/core/message/MessageProcessor'],
 				oControl.propagateMessages(aParts[1], aMessages);
 			}
 
-		}
+		});
 	};
 
 	return ControlMessageProcessor;

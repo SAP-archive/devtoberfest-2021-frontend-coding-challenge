@@ -27,11 +27,10 @@
 }
 
 /* Improved behaviour for TileContent in GenericTile */
-.sapMGT .sapMTileCnt.sapMFrameTypeAuto:only-of-type {
+.sapMGT .sapMTileCnt.sapMFrameTypeAuto:only-child {
 	width: 100%;
 }
-
-.sapMGT .sapMTileCnt.sapMFrameTypeAuto:not(:only-of-type) {
+.sapMGT .sapMTileCnt.sapMFrameTypeAuto:not(:only-child) {
 	width: ~"calc(50% - 0.25rem)"; //0.5rem margin between the contents
 }
 
@@ -59,9 +58,6 @@
 	text-align: left;
 }
 
-html[dir=rtl] .sapMGT .sapMTileCntFtrTxt {
-	text-align: right;
-}
 
 .sapMTileCntFooterTextColorNeutral {
 	color: @sapUiTileTextColor;
@@ -130,10 +126,6 @@ html[dir=rtl] .sapMTileCntFtrTxt {
 	.sapMTileCntContent > .sapMTcInnerMarker {
 		vertical-align: top;
 	}
-}
-
-.Stretch .sapMTileCnt.News{
-	height: 100%;
 }
 
 .sapMTileSmallPhone {

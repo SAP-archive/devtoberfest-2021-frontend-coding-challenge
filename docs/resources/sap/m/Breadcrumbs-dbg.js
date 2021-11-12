@@ -1,13 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.m.Breadcrumbs.
 sap.ui.define([
 	"sap/ui/core/Control",
-	"sap/ui/util/openWindow",
 	"sap/m/Text",
 	"sap/m/Link",
 	"sap/m/Select",
@@ -17,12 +16,9 @@ sap.ui.define([
 	"sap/ui/core/IconPool",
 	"sap/ui/Device",
 	"sap/m/library",
-	"./BreadcrumbsRenderer",
-	'sap/ui/base/ManagedObject',
-	'sap/ui/core/InvisibleText'
+	"./BreadcrumbsRenderer"
 ], function(
 	Control,
-	openWindow,
 	Text,
 	Link,
 	Select,
@@ -32,9 +28,7 @@ sap.ui.define([
 	IconPool,
 	Device,
 	library,
-	BreadcrumbsRenderer,
-	ManagedObject,
-	InvisibleText
+	BreadcrumbsRenderer
 ) {
 	"use strict";
 
@@ -60,7 +54,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -108,38 +102,27 @@ sap.ui.define([
 				_currentLocation: {type: "sap.m.Text", multiple: false, visibility: "hidden"},
 				_select: {type: "sap.m.Select", multiple: false, visibility: "hidden"}
 			},
-			defaultAggregation: "links",
-			associations: {
-
-				/**
-				 * Association to controls / IDs which label this control (see WAI-ARIA attribute <code>aria-labelledby</code>).
-				 * @since 1.92
-				 */
-				ariaLabelledBy: {
-					type: "sap.ui.core.Control", multiple: true, singularName: "ariaLabelledBy"
-				}
-			}
+			defaultAggregation: "links"
 		}
 	});
 
-	/*
+	/**
 	 * STATIC MEMBERS
 	 */
 
 	Breadcrumbs.STYLE_MAPPER = {
-		Slash: "/",
-		BackSlash: "\\",
-		DoubleSlash: "//",
-		DoubleBackSlash: "\\\\",
-		GreaterThan: ">",
-		DoubleGreaterThan: ">>"
+		Slash: "&#047;",
+		BackSlash: "&#092;",
+		DoubleSlash: "&#047;&#047;",
+		DoubleBackSlash: "&#092;&#092;",
+		GreaterThan: "&gt;",
+		DoubleGreaterThan: "&#187;"
 	};
 
 	/*************************************** Framework lifecycle events ******************************************/
 
 	Breadcrumbs.prototype.init = function () {
 		this._sSeparatorSymbol = Breadcrumbs.STYLE_MAPPER[this.getSeparatorStyle()];
-		this._getInvisibleText();
 	};
 
 	Breadcrumbs.prototype.onBeforeRendering = function () {
@@ -177,11 +160,6 @@ sap.ui.define([
 	Breadcrumbs.prototype.exit = function () {
 		this._resetControl();
 		this._destroyItemNavigation();
-
-		if (this._oInvisibleText) {
-			this._oInvisibleText.destroy();
-			this._oInvisibleText = null;
-		}
 	};
 
 	/*************************************** Static members ******************************************/
@@ -194,18 +172,6 @@ sap.ui.define([
 		return this.getId() + "-" + sSuffix;
 	};
 
-
-	Breadcrumbs.prototype._getInvisibleText = function() {
-		var oAriaLabelText = BreadcrumbsRenderer._getResourceBundleText("BREADCRUMB_LABEL");
-
-		if (!this._oInvisibleText) {
-			this._oInvisibleText = new InvisibleText({ id: this.getId() + "-InvisibleText"});
-			this._oInvisibleText.setText(oAriaLabelText).toStatic();
-		}
-
-		return this._oInvisibleText;
-	};
-
 	Breadcrumbs.prototype._getSelect = function () {
 		if (!this.getAggregation("_select")) {
 			this.setAggregation("_select", this._decorateSelect(new Select({
@@ -216,27 +182,18 @@ sap.ui.define([
 				icon: IconPool.getIconURI("slim-arrow-down"),
 				type: SelectType.IconOnly,
 				tooltip: BreadcrumbsRenderer._getResourceBundleText("BREADCRUMB_SELECT_TOOLTIP")
-			})), true);
+			})));
 		}
 		return this.getAggregation("_select");
 	};
 
 	Breadcrumbs.prototype._getCurrentLocation = function () {
 		if (!this.getAggregation("_currentLocation")) {
-			var oCurrentLocation = new Text({
+			this.setAggregation("_currentLocation", new Text({
 				id: this._getAugmentedId("currentText"),
 				text: this.getCurrentLocationText(),
 				wrapping: false
-			}).addStyleClass("sapMBreadcrumbsCurrentLocation");
-
-			oCurrentLocation.addEventDelegate({
-				onAfterRendering: function () {
-					oCurrentLocation.$().attr("aria-current", "page");
-					oCurrentLocation.$().attr("tabindex", 0);
-				}
-			});
-
-			this.setAggregation("_currentLocation", oCurrentLocation).addStyleClass("sapMBreadcrumbsCurrentLocation");
+			}).addStyleClass("sapMBreadcrumbsCurrentLocation"));
 		}
 		return this.getAggregation("_currentLocation");
 	};
@@ -338,7 +295,7 @@ sap.ui.define([
 	Breadcrumbs.prototype._createSelectItem = function (oItem) {
 		return new Item({
 			key: oItem.getId(),
-			text: ManagedObject.escapeSettingsValue(oItem.getText())
+			text: oItem.getText()
 		});
 	};
 
@@ -379,8 +336,7 @@ sap.ui.define([
 
 		if (sLinkHref) {
 			if (sLinkTarget) {
-				// TODO: take oLink.getRel() value into account ('links' is a public aggregation)
-				openWindow(sLinkHref, sLinkTarget);
+				window.open(sLinkHref, sLinkTarget);
 			} else {
 				window.location.href = sLinkHref;
 			}
@@ -388,7 +344,7 @@ sap.ui.define([
 	};
 
 	Breadcrumbs.prototype._getItemsForMobile = function () {
-		var oItems = this.getLinks().filter(function (oLink) { return oLink.getVisible(); });
+		var oItems = this.getLinks();
 
 		if (this.getCurrentLocationText()) {
 			oItems.push(this._getCurrentLocation());
@@ -442,7 +398,7 @@ sap.ui.define([
 		return {
 			id: oControl.getId(),
 			control: oControl,
-			width: getElementWidth(oControl.$().parent()),
+			width: oControl.$().parent().outerWidth(true),
 			bCanOverflow: oControl instanceof Link
 		};
 	};
@@ -503,11 +459,9 @@ sap.ui.define([
 	 */
 	Breadcrumbs.prototype._getControlsInfo = function () {
 		if (!this._bControlsInfoCached) {
-			this._iSelectWidth = getElementWidth(this._getSelect().$().parent()) || 0;
+			this._iSelectWidth = this._getSelect().$().parent().outerWidth(true) || 0;
 			this._aControlInfo = this._getControlsForBreadcrumbTrail().map(this._getControlInfo);
-			// ceil the container width to prevent unnecessary overflow of a link due to rounding issues
-			// (when the available space appears insufficient with less than a pixel
-			this._iContainerSize = Math.ceil(getElementWidth(this.$()));
+			this._iContainerSize = this.$().outerWidth(true);
 			this._bControlsInfoCached = true;
 		}
 
@@ -522,23 +476,13 @@ sap.ui.define([
 	 * Handles the resize event of the Breadcrumbs control container
 	 *
 	 * @param {jQuery.Event} oEvent
-	 * @returns {this} this
+	 * @returns {object} this
 	 * @private
 	 */
 	Breadcrumbs.prototype._handleScreenResize = function (oEvent) {
-		var iCachedControlsForBreadcrumbTrailCount,
-			oControlsDistribution,
-			iCalculatedControlsForBreadcrumbTrailCount;
-
-		if (oEvent.size.width === oEvent.oldSize.width || oEvent.size.width === 0) {
-			return this;
-		}
-
-		iCachedControlsForBreadcrumbTrailCount = this._oDistributedControls.aControlsForBreadcrumbTrail.length;
-		// ceil the container width to prevent unnecessary overflow of a link due to rounding issues
-		// (when the available space appears insufficient with less than a pixel
-		oControlsDistribution = this._getControlDistribution(Math.ceil(getElementWidth(this.$())));
-		iCalculatedControlsForBreadcrumbTrailCount = oControlsDistribution.aControlsForBreadcrumbTrail.length;
+		var iCachedControlsForBreadcrumbTrailCount = this._oDistributedControls.aControlsForBreadcrumbTrail.length,
+			oControlsDistribution = this._getControlDistribution(oEvent.size.width),
+			iCalculatedControlsForBreadcrumbTrailCount = oControlsDistribution.aControlsForBreadcrumbTrail.length;
 
 		if (iCachedControlsForBreadcrumbTrailCount !== iCalculatedControlsForBreadcrumbTrailCount) {
 			this._updateSelect(true);
@@ -654,20 +598,21 @@ sap.ui.define([
 	};
 
 	/**
-	 * Custom setter for the <code>Breadcrumbs</code> separator style.
-	 *
-	 * @returns {sap.m.Breadcrumbs} this
-	 * @param {sap.m.BreadcrumbsSeparatorStyle} sSeparatorStyle
-	 * @public
-	 * @since 1.71
-	 */
+	* Custom setter for the <code>Breadcrumbs</code> separator style.
+	*
+	* @returns {object} this
+	* @param {string} sSeparatorStyle
+	* @public
+	* @since 1.71
+	*/
 	Breadcrumbs.prototype.setSeparatorStyle = function (sSeparatorStyle) {
-		this.setProperty("separatorStyle", sSeparatorStyle);
-		var sSeparatorSymbol = Breadcrumbs.STYLE_MAPPER[this.getSeparatorStyle()];
-		if (sSeparatorSymbol){
-			this._sSeparatorSymbol = sSeparatorSymbol;
+		var sSeparatorSymbol = Breadcrumbs.STYLE_MAPPER[sSeparatorStyle];
+		if (!sSeparatorSymbol){
+			return this;
 		}
-		return this;
+
+		this._sSeparatorSymbol = sSeparatorSymbol;
+		return this.setProperty("separatorStyle", sSeparatorStyle);
 	};
 
 	/**
@@ -692,16 +637,6 @@ sap.ui.define([
 		this.invalidate(this);
 		return this;
 	};
-
-	// helper functions
-	function getElementWidth($element) {
-		var iMargins;
-		if ($element.length) {
-			iMargins = $element.outerWidth(true) - $element.outerWidth();
-
-			return $element.get(0).getBoundingClientRect().width + iMargins;
-		}
-	}
 
 	return Breadcrumbs;
 

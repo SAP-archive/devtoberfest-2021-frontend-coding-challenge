@@ -70,12 +70,7 @@ $.widget("ui.resizable", $.ui.mouse, {
 
 			//Create a wrapper element and set the wrapper to the new current internal element
 			this.element.wrap(
-				// ##### BEGIN: MODIFIED BY SAP
-				// CSP Modification - remove inline style
-				// $("<div class='ui-wrapper' style='overflow: hidden;'></div>").css({
-				$("<div class='ui-wrapper'></div>").css({
-					overflow: "hidden",
-				// ##### END: MODIFIED BY SAP
+				$("<div class='ui-wrapper' style='overflow: hidden;'></div>").css({
 					position: this.element.css("position"),
 					width: this.element.outerWidth(),
 					height: this.element.outerHeight(),
@@ -122,10 +117,7 @@ $.widget("ui.resizable", $.ui.mouse, {
 
 			for(i = 0; i < n.length; i++) {
 
-				// ##### BEGIN: MODIFIED BY SAP
-				// handle = $.trim(n[i]);
-				handle = n[i].trim();
-				// ##### END: MODIFIED BY SAP
+				handle = $.trim(n[i]);
 				hname = "ui-resizable-"+handle;
 				axis = $("<div class='ui-resizable-handle " + hname + "'></div>");
 
@@ -235,10 +227,7 @@ $.widget("ui.resizable", $.ui.mouse, {
 		var wrapper,
 			_destroy = function(exp) {
 				$(exp).removeClass("ui-resizable ui-resizable-disabled ui-resizable-resizing")
-					// ##### BEGIN: MODIFIED BY SAP
-					// .removeData("resizable").removeData("ui-resizable").unbind(".resizable").find(".ui-resizable-handle").remove();
-					.removeData("resizable").removeData("ui-resizable").off(".resizable").find(".ui-resizable-handle").remove();
-					// ##### END: MODIFIED BY SAP
+					.removeData("resizable").removeData("ui-resizable").unbind(".resizable").find(".ui-resizable-handle").remove();
 			};
 
 		//TODO: Unwrap at same DOM position
@@ -584,14 +573,9 @@ $.widget("ui.resizable", $.ui.mouse, {
 
 		if(this._helper) {
 
-			// ##### BEGIN: MODIFIED BY SAP
-			// CSP Modification - remove inline style
-			// this.helper = this.helper || $("<div style='overflow:hidden;'></div>");
-			this.helper = this.helper || $("<div></div>");
+			this.helper = this.helper || $("<div style='overflow:hidden;'></div>");
 
 			this.helper.addClass(this._helper).css({
-				overflow: "hidden",
-			// ##### END: MODIFIED BY SAP
 				width: this.element.outerWidth() - 1,
 				height: this.element.outerHeight() - 1,
 				position: "absolute",

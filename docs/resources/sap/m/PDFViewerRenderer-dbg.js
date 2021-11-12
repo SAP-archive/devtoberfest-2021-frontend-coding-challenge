@@ -1,11 +1,13 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define(['sap/ui/Device', "sap/base/Log", "sap/base/security/URLListValidator"],
-	function (Device, Log, URLListValidator) {
+ /* global ActiveXObject:false */
+
+sap.ui.define(['sap/ui/Device', "sap/base/Log"],
+	function (Device, Log) {
 		"use strict";
 
 		function shouldShowToolbar(oControl) {
@@ -21,9 +23,7 @@ sap.ui.define(['sap/ui/Device', "sap/base/Log", "sap/base/security/URLListValida
 		 * Pdf viewer renderer.
 		 * @namespace
 		 */
-		var PDFViewerRenderer = {
-			apiVersion: 2
-		};
+		var PDFViewerRenderer = {};
 
 		/**
 		 * Check whether Mime type is supported
@@ -43,6 +43,19 @@ sap.ui.define(['sap/ui/Device', "sap/base/Log", "sap/base/security/URLListValida
 			if (Device.browser.firefox) {
 				// https://bugzilla.mozilla.org/show_bug.cgi?id=1293406
 				// mimeType is missing for firefox even though it is enabled
+				return bIsEnabled;
+			}
+
+			if (Device.browser.internet_explorer) {
+				// hacky code how to recognize that pdf plugin is installed and enabled
+				try {
+					/* eslint-disable no-new */
+					new ActiveXObject("AcroPDF.PDF");
+					/* eslint-enable no-new */
+				} catch (e) {
+					bIsEnabled = false;
+				}
+
 				return bIsEnabled;
 			}
 
@@ -66,11 +79,14 @@ sap.ui.define(['sap/ui/Device', "sap/base/Log", "sap/base/security/URLListValida
 		 *            the PdfViewer component to be rendered
 		 */
 		PDFViewerRenderer.render = function (oRm, oControl) {
-			oRm.openStart("div", oControl);
-			oRm.style("width", oControl._getRenderWidth());
-			oRm.style("height", oControl._getRenderHeight());
+			oRm.write("<div");
+			oRm.writeControlData(oControl);
+			oRm.addStyle("width", oControl._getRenderWidth());
+			oRm.addStyle("height", oControl._getRenderHeight());
+			oRm.writeStyles();
+			oRm.writeClasses();
 			this._writeAccessibilityTags(oRm, oControl);
-			oRm.openEnd();
+			oRm.write(">");
 
 			if (shouldShowToolbar(oControl)) {
 				oRm.renderControl(oControl._objectsRegister.getOverflowToolbarControl());
@@ -80,44 +96,25 @@ sap.ui.define(['sap/ui/Device', "sap/base/Log", "sap/base/security/URLListValida
 				this.renderPdfContent(oRm, oControl);
 			}
 
-			oRm.close("div");
+			oRm.write("</div>");
 		};
 
 		PDFViewerRenderer._writeAccessibilityTags = function (oRm, oControl) {
-			oRm.attr("role", "document");
-			oRm.attr("aria-label", oControl._getLibraryResourceBundle().getText("PDF_VIEWER_ACCESSIBILITY_LABEL"));
+			oRm.writeAttribute("role", "document");
+			oRm.writeAttribute("aria-label", oControl._getLibraryResourceBundle().getText("PDF_VIEWER_ACCESSIBILITY_LABEL"));
 		};
 
 		PDFViewerRenderer.renderPdfContent = function (oRm, oControl) {
-
 			if (oControl._shouldRenderPdfContent()) {
-				oRm.openStart("iframe", oControl.getId() + "-iframe");
-
-				var sParametrizedSource = oControl.getSource();
-				var iCrossPosition = oControl.getSource().indexOf("#");
-				if (iCrossPosition > -1) {
-					sParametrizedSource = sParametrizedSource.substr(0, iCrossPosition);
-				}
-				if (!(Device.browser.safari && sParametrizedSource.startsWith("blob:"))) {
-					sParametrizedSource += "#view=FitH";
-				}
-				if (!URLListValidator.validate(sParametrizedSource)) {
-					sParametrizedSource = encodeURI(sParametrizedSource);
-				}
-
-				if (URLListValidator.validate(sParametrizedSource)) {
-					oRm.attr("src", sParametrizedSource);
-				} else {
-					oControl._fireErrorEvent();
-				}
-
-				oRm.class("sapMPDFViewerContent");
-				oRm.class("sapMPDFViewerLoading");
+				oRm.write("<iframe");
+				oRm.addClass("sapMPDFViewerContent");
+				oRm.addClass("sapMPDFViewerLoading");
 				if (shouldShowToolbar(oControl)) {
-					oRm.class("sapMPDFViewerReducedContent");
+					oRm.addClass("sapMPDFViewerReducedContent");
 				}
-				oRm.openEnd();
-				oRm.close("iframe");
+				oRm.writeClasses();
+				oRm.write(">");
+				oRm.write("</iframe>");
 			} else {
 				this.renderErrorContent(oRm, oControl);
 				if (!PDFViewerRenderer._isPdfPluginEnabled()) {
@@ -131,14 +128,15 @@ sap.ui.define(['sap/ui/Device', "sap/base/Log", "sap/base/security/URLListValida
 			var oErrorContent = oControl.getErrorPlaceholder() ? oControl.getErrorPlaceholder() :
 					oControl._objectsRegister.getPlaceholderMessagePageControl();
 
-			oRm.openStart("div");
-			oRm.class("sapMPDFViewerError");
+			oRm.write("<div");
+			oRm.addClass("sapMPDFViewerError");
 			if (!oControl._bIsPopupOpen) {
-				oRm.class("sapMPDFViewerEmbeddedContent");
+				oRm.addClass("sapMPDFViewerEmbeddedContent");
 			}
-			oRm.openEnd();
+			oRm.writeClasses();
+			oRm.write(">");
 			oRm.renderControl(oErrorContent);
-			oRm.close("div");
+			oRm.write("</div>");
 		};
 
 		return PDFViewerRenderer;

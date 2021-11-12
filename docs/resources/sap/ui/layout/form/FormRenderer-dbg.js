@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -16,51 +16,54 @@ sap.ui.define([
 	 * @namespace
 	 */
 	var FormRenderer = {
-		apiVersion: 2
 	};
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
 	 *
-	 * @param {sap.ui.core.RenderManager} rm the RenderManager that can be used for writing to the Render-Output-Buffer
+	 * @param {sap.ui.core.RenderManager} oRenderManager the RenderManager that can be used for writing to the Render-Output-Buffer
 	 * @param {sap.ui.core.Control} oForm an object representation of the control that should be rendered
 	 */
-	FormRenderer.render = function(rm, oForm){
+	FormRenderer.render = function(oRenderManager, oForm){
+		// convenience variable
+		var rm = oRenderManager;
 		var oLayout = oForm.getLayout();
 		var mAriaProps = {role: "form"};
 
 		// write only a DIV for the form and let the layout render the rest
-		rm.openStart("div", oForm)
-			.class("sapUiForm")
-			.class("sapUiFormLblColon") // to always have the ":" at the Labels
-			.attr("data-sap-ui-customfastnavgroup", "true");
+		rm.write("<div");
+		rm.writeControlData(oForm);
+		rm.addClass("sapUiForm");
+		rm.addClass("sapUiFormLblColon"); // to always have the ":" at the Labels
+		rm.writeAttribute("data-sap-ui-customfastnavgroup", "true");
 
 		var sClass = library.form.FormHelper.addFormClass();
 		if (sClass) {
-			rm.class(sClass);
+			rm.addClass(sClass);
 		}
 
 		if (oForm.getEditable()) {
-			rm.class("sapUiFormEdit");
-			rm.class("sapUiFormEdit-CTX");
+			rm.addClass("sapUiFormEdit");
+			rm.addClass("sapUiFormEdit-CTX");
 		} else {
 			mAriaProps.readonly = ""; // to prevent rendering of aria-readonly
 		}
 
 		if (oForm.getWidth()) {
-			rm.style("width", oForm.getWidth());
+			rm.addStyle("width", oForm.getWidth());
 		}
 		if (oForm.getTooltip_AsString()) {
-			rm.attr('title', oForm.getTooltip_AsString());
+			rm.writeAttributeEscaped('title', oForm.getTooltip_AsString());
 		}
+		rm.writeClasses();
+		rm.writeStyles();
 
 		var oTitle = oForm.getTitle();
 		var oToolbar = oForm.getToolbar();
 		if (oToolbar) {
 			if (!oForm.getAriaLabelledBy() || oForm.getAriaLabelledBy().length == 0) {
-				// no aria-label -> use Title of Toolbar
-				var sToolbarTitleID = library.form.FormHelper.getToolbarTitle(oToolbar);
-				mAriaProps["labelledby"] = sToolbarTitleID;
+				// no aria-label -> use complete Toolbar as fallback
+				mAriaProps["labelledby"] = oToolbar.getId();
 			}
 		} else if (oTitle) {
 			var sId = "";
@@ -74,9 +77,9 @@ sap.ui.define([
 			mAriaProps["labelledby"] = {value: oForm._sSuggestedTitleId, append: true};
 		}
 
-		rm.accessibilityState(oForm, mAriaProps);
+		rm.writeAccessibilityState(oForm, mAriaProps);
 
-		rm.openEnd();
+		rm.write(">");
 
 		if (oLayout) {
 			// render the layout with the content of this form control
@@ -85,7 +88,7 @@ sap.ui.define([
 			Log.warning("Form \"" + oForm.getId() + "\" - Layout missing!", "Renderer", "Form");
 		}
 
-		rm.close("div");
+		rm.write("</div>");
 	};
 
 	return FormRenderer;

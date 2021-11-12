@@ -1,115 +1,105 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define([
-	"./library",
-	"sap/ui/Device"
-], function(library, Device) {
+sap.ui.define(["sap/ui/Device"],
+	function(Device) {
 	"use strict";
 
-	// shortcut for sap.m.SplitAppMode
-	var SplitAppMode = library.SplitAppMode;
 
 	/**
 	 * SplitContainer renderer.
 	 * @namespace
 	 */
 	var SplitContainerRenderer = {
-		apiVersion: 2
 	};
+
 
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
 	 *
 	 * @param {sap.ui.core.RenderManager} oRm the RenderManager that can be used for writing to the render output buffer
-	 * @param {sap.m.SplitContainer} oSplitContainer an object representation of the control that should be rendered
+	 * @param {sap.ui.core.Control} oControl an object representation of the control that should be rendered
 	 */
-	SplitContainerRenderer.render = function(oRm, oSplitContainer){
-		var sMode = oSplitContainer.getMode(),
-			sTooltip = oSplitContainer.getTooltip_AsString();
+	SplitContainerRenderer.render = function(oRm, oControl){
+		var sMode = oControl.getMode();
 
-		oRm.openStart("div", oSplitContainer)
-			.class("sapMSplitContainer");
+		oRm.write("<div");
+		oRm.writeControlData(oControl);
+		oRm.addClass("sapMSplitContainer");
 
 		if (this.renderAttributes) {
-			this.renderAttributes(oRm, oSplitContainer); // may be used by inheriting renderers, but DO NOT write class or style attributes! Instead, call addClass/addStyle.
+			this.renderAttributes(oRm, oControl); // may be used by inheriting renderers, but DO NOT write class or style attributes! Instead, call addClass/addStyle.
 		}
 
 		if (!Device.system.phone) {
 			if (Device.orientation.portrait) {
-				oRm.class("sapMSplitContainerPortrait");
+				oRm.addClass("sapMSplitContainerPortrait");
 			}
-
 			switch (sMode) {
-				case SplitAppMode.ShowHideMode:
-					oRm.class("sapMSplitContainerShowHide");
+				case "ShowHideMode":
+					oRm.addClass("sapMSplitContainerShowHide");
 					break;
-				case SplitAppMode.StretchCompressMode:
-					oRm.class("sapMSplitContainerStretchCompress");
+				case "StretchCompress":
+					oRm.addClass("sapMSplitContainerStretchCompress");
 					break;
-				case SplitAppMode.PopoverMode:
-					oRm.class("sapMSplitContainerPopover");
+				case "PopoverMode":
+					oRm.addClass("sapMSplitContainerPopover");
 					break;
-				case SplitAppMode.HideMode:
-					oRm.class("sapMSplitContainerHideMode");
-					break;
-				default:
+				case "HideMode":
+					oRm.addClass("sapMSplitContainerHideMode");
 					break;
 			}
 		}
 
+		oRm.writeClasses();
+		oRm.writeStyles();
+		var sTooltip = oControl.getTooltip_AsString();
 		if (sTooltip) {
-			oRm.attr("title", sTooltip);
+			oRm.writeAttributeEscaped("title", sTooltip);
 		}
-		oRm.openEnd(); // div
+		oRm.write(">"); // div element
 
 		if (this.renderBeforeContent) {
-			this.renderBeforeContent(oRm, oSplitContainer);
+			this.renderBeforeContent(oRm, oControl);
 		}
 
-		this.renderMasterAndDetail(oRm, oSplitContainer, sMode);
+		if (!Device.system.phone) {
+			oControl._bMasterisOpen = false;
+			if ((Device.orientation.landscape && (sMode !== "HideMode")) ||
+					Device.orientation.portrait && (sMode === "StretchCompress")) {
+				oControl._oMasterNav.addStyleClass("sapMSplitContainerMasterVisible");
+				oControl._bMasterisOpen = true;
+			} else {
+				// "sapMSplitContainerNoTransition" class is added to prevent initial flickering
+				oControl._oMasterNav.addStyleClass("sapMSplitContainerMasterHidden sapMSplitContainerNoTransition");
+			}
 
-		oRm.close("div");
-	};
+			if (oControl.getMode() === "PopoverMode" && Device.orientation.portrait) {
+				oControl._oDetailNav.addStyleClass("sapMSplitContainerDetail");
+				oRm.renderControl(oControl._oDetailNav);
+				//add master to popover if it's not yet added
+				if (oControl._oPopOver.getContent().length === 0) {
+					oControl._oPopOver.addAggregation("content", oControl._oMasterNav, true);
+				}
+			} else {
+				oControl._oMasterNav.addStyleClass("sapMSplitContainerMaster");
+				oRm.renderControl(oControl._oMasterNav);
 
-	SplitContainerRenderer.renderMasterAndDetail = function (oRm, oSplitContainer, sMode) {
-		if (Device.system.phone) {
-			oSplitContainer._oMasterNav.addStyleClass("sapMSplitContainerMobile");
-			oRm.renderControl(oSplitContainer._oMasterNav);
-			return;
-		}
-
-		oSplitContainer._bMasterisOpen = false;
-
-		if ((Device.orientation.landscape && (sMode !== SplitAppMode.HideMode)) || Device.orientation.portrait && (sMode === SplitAppMode.StretchCompress)) {
-			oSplitContainer._oMasterNav.addStyleClass("sapMSplitContainerMasterVisible")
-										.removeStyleClass("sapMSplitContainerMasterHidden")
-										.removeStyleClass("sapMSplitContainerNoTransition");
-			oSplitContainer._bMasterisOpen = true;
-		} else {
-			oSplitContainer._oMasterNav.addStyleClass("sapMSplitContainerMasterHidden")
-										.addStyleClass("sapMSplitContainerNoTransition") // "sapMSplitContainerNoTransition" class is added to prevent initial flickering
-										.removeStyleClass("sapMSplitContainerMasterVisible");
-		}
-
-		if (sMode === SplitAppMode.PopoverMode && Device.orientation.portrait) {
-			oSplitContainer._oDetailNav.addStyleClass("sapMSplitContainerDetail");
-			oRm.renderControl(oSplitContainer._oDetailNav);
-			//add master to popover if it's not yet added
-			if (oSplitContainer._oPopOver.getContent().length === 0) {
-				oSplitContainer._oPopOver.addAggregation("content", oSplitContainer._oMasterNav, true);
+				oControl._oDetailNav.addStyleClass("sapMSplitContainerDetail");
+				oRm.renderControl(oControl._oDetailNav);
 			}
 		} else {
-			oSplitContainer._oMasterNav.addStyleClass("sapMSplitContainerMaster");
-			oRm.renderControl(oSplitContainer._oMasterNav);
-
-			oSplitContainer._oDetailNav.addStyleClass("sapMSplitContainerDetail");
-			oRm.renderControl(oSplitContainer._oDetailNav);
+			oControl._oMasterNav.addStyleClass("sapMSplitContainerMobile");
+			oRm.renderControl(oControl._oMasterNav);
 		}
+
+		 oRm.write("</div>");
 	};
 
+
 	return SplitContainerRenderer;
+
 }, /* bExport= */ true);

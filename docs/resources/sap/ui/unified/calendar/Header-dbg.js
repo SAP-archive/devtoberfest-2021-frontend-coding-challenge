@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -27,7 +27,7 @@ sap.ui.define([
 	 *
 	 * <b>Note:</b> This is used inside the calendar. Not for standalone usage
 	 * @extends sap.ui.core.Control
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -118,13 +118,7 @@ sap.ui.define([
 			/**
 			 * Enables the Next button
 			 */
-			enabledNext : {type : "boolean", group : "Behavior", defaultValue : true},
-
-			/**
-			 * If set, the Current date button will be displayed.
-			 * @since 1.95.0
-			 */
-			visibleCurrentDateButton : {type : "boolean", group : "Appearance", defaultValue : false}
+			enabledNext : {type : "boolean", group : "Behavior", defaultValue : true}
 
 		},
 		events : {
@@ -138,11 +132,6 @@ sap.ui.define([
 			 * Next button pressed
 			 */
 			pressNext : {},
-
-			/**
-			 * Current date button pressed
-			 */
-			pressCurrentDate : {},
 
 			/**
 			 * First button pressed (normally day)
@@ -167,7 +156,7 @@ sap.ui.define([
 	 * If set, the third button will be displayed
 	 *
 	 * @param bVisible
-	 * @returns {this}
+	 * @returns {sap.ui.unified.calendar.Header}
 	 * @private
 	 */
 	Header.prototype._setVisibleButton3 = function (bVisible) {
@@ -190,7 +179,7 @@ sap.ui.define([
 	 * Text of the third button (normally month)
 	 *
 	 * @param sText
-	 * @returns {this}
+	 * @returns {sap.ui.unified.calendar.Header}
 	 * @private
 	 */
 	Header.prototype._setTextButton3 = function(sText){
@@ -211,7 +200,7 @@ sap.ui.define([
 	/**
 	 * Additional text of the third button (normally month)
 	 * @param sText
-	 * @returns {this}
+	 * @returns {sap.ui.unified.calendar.Header}
 	 */
 	Header.prototype._setAdditionalTextButton3 = function(sText){
 		_setAdditionalTextPrivateButton.call(this, 3, sText);
@@ -231,7 +220,7 @@ sap.ui.define([
 	/**
 	 * aria-label of the third button (normally month)
 	 * @param sText
-	 * @returns {this}
+	 * @returns {sap.ui.unified.calendar.Header}
 	 * @private
 	 */
 	Header.prototype._setAriaLabelButton3 = function(sText){
@@ -253,7 +242,7 @@ sap.ui.define([
 	 * If set, the fourth button will be displayed
 	 *
 	 * @param bVisible
-	 * @returns {this}
+	 * @returns {sap.ui.unified.calendar.Header}
 	 * @private
 	 */
 	Header.prototype._setVisibleButton4 = function (bVisible) {
@@ -275,7 +264,7 @@ sap.ui.define([
 	/**
 	 * Text of the fourth button (normally year)
 	 * @param sText
-	 * @returns {this}
+	 * @returns {sap.ui.unified.calendar.Header}
 	 * @private
 	 */
 	Header.prototype._setTextButton4 = function(sText){
@@ -296,7 +285,7 @@ sap.ui.define([
 	/**
 	 * Additional text of the fourth button (normally year)
 	 * @param sText
-	 * @returns {this}
+	 * @returns {sap.ui.unified.calendar.Header}
 	 * @private
 	 */
 	Header.prototype._setAdditionalTextButton4 = function(sText){
@@ -317,7 +306,7 @@ sap.ui.define([
 	/**
 	 * aria-label of the fourth button (normally year)
 	 * @param sText
-	 * @returns {this}
+	 * @returns {sap.ui.unified.calendar.Header}
 	 * @private
 	 */
 	Header.prototype._setAriaLabelButton4 = function(sText){
@@ -345,8 +334,6 @@ sap.ui.define([
 			this.firePressPrevious();
 		} else if (containsOrEquals(this.getDomRef("next"), oEvent.target) && this.getEnabledNext()){
 			this.firePressNext();
-		} else if (containsOrEquals(this.getDomRef("today"), oEvent.target) && this.getVisibleCurrentDateButton()){
-			this.firePressCurrentDate();
 		} else if (containsOrEquals(this.getDomRef("B0"), oEvent.target)){
 			this.firePressButton0();
 		} else if (containsOrEquals(this.getDomRef("B1"), oEvent.target)){

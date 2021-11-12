@@ -1,13 +1,14 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 	"sap/ui/base/ManagedObject",
-	"./GridItemLayoutData"
-], function (ManagedObject, GridItemLayoutData) {
+	"./GridItemLayoutData",
+	"sap/ui/Device"
+], function (ManagedObject, GridItemLayoutData, Device) {
 	"use strict";
 
 	var mGridProperties = {
@@ -20,6 +21,8 @@ sap.ui.define([
 		gridAutoColumns: "grid-auto-columns",
 		gridAutoFlow: "grid-auto-flow"
 	};
+
+	var EDGE_VERSION_WITH_GRID_SUPPORT = 16;
 
 	var mGridAutoFlow = {
 		Row: "row",
@@ -36,7 +39,7 @@ sap.ui.define([
 	 * Applies a sap.ui.layout.cssgrid.GridSettings to a provided DOM element or Control.
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @extends sap.ui.base.ManagedObject
 	 *
@@ -67,7 +70,7 @@ sap.ui.define([
 		}
 
 		var oLayoutData = GridLayoutBase._getLayoutDataForControl(oItem),
-			oElement = oItem.getDomRef();
+			oElement = GridLayoutBase._getElement(oItem);
 
 		if (!oElement) {
 			return;
@@ -118,38 +121,51 @@ sap.ui.define([
 	};
 
 	/**
-	 * Apply styles to the provided array of HTML elements or controls based on the currently active GridSettings
+	 * Returns the DOM ref of the item or the item's wrapper
+	 *
+	 * @private
+	 * @param {sap.ui.core.Control} oItem The item
+	 */
+	GridLayoutBase._getElement = function (oItem) {
+		var oItemDom = oItem.getDomRef();
+
+		if (!oItemDom) {
+			return undefined;
+		}
+
+		var oWrapper = oItemDom.parentNode;
+
+		if (oWrapper && oWrapper.classList.contains("sapUiLayoutCSSGridItemWrapper")) {
+			return oWrapper;
+		}
+
+		return oItemDom;
+	};
+
+	/**
+	 * Apply display:grid styles to the provided array of HTML elements or controls based on the currently active GridSettings
 	 *
 	 * @public
 	 * @param {sap.ui.core.Control[]|HTMLElement[]} aElements The elements or controls on which to apply the display:grid styles
 	 */
 	GridLayoutBase.prototype.applyGridLayout = function (aElements) {
-		if (!aElements) {
-			return;
-		}
-
+		if (!aElements) { return; }
 		aElements.forEach(this._applySingleGridLayout, this);
 	};
 
 	/**
-	 * Apply styles to the provided HTML element or control based on the currently active GridSettings
+	 * Apply display:grid styles to the provided HTML element or control based on the currently active GridSettings
 	 *
-	 * @private
+	 * @protected
 	 * @param {sap.ui.core.Control|HTMLElement} oElement The element or control on which to apply the display:grid styles
 	 */
 	GridLayoutBase.prototype._applySingleGridLayout = function (oElement) {
-		if (!oElement) {
-			return;
-		}
-
+		if (!oElement) { return; }
 		oElement = oElement instanceof window.HTMLElement ? oElement : oElement.getDomRef();
 
 		var oGridSettings = this.getActiveGridSettings();
 
-		// check if the style is not already added by RenderManager or something else
-		if (oElement.style.getPropertyValue("display") !== "grid") {
-			oElement.style.setProperty("display", "grid");
-		}
+		oElement.style.setProperty("display", "grid");
 
 		if (oGridSettings) {
 			this._setGridLayout(oElement, oGridSettings);
@@ -213,15 +229,24 @@ sap.ui.define([
 	/**
 	 * Hook function for the Grid's onAfterRendering
 	 * @virtual
-	 * @protected
 	 * @param {sap.ui.layout.cssgrid.IGridConfigurable} oGrid The grid
 	 */
-	GridLayoutBase.prototype.onGridAfterRendering = function (oGrid) { };
+	GridLayoutBase.prototype.onGridAfterRendering = function (oGrid) {
+		// Loops over each element's dom and adds the grid item class
+		oGrid.getGridDomRefs().forEach(function (oDomRef) {
+			if (oDomRef.children){
+				for (var i = 0; i < oDomRef.children.length; i++) {
+					if (!oDomRef.children[i].classList.contains("sapMGHLI") && !oDomRef.children[i].classList.contains("sapUiBlockLayerTabbable")) { // the item is not group header or a block layer tabbable
+						oDomRef.children[i].classList.add("sapUiLayoutCSSGridItem");
+					}
+				}
+			}
+		});
+	};
 
 	/**
 	 * Hook function for the Grid's resize. Will be called if the grid layout is responsive.
 	 * @virtual
-	 * @protected
 	 * @param {jQuery.Event} oEvent The event passed by the resize handler
 	 */
 	GridLayoutBase.prototype.onGridResize = function (oEvent) { };
@@ -236,17 +261,25 @@ sap.ui.define([
 	};
 
 	/**
-	 * Add "display:grid" and configuration styles with RenderManager.
-	 * If the layout is responsive, the configuration styles are not added, as they are added by "applyGridLayout" later.
-	 *
-	 * @param {sap.ui.core.RenderManager} oRM The render manager of the Grid which wants to add the styles
-	 * @private
-	 * @ui5-restricted
+	 * @public
+	 * @returns {boolean} If native grid is supported by the browser
 	 */
-	GridLayoutBase.prototype.addGridStyles = function (oRM) {
-		var oGridSettings = this.getActiveGridSettings();
+	GridLayoutBase.prototype.isGridSupportedByBrowser = function () {
+		return !Device.browser.msie && !(Device.browser.edge && Device.browser.version < EDGE_VERSION_WITH_GRID_SUPPORT);
+	};
 
-		oRM.style("display", "grid");
+	/**
+	 * Render display:grid styles. Used for non-responsive grid layouts.
+	 *
+	 * @param {sap.ui.core.RenderManager} rm The render manager of the Control which wants to render display:grid styles
+	 * @param {sap.ui.layout.cssgrid.GridLayoutBase} oGridLayout The grid layout to use to apply display:grid styles
+	 */
+	GridLayoutBase.prototype.renderSingleGridLayout = function (rm) {
+		var oGridSettings = this && this.getActiveGridSettings(),
+			sProp,
+			sPropValue;
+
+		rm.addStyle("display", "grid");
 
 		// If the GridLayoutBase is responsive the grid styles will be applied onAfterRendering.
 		if (!oGridSettings || this.isResponsive()) {
@@ -254,15 +287,14 @@ sap.ui.define([
 		}
 
 		var oProperties = oGridSettings.getMetadata().getProperties();
-		for (var sProp in mGridProperties) {
-			if (oProperties[sProp]) {
-				var sPropValue = oGridSettings.getProperty(sProp);
 
+		for (sProp in mGridProperties) {
+			if (oProperties[sProp]) {
+				sPropValue = oGridSettings.getProperty(sProp);
 				if (sProp === "gridAutoFlow") {
 					sPropValue = mGridAutoFlow[sPropValue];
 				}
-
-				oRM.style(mGridProperties[sProp], sPropValue);
+				rm.addStyle(mGridProperties[sProp], sPropValue);
 			}
 		}
 	};

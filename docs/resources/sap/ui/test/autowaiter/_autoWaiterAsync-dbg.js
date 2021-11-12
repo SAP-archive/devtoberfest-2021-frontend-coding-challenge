@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -18,6 +18,7 @@ sap.ui.define([
 	// this includes only the final pending result logs without any intermediate advanced logs
 	// final result logs are recognized by a component name suffix "#hasPending"
 	var oLogCollector = _LogCollector.getInstance("^sap.ui.test.autowaiter.*#hasPending$");
+
 	var oConfigValidator = new _ParameterValidator({
 		errorPrefix: "sap.ui.test.autowaiter._autoWaiterAsync#extendConfig"
 	});
@@ -28,9 +29,9 @@ sap.ui.define([
 		timeout: 15000 // milliseconds
 	};
 
-	function extendConfig(oNewConfig) {
-		validateConfig(oNewConfig);
-		$.extend(config, oNewConfig);
+	function extendConfig(oConfig) {
+		validateConfig(oConfig);
+		$.extend(config, oConfig);
 		_autoWaiter.extendConfig(config);
 	}
 
@@ -78,13 +79,16 @@ sap.ui.define([
 
 	function validateConfig(oConfig) {
 		oConfigValidator.validate({
-			allowUnknownProperties: true,
 			inputToValidate: oConfig,
 			validationInfo: {
-				interval: "positivenumeric",
-				timeout: "positivenumeric"
+				interval: "numeric",
+				timeout: "numeric"
 			}
 		});
+
+		if (oConfig.timeout <= 0 || oConfig.interval <= 0) {
+			throw new Error("Invalid polling config: Timeout and interval should be greater than 0");
+		}
 	}
 
 	return {

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -52,9 +52,9 @@ sap.ui.define(['sap/base/Log', '../../Component', '../../Element', '../../routin
 
 
 		/*
-		 * Default ExcludeList configuration.
+		 * Default Blacklist configuration.
 		 */
-		var EventsExcludeList = {
+		var EventsBlacklist = {
 				global: ["modelContextChange", "beforeRendering", "afterRendering", "propertyChanged", "beforeGeometryChanged", "geometryChanged",
 						"aggregationChanged", "componentCreated", "afterInit", "updateStarted", "updateFinished", "load", "scroll"
 						],
@@ -62,22 +62,22 @@ sap.ui.define(['sap/base/Log', '../../Component', '../../Element', '../../routin
 		};
 
 		/**
-		 * Returns the currently set ExcludeList configuration.
+		 * Returns the currently set Blacklist configuration.
 		 * Returned object is copied from the original one.
 		 * In case you modify it, you have to set it by using the
-		 * <code>setEventExcludeList</code> setter in order for it to take effect.
+		 * <code>setEventBlacklist</code> setter in order for it to take effect.
 		 * @experimental
 		 * @since 1.65
 		 * @public
 		 */
-		EventBroadcaster.getEventsExcludeList = function() {
-			return JSON.parse(JSON.stringify(EventsExcludeList));
+		EventBroadcaster.getEventsBlacklist = function() {
+			return JSON.parse(JSON.stringify(EventsBlacklist));
 		};
 
 		/**
-		 * Sets a new ExcludeList configuration.
+		 * Sets a new Blacklist configuration.
 		 *
-		 * ExcludeList configuration should have the following structure as in the example
+		 * BlackList configuration should have the following structure as in the example
 		 * shown below.
 		 *
 		 * In <code>global</code> object, we set all events that we don't want to track.
@@ -106,11 +106,11 @@ sap.ui.define(['sap/base/Log', '../../Component', '../../Element', '../../routin
 		 *				],
 		 *		controls: {
 		 *			"sap.m.Image": {
-		 *				include: ["load"]
+		 *				exclude: ["load"]
 		 *			},
 		 *			"sap.m.Button": {
-		 *				exclude: ["tap"],
-		 *				include: ["afterRendering"]
+		 *				include: ["tap"],
+		 *				exclude: ["afterRendering"]
 		 *			},
 		 *			"sap.m.AccButton": {}
 		 *		}
@@ -121,19 +121,19 @@ sap.ui.define(['sap/base/Log', '../../Component', '../../Element', '../../routin
 		 * @since 1.65
 		 * @public
 		 */
-		EventBroadcaster.setEventsExcludeList = function(oConfig) {
+		EventBroadcaster.setEventsBlacklist = function(oConfig) {
 			if (this._isValidConfig(oConfig)) {
-				EventsExcludeList = JSON.parse(JSON.stringify(oConfig));
+				EventsBlacklist = JSON.parse(JSON.stringify(oConfig));
 			} else {
 				if (Log.isLoggable()) {
-					Log.error("Provided ExcludeList configuration is not valid. Continuing to use previously/default set configuration.");
+					Log.error("Provided Blacklist configuration is not valid. Continuing to use previously/default set configuration.");
 				}
 			}
 		};
 
 		/**
 		 * Starts broadcasting events. Consumers could stop broadcasting via
-		 * {@link sap.ui.core.support.usage.EventBroadcaster.disable EventBroadcaster.disable}
+		 * {@link sap.ui.core.support.usage.EventBroadcaster#disable EventBroadcaster.disable}
 		 * @public
 		 */
 		EventBroadcaster.enable = function () {
@@ -246,16 +246,16 @@ sap.ui.define(['sap/base/Log', '../../Component', '../../Element', '../../routin
 
 		/**
 		 * Checks inside the configuration if the given event should be exposed.
-		 * The check is made once for the global list of excluded events
+		 * The check is made once for the global list of blacklisted events
 		 * and then for the listed controls.
 		 * @param {string} sEventId the name of the event
 		 * @param {sap.ui.core.Element} oElement The event's target UI5 element.
 		 * @private
 		 */
 		EventBroadcaster._shouldExpose = function(sEventId, oElement) {
-			var oExcludeListConfig = EventBroadcaster.getEventsExcludeList(),
-				bExposeGlobal = oExcludeListConfig.global.indexOf(sEventId) === -1 && EventBroadcaster._isPublicElementEvent(sEventId, oElement),
-				bExposeControl = EventBroadcaster._isTrackableControlEvent(oExcludeListConfig, sEventId, oElement);
+			var oBlacklistConfig = EventBroadcaster.getEventsBlacklist(),
+				bExposeGlobal = oBlacklistConfig.global.indexOf(sEventId) === -1 && EventBroadcaster._isPublicElementEvent(sEventId, oElement),
+				bExposeControl = EventBroadcaster._isTrackableControlEvent(oBlacklistConfig, sEventId, oElement);
 
 			return bExposeGlobal && bExposeControl;
 		};
@@ -269,24 +269,24 @@ sap.ui.define(['sap/base/Log', '../../Component', '../../Element', '../../routin
 		 * @private
 		 */
 		EventBroadcaster._isTrackableControlEvent = function(oConfig, sEventId, oElement) {
-			var aExclude,
-				aInclude,
+			var oInclude,
+				oExclude,
 				bTrackable = true,
 				sName = oElement.getMetadata().getName();
 
 			if (oConfig.controls[sName]) {
 
-				aExclude = oConfig.controls[sName].exclude;
-				aInclude = oConfig.controls[sName].include;
+				oInclude = oConfig.controls[sName].include;
+				oExclude = oConfig.controls[sName].exclude;
 
-				if (!aExclude && !aInclude) {
+				if (!oInclude && !oExclude) {
 					bTrackable = false;
 				}
 
-				if (aInclude && aInclude.indexOf(sEventId) > -1) {
+				if (oExclude && oExclude.indexOf(sEventId) > -1) {
 					bTrackable = true;
 				}
-				if (aExclude && aExclude.indexOf(sEventId) > -1) {
+				if (oInclude && oInclude.indexOf(sEventId) > -1) {
 					bTrackable = false;
 				}
 			}
@@ -328,6 +328,28 @@ sap.ui.define(['sap/base/Log', '../../Component', '../../Element', '../../routin
 				version: sVersion || ""
 			};
 		};
+
+		// CustomEvent polyfill for IE version 9 and higher
+		function initCustomEvents() {
+			if (typeof window.CustomEvent === "function") {
+				return false;
+			}
+
+			function CustomEvent(event, params) {
+				params = params || {
+					bubbles: false,
+					cancelable: false,
+					detail: undefined
+				};
+				var evt = document.createEvent('CustomEvent');
+				evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+				return evt;
+			}
+			CustomEvent.prototype = window.Event.prototype;
+			window.CustomEvent = CustomEvent;
+		}
+
+		initCustomEvents();
 
 		return EventBroadcaster;
 	});

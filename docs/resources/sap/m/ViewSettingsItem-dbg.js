@@ -1,12 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.m.ViewSettingsItem.
-sap.ui.define(['./library', 'sap/ui/core/Item'],
-	function(library, Item) {
+sap.ui.define(['./library', 'sap/ui/core/Item', 'sap/ui/base/ManagedObject'],
+	function(library, Item, ManagedObject) {
 	"use strict";
 
 
@@ -25,7 +25,7 @@ sap.ui.define(['./library', 'sap/ui/core/Item'],
 	 * @extends sap.ui.core.Item
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -68,7 +68,7 @@ sap.ui.define(['./library', 'sap/ui/core/Item'],
 	}});
 
 	ViewSettingsItem.prototype.setSelected = function(bValue) {
-		this.setProperty("selected", bValue, true);
+		ViewSettingsItem.prototype.setProperty.call(this, "selected", bValue, true);
 		return this;
 	};
 
@@ -82,7 +82,7 @@ sap.ui.define(['./library', 'sap/ui/core/Item'],
 	 * @param {boolean} bFireEvent Whether the event must be fired
 	 */
 	ViewSettingsItem.prototype.setProperty = function (sName, vValue, bSupressInvalidation, bFireEvent) {
-		Item.prototype.setProperty.apply(this, arguments);
+		ManagedObject.prototype.setProperty.apply(this, arguments);
 
 		bFireEvent = bFireEvent === undefined ? true : bFireEvent;
 

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -40,7 +40,7 @@ sap.ui.define([
 	 * @class Static class for enabling declarative UI support.
 	 *
 	 * @author Peter Muessig, Tino Butz
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @since 1.7.0
 	 * @public
 	 * @alias sap.ui.core.DeclarativeSupport
@@ -187,8 +187,7 @@ sap.ui.define([
 
 		var sType = $element.attr("data-sap-ui-type");
 		if (sType) {
-			// make sure fnClass.getMatadata() is available
-			var fnClass = sap.ui.requireSync(sType.replace(/\./g, "/")); // legacy-relevant
+			var fnClass = sap.ui.requireSync(sType.replace(/\./g, "/")); // make sure fnClass.getMatadata() is available
 			fnClass = fnClass || ObjectPath.get(sType);
 			assert(typeof fnClass !== "undefined", "Class not found: " + sType);
 
@@ -204,7 +203,7 @@ sap.ui.define([
 			var oControl;
 			if (View.prototype.isPrototypeOf(fnClass.prototype) && typeof fnClass._sType === "string") {
 				// for views having a factory function defined we use the factory function!
-				oControl = View._create(mSettings, undefined, fnClass._sType);
+				oControl = View._legacyCreate(mSettings, undefined, fnClass._sType);
 			} else {
 				oControl = new fnClass(mSettings);
 			}

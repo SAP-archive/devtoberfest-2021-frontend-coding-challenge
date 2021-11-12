@@ -1,16 +1,14 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides class sap.ui.core.plugin.TemplatingSupport
-sap.ui.define([
-	"sap/base/Log",
-	'sap/ui/core/tmpl/Template', // provides sap.ui.template
-	'sap/ui/core/Core' // provides sap.ui.getCore()
-], function(Log) {
+sap.ui.define(['sap/ui/core/Core', 'sap/ui/core/tmpl/Template', "sap/base/Log"],
+	function(Core, Template, Log) {
 	"use strict";
+
 
 
 	/**
@@ -20,7 +18,7 @@ sap.ui.define([
 	 * @author Peter Muessig
 	 * @public
 	 * @since 1.15.0
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @alias sap.ui.core.plugin.TemplatingSupport
 	 */
 	var TemplatingSupport = function() {
@@ -54,7 +52,10 @@ sap.ui.define([
 	 * Create the <code>sap.ui.core.plugin.TemplatingSupport</code> plugin and
 	 * register it within the <code>sap.ui.core.Core</code>.
 	 */
-	sap.ui.getCore().registerPlugin(new TemplatingSupport());
+	(function(){
+		var oThis = new TemplatingSupport();
+		sap.ui.getCore().registerPlugin(oThis);
+	}());
 
 	return TemplatingSupport;
 

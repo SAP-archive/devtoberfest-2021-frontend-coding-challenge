@@ -1,6 +1,6 @@
 /*!
 * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
 */
 
@@ -35,7 +35,7 @@ function(
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @private
@@ -96,7 +96,7 @@ function(
 		SliderTooltipContainer.prototype._handleRangeSliderF2 = function (oEvent) {
 			var oHandle = this._oParentSlider._getHandleForTooltip(oEvent.srcControl);
 
-			jQuery(oHandle).trigger("focus");
+			jQuery(oHandle).focus();
 		};
 
 		SliderTooltipContainer.prototype.onsaptabnext = SliderTooltipContainer.prototype._handleTabNavigation;
@@ -301,7 +301,7 @@ function(
 		/**
 		 * Sets the width of the SliderTooltipContainer.
 		 * @param {sap.ui.core.CSSSize} sWidth The width of the SliderTooltipContainer as CSS size.
-		 * @returns {this} Pointer to the control instance to allow method chaining.
+		 * @returns {sap.m.SliderTooltipContainer} Pointer to the control instance to allow method chaining.
 		 * @public
 		 */
 		SliderTooltipContainer.prototype.setWidth = function (sWidth) {

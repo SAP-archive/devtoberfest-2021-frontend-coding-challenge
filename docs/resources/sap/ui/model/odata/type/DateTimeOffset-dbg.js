@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -28,7 +28,7 @@ sap.ui.define([
 	 * @extends sap.ui.model.odata.type.DateTimeBase
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @alias sap.ui.model.odata.type.DateTimeOffset
 	 * @param {object} [oFormatOptions]
@@ -91,7 +91,7 @@ sap.ui.define([
 			}
 			oType.oModelFormat = DateFormat.getDateInstance({
 				calendarType : CalendarType.Gregorian,
-				pattern : sPattern + "XXX",
+				pattern : sPattern + "X",
 				strictParsing : true,
 				UTC : oType.oFormatOptions && oType.oFormatOptions.UTC
 			});
@@ -150,18 +150,6 @@ sap.ui.define([
 			vValue = oDateValue;
 		}
 		return DateTimeBase.prototype.formatValue.call(this, vValue, sTargetType);
-	};
-
-	// @override
-	// @see sap.ui.model.SimpleType#getConstraints
-	DateTimeOffset.prototype.getConstraints = function () {
-		var oConstraints = DateTimeBase.prototype.getConstraints.call(this);
-
-		if (this.bV4) {
-			oConstraints.V4 = true;
-		}
-
-		return oConstraints;
 	};
 
 	/**
@@ -230,7 +218,7 @@ sap.ui.define([
 	/**
 	 * Sets OData V4 semantics for this type instance.
 	 *
-	 * @returns {this}
+	 * @returns {sap.ui.model.odata.type.DateTimeOffset}
 	 *   <code>this</code> to allow method chaining
 	 *
 	 * @private

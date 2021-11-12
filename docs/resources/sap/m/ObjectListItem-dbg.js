@@ -1,11 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.m.ObjectListItem.
 sap.ui.define([
+	'sap/ui/core/Control',
 	'sap/ui/base/ManagedObjectObserver',
 	'./ListItemBase',
 	'./library',
@@ -17,6 +18,7 @@ sap.ui.define([
 	'./ObjectListItemRenderer'
 ],
 function(
+	Control,
 	ManagedObjectObserver,
 	ListItemBase,
 	library,
@@ -59,7 +61,7 @@ function(
 		 *
 		 * <b>Note:</b> The control must only be used in the context of a list.
 		 * @extends sap.m.ListItemBase
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @public
@@ -217,8 +219,8 @@ function(
 		ObjectListItem.prototype.init = function (oEvent) {
 			this._generateObjectNumber();
 
-			this._observerObjectItemChanges = this._observerObjectItemChanges.bind(this);
-			this._oItemsObservers = {};
+			this._observerObjectMarkerChanges = this._observerObjectMarkerChanges.bind(this);
+			this._oMarkersObservers = {};
 		};
 
 		/**
@@ -318,44 +320,6 @@ function(
 			return aVisibleAttributes;
 		};
 
-		ObjectListItem.prototype.addAttribute = function(oObject) {
-			this._startObservingItem(oObject);
-
-			return ListItemBase.prototype.addAggregation.call(this, "attributes", oObject);
-		};
-
-		ObjectListItem.prototype.insertAttribute = function(oObject, iIndex) {
-			this._startObservingItem(oObject);
-
-			return ListItemBase.prototype.insertAggregation.call(this, "attributes", oObject, iIndex);
-		};
-
-		ObjectListItem.prototype.removeAttribute = function(vObject) {
-			var oObject = ListItemBase.prototype.removeAggregation.call(this, "attributes", vObject);
-
-			this._stopObservingItem(oObject);
-
-			return oObject;
-		};
-
-		ObjectListItem.prototype.removeAllAttributes = function() {
-			var aItems = ListItemBase.prototype.removeAllAggregation.call(this, "attributes");
-
-			for (var i = 0; i < aItems.length; i++) {
-				this._stopObservingItem(aItems[i]);
-			}
-
-			return aItems;
-		};
-
-		ObjectListItem.prototype.destroyAttributes = function() {
-			this.getAttributes().forEach(function (oAttribute) {
-				this._stopObservingItem(oAttribute);
-			}, this);
-
-			return ListItemBase.prototype.destroyAggregation.call(this, "attributes");
-		};
-
 		/**
 		 * @private
 		 * @returns {Array} The visible markers of the control
@@ -416,7 +380,7 @@ function(
 		ObjectListItem.prototype._activeHandlingInheritor = function() {
 			var sActiveSrc = this.getActiveIcon();
 
-			if (this._oImageControl && sActiveSrc) {
+			if (!!this._oImageControl  && !!sActiveSrc) {
 				this._oImageControl.setSrc(sActiveSrc);
 			}
 		};
@@ -428,7 +392,7 @@ function(
 		 */
 		ObjectListItem.prototype._inactiveHandlingInheritor = function() {
 			var sSrc = this.getIcon();
-			if (this._oImageControl) {
+			if (!!this._oImageControl) {
 				this._oImageControl.setSrc(sSrc);
 			}
 		};
@@ -437,7 +401,7 @@ function(
 		 * Sets the <code>number</code> property of the control.
 		 * @param {string} sNumber <code>Number</code> showed in <code>ObjectListItem</code>
 		 * @override
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.m.ObjectListItem} this pointer for chaining
 		 */
 		ObjectListItem.prototype.setNumber = function (sNumber) {
 			//Do not rerender the whole control ObjectListItem control
@@ -452,7 +416,7 @@ function(
 		 * Sets the <code>numberUnit</code> property of the control.
 		 * @param {string} sNumberUnit <code>NumberUnit</code> showed in <code>ObjectListItem</code>
 		 * @override
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.m.ObjectListItem} this pointer for chaining
 		 */
 		ObjectListItem.prototype.setNumberUnit = function (sNumberUnit) {
 			//Do not rerender the whole control but only ObjectNumber control
@@ -467,7 +431,7 @@ function(
 		 * Sets the <code>numberTextDirection</code> property of the control.
 		 * @param {sap.ui.core.TextDirection} oTextDirection The text direction of the internal <code>ObjectNumber</code>
 		 * @override
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.m.ObjectListItem} this pointer for chaining
 		 */
 		ObjectListItem.prototype.setNumberTextDirection = function (oTextDirection) {
 			//Do not rerender the whole control but only ObjectNumber control
@@ -482,7 +446,7 @@ function(
 		 * Sets the <code>numberState</code> property of the control.
 		 * @param {sap.ui.core.ValueState} oValueState The <code>valueState</code> of the internal <code>ObjectNumber</code>
 		 * @override
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.m.ObjectListItem} this pointer for chaining
 		 */
 		ObjectListItem.prototype.setNumberState = function (oValueState) {
 			//Do not rerender the whole control but only ObjectNumber control
@@ -498,7 +462,7 @@ function(
 		 * @override
 		 * @public
 		 * @param {boolean} bMarked the new value
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.m.ObjectListItem} this pointer for chaining
 		 */
 		ObjectListItem.prototype.setMarkFavorite = function (bMarked) {
 			return this._setOldMarkers(ObjectMarkerType.Favorite, bMarked);
@@ -509,7 +473,7 @@ function(
 		 * @override
 		 * @public
 		 * @param {boolean} bMarked the new value
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.m.ObjectListItem} this pointer for chaining
 		 */
 		ObjectListItem.prototype.setMarkFlagged = function (bMarked) {
 			return this._setOldMarkers(ObjectMarkerType.Flagged, bMarked);
@@ -520,7 +484,7 @@ function(
 		 * @override
 		 * @public
 		 * @param {boolean} bMarked the new value
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.m.ObjectListItem} this pointer for chaining
 		 */
 		ObjectListItem.prototype.setMarkLocked = function (bMarked) {
 			return this._setOldMarkers(ObjectMarkerType.Locked, bMarked);
@@ -531,7 +495,7 @@ function(
 		 * @override
 		 * @public
 		 * @param {boolean} bMarked the new value
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.m.ObjectListItem} this pointer for chaining
 		 */
 		ObjectListItem.prototype.setShowMarkers = function (bMarked) {
 			var sMarkerType;
@@ -553,30 +517,30 @@ function(
 		};
 
 		ObjectListItem.prototype.addMarker = function(oObject) {
-			this._startObservingItem(oObject);
+			this._startObservingMarker(oObject);
 
-			return ListItemBase.prototype.addAggregation.call(this, "markers", oObject);
+			return Control.prototype.addAggregation.call(this, "markers", oObject);
 		};
 
 		ObjectListItem.prototype.insertMarker = function(oObject, iIndex) {
-			this._startObservingItem(oObject);
+			this._startObservingMarker(oObject);
 
-			return ListItemBase.prototype.insertAggregation.call(this, "markers", oObject, iIndex);
+			return Control.prototype.insertAggregation.call(this, "markers", oObject, iIndex);
 		};
 
 		ObjectListItem.prototype.removeMarker = function(vObject) {
-			var oObject = ListItemBase.prototype.removeAggregation.call(this, "markers", vObject);
+			var oObject = Control.prototype.removeAggregation.call(this, "markers", vObject);
 
-			this._stopObservingItem(oObject);
+			this._stopObservingMarker(oObject);
 
 			return oObject;
 		};
 
 		ObjectListItem.prototype.removeAllMarkers = function() {
-			var aItems = ListItemBase.prototype.removeAllAggregation.call(this, "markers");
+			var aItems = Control.prototype.removeAllAggregation.call(this, "markers");
 
 			for (var i = 0; i < aItems.length; i++) {
-				this._stopObservingItem(aItems[i]);
+				this._stopObservingMarker(aItems[i]);
 			}
 
 			return aItems;
@@ -584,32 +548,32 @@ function(
 
 		ObjectListItem.prototype.destroyMarkers = function() {
 			this.getMarkers().forEach(function (oMarker) {
-				this._stopObservingItem(oMarker);
+				this._stopObservingMarker(oMarker);
 			}, this);
 
-			return ListItemBase.prototype.destroyAggregation.call(this, "markers");
+			return Control.prototype.destroyAggregation.call(this, "markers");
 		};
 
-		ObjectListItem.prototype._observerObjectItemChanges = function (oChanges) {
+		ObjectListItem.prototype._observerObjectMarkerChanges = function (oChanges) {
 			if (oChanges.current !== oChanges.old) {
 				this.invalidate();
 			}
 		};
 
-		ObjectListItem.prototype._startObservingItem = function (oItem) {
-			var oObserver = new ManagedObjectObserver(this._observerObjectItemChanges);
-			this._oItemsObservers[oItem.getId()] = oObserver;
+		ObjectListItem.prototype._startObservingMarker = function (oMarker) {
+			var oObserver = new ManagedObjectObserver(this._observerObjectMarkerChanges);
+			this._oMarkersObservers[oMarker.getId()] = oObserver;
 
-			oObserver.observe(oItem, { properties: true });
+			oObserver.observe(oMarker, { properties: true });
 
 			return this;
 		};
 
-		ObjectListItem.prototype._stopObservingItem = function (oItem) {
-			var sItemId = oItem.getId();
+		ObjectListItem.prototype._stopObservingMarker = function (oMarker) {
+			var sMarkerId = oMarker.getId();
 
-			this._oItemsObservers[sItemId].disconnect();
-			delete this._oItemsObservers[sItemId];
+			this._oMarkersObservers[sMarkerId].disconnect();
+			delete this._oMarkersObservers[sMarkerId];
 
 			return this;
 		};
@@ -618,7 +582,7 @@ function(
 		 * @private
 		 * @param {string} markerType the type of the marker which should be created to updated
 		 * @param {boolean} bMarked the new value
-		 * @returns {this} this pointer for chaining
+		 * @returns {sap.m.ObjectListItem} this pointer for chaining
 		 */
 		ObjectListItem.prototype._setOldMarkers = function (markerType, bMarked) {
 			var aAllMarkers = this.getMarkers();
@@ -658,7 +622,7 @@ function(
 
 		/**
 		 * @private
-		 * @returns {sap.m.Text} Title text control
+		 * @returns {sap.m.ObjectListItem} Title text control
 		 */
 		ObjectListItem.prototype._getTitleText = function() {
 

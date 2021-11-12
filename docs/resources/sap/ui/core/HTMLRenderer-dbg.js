@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -14,8 +14,6 @@ sap.ui.define(['./RenderManager'], function(RenderManager) {
 
 	var HTMLRenderer = {
 
-		apiVersion: 2,
-
 		/**
 		 * Renders either the configured content or a dummy div that will be replaced after rendering
 		 *
@@ -24,15 +22,13 @@ sap.ui.define(['./RenderManager'], function(RenderManager) {
 		 */
 		render : function(oRM, oControl) {
 			// render an invisible, but easily identifiable placeholder for the content
-			oRM.openStart("div", RenderPrefixes.Dummy + oControl.getId());
-			oRM.style("display", "none");
-			oRM.openEnd();
+			oRM.write("<div id=\"" + RenderPrefixes.Dummy + oControl.getId() + "\" style=\"display:none\">");
 
 			// Note: we do not render the content string here, but only in onAfterRendering
 			// This has the advantage that syntax errors don't affect the whole control tree
 			// but only this control...
 
-			oRM.close("div");
+			oRM.write("</div>");
 		}
 
 	};

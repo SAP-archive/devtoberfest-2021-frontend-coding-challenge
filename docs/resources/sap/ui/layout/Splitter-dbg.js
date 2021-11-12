@@ -1,9 +1,10 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
+// Provides control sap.ui.layout.Splitter.
 sap.ui.define([
 	'sap/ui/core/Control',
 	'./library',
@@ -40,33 +41,20 @@ sap.ui.define([
 	 * @param {object} [mSettings] initial settings for the new control
 	 *
 	 * @class
-	 * <h3>Overview</h3>
-	 * A layout that contains several content areas. The content that is added to the splitter should contain <code>layoutData</code> of type {@link sap.ui.layout.SplitterLayoutData SplitterLayoutData}
-	 * which defines its size and size constraints. If such <code>layoutData</code> is not defined, it will be generated automatically.
 	 *
-	 * By adding or changing the <code>layoutData</code> to the controls that make up the content areas, the size can be changed programmatically.
-	 * Additionally the content areas can be made non-resizable individually and a minimal size (in px) can be set.
+	 * A layout that contains several content areas. The content that is added to the splitter should contain LayoutData of the type SplitterLayoutData that defines its size and size contraints.
 	 *
-	 * The orientation of the splitter can be set to horizontal (default) or vertical. All content areas of the splitter will be arranged in that way.
-	 * In order to split vertically and horizontally at the same time, splitters need to be nested.
+	 * By adding or changing SplitterLayoutData to the controls that make up the content areas, the size can be changed programatically. Additionally the contents can be made non-resizable individually and a minimal size (in px) can be set.
 	 *
-	 * The splitter bars are focusable to enable resizing of the content areas via keyboard.
-	 * The size of the content areas can be manipulated when the splitter bar is focused and Shift-Left/Down/Right/Up are pressed.
-	 * When Shift-Home/End are pressed, the content areas are resized to their minimum or maximum size (Note, that resizing one
-	 * auto-size content area next to another auto-size content area, might lead to the effect that the former does not take its
-	 * maximum size but only the maximum size before recalculating the auto-sizes).
+	 * The orientation of the splitter can be set to horizontal (default) or vertical. All content areas of the splitter will be arranged in that way. In order to split vertically and horizontally at the same time, Splitters need to be nested.
 	 *
-	 * The splitter bars used for resizing the content areas by the user can be set to different widths (or heights in vertical mode)
-	 * and the splitter will automatically resize the other content areas accordingly.
-	 * In case the splitter bar is resized after the splitter has been rendered, a manual resize has to be triggered by invoking triggerResize() on the splitter.
+	 * The splitter bars can be focused to enable resizing of the content areas via keyboard. The contents size can be manipulated when the splitter bar is focused and Shift-Left/Down/Right/Up are pressed. When Shift-Home/End are pressed, the contents are set their minimum or maximum size (keep in mind though, that resizing an auto-size content-area next to another auto-size one might lead to the effect that the former does not take its maximum size but only the maximum size before recalculating auto sizes).
 	 *
-	 * <h3>Responsive Behavior</h3>
-	 * On touch-enabled devices the bars of the splitter can be moved by touching the grip.
-	 *
+	 * The splitter bars used for resizing the contents by the user can be set to different widths (or heights in vertical mode) and the splitter will automatically resize the other contents accordingly. In case the splitter bar is resized after the splitter has rendered, a manual resize has to be triggered by invoking triggerResize() on the Splitter.
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -74,65 +62,72 @@ sap.ui.define([
 	 * @alias sap.ui.layout.Splitter
 	 * @ui5-metamodel This control/element also will be described in the UI5 (legacy) designtime metamodel
 	 */
-	var Splitter = Control.extend("sap.ui.layout.Splitter", /** @lends sap.ui.layout.Splitter.prototype */ {
-		metadata: {
-			library : "sap.ui.layout",
-			properties : {
+	var Splitter = Control.extend("sap.ui.layout.Splitter", /** @lends sap.ui.layout.Splitter.prototype */ { metadata : {
 
-				/**
-				 * Whether to split the contents horizontally (default) or vertically.
-				 */
-				orientation : {type : "sap.ui.core.Orientation", group : "Behavior", defaultValue : Orientation.Horizontal},
+		library : "sap.ui.layout",
+		properties : {
 
-				/**
-				 * The width of the control
-				 */
-				width : {type : "sap.ui.core.CSSSize", group : "Appearance", defaultValue : '100%'},
+			/**
+			 * Whether to split the contents horizontally (default) or vertically.
+			 */
+			orientation : {type : "sap.ui.core.Orientation", group : "Behavior", defaultValue : Orientation.Horizontal},
 
-				/**
-				 * The height of the control
-				 */
-				height : {type : "sap.ui.core.CSSSize", group : "Appearance", defaultValue : '100%'}
-			},
-			defaultAggregation : "contentAreas",
-			aggregations : {
+			/**
+			 * The width of the control
+			 */
+			width : {type : "sap.ui.core.CSSSize", group : "Appearance", defaultValue : '100%'},
 
-				/**
-				 * The content areas to be split. The control will show n-1 splitter bars between n controls in this aggregation.
-				 */
-				contentAreas : {type : "sap.ui.core.Control", multiple : true, singularName : "contentArea"}
-			},
-			events : {
-
-				/**
-				 * Event is fired when contents are resized.
-				 */
-				resize : {
-					parameters : {
-
-						/**
-						 * The ID of the splitter control. The splitter control can also be accessed by calling getSource() on the event.
-						 */
-						id : {type : "string"},
-
-						/**
-						 * An array of values representing the old (pixel-)sizes of the splitter contents
-						 */
-						oldSizes : {type : "int[]"},
-
-						/**
-						 * An array of values representing the new (pixel-)sizes of the splitter contents
-						 */
-						newSizes : {type : "int[]"}
-					}
-				}
-			},
-			designtime: "sap/ui/layout/designtime/Splitter.designtime"
+			/**
+			 * The height of the control
+			 */
+			height : {type : "sap.ui.core.CSSSize", group : "Appearance", defaultValue : '100%'}
 		},
-		renderer: SplitterRenderer
-	});
+		defaultAggregation : "contentAreas",
+		aggregations : {
+
+			/**
+			 * The content areas to be split. The control will show n-1 splitter bars between n controls in this aggregation.
+			 */
+			contentAreas : {type : "sap.ui.core.Control", multiple : true, singularName : "contentArea"}
+		},
+		events : {
+
+			/**
+			 * Event is fired when contents are resized.
+			 */
+			resize : {
+				parameters : {
+
+					/**
+					 * The ID of the splitter control. The splitter control can also be accessed by calling getSource() on the event.
+					 */
+					id : {type : "string"},
+
+					/**
+					 * An array of values representing the old (pixel-)sizes of the splitter contents
+					 */
+					oldSizes : {type : "int[]"},
+
+					/**
+					 * An array of values representing the new (pixel-)sizes of the splitter contents
+					 */
+					newSizes : {type : "int[]"}
+				}
+			}
+		},
+		designtime: "sap/ui/layout/designtime/Splitter.designtime"
+	}});
+
+	// "Hidden" resource bundle instance
+	var oResourceBundle = sap.ui.getCore().getLibraryResourceBundle("sap.ui.layout");
+
+	//////////////////////////////////////// "Static" Properties ///////////////////////////////////////
+
+
+	////////////////////////////////////////// Public Methods //////////////////////////////////////////
 
 	Splitter.prototype.init = function() {
+		this._needsInvalidation = false;
 		this._liveResize        = true;
 		this._keyboardEnabled   = true;
 		this._bHorizontal       = true;
@@ -155,7 +150,7 @@ sap.ui.define([
 		this._boundBarMove      = this._onBarMove.bind(this);
 
 		// Switch resizing parameters based on orientation - this must be done to initialize the values
-		this._initOrientationProperties();
+		this._switchOrientation();
 
 		this._bRtl = sap.ui.getCore().getConfiguration().getRTL();
 
@@ -169,6 +164,9 @@ sap.ui.define([
 			min          : this._onKeyboardResize.bind(this, "min", 20)
 		};
 		this._enableKeyboardListeners();
+
+		// Use Icon for separators
+		this._bUseIconForSeparator = true;
 	};
 
 	Splitter.prototype.exit = function() {
@@ -181,20 +179,6 @@ sap.ui.define([
 		delete this._$SplitterOverlay;
 		delete this._$SplitterOverlayBar;
 	};
-
-	Splitter.prototype.onBeforeRendering = function() {
-		this._initOrientationProperties();
-	};
-
-	Splitter.prototype.onAfterRendering = function() {
-		this._$SplitterOverlay = this.$("overlay");
-		this._$SplitterOverlayBar = this.$("overlayBar");
-
-		// Calculate and apply correct sizes to the Splitter contents
-		this._resize();
-	};
-
-	////////////////////////////////////////// Public Methods //////////////////////////////////////////
 
 	/**
 	 * This method  triggers a resize on the Splitter - meaning it forces the Splitter to recalculate
@@ -213,25 +197,13 @@ sap.ui.define([
 		}
 	};
 
-	/**
-	 * Resets the size (width or height) of each of the content areas.
-	 *
-	 * @public
-	 */
-	Splitter.prototype.resetContentAreasSizes = function () {
-		var aContentAreas = this._getContentAreas();
-		for (var i = 0; i < aContentAreas.length; i++) {
-			aContentAreas[i].getLayoutData().setSize("auto");
-		}
-	};
-
 	//////////////////////////////////////// "Protected" Methods ///////////////////////////////////////
 
 	/**
 	 * Returns the current actual content sizes as pixel value - these values can change with every
 	 * resize.
 	 *
-	 * @returns {number[]} Array of px values that correspond to the content area sizes
+	 * @returns {Number[]} Array of px values that correspond to the content area sizes
 	 * @protected
 	 * @deprecated As of version 1.21. This method is declared as protected in order to assess the need for this feature. It is declared as deprecated because the API might change in case the need for this is high enough to make it part of the official Splitter interface
 	 */
@@ -292,7 +264,7 @@ sap.ui.define([
 	 */
 	Splitter.prototype.enableLiveResize = function() {
 		this._liveResize = true;
-		this.removeStyleClass("sapUiLoSplitterAnimated");
+		this.$().toggleClass("sapUiLoSplitterAnimated", false);
 	};
 
 	/**
@@ -304,12 +276,12 @@ sap.ui.define([
 	 */
 	Splitter.prototype.disableLiveResize = function() {
 		this._liveResize = false;
-		this.addStyleClass("sapUiLoSplitterAnimated");
+		this.$().toggleClass("sapUiLoSplitterAnimated", true);
 	};
 
 	/**
 	 * Enables the resizing of the Splitter contents via keyboard. This makes the Splitter bars
-	 * focusable elements.
+	 * focussable elements.
 	 *
 	 * @protected
 	 */
@@ -321,7 +293,7 @@ sap.ui.define([
 
 	/**
 	 * Disables the resizing of the Splitter contents via keyboard. This changes the Splitter bars
-	 * to non-focusable elements.
+	 * to non-focussable elements.
 	 *
 	 * @protected
 	 */
@@ -331,7 +303,29 @@ sap.ui.define([
 		this._disableKeyboardListeners();
 	};
 
-	////////////////////////////////////////// Events Handlers /////////////////////////////////////////
+
+
+
+	////////////////////////////////////////// onEvent Methods /////////////////////////////////////////
+
+	Splitter.prototype.onBeforeRendering = function() {
+		this._switchOrientation();
+	};
+
+	/**
+	 * After Rendering, this method is called, it can be used to manipulate the DOM which has already
+	 * been written. Its main function is to move the previously rendered DOM from the hidden area to
+	 * the main splitter area and apply correct sizing.
+	 */
+	Splitter.prototype.onAfterRendering = function() {
+		// Create overlay DOM element for resizing
+		this._$SplitterOverlay = this.$("overlay");
+		this._$SplitterOverlayBar = this.$("overlayBar");
+		this._$SplitterOverlay.detach();
+
+		// Calculate and apply correct sizes to the Splitter contents
+		this._resize();
+	};
 
 	/**
 	 * When one or several of the child controls change their layoutData, the Splitter must
@@ -346,70 +340,70 @@ sap.ui.define([
 	/**
 	 * Starts the resize of splitter contents (when the bar is moved by touch)
 	 *
-	 * @param {jQuery.Event} oEvent The jQuery event
+	 * @param {jQuery.Event} [oJEv] The jQuery event
 	 * @private
 	 */
-	Splitter.prototype.ontouchstart = function (oEvent) {
+	Splitter.prototype.ontouchstart = function(oJEv) {
 		if (this._ignoreTouch) {
 			return;
 		}
 
-		var oTarget = this._getBar(oEvent.target);
-
-		if (!oTarget) {
+		var sId = this.getId();
+		if (!oJEv.target.id || oJEv.target.id.indexOf(sId + "-splitbar") != 0) {
+			// The clicked element was not one of my splitter bars
 			return;
 		}
 
-		if (!oEvent.changedTouches || !oEvent.changedTouches[0]) {
+		if (!oJEv.changedTouches || !oJEv.changedTouches[0]) {
 			// No touch in event
 			return;
 		}
 
 		this._ignoreMouse = true;
-		this._onBarMoveStart(oEvent.changedTouches[0], oTarget, true);
+		this._onBarMoveStart(oJEv.changedTouches[0], true);
 	};
 
 	/**
 	 * Starts the resize of splitter contents (when the bar is moved by mouse)
 	 *
-	 * @param {jQuery.Event} oEvent The jQuery event
+	 * @param {jQuery.Event} [oJEv] The jQuery event
 	 * @private
 	 */
-	Splitter.prototype.onmousedown = function (oEvent) {
+	Splitter.prototype.onmousedown = function(oJEv) {
 		if (this._ignoreMouse) {
 			return;
 		}
 
-		var oTarget = this._getBar(oEvent.target);
-
-		if (!oTarget) {
+		var sId = this.getId();
+		if (!oJEv.target.id || oJEv.target.id.indexOf(sId + "-splitbar") != 0) {
+			// The clicked element was not one of my splitter bars
 			return;
 		}
 
 		this._ignoreTouch = true;
-		this._onBarMoveStart(oEvent, oTarget);
-		this._oLastDOMclicked = oTarget;
+		this._onBarMoveStart(oJEv);
 	};
+
 
 	/**
 	 * Starts a resize (for touch and click)
 	 *
-	 * @param {jQuery.Event|Touch} oEvent jQuery event or Touch object.
-	 * @param {HTMLElement} oBar The bar which is being moved
+	 * @param {jQuery.Event} [oJEv] The jQuery event
 	 * @param {boolean} [bTouch] Whether the first parameter is a touch event
 	 * @private
 	 */
-	Splitter.prototype._onBarMoveStart = function (oEvent, oBar, bTouch) {
+	Splitter.prototype._onBarMoveStart = function(oJEv, bTouch) {
 		var sId = this.getId();
 
 		// Disable auto resize during bar move
 		this.disableAutoResize(/* temporarily: */ true);
 
-		var iPos = oEvent[this._moveCord];
-		var iBar = parseInt(oBar.id.substr((sId + "-splitbar-").length));
-		var $bar = jQuery(oBar);
+		var iPos = oJEv[this._moveCord];
+		var iBar = parseInt(oJEv.target.id.substr((sId + "-splitbar-").length));
+		var $Bar = jQuery(oJEv.target);
 		var mCalcSizes = this.getCalculatedSizes();
-		var iBarSize = this._bHorizontal ? $bar.outerWidth() : $bar.outerHeight();
+		var iBarSize = this._bHorizontal ?  $Bar.innerWidth() : $Bar.innerHeight();
+
 		var aContentAreas = this._getContentAreas();
 		var oLd1   = aContentAreas[iBar].getLayoutData();
 		var oLd2   = aContentAreas[iBar + 1].getLayoutData();
@@ -435,12 +429,12 @@ sap.ui.define([
 			// The number of the bar that is moved
 			barNum : iBar,
 			// The splitter bar that is moved
-			$bar : $bar,
+			bar : jQuery(oJEv.target),
 			// The content sizes for fast resize bound calculation
 			c1Size : mCalcSizes[iBar],
-			c1MinSize : oLd1.getMinSize(),
+			c1MinSize : oLd1 ? parseInt(oLd1.getMinSize()) : 0,
 			c2Size : mCalcSizes[iBar + 1],
-			c2MinSize : oLd2.getMinSize()
+			c2MinSize : oLd2 ? parseInt(oLd2.getMinSize()) : 0
 		};
 
 		// Event handlers use bound handler methods - see init()
@@ -453,30 +447,23 @@ sap.ui.define([
 			document.addEventListener("mousemove", this._boundBarMove);
 		}
 
-		this._$SplitterOverlay.css("display", "block"); // Show the overlay while moving
+		this._$SplitterOverlay.css("display", "block"); // Needed because it is set to none in renderer
+		this._$SplitterOverlay.appendTo(this.getDomRef());
 		this._$SplitterOverlayBar.css(this._sizeDirNot, "");
-		this._move.$bar.css("visibility", "hidden"); // Hide the moved bar
-		this._onBarMove(oEvent);
+		this._move["bar"].css("visibility", "hidden");
+		this._onBarMove(oJEv);
 	};
 
-	/**
-	 * Handles moving of any bar (by touch or mouse)
-	 *
-	 * @param {jQuery.Event|MouseEvent|Touch|TouchEvent} oEvent The event object.
-	 * @private
-	 */
-	Splitter.prototype._onBarMove = function(oEvent) {
-		if (oEvent.preventDefault && !(oEvent.changedTouches)) {
-			oEvent.preventDefault(); // Do not select text
-		}
+	Splitter.prototype._onBarMove = function(oJEv) {
+		if (oJEv.preventDefault) { oJEv.preventDefault(); } // Do not select text
 
-		var oConfig = oEvent;
-		if (oEvent.changedTouches && oEvent.changedTouches[0]) {
+		var oEvent = oJEv;
+		if (oJEv.changedTouches && oJEv.changedTouches[0]) {
 			// Touch me baby!
-			oConfig = oConfig.changedTouches[0];
+			oEvent = oJEv.changedTouches[0];
 		}
 
-		var iPos = oConfig[this._moveCord];
+		var iPos = oEvent[this._moveCord];
 
 		var iDelta = (iPos - this._move.start);
 		//We should only switch direction of change in case it is left or right.
@@ -501,7 +488,7 @@ sap.ui.define([
 			this._$SplitterOverlayBar.css(this._sizeDir, this._move.relStart + iDelta);
 
 			if (this._liveResize) {
-				var fMove = (this._move["start"] - oConfig[this._moveCord]);
+				var fMove = (this._move["start"] - oEvent[this._moveCord]);
 
 				//We should only switch direction of change in case it is left or right.
 				//Otherwise the vertical splitter is moved opposite to the mouse movement
@@ -519,23 +506,24 @@ sap.ui.define([
 
 	};
 
+
 	/**
 	 * Ends the resize of splitter contents (when the bar is moved)
 	 *
-	 * @param {MouseEvent|TouchEvent} oEvent The native event
+	 * @param {jQuery.Event} [oJEv] The jQuery event
 	 * @private
 	 */
-	Splitter.prototype._onBarMoveEnd = function(oEvent) {
+	Splitter.prototype._onBarMoveEnd = function(oJEv) {
 		this._ignoreMouse = false;
 		this._ignoreTouch = false;
 
-		var oConfig = oEvent;
-		if (oEvent.changedTouches && oEvent.changedTouches[0]) {
+		var oEvent = oJEv;
+		if (oJEv.changedTouches && oJEv.changedTouches[0]) {
 			// Touch me baby!
-			oConfig = oConfig.changedTouches[0];
+			oEvent = oJEv.changedTouches[0];
 		}
 
-		var iPos = oConfig[this._moveCord];
+		var iPos = oEvent[this._moveCord];
 
 		var fMove = this._move["start"] - iPos;
 
@@ -551,8 +539,11 @@ sap.ui.define([
 			/* also change layoutData: */ true
 		);
 
-		this._move.$bar.css("visibility", ""); // Return the moved bar
-		this._$SplitterOverlay.css("display", ""); // Remove resizing overlay
+		// Remove resizing overlay
+		this._move["bar"].css("visibility", "");
+		this._$SplitterOverlay.css("display", ""); // Remove?
+
+		// this._$SplitterOverlay.detach(); TODO move to better position
 
 		// Uses bound handler methods - see init()
 		document.removeEventListener("mouseup",   this._boundBarMoveEnd);
@@ -562,8 +553,8 @@ sap.ui.define([
 
 		// Enable auto resize after bar move if it was enabled before
 		this.enableAutoResize(/* temporarily: */ true);
-		if (this._move.$bar){
-			this._move.$bar.trigger("focus");
+		if (this._move.bar){
+			this._move.bar.focus();
 		}
 	};
 
@@ -593,8 +584,8 @@ sap.ui.define([
 
 		var iNewSize1 = this._move.c1Size + iPixels;
 		var iNewSize2 = this._move.c2Size - iPixels;
-		var iMinSize1 = oLd1.getMinSize();
-		var iMinSize2 = oLd2.getMinSize();
+		var iMinSize1 = parseInt(oLd1.getMinSize());
+		var iMinSize2 = parseInt(oLd2.getMinSize());
 
 		// Adhere to size constraints
 		var iDiff;
@@ -656,26 +647,26 @@ sap.ui.define([
 	 * been calculated.
 	 *
 	 * @param {sap.ui.core.Control[]} aContentAreas - The content areas of the Splitter
+	 * @returns {void}
 	 * @private
 	 */
 	Splitter.prototype._resizeBars = function(aContentAreas) {
-		var i, $Bar,
-			iSizeNot = this._bHorizontal ? this.$().innerHeight() : this.$().innerWidth();
-
+		var i, $Bar;
 		// In case the Splitter has a relative height or width set (like "100%"), and the surrounding
 		// container does not have a size set, the content of the Splitter defines the height/width,
 		// in which case the size of the splitter bars is incorrect.
+		var $this = this.$();
 		// First remove the size from the splitter bar so it does not lead to growing the content
 		for (i = 0; i < aContentAreas.length - 1; ++i) {
 			$Bar = this.$("splitbar-" + i);
 			$Bar.css(this._sizeTypeNot, "");
 		}
-
 		// Now measure the content and adapt the size of the Splitter bar
 		for (i = 0; i < aContentAreas.length - 1; ++i) {
 			$Bar = this.$("splitbar-" + i);
+			var iSize = this._bHorizontal ? $this.height() : $this.width();
 			$Bar.css(this._sizeType, "");
-			$Bar.css(this._sizeTypeNot, iSizeNot + "px");
+			$Bar.css(this._sizeTypeNot, iSize + "px");
 		}
 	};
 
@@ -747,75 +738,103 @@ sap.ui.define([
 		}
 	};
 
-	Splitter.prototype._getTotalSize = function () {
-		return this._bHorizontal ? this.$().innerWidth() : this.$().innerHeight();
-	};
-
-	Splitter.prototype._calcAvailableContentSize = function () {
-		return this._getTotalSize() - this._calcBarsSize();
-	};
 
 	/**
-	 * @returns {int} Sum of the widths of all bars in px
+	 * Calculates how much space is actually available inside the splitter to distribute the content
+	 * areas in.
+	 *
+	 * @param {string[]} [aSizes] The list of size values from the LayoutData of the content areas
+	 * @returns {Number} The available space in px
 	 * @private
 	 */
-	Splitter.prototype._calcBarsSize = function () {
-		var iSplitBarsWidth = 0,
-			iBarsCount = this._getContentAreas().length - 1;
+	Splitter.prototype._calculateAvailableContentSize = function(aSizes) {
+		var i = 0;
+
+		var $Splitter = this.$();
+		var iFullSize      = this._bHorizontal ? $Splitter.innerWidth() : $Splitter.innerHeight();
+		// Due to rounding errors when zoom is activated, we need 1px of error margin for every element
+		// that is automatically sized...
+		var iAutosizedAreas = 0;
+		var bHasAutoSizedContent = false;
+		for (i = 0; i < aSizes.length; ++i) {
+			var sSize = aSizes[i];
+			if (sSize.indexOf("%") > -1) {
+				iAutosizedAreas++;
+			}
+			if (aSizes[i] == "auto") {
+				bHasAutoSizedContent = true;
+			}
+		}
+		iAutosizedAreas += bHasAutoSizedContent ? 1 : 0;
+
+		// don't subtract from the full size when orientation is Vertical to prevent endless resizing
+		if (this.getOrientation() === Orientation.Horizontal) {
+			iFullSize -= iAutosizedAreas;
+		}
 
 		// Due to zoom rounding erros, we cannot assume that all SplitBars have the same sizes, even
 		// though they have the same CSS size set.
-		for (var i = 0; i < iBarsCount; i++) {
+		var iSplitters     = aSizes.length - 1;
+		var iSplitBarsWidth = 0;
+		for (i = 0; i < iSplitters; ++i) {
 			iSplitBarsWidth += this._bHorizontal
-				? this.$("splitbar-" + i).outerWidth()
-				: this.$("splitbar-" + i).outerHeight();
+				? this.$("splitbar-" + i).innerWidth()
+				: this.$("splitbar-" + i).innerHeight();
 		}
 
-		return iSplitBarsWidth;
+		return Math.max(0, iFullSize - iSplitBarsWidth);
 	};
 
 	/**
 	 * Recalculates the content sizes in three steps:
 	 *  1. Searches for all absolute values ("px") and deducts them from the available space.
-	 *  2. Searches for all percent values and interprets them as % of the available space
+	 *  2. Searches for all percent values and interprets them as % of the available space after step 1
 	 *  3. Divides the rest of the space uniformly between all contents with "auto" size values
 	 *
 	 * @private
 	 */
-	Splitter.prototype._recalculateSizes = function () {
-		var i, iAreaSize, idx, iMinSize;
+	Splitter.prototype._recalculateSizes = function() {
+		// TODO: (?) Use maxSize value from layoutData
+		var i, sSize, oLayoutData, iColSize, idx;
+
+		// Read all content sizes from the layout data
 		var aSizes = [];
 		var aContentAreas = this._getContentAreas();
-		var iRemainingSize = this._calcAvailableContentSize();
-		var aAutosizeIdx = [];
-		var aAutoMinsizeIdx = [];
-		var aPercentSizeIdx = [];
+		for (i = 0; i < aContentAreas.length; ++i) {
+			oLayoutData = aContentAreas[i].getLayoutData();
+			sSize = oLayoutData ? oLayoutData.getSize() : "auto";
+
+			aSizes.push(sSize);
+		}
 
 		this._calculatedSizes = [];
 
-		// Read all content sizes from the layout data
-		for (i = 0; i < aContentAreas.length; ++i) {
-			aSizes.push(aContentAreas[i].getLayoutData().getSize());
-		}
+		var iAvailableSize = this._calculateAvailableContentSize(aSizes);
 
-		// Step 1: Subtract fixed sizes from available size
+		var aAutosizeIdx = [];
+		var aAutoMinsizeIdx = [];
+		var aPercentsizeIdx = [];
+		var iRest = iAvailableSize;
+
+		// Remove fixed sizes from available size
 		for (i = 0; i < aSizes.length; ++i) {
-			var sSize = aSizes[i];
+			sSize = aSizes[i];
 			var iSize;
 
 			if (sSize.indexOf("rem") > -1) {
 				iSize = parseFloat(sSize) * iRemAsPixels;
-				iRemainingSize -= iSize;
+				iRest -= iSize;
 				this._calculatedSizes[i] = iSize;
 			} else if (sSize.indexOf("px") > -1) {
 				// Pixel based Value - deduct it from available size
 				iSize = parseInt(sSize);
-				iRemainingSize -= iSize;
+				iRest -= iSize;
 				this._calculatedSizes[i] = iSize;
 			} else if (sSize.indexOf("%") > -1) {
-				aPercentSizeIdx.push(i);
-			} else if (sSize === "auto") {
-				if (aContentAreas[i].getLayoutData().getMinSize() !== 0) {
+				aPercentsizeIdx.push(i);
+			} else if (aSizes[i] == "auto") {
+				oLayoutData = aContentAreas[i].getLayoutData();
+				if (oLayoutData && parseInt(oLayoutData.getMinSize()) != 0) {
 					aAutoMinsizeIdx.push(i);
 				} else {
 					aAutosizeIdx.push(i);
@@ -827,94 +846,75 @@ sap.ui.define([
 
 		var bWarnSize = false; // Warn about sizes being too big for the available space
 
-		// If more than the available size is assigned to fixed width content, the rest will get no space at all
-		if (iRemainingSize < 0) {
-			bWarnSize = true;
-			iRemainingSize = 0;
+		// If more than the available size if assigned to fixed width content, the rest will get no
+		// space at all
+		if (iRest < 0) { bWarnSize = true; iRest = 0; }
+
+		// Now calculate % of the available space
+		var iPercentSizes = aPercentsizeIdx.length;
+		for (i = 0; i < iPercentSizes; ++i) {
+			idx = aPercentsizeIdx[i];
+			// Percent based Value - deduct it from available size
+			iColSize = Math.floor((parseFloat(aSizes[idx]) / 100) * iAvailableSize);
+			this._calculatedSizes[idx] = iColSize;
+			iRest -= iColSize;
 		}
+		iAvailableSize = iRest;
 
-		// Step 2: Calculate % of the total space
-		iRemainingSize = this._calcPercentBasedSizes(aPercentSizeIdx, iRemainingSize);
+		if (iAvailableSize < 0) { bWarnSize = true; iAvailableSize = 0; }
 
-		if (iRemainingSize < 0) {
-			bWarnSize = true;
-			iRemainingSize = 0;
-		}
-
-		// Step 3: Calculate auto sizes
-		var iAutoSize = Math.floor(iRemainingSize / (aAutoMinsizeIdx.length + aAutosizeIdx.length), 0);
+		// Calculate auto sizes
+		iColSize = Math.floor(iAvailableSize / (aAutoMinsizeIdx.length + aAutosizeIdx.length), 0);
 
 		// First calculate auto-sizes with a minSize constraint
-		for (i = 0; i < aAutoMinsizeIdx.length; ++i) {
-			iAreaSize = iAutoSize;
+		var iAutoMinSizes = aAutoMinsizeIdx.length;
+		for (i = 0; i < iAutoMinSizes; ++i) {
 			idx = aAutoMinsizeIdx[i];
-			iMinSize = aContentAreas[idx].getLayoutData().getMinSize();
-
-			if (iAreaSize > iRemainingSize) {
-				iAreaSize = iRemainingSize;
+			var iMinSize = parseInt(aContentAreas[idx].getLayoutData().getMinSize());
+			if (iMinSize > iColSize) {
+				this._calculatedSizes[idx] = iMinSize;
+				iAvailableSize -= iMinSize;
+			} else {
+				this._calculatedSizes[idx] = iColSize;
+				iAvailableSize -= iColSize;
 			}
-
-			if (iAreaSize < iMinSize) {
-				iAreaSize = iMinSize;
-			}
-
-			this._calculatedSizes[idx] = iAreaSize;
-			iRemainingSize -= iAreaSize;
 		}
 
-		if (iRemainingSize < 0) {
-			bWarnSize = true;
-			iRemainingSize = 0;
-		}
+		if (iAvailableSize < 0) { bWarnSize = true; iAvailableSize = 0; }
 
 		// Now calculate "auto"-sizes
+		iRest = iAvailableSize;
 		var iAutoSizes = aAutosizeIdx.length;
-		iAutoSize = Math.floor(iRemainingSize / iAutoSizes, 0);
+		iColSize = Math.floor(iAvailableSize / iAutoSizes, 0);
 		for (i = 0; i < iAutoSizes; ++i) {
 			idx = aAutosizeIdx[i];
-			this._calculatedSizes[idx] = iAutoSize;
-			iRemainingSize -= iAutoSize;
+			this._calculatedSizes[idx] = iColSize;
+			iRest -= iColSize;
+	//			if (i == iAutoSizes - 1 && iRest != 0) {
+	//				// In case of rounding errors, change the last auto-size column
+	//				this._calculatedSizes[idx] += iRest;
+	//			}
 		}
 
 		if (bWarnSize) {
-			this._logConstraintsViolated();
+			// TODO: Decide if the warning should be kept - might spam the console but on the other
+			//       hand it might make analyzing of splitter bugs easier, since we can just ask
+			//       developers if there was a [Splitter] output on the console if the splitter looks
+			//       weird in their application.
+			Log.info(
+				"[Splitter] The set sizes and minimal sizes of the splitter contents are bigger " +
+				"than the available space in the UI."
+			);
 		}
-	};
-
-	Splitter.prototype._calcPercentBasedSizes = function (aPercentSizeIdx, iRemainingSize) {
-		var aContentAreas = this._getContentAreas(),
-			iAvailableContentSize = this._calcAvailableContentSize();
-
-		for (var i = 0; i < aPercentSizeIdx.length; ++i) {
-			var idx = aPercentSizeIdx[i];
-			// Percent based value - deduct it from available size
-			var iAreaSize = parseFloat(aContentAreas[idx].getLayoutData().getSize()) / 100 * iAvailableContentSize;
-			var iMinSize = aContentAreas[idx].getLayoutData().getMinSize();
-
-			if (iAreaSize < iMinSize) {
-				iAreaSize = iMinSize;
-			}
-
-			this._calculatedSizes[idx] = iAreaSize;
-			iRemainingSize -= iAreaSize;
-		}
-
-		return iRemainingSize;
-	};
-
-	Splitter.prototype._logConstraintsViolated = function () {
-		Log.warning(
-			"The set sizes and minimal sizes of the splitter contents are bigger than the available space in the UI.",
-			null,
-			"sap.ui.layout.Splitter"
-		);
 	};
 
 	/**
-	 * Stores the respective values that differ when resizing the splitter in horizontal vs. vertical mode
+	 * Stores the respective values that differ when resizing the splitter in horizontal vs. vertical
+	 * mode
+	 *
 	 * @private
 	 */
-	Splitter.prototype._initOrientationProperties = function() {
+	Splitter.prototype._switchOrientation = function() {
 		this._bHorizontal = this.getOrientation() === Orientation.Horizontal;
 		if (this._bHorizontal) {
 			this._sizeDirNot  = "top";
@@ -934,6 +934,10 @@ sap.ui.define([
 			this._sizeDir     = "top";
 			this._sizeDirNot  = "left";
 		}
+
+		var $This = this.$();
+		$This.toggleClass("sapUiLoSplitterH", this._bHorizontal);
+		$This.toggleClass("sapUiLoSplitterV", !this._bHorizontal);
 	};
 
 	/**
@@ -1020,33 +1024,20 @@ sap.ui.define([
 		this._keyboardEnabled = false;
 	};
 
-	///////////////////////////////////////// Hidden Functions /////////////////////////////////////////
-
 	/**
-	 * Returns the bar for the given target. If there isn't such, null is returned
-	 * @param {HTMLElement} oTarget The target
-	 * @returns {HTMLElement|null} The found bar or null
+	 * Gets the text for the given key from the current resourcebundle
+	 *
+	 * @param {string} [sKey] Text key to look for in the resource bundle
+	 * @param {array} [aArgs] Additional arguments for the getText method of the ResourceBundle
+	 * @returns {string} The translated string
+	 * @private
 	 */
-	Splitter.prototype._getBar = function (oTarget) {
-		var oBar = oTarget,
-			sId = this.getId();
-
-		if (oBar.classList.contains("sapUiLoSplitterBarGripIcon")) {
-			oBar = oTarget.parentElement;
-		}
-
-		if (oBar.classList.contains("sapUiLoSplitterBarDecorationBefore")
-			|| oBar.classList.contains("sapUiLoSplitterBarDecorationAfter")
-			|| oBar.classList.contains("sapUiLoSplitterBarGrip")) {
-				oBar = oBar.parentElement;
-		}
-
-		if (!oBar.id || oBar.id.indexOf(sId + "-splitbar") !== 0) {
-			// The clicked element was not one of my splitter bars
-			return null;
-		}
-		return oBar;
+	Splitter.prototype._getText = function(sKey, aArgs) {
+		return (oResourceBundle ? oResourceBundle.getText(sKey, aArgs) : sKey);
 	};
+
+
+	///////////////////////////////////////// Hidden Functions /////////////////////////////////////////
 
 	/**
 	 * Compares two (simple, one-dimensional) arrays. If all values are the same, false is returned -
@@ -1088,9 +1079,7 @@ sap.ui.define([
 	 */
 	function _preventTextSelection(bTouch) {
 		var fnPreventSelection = function(oEvent) {
-			if (!bTouch) {
-				oEvent.preventDefault();
-			}
+			oEvent.preventDefault();
 		};
 		var fnAllowSelection = null;
 		fnAllowSelection = function() {
@@ -1114,10 +1103,10 @@ sap.ui.define([
 	 * Makes sure the LayoutData for the given control is set and compatible. In case nothing is set,
 	 * a default sap.ui.layout.SplitterLayoutData is set on the Element
 	 *
-	 * @param {sap.ui.core.Element} oContent The Element for which the existence of LayoutData should be ensured
+	 * @param {sap.ui.core.Element} [oContent] The Element for which the existance of LayoutData should be ensured
 	 * @private
 	 */
-	Splitter.prototype._ensureLayoutData = function (oContent) {
+	function _ensureLayoutData(oContent) {
 		var oLd = oContent.getLayoutData();
 		// Make sure LayoutData is set on the content
 		// But this approach has the advantage that "compatible" LayoutData can be used.
@@ -1131,9 +1120,11 @@ sap.ui.define([
 		if (!oLd) {
 			oContent.setLayoutData(new SplitterLayoutData());
 		}
-	};
+	}
+
 
 	//////////////////////////////////////// Overridden Methods ////////////////////////////////////////
+
 
 	Splitter.prototype.invalidate = function(oOrigin) {
 		var bForce =
@@ -1149,18 +1140,74 @@ sap.ui.define([
 		 || (oOrigin === undefined);
 
 		// Only really invalidate/rerender if needed
-		if (bForce) {
+		if (bForce || this._needsInvalidation) {
+			this._needsInvalidation = false;
 			Control.prototype.invalidate.apply(this, arguments);
 		}
 	};
 
+	//////////////////////////////////// Property "orientation" ///////////////////////////////////
+
+	Splitter.prototype.setOrientation = function(sOrientation) {
+		var vReturn = this.setProperty("orientation", sOrientation, true);
+
+		this._switchOrientation();
+		this._delayedResize();
+
+		this.$().find(".sapUiLoSplitterBar").attr("aria-orientation", this._bHorizontal ? "vertical" : "horizontal");
+
+		return vReturn;
+	};
+
+
+	///////////////////////////////////// Property "width" ///////////////////////////////
+
+	Splitter.prototype.setWidth = function(sWidth) {
+		// Do not invalidate for size change
+		this.setProperty("width", sWidth, true);
+		// Set validated width on control
+		this.$().css("width", this.getProperty("width"));
+		return this;
+	};
+
+	///////////////////////////////////// Property "height" ///////////////////////////////
+
+	Splitter.prototype.setHeight = function(sHeight) {
+		// Do not invalidate for size change
+		this.setProperty("height", sHeight, true);
+		// Set validated height on control
+		this.$().css("height", this.getProperty("height"));
+		return this;
+	};
+
+	//////////////////////////////////////// Event "xxx" ///////////////////////////////////////
+
+	///////////////////////////////////// Aggregation "contents" ///////////////////////////////
+
 	Splitter.prototype.addContentArea = function(oContent) {
-		this._ensureLayoutData(oContent);
+		this._needsInvalidation = true;
+		_ensureLayoutData(oContent);
 		return this.addAggregation("contentAreas", oContent);
 	};
 
+	Splitter.prototype.removeContentArea = function(oContent) {
+		this._needsInvalidation = true;
+		return this.removeAggregation("contentAreas", oContent);
+	};
+
+	Splitter.prototype.removeAllContentArea = function() {
+		this._needsInvalidation = true;
+		return this.removeAllAggregation("contentAreas");
+	};
+
+	Splitter.prototype.destroyContentArea = function() {
+		this._needsInvalidation = true;
+		return this.destroyAggregation("contentAreas");
+	};
+
 	Splitter.prototype.insertContentArea = function(oContent, iIndex) {
-		this._ensureLayoutData(oContent);
+		this._needsInvalidation = true;
+		_ensureLayoutData(oContent);
 		return this.insertAggregation("contentAreas", oContent, iIndex);
 	};
 
@@ -1168,5 +1215,8 @@ sap.ui.define([
 		return this.getContentAreas();
 	};
 
+	///////////////////////////////////// Association "xxx" ////////////////////////////////////
+
 	return Splitter;
+
 });

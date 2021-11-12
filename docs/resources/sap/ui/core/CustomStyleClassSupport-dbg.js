@@ -1,17 +1,13 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides helper sap.ui.core.CustomStyleClassSupport
-sap.ui.define(['./Element', "sap/base/assert", "sap/base/Log"],
-	function(Element, assert, Log) {
+sap.ui.define(['./Element', "sap/base/assert", "sap/base/Log", "sap/ui/thirdparty/jquery"],
+	function(Element, assert, Log, jQuery) {
 	"use strict";
-
-
-	var rAnyWhiteSpace = /\s/;
-	var rNonWhiteSpace = /\S+/g;
 
 	/**
 	 * Applies the support for custom style classes on the prototype of a <code>sap.ui.core.Element</code>.
@@ -67,10 +63,10 @@ sap.ui.define(['./Element', "sap/base/assert", "sap/base/Log"],
 		}
 
 		// enrich original clone function
-		var fnOriginalClone = this.clone;
+		var fOriginalClone = this.clone;
 		this.clone = function() {
 			// call original clone function
-			var oClone = fnOriginalClone.apply(this, arguments);
+			var oClone = fOriginalClone.apply(this, arguments);
 
 			// add the style classes of "this" to the clone
 			if (this.aCustomStyleClasses) {
@@ -78,70 +74,69 @@ sap.ui.define(['./Element', "sap/base/assert", "sap/base/Log"],
 			}
 			//add the style class map of "this" to the clone
 			if (this.mCustomStyleClassMap) {
-				oClone.mCustomStyleClassMap = Object.assign(Object.create(null), this.mCustomStyleClassMap);
+				oClone.mCustomStyleClassMap = jQuery.extend({}, this.mCustomStyleClassMap);
 			}
 
 			return oClone;
 		};
 
+		var rNonWhiteSpace = /\S+/g;
+
 		this.addStyleClass = function(sStyleClass, bSuppressRerendering) { // bSuppressRerendering is experimental and hence undocumented
 			assert(typeof sStyleClass === "string", "sStyleClass must be a string");
 
-			// ensure that sStyleClass is a non-empty string with no quotes in it (quotes would break string rendering)
-			if (!sStyleClass
-				|| typeof sStyleClass !== "string"
-				|| sStyleClass.indexOf("\"") > -1
-				|| sStyleClass.indexOf("'") > -1) {
-				return this;
+			var aClasses,
+				bModified = false;
+
+			var aChangedScopes = [], aScopes = getScopes();
+
+			if (!this.aCustomStyleClasses) {
+				this.aCustomStyleClasses = [];
 			}
 
-			var aCustomStyleClasses = this.aCustomStyleClasses || (this.aCustomStyleClasses = []),
-				mCustomStyleClassMap = this.mCustomStyleClassMap || (this.mCustomStyleClassMap = Object.create(null)),
-				aClasses,
-				bModified = false,
-				aChangedScopes = [],
-				aScopes = getScopes();
+			if (!this.mCustomStyleClassMap) {
+				this.mCustomStyleClassMap = {};
+			}
 
-			function check(sClass) {
-				if (!mCustomStyleClassMap[sClass]) {
-					mCustomStyleClassMap[sClass] = true;
-					aCustomStyleClasses.push(sClass);
+			if (sStyleClass && typeof sStyleClass === "string") {
+				// ensure the "class" attribute is not closed
+				if (sStyleClass.indexOf("\"") > -1) {
+					return this;
+				}
+				if (sStyleClass.indexOf("'") > -1) {
+					return this;
+				} // TODO: maybe check for quotes in different charsets or encodings
 
-					if (aScopes && aScopes.indexOf(sClass) > -1){
-						aChangedScopes.push(sClass);
+				aClasses = sStyleClass.match(rNonWhiteSpace) || [];
+				aClasses.forEach(function(sClass) {
+					if (!this.mCustomStyleClassMap[sClass]) {
+						this.mCustomStyleClassMap[sClass] = true;
+						this.aCustomStyleClasses.push(sClass);
+
+						if (aScopes && aScopes.indexOf(sClass) > -1){
+							aChangedScopes.push(sClass);
+						}
+
+						bModified = true;
 					}
+				}.bind(this));
 
-					bModified = true;
+				// if all classes exist already, it's not needed to change the DOM or trigger invalidate
+				if (!bModified) {
+					return this;
+				}
+
+				var oRoot = this.getDomRef();
+				if (oRoot) { // non-rerendering shortcut
+					jQuery(oRoot).addClass(sStyleClass);
+				} else if (bSuppressRerendering === false) {
+					this.invalidate();
+				}
+				if (aChangedScopes.length > 0) {
+					// scope has been added
+					fireThemeScopingChangedEvent(this, aChangedScopes, true);
 				}
 			}
-
-			if ( rAnyWhiteSpace.test(sStyleClass) ) {
-				aClasses = sStyleClass.match(rNonWhiteSpace);
-				aClasses && aClasses.forEach(check);
-			} else {
-				check(sStyleClass);
-			}
-
-			// if all classes exist already, it's not needed to change the DOM or trigger invalidate
-			if (!bModified) {
-				return this;
-			}
-
-			var oRoot = this.getDomRef();
-			if (oRoot) { // non-rerendering shortcut
-				if ( aClasses ) {
-					oRoot.classList.add.apply(oRoot.classList, aClasses);
-				} else {
-					oRoot.classList.add(sStyleClass);
-				}
-			} else if (bSuppressRerendering === false) {
-				this.invalidate();
-			}
-			if (aChangedScopes.length > 0) {
-				// scope has been added
-				fireThemeScopingChangedEvent(this, aChangedScopes, true);
-			}
-
 			return this;
 		};
 
@@ -149,51 +144,34 @@ sap.ui.define(['./Element', "sap/base/assert", "sap/base/Log"],
 		this.removeStyleClass = function(sStyleClass, bSuppressRerendering) { // bSuppressRerendering is experimental and hence undocumented
 			assert(typeof sStyleClass === "string", "sStyleClass must be a string");
 
-			if (!sStyleClass
-				|| typeof sStyleClass !== "string"
-				|| !this.aCustomStyleClasses
-				|| !this.mCustomStyleClassMap) {
-				return this;
-			}
-
-			var aCustomStyleClasses = this.aCustomStyleClasses,
-				mCustomStyleClassMap = this.mCustomStyleClassMap,
-				aClasses,
+			var aClasses,
 				bExist = false,
-				aChangedScopes = [],
-				aScopes = getScopes(),
 				nIndex;
 
-			function check(sClass) {
-				if (mCustomStyleClassMap[sClass]) {
-					bExist = true;
-					nIndex = aCustomStyleClasses.indexOf(sClass);
-					if (nIndex !== -1) {
-						aCustomStyleClasses.splice(nIndex, 1);
-						delete mCustomStyleClassMap[sClass];
+			var aChangedScopes = [], aScopes = getScopes();
 
-						if (aScopes && aScopes.indexOf(sClass) > -1) {
-							aChangedScopes.push(sClass);
+			if (sStyleClass && typeof sStyleClass === "string" && this.aCustomStyleClasses && this.mCustomStyleClassMap) {
+				aClasses = sStyleClass.match(rNonWhiteSpace) || [];
+				aClasses.forEach(function(sClass) {
+					if (this.mCustomStyleClassMap[sClass]) {
+						bExist = true;
+						nIndex = this.aCustomStyleClasses.indexOf(sClass);
+						if (nIndex !== -1) {
+							this.aCustomStyleClasses.splice(nIndex, 1);
+							delete this.mCustomStyleClassMap[sClass];
+
+							if (aScopes && aScopes.indexOf(sClass) > -1) {
+								aChangedScopes.push(sClass);
+							}
 						}
 					}
-				}
-			}
-
-			if ( rAnyWhiteSpace.test(sStyleClass) ) {
-				aClasses = sStyleClass.match(rNonWhiteSpace);
-				aClasses && aClasses.forEach(check);
-			} else {
-				check(sStyleClass);
+				}.bind(this));
 			}
 
 			if (bExist) {
 				var oRoot = this.getDomRef();
 				if (oRoot) { // non-rerendering shortcut
-					if ( aClasses ) {
-						oRoot.classList.remove.apply(oRoot.classList, aClasses);
-					} else {
-						oRoot.classList.remove(sStyleClass);
-					}
+					jQuery(oRoot).removeClass(sStyleClass);
 				} else if (bSuppressRerendering === false) {
 					this.invalidate();
 				}
@@ -228,15 +206,12 @@ sap.ui.define(['./Element', "sap/base/assert", "sap/base/Log"],
 		this.hasStyleClass = function(sStyleClass) {
 			assert(typeof sStyleClass === "string", "sStyleClass must be a string");
 
-			if (sStyleClass &&	 typeof sStyleClass === "string" && this.mCustomStyleClassMap) {
-				if ( rAnyWhiteSpace.test(sStyleClass) ) {
-					var aClasses = sStyleClass.match(rNonWhiteSpace);
-					return aClasses != null && aClasses.every(function(sClass) {
-						return this.mCustomStyleClassMap[sClass];
-					}, this);
-				} else {
-					return !!this.mCustomStyleClassMap[sStyleClass];
-				}
+			var aClasses;
+			if (sStyleClass && typeof sStyleClass === "string" && this.mCustomStyleClassMap) {
+				aClasses = sStyleClass.match(rNonWhiteSpace) || [];
+				return aClasses.length !== 0 && aClasses.every(function(sClass) {
+					return this.mCustomStyleClassMap[sClass];
+				}.bind(this));
 			}
 			return false;
 		};

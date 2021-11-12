@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -28,7 +28,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Element
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -50,8 +50,7 @@ sap.ui.define([
 				contributor: {
 					type: "string",
 					group: "Data",
-					defaultValue: null,
-					deprecated: true
+					defaultValue: null
 				},
 
 				/**
@@ -79,8 +78,7 @@ sap.ui.define([
 				fileSize: {
 					type: "float",
 					group: "Misc",
-					defaultValue: null,
-					deprecated: true
+					defaultValue: null
 				},
 
 				/**
@@ -109,8 +107,7 @@ sap.ui.define([
 				uploadedDate: {
 					type: "string",
 					group: "Misc",
-					defaultValue: null,
-					deprecated: true
+					defaultValue: null
 				},
 
 				/**
@@ -384,7 +381,7 @@ sap.ui.define([
 		jQuery.each(aProperties, function(i, sName) {
 			var sValue = this.getProperty(sName),
 				oAttribute = this._mDeprecatedProperties[sName];
-			if (sValue) {
+			if (jQuery.type(sValue) === "number" && !!sValue || !!sValue) {
 				if (!oAttribute) {
 					oAttribute = new ObjectAttribute({
 						active: false
@@ -440,17 +437,7 @@ sap.ui.define([
 	 * @private
 	 */
 	UploadCollectionItem.prototype._getPressEnabled = function() {
-		return this.hasListeners("press") || this._hasUrl();
-	};
-
-	/**
-	 * Checks if item has a non-empty URL.
-	 * @returns {boolean} True if item has a non-empty URL.
-	 * @private
-	 */
-	UploadCollectionItem.prototype._hasUrl = function() {
-		var sUrl = this.getUrl();
-		return sUrl != null && !!sUrl.trim();
+		return this.hasListeners("press") || !!jQuery.trim(this.getUrl());
 	};
 
 	return UploadCollectionItem;

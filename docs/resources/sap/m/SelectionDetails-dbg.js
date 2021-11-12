@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 // Provides control sap.m.SelectionDetails.
@@ -39,7 +39,7 @@ function(
 	 * <b><i>Note:</i></b>It is protected and should only be used within the framework itself.
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @extends sap.ui.core.Control
 	 * @constructor
@@ -167,10 +167,6 @@ function(
 		this._updateButton();
 	};
 
-	SelectionDetails.prototype.onAfterRendering = function() {
-		document.getElementById(this.getAggregation("_button").getId()).setAttribute("aria-haspopup", "dialog");
-	};
-
 	SelectionDetails.prototype.exit = function() {
 		this.detachSelectionHandler();
 		this._oItemFactory = null;
@@ -205,7 +201,7 @@ function(
 
 	/**
 	 * Closes SelectionDetails if open.
-	 * @returns {this} To ensure method chaining, return the SelectionDetails.
+	 * @returns {sap.m.SelectionDetails} To ensure method chaining, return the SelectionDetails.
 	 * @public
 	 * @function
 	 * @name sap.m.SelectionDetailsFacade#close
@@ -225,7 +221,7 @@ function(
 	 *
 	 * @param {string} title The title property of the {@link sap.m.Page page} control to which the navigation should occur.
 	 * @param {sap.ui.core.Control} content The content of the control to which the navigation should occur.
-	 * @returns {this} To ensure method chaining, return the SelectionDetails.
+	 * @returns {sap.m.SelectionDetails} To ensure method chaining, return the SelectionDetails.
 	 * @public
 	 * @function
 	 * @name sap.m.SelectionDetailsFacade#navTo
@@ -254,7 +250,7 @@ function(
 	/**
 	 * Enables line wrapping for the labels of the of the {@link sap.m.SelectionDetailsItemLine} elements.
 	 * @param {boolean} bWrap True to apply wrapping to the labels of the {@link sap.m.SelectionDetailsItemLine} elements.
-	 * @returns {this} To ensure method chaining, returns SelectionDetails.
+	 * @returns {sap.m.SelectionDetails} To ensure method chaining, returns SelectionDetails.
 	 * @public
 	 * @function
 	 * @name sap.m.SelectionDetailsFacade#setWrapLabels
@@ -276,7 +272,7 @@ function(
 	 * Sets the popover to modal or non-modal based on the given parameter. This only takes effect on desktop or tablet.
 	 * Please see the documentation {@link sap.m.ResponsivePopover#modal}.
 	 * @param {boolean} modal New value for property modal of the internally used popover.
-	 * @returns {this} To ensure method chaining, return the SelectionDetails.
+	 * @returns {sap.m.SelectionDetails} To ensure method chaining, return the SelectionDetails.
 	 * @protected
 	 */
 	SelectionDetails.prototype.setPopoverModal = function(modal) {
@@ -489,7 +485,7 @@ function(
 	 * @private
 	 */
 	SelectionDetails.prototype._updateButton = function() {
-		var sText, iCount, oButton = this.getAggregation("_button"), bEnabled;
+		var sText, iCount, oButton = this.getAggregation("_button");
 		if (this._oSelectionData && this._oSelectionData.length >= 0) {
 			iCount = this._oSelectionData.length;
 		} else {
@@ -498,14 +494,13 @@ function(
 
 		if (iCount > 0) {
 			sText = this._oRb.getText("SELECTIONDETAILS_BUTTON_TEXT_WITH_NUMBER", [ iCount ]);
-			bEnabled = true;
+			oButton.setProperty("text", sText, true);
+			oButton.setProperty("enabled", true, true);
 		} else {
 			sText = this._oRb.getText("SELECTIONDETAILS_BUTTON_TEXT");
-			bEnabled = false;
+			oButton.setProperty("text", sText, true);
+			oButton.setProperty("enabled", false, true);
 		}
-		oButton.setText(sText);
-		oButton.setEnabled(bEnabled);
-		oButton.setTooltip(sText);
 	};
 
 	/**
@@ -616,10 +611,7 @@ function(
 	 * @private
 	 */
 	SelectionDetails.prototype._getNavContainer = function(NavContainer) {
-		if (!this._oNavContainer) {
-			this._oNavContainer = new NavContainer(this.getId() + "-nav-container");
-		}
-		return this._oNavContainer;
+		return this._oNavContainer || (this._oNavContainer = new NavContainer(this.getId() + "-nav-container"));
 	};
 
 	/**
@@ -914,9 +906,10 @@ function(
 	 */
 	SelectionDetails.prototype._handleSelectionChange = function(oEvent) {
 		var oEventParams = oEvent.getParameter("data");
-		if (Array.isArray(oEventParams)) {
+		if (jQuery.type(oEventParams) === "array") {
 			this._oSelectionData = oEventParams;
 			this._updateButton();
+			this.getAggregation("_button").rerender();
 		}
 	};
 
@@ -933,7 +926,7 @@ function(
 	 * @protected
 	 * @param {any} data Data to be passed to the factory function
 	 * @param {function} factory The item factory function that returns SelectionDetailsItems
-	 * @returns {this} this to allow method chaining
+	 * @returns {sap.m.SelectionDetails} this to allow method chaining
 	 */
 	SelectionDetails.prototype.registerSelectionDetailsItemFactory = function(data, factory) {
 		if (typeof (data) === "function") {
@@ -954,25 +947,25 @@ function(
 	 * @protected
 	 * @param {string} eventId The identifier of the event to listen for
 	 * @param {object} listener The object which triggers the event to register on
-	 * @returns {this} this to allow method chaining
+	 * @returns {sap.m.SelectionDetails} this to allow method chaining
 	 */
 	SelectionDetails.prototype.attachSelectionHandler = function(eventId, listener) {
-		// only create change handler once + check for argument validity
-		if (!this._oChangeHandler && typeof eventId === "string" && listener && typeof listener.attachEvent === "function") {
+		if (this._oChangeHandler || jQuery.type(eventId) !== "String" && (jQuery.type(listener) !== "object" || jQuery.type(listener.attachEvent) !== "function")) {
+			return this;
+		} else {
 			this._oChangeHandler = {
 				eventId: eventId,
 				listener: listener
 			};
 			listener.attachEvent(eventId, this._handleSelectionChange, this);
 		}
-
 		return this;
 	};
 
 	/**
 	 * Detaches the event which was attached by <code>attachSelectionHandler</code>.
 	 * @protected
-	 * @returns {this} this to allow method chaining
+	 * @returns {sap.m.SelectionDetails} this to allow method chaining
 	 */
 	SelectionDetails.prototype.detachSelectionHandler = function() {
 		if (this._oChangeHandler) {

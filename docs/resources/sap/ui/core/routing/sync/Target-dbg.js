@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/base/Log"], function(Log) {
@@ -11,15 +11,11 @@ sap.ui.define(["sap/base/Log"], function(Log) {
 	 * @private
 	 * @experimental
 	 * @since 1.33
-	 * @deprecated Since 1.90. Use a {@link sap.ui.core.routing.async.Target async.Target} instead
 	 */
 	return {
 
 		/**
 		 * Creates a view and puts it in an aggregation of a control that has been defined in the {@link #constructor}.
-		 *
-		 * This method can be used to display a target without changing the browser hash. If the browser hash should be changed,
-		 *  the {@link sap.ui.core.routing.Router#navTo} method should be used instead
 		 *
 		 * @param {*} [vData] an object that will be passed to the display event in the data property. If the target has parents, the data will also be passed to them.
 		 * @returns {object} The place info
@@ -45,21 +41,6 @@ sap.ui.define(["sap/base/Log"], function(Log) {
 		 * @private
 		 */
 		suspend : function () {
-			// the sync target can only load view and not component
-			// therefore it's not needed to do anything in this function
-			return this;
-		},
-
-		/**
-		 * Resumes the object which is loaded by the target.
-		 *
-		 * Currently this function doesn't do anything because the sync
-		 * version of the Target can only load Views but no Components.
-		 *
-		 * @return {sap.ui.core.routing.Target} The 'this' to chain the call
-		 * @private
-		 */
-		resume : function () {
 			// the sync target can only load view and not component
 			// therefore it's not needed to do anything in this function
 			return this;

@@ -1,9 +1,8 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-
 /*
  * IMPORTANT: This is a private module, its API must not be used and is subject to change.
  * Code other than the OpenUI5 libraries must not introduce dependencies to this module.
@@ -55,7 +54,7 @@ sap.ui.define(['sap/ui/thirdparty/jquery'], function(jQuery) {
 
 		// check for at least one item to be visible
 		return !jQuery(element).add($refs).filter(function() {
-			return jQuery.css( this, "visibility" ) === "hidden" || jQuery.expr.pseudos.hidden( this );
+			return jQuery.css( this, "visibility" ) === "hidden" || jQuery.expr.filters.hidden( this );
 		}).length;
 	}
 
@@ -84,7 +83,7 @@ sap.ui.define(['sap/ui/thirdparty/jquery'], function(jQuery) {
 	}
 
 
-	if (!getValue(jQuery.expr.pseudos, "focusable")) {
+	if (!getValue(jQuery.expr[":"], "focusable")) {
 		/*!
 		 * The following function is taken from jQuery UI 1.8.17
 		 *
@@ -94,7 +93,7 @@ sap.ui.define(['sap/ui/thirdparty/jquery'], function(jQuery) {
 		 *
 		 * http://docs.jquery.com/UI
 		 *
-		 * But since visible is modified, focusable is different from the jQuery UI version too.
+		 * But since visible is modified, focusable is different too the jQuery UI version too.
 		 */
 
 		/*
@@ -103,12 +102,12 @@ sap.ui.define(['sap/ui/thirdparty/jquery'], function(jQuery) {
 		 * If jQuery UI is loaded later on, this implementation here will be overwritten by that one, which is fine,
 		 * as it is semantically the same thing and intended to do exactly the same.
 		 */
-		jQuery.expr.pseudos.focusable = function( element ) {
+		jQuery.expr[ ":" ].focusable = function( element ) {
 			return focusable( element, !isNaN( jQuery.attr( element, "tabindex" ) ) );
 		};
 	}
 
-	if (!getValue(jQuery.expr.pseudos, "sapTabbable")) {
+	if (!getValue(jQuery.expr[":"], "sapTabbable")) {
 		/*!
 		 * The following function is taken from
 		 * jQuery UI Core 1.11.1
@@ -127,14 +126,14 @@ sap.ui.define(['sap/ui/thirdparty/jquery'], function(jQuery) {
 		 * If jQuery UI is loaded later on, this implementation here will be overwritten by that one, which is fine,
 		 * as it is semantically the same thing and intended to do exactly the same.
 		 */
-		jQuery.expr.pseudos.sapTabbable = function( element ) {
+		jQuery.expr[ ":" ].sapTabbable = function( element ) {
 			var tabIndex = jQuery.attr( element, "tabindex" ),
 				isTabIndexNaN = isNaN( tabIndex );
 			return ( isTabIndexNaN || tabIndex >= 0 ) && focusable( element, !isTabIndexNaN );
 		};
 	}
 
-	if (!getValue(jQuery.expr.pseudos, "sapFocusable")) {
+	if (!getValue(jQuery.expr[":"], "sapFocusable")) {
 		/*!
 		 * Do not use jQuery UI focusable because this might be overwritten if jQuery UI is loaded
 		 */
@@ -144,7 +143,7 @@ sap.ui.define(['sap/ui/thirdparty/jquery'], function(jQuery) {
 		 * done here, so we will not overwrite any previous implementation.
 		 * If jQuery UI is loaded later on, this implementation here will NOT be overwritten by.
 		 */
-		jQuery.expr.pseudos.sapFocusable = function( element ) {
+		jQuery.expr[ ":" ].sapFocusable = function( element ) {
 			return focusable( element, !isNaN( jQuery.attr( element, "tabindex" ) ) );
 		};
 	}

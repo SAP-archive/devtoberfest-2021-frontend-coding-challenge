@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -44,7 +44,7 @@ function(
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -56,7 +56,6 @@ function(
 	var TileContainer = Control.extend("sap.m.TileContainer", /** @lends sap.m.TileContainer.prototype */ { metadata : {
 
 		library : "sap.m",
-		deprecated: true,
 		properties : {
 
 			/**
@@ -183,8 +182,8 @@ function(
 
 					var oFirstTile = this._getVisibleTiles()[iTargetTileIndex];
 
-					if (oFirstTile) {
-						this._findTile(oFirstTile.$()).trigger("focus");
+					if (!!oFirstTile) {
+						this._findTile(oFirstTile.$()).focus();
 						// event should not trigger any further actions
 						oEvent.stopPropagation();
 					}
@@ -204,7 +203,7 @@ function(
 						: iRowLastTileIndex;
 
 					if (oTiles.length > 0) {
-						this._findTile(oTiles[iTargetTileIndex].$()).trigger("focus");
+						this._findTile(oTiles[iTargetTileIndex].$()).focus();
 						// event should not trigger any further actions
 						oEvent.stopPropagation();
 					}
@@ -220,9 +219,9 @@ function(
 
 					var oNextTile = aTiles[iNextIndex];
 
-					if (oNextTile) {
+					if (!!oNextTile) {
 						this._renderTilesInTheSamePage(iNextIndex, aTiles);
-						this._findTile(oNextTile.$()).trigger("focus");
+						this._findTile(oNextTile.$()).focus();
 						// event should not trigger any further actions
 						oEvent.stopPropagation();
 					}
@@ -239,9 +238,9 @@ function(
 
 					var oNextTile = aTiles[iNextIndex];
 
-					if (oNextTile) {
+					if (!!oNextTile) {
 						this._renderTilesInTheSamePage(iNextIndex, aTiles);
-						this._findTile(oNextTile.$()).trigger("focus");
+						this._findTile(oNextTile.$()).focus();
 						// event should not trigger any further actions
 						oEvent.stopPropagation();
 					}
@@ -257,22 +256,22 @@ function(
 					if (!oEvent.ctrlKey) {
 						var oNextTile = aTiles[iNextIndex];
 
-						if (oNextTile) {
+						if (!!oNextTile) {
 							if (iNextIndex < this._iCurrentTileStartIndex + this._iMaxTiles) { // tile on same page?
-								this._findTile(oNextTile.$()).trigger("focus");
+								this._findTile(oNextTile.$()).focus();
 							} else {
 								this._renderTilesInTheSamePage(iNextIndex, aTiles);
 								this.scrollIntoView(oNextTile, true, aTiles);
 								var that = this;
 								setTimeout(function() {
-									that._findTile(oNextTile.$()).trigger("focus");
+									that._findTile(oNextTile.$()).focus();
 								}, 400);
 							}
 						}
 					} else if (this.getEditable()) {
 						var oTile = aTiles[this._iCurrentFocusIndex];
 						this.moveTile(oTile, iNextIndex);
-						oTile.$().trigger("focus");
+						oTile.$().focus();
 					}
 					this._handleAriaActiveDescendant();
 
@@ -289,22 +288,22 @@ function(
 					if (!oEvent.ctrlKey) {
 						var oNextTile = aTiles[iNextIndex];
 
-						if (oNextTile) {
+						if (!!oNextTile) {
 							if (iNextIndex >= this._iCurrentTileStartIndex) { // tile on same page?
-								this._findTile(oNextTile.$()).trigger("focus");
+								this._findTile(oNextTile.$()).focus();
 							} else {
 								this._renderTilesInTheSamePage(iNextIndex, aTiles);
 								this.scrollIntoView(oNextTile, true, aTiles);
 								var that = this;
 								setTimeout(function () {
-									that._findTile(oNextTile.$()).trigger("focus");
+									that._findTile(oNextTile.$()).focus();
 								}, 400);
 							}
 						}
 					} else if (this.getEditable()) {
 						var oTile = aTiles[this._iCurrentFocusIndex];
 						this.moveTile(oTile, iNextIndex);
-						oTile.$().trigger("focus");
+						oTile.$().focus();
 					}
 					this._handleAriaActiveDescendant();
 					// event should not trigger any further actions
@@ -323,14 +322,14 @@ function(
 					if (!oEvent.ctrlKey) {
 						var oNextTile = oTiles[iNextIndex];
 
-						if ((iModNext > iModCurr) && oNextTile) {
+						if ((iModNext > iModCurr) && !!oNextTile) {
 							// '(iModNext > iModCurr)' means: still on same page
-							this._findTile(oNextTile.$()).trigger("focus");
+							this._findTile(oNextTile.$()).focus();
 						}
 					} else if (this.getEditable()) {
 						var oTile = oTiles[this._iCurrentFocusIndex];
 						this.moveTile(oTile, iNextIndex);
-						oTile.$().trigger("focus");
+						oTile.$().focus();
 					}
 					this._handleAriaActiveDescendant();
 					// event should not trigger any further actions
@@ -348,14 +347,14 @@ function(
 
 					if (!oEvent.ctrlKey) {
 						var oNextTile = oTiles[iNextIndex];
-						if ((iModNext < iModCurr) && oNextTile) {
+						if ((iModNext < iModCurr) && !!oNextTile) {
 							// '(iModNext < iModCurr)' means: still on same page
-							this._findTile(oNextTile.$()).trigger("focus");
+							this._findTile(oNextTile.$()).focus();
 						}
 					} else if (this.getEditable()) {
 						var oTile = oTiles[this._iCurrentFocusIndex];
 						this.moveTile(oTile, iNextIndex);
-						oTile.$().trigger("focus");
+						oTile.$().focus();
 					}
 					this._handleAriaActiveDescendant();
 					// event should not trigger any further actions
@@ -375,12 +374,12 @@ function(
 
 						if (this._iCurrentFocusIndex === oTiles.length) {
 							if (oTiles.length !== 0) {
-								oTiles[this._iCurrentFocusIndex - 1].$().trigger("focus");
+								oTiles[this._iCurrentFocusIndex - 1].$().focus();
 							} else {
-								this._findNextTabbable().trigger("focus");
+								this._findNextTabbable().focus();
 							}
 						} else {
-							oTiles[this._iCurrentFocusIndex].$().trigger("focus");
+							oTiles[this._iCurrentFocusIndex].$().focus();
 						}
 						this._handleAriaActiveDescendant();
 					}
@@ -599,7 +598,7 @@ function(
 	 * This is currently also set with a long tap.
 	 *
 	 * @param {boolean} bValue Whether the container is in edit mode or not
-	 * @returns {this} this pointer for chaining
+	 * @returns {sap.m.TileContainer} this pointer for chaining
 	 * @public
 	 */
 	TileContainer.prototype.setEditable = function(bValue) {
@@ -785,7 +784,7 @@ function(
 	 *
 	 * @param {sap.m.Tile} vTile The tile to move
 	 * @param {int} iNewIndex The new Tile position in the tiles aggregation
-	 * @returns {this} this pointer for chaining
+	 * @returns {sap.m.TileContainer} this pointer for chaining
 	 * @public
 	 * @ui5-metamodel This method also will be described in the UI5 (legacy) designtime metamodel
 	 */
@@ -809,7 +808,7 @@ function(
 	 * Adds a Tile to the end of the tiles collection.
 	 *
 	 * @param {sap.m.Tile} oTile The tile to add
-	 * @returns {this} this pointer for chaining
+	 * @returns {sap.m.TileContainer} this pointer for chaining
 	 * @override
 	 * @public
 	 */
@@ -823,7 +822,7 @@ function(
 	 *
 	 * @param {sap.m.Tile} oTile The Tile to insert
 	 * @param {int} iIndex The new Tile position in the tiles aggregation
-	 * @returns {this} this pointer for chaining
+	 * @returns {sap.m.TileContainer} this pointer for chaining
 	 * @override
 	 * @public
 	 */
@@ -932,7 +931,7 @@ function(
 	 * To be used within jQuery.filter function.
 	 * @param {int} index Index of the element within an array
 	 * @param {Element} element DOM element to check
-	 * @returns {boolean} If a DOM element is focusable
+	 * @returns {Boolean} If a DOM element is focusable
 	 * @private
 	 */
 	TileContainer.prototype._isFocusable = function(index, element) {
@@ -961,7 +960,7 @@ function(
 	 * Deletes a Tile.
 	 *
 	 * @param {sap.m.Tile} oTile The tile to move
-	 * @returns {this} this pointer for chaining
+	 * @returns {sap.m.TileContainer} this pointer for chaining
 	 * @override
 	 * @public
 	 */
@@ -1810,7 +1809,7 @@ function(
 			iNearRight = oContentDimension.width - (iLeft +  this._oDragSession.oTileElement.offsetWidth),
 			iNearLeft =  iLeft;
 
-		//Log.info("ScrollLeft = " + this._iScrollLeft + " Left = " + iLeft + " Top = " + iTop);
+		//jQuery.sap.log.info("ScrollLeft = " + this._iScrollLeft + " Left = " + iLeft + " Top = " + iTop);
 		this._oDragSession.oTile.setPos(iLeft,iTop);
 
 		// reset the clipping of the tile
@@ -1961,7 +1960,7 @@ function(
 			this.scrollIntoView(oTile, false);
 
 			if (Device.system.desktop || Device.system.combi) {
-				this._findTile(oTile.$()).trigger("focus");
+				this._findTile(oTile.$()).focus();
 			}
 			this._handleAriaActiveDescendant();
 

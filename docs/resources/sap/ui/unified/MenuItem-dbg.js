@@ -1,12 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides control sap.ui.unified.MenuItem.
-sap.ui.define(['sap/ui/core/IconPool', './MenuItemBase', './library', 'sap/ui/core/library'],
-	function(IconPool, MenuItemBase, library, coreLibrary) {
+sap.ui.define(['sap/ui/core/IconPool', './MenuItemBase', './library'],
+	function(IconPool, MenuItemBase, library) {
 	"use strict";
 
 
@@ -23,7 +23,7 @@ sap.ui.define(['sap/ui/core/IconPool', './MenuItemBase', './library', 'sap/ui/co
 	 * @extends sap.ui.unified.MenuItemBase
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @since 1.21.0
 	 *
 	 * @constructor
@@ -96,10 +96,10 @@ sap.ui.define(['sap/ui/core/IconPool', './MenuItemBase', './library', 'sap/ui/co
 				disabled: null, // Prevent aria-disabled as a disabled attribute is enough
 				posinset: oInfo.iItemNo,
 				setsize: oInfo.iTotalItems,
-				labelledby: { value: this.getId() + "-txt", append: true }
+				labelledby: {value: /*oMenu.getId() + "-label " + */this.getId() + "-txt " + this.getId() + "-scuttxt", append: true}
 			});
 			if (oSubMenu) {
-				rm.attr("aria-haspopup", coreLibrary.aria.HasPopup.Menu.toLowerCase());
+				rm.attr("aria-haspopup", true);
 				rm.attr("aria-owns", oSubMenu.getId());
 			}
 		}
@@ -160,7 +160,7 @@ sap.ui.define(['sap/ui/core/IconPool', './MenuItemBase', './library', 'sap/ui/co
 
 	MenuItem.prototype.focus = function(oMenu){
 		if (this.getEnabled() && this.getVisible()) {
-			this.$().trigger("focus");
+			this.$().focus();
 		} else {
 			oMenu.focus();
 		}

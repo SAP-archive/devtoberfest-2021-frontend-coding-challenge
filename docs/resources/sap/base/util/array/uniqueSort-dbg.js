@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(['sap/base/assert'], function(assert) {
@@ -9,10 +9,7 @@ sap.ui.define(['sap/base/assert'], function(assert) {
 	/**
 	 * Sorts the given array in-place and removes any duplicates (identified by "===").
 	 *
-	 * Uses Array#sort()
-	 * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-	 *
-	 * Use <code>jQuery.uniqueSort()</code> for arrays of DOMElements.
+	 * Use <code>jQuery.unique()</code> for arrays of DOMElements.
 	 *
 	 * @function
 	 * @since 1.58
@@ -22,20 +19,20 @@ sap.ui.define(['sap/base/assert'], function(assert) {
 	 * @public
 	 */
 	var fnUniqueSort = function(aArray) {
-		assert(Array.isArray(aArray), "uniqueSort: input parameter must be an Array");
-		var iLength = aArray.length;
-		if ( iLength > 1 ) {
+		assert(aArray instanceof Array, "uniqueSort: input parameter must be an Array");
+		var l = aArray.length;
+		if ( l > 1 ) {
 			aArray.sort();
 			var j = 0;
-			for (var i = 1; i < iLength; i++) {
+			for (var i = 1; i < l; i++) {
 				// invariant: i is the entry to check, j is the last unique entry known so far
-				if ( aArray.indexOf(aArray[i]) === i ) {
+				if ( aArray[i] !== aArray[j] ) {
 					aArray[++j] = aArray[i];
 				}
 			}
 			// cut off the rest - if any
-			if ( ++j < iLength ) {
-				aArray.splice(j, iLength - j);
+			if ( ++j < l ) {
+				aArray.splice(j, l - j);
 			}
 		}
 		return aArray;

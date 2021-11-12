@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 /*
@@ -13,8 +13,9 @@ sap.ui.define(function() {
 	/*global ClipboardEvent, HTMLElement*/
 
 	document.documentElement.addEventListener("paste", function(oEvent) {
-		var oActiveElement = document.activeElement;
-		if (oEvent.isTrusted && oActiveElement instanceof HTMLElement &&
+		var oActiveElement = document.activeElement,
+			oNewEvent;
+		if (oActiveElement instanceof HTMLElement &&
 			// The paste event should always be fired on or within
 			// the active element because the corresponding key board
 			// event can only occur on or within the active element.
@@ -24,11 +25,19 @@ sap.ui.define(function() {
 			// event should be dispatched on the active element again.
 			!oActiveElement.contains(oEvent.target)) {
 
-			var oNewEvent = new ClipboardEvent("paste", {
-				bubbles: true,
-				cancelable: true,
-				clipboardData: oEvent.clipboardData
-			});
+			if (typeof ClipboardEvent === "function") {
+				oNewEvent = new ClipboardEvent("paste", {
+					bubbles: true,
+					cancelable: true,
+					clipboardData: oEvent.clipboardData
+				});
+			} else {
+				// Fallback to the legacy way of event creation when
+				// ClipboardEvent class doesn't exist, for example in IE11
+				oNewEvent = document.createEvent('Event');
+				oNewEvent.initEvent("paste", true, true);
+				oNewEvent.clipboardData = oEvent.clipboardData;
+			}
 
 			oActiveElement.dispatchEvent(oNewEvent);
 
@@ -38,7 +47,5 @@ sap.ui.define(function() {
 			oEvent.preventDefault();
 		}
 
-	}, /* capturing phase */ true);
-	// use capturing phase because the additional event handler for the "paste" event may change the focused element
-	// which affects the way that processes the event here
+	});
 });

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/core/library"],
@@ -35,8 +35,7 @@ sap.ui.define(["sap/ui/core/library"],
 			bShowText = oControl.getShowValue(),
 			sState = oControl.getState(),
 			sTextDirectionLowerCase = oControl.getTextDirection().toLowerCase(),
-			sControlId = oControl.getId(),
-			bEnabled = oControl.getEnabled();
+			sControlId = oControl.getId();
 
 		// PI container
 		oRm.openStart("div", oControl);
@@ -79,28 +78,23 @@ sap.ui.define(["sap/ui/core/library"],
 		oRm.openStart("div", sControlId + "-bar");
 		oRm.class("sapMPIBar");
 
-		if (bEnabled) {
-			switch (sState) {
-				case ValueState.Warning:
-					oRm.class("sapMPIBarCritical");
-					break;
-				case ValueState.Error:
-					oRm.class("sapMPIBarNegative");
-					break;
-				case ValueState.Success:
-					oRm.class("sapMPIBarPositive");
-					break;
-				case ValueState.Information:
-					oRm.class("sapMPIBarInformation");
-					break;
-				default:
-					oRm.class("sapMPIBarNeutral");
-					break;
-				}
-		} else {
+		switch (sState) {
+		case ValueState.Warning:
+			oRm.class("sapMPIBarCritical");
+			break;
+		case ValueState.Error:
+			oRm.class("sapMPIBarNegative");
+			break;
+		case ValueState.Success:
+			oRm.class("sapMPIBarPositive");
+			break;
+		case ValueState.Information:
+			oRm.class("sapMPIBarInformation");
+			break;
+		default:
 			oRm.class("sapMPIBarNeutral");
+			break;
 		}
-
 
 		oRm.style("flex-basis", fPercentValue + "%");
 		oRm.openEnd();

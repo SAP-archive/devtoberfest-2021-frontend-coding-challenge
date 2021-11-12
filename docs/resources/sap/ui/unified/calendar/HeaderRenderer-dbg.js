@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -29,16 +29,12 @@ sap.ui.define(["sap/base/security/encodeXML"],
 		var sLanguage = sap.ui.getCore().getConfiguration().getLocale().getLanguage();
 		var sTooltip = oHead.getTooltip_AsString();
 		var sId = oHead.getId();
-		var oRB = sap.ui.getCore().getLibraryResourceBundle("sap.ui.unified");
-		var sLabelNext = oRB.getText("CALENDAR_BTN_NEXT");
-		var sLabelPrev = oRB.getText("CALENDAR_BTN_PREV");
-		var sLabelToday = oRB.getText("CALENDAR_BTN_TODAY");
+		var mAccProps = {};
+		var sLabelNext = sap.ui.getCore().getLibraryResourceBundle("sap.ui.unified").getText("CALENDAR_BTN_NEXT");
+		var sLabelPrev = sap.ui.getCore().getLibraryResourceBundle("sap.ui.unified").getText("CALENDAR_BTN_PREV");
 
 		oRm.openStart("div", oHead);
 		oRm.class("sapUiCalHead");
-		if (oHead.getVisibleCurrentDateButton()) {
-			oRm.class("sapUiCalHeaderWithTodayButton");
-		}
 
 		if (sTooltip) {
 			oRm.attr('title', sTooltip);
@@ -105,13 +101,7 @@ sap.ui.define(["sap/base/security/encodeXML"],
 				iFirst = 2;
 				iLast = 3;
 			}
-			this.renderCalendarButtons(oRm, oHead, sId, iFirst, iLast, iBtn);
-		}
-		if (!oHead.getVisibleButton0() && !oHead.getVisibleButton1() && !oHead.getVisibleButton2() && !oHead._getVisibleButton3() && !oHead._getVisibleButton4()) {
-			oRm.openStart("div", sId + '-B' + "-Placeholder");
-			oRm.class("sapUiCalHeadBPlaceholder");
-			oRm.openEnd(); // span element
-			oRm.close("span");
+			this.renderCalendarButtons(oRm, oHead, sId, iFirst, iLast, mAccProps, iBtn);
 		}
 
 		oRm.openStart("button", sId + '-next');
@@ -128,25 +118,11 @@ sap.ui.define(["sap/base/security/encodeXML"],
 		oRm.icon("sap-icon://slim-arrow-right", null, { title: null });
 		oRm.close("button");
 
-		if (oHead.getVisibleCurrentDateButton()) {
-			oRm.openStart("button", sId + '-today');
-			oRm.attr("title", sLabelToday);
-			oRm.accessibilityState(null, { label: sLabelToday});
-
-			oRm.class("sapUiCalHeadToday");
-			oRm.attr('tabindex', "-1");
-			oRm.openEnd(); // button element
-			oRm.icon("sap-icon://appointment", null, { title: null });
-			oRm.close("button");
-		}
-
 		oRm.close("div");
 
 	};
 
-	HeaderRenderer.renderCalendarButtons = function (oRm, oHead, sId, iFirst, iLast, i) {
-		var mAccProps = {};
-
+	HeaderRenderer.renderCalendarButtons = function (oRm, oHead, sId, iFirst, iLast, mAccProps, i) {
 		if (this.getVisibleButton(oHead, i)) {
 			oRm.openStart("button", sId + '-B' + i);
 			oRm.class("sapUiCalHeadB");

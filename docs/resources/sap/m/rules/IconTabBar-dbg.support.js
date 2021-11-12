@@ -1,20 +1,19 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 /**
  * Defines support rules of the IconTabBar control of sap.m library.
  */
-sap.ui.define(["sap/ui/support/library", "sap/m/library"],
-	function(SupportLib, mobileLibrary) {
+sap.ui.define(["sap/ui/support/library"],
+	function(SupportLib) {
 	"use strict";
 
 	// shortcuts
 	var Categories = SupportLib.Categories, // Accessibility, Performance, Memory, ...
 		Severity = SupportLib.Severity,	// Hint, Warning, Error
-		Audiences = SupportLib.Audiences, // Control, Internal, Application
-		IconTabFilterDesign = mobileLibrary.IconTabFilterDesign;
+		Audiences = SupportLib.Audiences; // Control, Internal, Application
 
 	//**********************************************************
 	// Rule Definitions
@@ -36,7 +35,7 @@ sap.ui.define(["sap/ui/support/library", "sap/m/library"],
 		check: function (oIssueManager, oCoreFacade, oScope) {
 			oScope.getElementsByClassName("sap.m.IconTabFilter")
 				.forEach(function(oElement) {
-					if (oElement.getProperty("design") === IconTabFilterDesign.Horizontal
+					if (oElement.getProperty("design") === sap.m.IconTabFilterDesign.Horizontal
 						&& !oElement.getProperty("icon")
 						&& !oElement.getProperty("showAll")) {
 
@@ -125,7 +124,7 @@ sap.ui.define(["sap/ui/support/library", "sap/m/library"],
 		check: function (oIssueManager, oCoreFacade, oScope) {
 			oScope.getElementsByClassName("sap.m.IconTabFilter")
 				.forEach(function(oElement) {
-					if (oElement.getProperty("design") === IconTabFilterDesign.Vertical
+					if (oElement.getProperty("design") === sap.m.IconTabFilterDesign.Vertical
 						&& oElement.getProperty("icon")
 						&& oElement.getProperty("count").length > 4) {
 

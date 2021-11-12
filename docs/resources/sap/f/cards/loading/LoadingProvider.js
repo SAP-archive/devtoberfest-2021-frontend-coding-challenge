@@ -1,0 +1,6 @@
+/*!
+ * OpenUI5
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
+ */
+sap.ui.define(["sap/ui/base/ManagedObject","sap/ui/core/Core","sap/f/cards/loading/GenericPlaceholder","sap/f/cards/loading/ListPlaceholder"],function(e,t,o,a){"use strict";var n=e.extend("sap.f.cards.loading.LoadingProvider",{});n.prototype.createLoadingState=function(e){this._bLoading=true;this._bJSON=false;if(e){if(e.getSettings()["json"]){this._bJSON=true}}else{this._bLoading=false}};n.prototype.getDataProviderJSON=function(){return this._bJSON};n.prototype.setLoading=function(e){this._bLoading=e;return this._bLoading};n.prototype.getLoadingState=function(){return this._bLoading};n.prototype.removeHeaderPlaceholder=function(e){if(e&&e.getDomRef()){e.removeStyleClass("sapFCardHeaderLoading");e.getDomRef().classList.remove("sapFCardHeaderLoading")}};n.prototype.destroy=function(){this._bLoading=null;this._bJSON=null;if(this._oContentPlaceholder){this._oContentPlaceholder.destroy();this._oContentPlaceholder=null}e.prototype.destroy.apply(this,arguments)};n.prototype.createContentPlaceholder=function(e,t){switch(t){case"List":this._oContentPlaceholder=new a({maxItems:e.maxItems?parseInt(e.maxItems):2,item:e.item});break;default:this._oContentPlaceholder=new o}return this._oContentPlaceholder};return n});

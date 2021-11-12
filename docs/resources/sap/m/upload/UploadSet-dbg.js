@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -22,10 +22,9 @@ sap.ui.define([
 	"sap/ui/unified/FileUploader",
 	"sap/m/upload/UploadSetItem",
 	"sap/m/upload/Uploader",
-	"sap/m/upload/UploadSetRenderer",
-	"sap/m/upload/UploaderHttpRequestMethod"
+	"sap/m/upload/UploadSetRenderer"
 ], function (Control, Icon, KeyCodes, Log, deepEqual, MobileLibrary, Button, Dialog, List, MessageBox, OverflowToolbar,
-			 StandardListItem, Text, ToolbarSpacer, FileUploader, UploadSetItem, Uploader, Renderer, UploaderHttpRequestMethod) {
+			 StandardListItem, Text, ToolbarSpacer, FileUploader, UploadSetItem, Uploader, Renderer) {
 	"use strict";
 
 	/**
@@ -39,10 +38,10 @@ sap.ui.define([
 	 * and requests, unified behavior of instant and deferred uploads, as well as improved progress indication.
 	 * @extends sap.ui.core.Control
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @constructor
 	 * @public
-	 * @since 1.63
+	 * @since 1.62
 	 * @alias sap.m.upload.UploadSet
 	 * @ui5-metamodel This control/element also will be described in the UI5 (legacy) designtime metamodel.
 	 */
@@ -99,13 +98,8 @@ sap.ui.define([
 				/**
 				 * URL where the uploaded files will be stored.
 				 */
-				uploadUrl: {type: "string", defaultValue: null},
-				/**
-				 * HTTP request method chosen for file upload.
-				 * @since 1.90
-				 */
-				httpRequestMethod: {type: "sap.m.upload.UploaderHttpRequestMethod", defaultValue: UploaderHttpRequestMethod.Post}
-				},
+				uploadUrl: {type: "string", defaultValue: null}
+			},
 			defaultAggregation: "items",
 			aggregations: {
 				/**
@@ -137,30 +131,6 @@ sap.ui.define([
 					parameters: {
 						/**
 						 * The file that has just been added.
-						 */
-						item: {type: "sap.m.upload.UploadSetItem"}
-					}
-				},
-				/**
-				 * This event is fired after the item is removed on click of ok button in confirmation dialog.
-				 * @since 1.83
-				 */
-				afterItemRemoved: {
-					parameters: {
-						/**
-						 * The item removed from the set of items to be uploaded.
-						 */
-						item: {type: "sap.m.upload.UploadSetItem"}
-					}
-				},
-				/**
-				 * This event is fired after item edit is confirmed.
-				 * @since 1.83
-				 */
-				afterItemEdited: {
-					parameters: {
-						/**
-						 * The item edited.
 						 */
 						item: {type: "sap.m.upload.UploadSetItem"}
 					}
@@ -333,8 +303,7 @@ sap.ui.define([
 					}
 				}
 			}
-		},
-		renderer: Renderer
+		}
 	});
 
 	var UploadState = MobileLibrary.UploadState;
@@ -381,10 +350,10 @@ sap.ui.define([
 		if (this._oEditedItem) {
 			oInput = this._oEditedItem._getFileNameEdit().$("inner");
 			if (oInput) {
-				oInput.on("focus", function () {
+				oInput.focus(function () {
 					oInput.selectText(0, oInput.val().length);
 				});
-				oInput.trigger("focus");
+				oInput.focus();
 			}
 		}
 
@@ -422,9 +391,7 @@ sap.ui.define([
 				this._handleItemEditCancelation(oEvent, oItem);
 				break;
 			case KeyCodes.DELETE:
-				if (!oItem.$("fileNameEdit").hasClass("sapMInputFocused")) {
-					this._handleItemDelete(oEvent, oItem);
-				}
+				this._handleItemDelete(oEvent, oItem);
 				break;
 			case KeyCodes.ENTER:
 				if (oItem === this._oEditedItem) {
@@ -462,7 +429,7 @@ sap.ui.define([
 
 	UploadSet.prototype.getNoDataDescription = function () {
 		var sNoDataDescription = this.getProperty("noDataDescription");
-		sNoDataDescription = sNoDataDescription || this._oRb.getText("UPLOADCOLLECTION_NO_DATA_DESCRIPTION");
+		sNoDataDescription = sNoDataDescription || this._oRb.getText("UPLOAD_SET_NO_DATA_DESCRIPTION");
 		return sNoDataDescription;
 	};
 
@@ -490,18 +457,17 @@ sap.ui.define([
 	};
 
 	UploadSet.prototype.removeAggregation = function (sAggregationName, oObject, bSuppressInvalidate) {
-        var oListItem;
-        Control.prototype.removeAggregation.call(this, sAggregationName, oObject, bSuppressInvalidate);
-        if (oObject && (sAggregationName === "items" || sAggregationName === "incompleteItems")) {
-            oListItem = oObject._getListItem();
-            var oItem = this.getList().removeAggregation("items", oListItem, bSuppressInvalidate);
-            if (oItem && oObject) {
-                oObject.destroy();
-                oItem.destroy();
-            }
-            this._refreshInnerListStyle();
-        }
-    };
+		var oListItem;
+		Control.prototype.removeAggregation.call(this, sAggregationName, oObject, bSuppressInvalidate);
+		if (oObject && (sAggregationName === "items" || sAggregationName === "incompleteItems")) {
+			oListItem = oObject._getListItem();
+			var oItem = this.getList().removeAggregation("items", oListItem, bSuppressInvalidate);
+			if (oItem) {
+				oItem.destroy();
+			}
+			this._refreshInnerListStyle();
+		}
+	};
 
 	UploadSet.prototype.removeAllAggregation = function (sAggregationName, bSuppressInvalidate) {
 		if (sAggregationName === "items") {
@@ -660,19 +626,16 @@ sap.ui.define([
 	 * @public
 	 */
 	UploadSet.prototype.getDefaultFileUploader = function () {
-		var sTooltip = this._oRb.getText("UPLOADCOLLECTION_UPLOAD");
+		var sTooltip;
 		if (!this._oFileUploader) {
 			this._oFileUploader = new FileUploader(this.getId() + "-uploader", {
 				buttonOnly: true,
 				buttonText: sTooltip,
 				tooltip: sTooltip,
-				iconOnly: false,
+				iconOnly: true,
 				enabled: this.getUploadEnabled(),
-				fileType: this.getFileTypes(),
-				mimeType: this.getMediaTypes(),
-				icon: "",
+				icon: "sap-icon://add",
 				iconFirst: false,
-				multiple: true,
 				style: "Transparent",
 				name: "uploadSetFileUploader",
 				sameFilenameAllowed: true,
@@ -682,10 +645,7 @@ sap.ui.define([
 				uploadStart: [this._onUploadStarted, this],
 				uploadProgress: [this._onUploadProgressed, this],
 				uploadComplete: [this._onUploadCompleted, this],
-				uploadAborted: [this._onUploadAborted, this],
-				typeMissmatch: [this._fireFileTypeMismatch, this],
-				fileSizeExceed: [this._fireFileSizeExceed, this],
-				filenameLengthExceed: [this._fireFilenameLengthExceed, this]
+				uploadAborted: [this._onUploadAborted, this]
 			});
 		}
 
@@ -728,7 +688,6 @@ sap.ui.define([
 	UploadSet.prototype._onUploadCompleted = function (oEvent) {
 		var oItem = oEvent.getParameter("item");
 		oItem.setProgress(100);
-		this.insertItem(oItem, 0);
 		oItem.setUploadState(UploadState.Complete);
 		this.fireUploadCompleted({item: oItem});
 	};
@@ -776,12 +735,11 @@ sap.ui.define([
 		}
 
 		if (oFile.name !== sNewFileName) {
-			sNewFullName = oFile.extension ? sNewFileName + "." + oFile.extension : sNewFileName;
+			sNewFullName = sNewFileName + "." + oFile.extension;
 			oItem.setFileName(sNewFullName);
 		}
 		oItem._setContainsError(false);
 		oItem._setInEditMode(false);
-		this.fireAfterItemEdited({item: oItem});
 		this._oEditedItem = null;
 	};
 
@@ -839,7 +797,6 @@ sap.ui.define([
 		}
 		this.removeItem(this._oItemToBeDeleted);
 		this.removeIncompleteItem(this._oItemToBeDeleted);
-		this.fireAfterItemRemoved({item: this._oItemToBeDeleted});
 		this._oItemToBeDeleted = null;
 	};
 
@@ -907,13 +864,13 @@ sap.ui.define([
 	};
 
 	UploadSet.prototype._onDragEnterSet = function (oEvent) {
-		if (oEvent.target === this._$DragDropArea[0] && this.getUploadEnabled()) {
+		if (oEvent.target === this._$DragDropArea[0]) {
 			this._$DragDropArea.addClass("sapMUCDropIndicator");
 		}
 	};
 
 	UploadSet.prototype._onDragLeaveSet = function (oEvent) {
-		if (oEvent.target === this._$DragDropArea[0] && this.getUploadEnabled()) {
+		if (oEvent.target === this._$DragDropArea[0]) {
 			this._$DragDropArea.removeClass("sapMUCDropIndicator");
 		}
 	};
@@ -926,7 +883,7 @@ sap.ui.define([
 		var oFiles;
 
 		oEvent.preventDefault();
-		if (oEvent.target === this._$DragDropArea[0] && this.getUploadEnabled()) {
+		if (oEvent.target === this._$DragDropArea[0]) {
 			this._$DragDropArea.removeClass("sapMUCDropIndicator");
 			this._$DragDropArea.addClass("sapMUCDragDropOverlayHide");
 
@@ -936,29 +893,23 @@ sap.ui.define([
 	};
 
 	UploadSet.prototype._onDragEnterBody = function (oEvent) {
-		if (this.getUploadEnabled()) {
-			this._oLastEnteredTarget = oEvent.target;
-			this._$DragDropArea.removeClass("sapMUCDragDropOverlayHide");
-		}
+		this._oLastEnteredTarget = oEvent.target;
+		this._$DragDropArea.removeClass("sapMUCDragDropOverlayHide");
 	};
 
 	UploadSet.prototype._onDragLeaveBody = function (oEvent) {
-		if (this._oLastEnteredTarget === oEvent.target && this.getUploadEnabled()) {
+		if (this._oLastEnteredTarget === oEvent.target) {
 			this._$DragDropArea.addClass("sapMUCDragDropOverlayHide");
 		}
 	};
 
 	UploadSet.prototype._onDragOverBody = function (oEvent) {
 		oEvent.preventDefault();
-		if (this.getUploadEnabled()) {
-			this._$DragDropArea.removeClass("sapMUCDragDropOverlayHide");
-		}
+		this._$DragDropArea.removeClass("sapMUCDragDropOverlayHide");
 	};
 
 	UploadSet.prototype._onDropOnBody = function (oEvent) {
-		if (this.getUploadEnabled()) {
-			this._$DragDropArea.addClass("sapMUCDragDropOverlayHide");
-		}
+		this._$DragDropArea.addClass("sapMUCDragDropOverlayHide");
 	};
 
 	/* =============== */
@@ -1001,10 +952,10 @@ sap.ui.define([
 
 		aFiles.forEach(function (oFile) {
 			oItem = new UploadSetItem({
+				fileName: oFile.name,
 				uploadState: UploadState.Ready
 			});
 			oItem._setFileObject(oFile);
-			oItem.setFileName(oFile.name);//For handling curly braces in file name we have to use setter.Otherwise it will be treated as binding.
 
 			if (!this.fireBeforeItemAdded({item: oItem})) {
 				return;
@@ -1031,9 +982,7 @@ sap.ui.define([
 
 	UploadSet.prototype._getImplicitUploader = function () {
 		if (!this._oUploader) {
-			this._oUploader = new Uploader({
-				httpRequestMethod : this.getHttpRequestMethod()
-			});
+			this._oUploader = new Uploader();
 			this._oUploader.setUploadUrl(this.getUploadUrl());
 			this.registerUploaderEvents(this._oUploader);
 			this.addDependent(this._oUploader);
@@ -1049,8 +998,7 @@ sap.ui.define([
 	UploadSet.prototype._uploadItemIfGoodToGo = function (oItem) {
 		if (oItem.getUploadState() === UploadState.Ready && !oItem._isRestricted()) {
 			if (this.fireBeforeUploadStarts({item: oItem})) {
-				var oHeaderFields = oItem.getHeaderFields().length ? oItem.getHeaderFields() : this.getHeaderFields();
-				this._getActiveUploader().uploadItem(oItem, oHeaderFields);
+				this._getActiveUploader().uploadItem(oItem, this.getHeaderFields());
 			}
 		}
 	};
@@ -1099,8 +1047,9 @@ sap.ui.define([
 	};
 
 	UploadSet.prototype._checkRestrictions = function () {
-		// this will only check the restriction for the newly uploaded files
-		// or files for which the upload is pending
+		this.getItems().forEach(function (oItem) {
+			this._checkRestrictionsForItem(oItem);
+		}.bind(this));
 		this.getIncompleteItems().forEach(function (oItem) {
 			this._checkRestrictionsForItem(oItem);
 		}.bind(this));
@@ -1111,31 +1060,6 @@ sap.ui.define([
 		oItem._checkNameLengthRestriction(this.getMaxFileNameLength());
 		oItem._checkSizeRestriction(this.getMaxFileSize());
 		oItem._checkMediaTypeRestriction(this.getMediaTypes());
-	};
-
-	UploadSet.prototype._fireFileTypeMismatch = function (oItem) {
-		var aMediaTypes = this.getMediaTypes();
-		var aFileTypes = this.getFileTypes();
-
-		var sFileType = oItem.getParameter("fileType");
-		var sMediaType = oItem.getParameter("mimeType");
-
-		var bMediaRestricted = (!!aMediaTypes && (aMediaTypes.length > 0) && !!sMediaType && aMediaTypes.indexOf(sMediaType) === -1);
-		var bFileRestricted = (!!aFileTypes && (aFileTypes.length > 0) && !!sFileType && aFileTypes.indexOf(sFileType) === -1);
-
-		if (bMediaRestricted){
-			this.fireMediaTypeMismatch({item: oItem});
-		} else if (bFileRestricted){
-			this.fireFileTypeMismatch({item: oItem});
-		}
-	};
-
-	UploadSet.prototype._fireFileSizeExceed = function (oItem) {
-		this.fireFileSizeExceeded({item: oItem});
-	};
-
-	UploadSet.prototype._fireFilenameLengthExceed = function (oItem) {
-		this.fireFileNameLengthExceeded({item: oItem});
 	};
 
 	return UploadSet;

@@ -1,12 +1,12 @@
 var Mobify = window.Mobify = window.Mobify || {};
 Mobify.$ = Mobify.$ || window.Zepto || window.jQuery;
-// MODIFIED BY SAP: changed classPrefix from 'm-' to ''
+//SAP MODIFICATION: changed classPrefix from 'm-' to ''
 Mobify.UI = Mobify.UI || { classPrefix: '' };
 
 (function($, document) {
     $.support = $.support || {};
 
-    // BEGIN: MODIFIED BY SAP
+    // SAP MODIFICATION
     var support = {
         'touch': 'ontouchend' in document
     };
@@ -17,7 +17,7 @@ Mobify.UI = Mobify.UI || { classPrefix: '' };
     }
 
     $.extend($.support, support);
-    // END: MODIFIED BY SAP
+    // SAP MODIFICATION END
 
 })(Mobify.$, document);
 
@@ -33,13 +33,13 @@ Mobify.UI.Utils = (function($) {
     /**
         Events (either touch or mouse)
     */
-    // BEGIN: MODIFIED BY SAP
+    // SAP MODIFICATION
     exports.events = {
         down: 'touchstart mousedown',
         move: 'touchmove mousemove',
         up: 'touchend touchcancel mouseup'
     };
-    // END: MODIFIED BY SAP
+    // SAP MODIFICATION END
 
     /**
         Returns the position of a mouse or touch event in (x, y)
@@ -47,7 +47,7 @@ Mobify.UI.Utils = (function($) {
         @param {Event} touch or mouse event
         @returns {Object} X and Y coordinates
     */
-    // BEGIN: MODIFIED BY SAP
+    // SAP MODIFICATION
     exports.getCursorPosition = function(e) {
         e = e.originalEvent || e;
         var oTouches = e.touches && e.touches[0];
@@ -57,7 +57,7 @@ Mobify.UI.Utils = (function($) {
             y: oTouches ? oTouches.clientY : e.clientY
         }
     }
-    // END: MODIFIED BY SAP
+    // SAP MODIFICATION END
 
     /**
         Returns prefix property for current browser.
@@ -169,7 +169,7 @@ Mobify.UI.Carousel = (function($, Utils) {
     Carousel.defaults = defaults;
 
     Carousel.prototype.setOptions = function(opts) {
-        var options = $.extend(this.options || {}, defaults, opts);
+        var options = this.options || $.extend({}, defaults, opts);
 
         /* classNames requires a deep copy */
         options.classNames = $.extend({}, options.classNames, opts.classNames || {});
@@ -274,7 +274,7 @@ Mobify.UI.Carousel = (function($, Utils) {
         this._needsUpdate = false;
     }
 
-    // MODIFIED BY SAP
+    //SAP MODIFICATION
     //added loop getter and setter
     Carousel.prototype.setLoop = function(bLoop) {
         this._bLoop = bLoop;
@@ -292,7 +292,7 @@ Mobify.UI.Carousel = (function($, Utils) {
     Carousel.prototype.getRTL = function() {
         return this._bRTL;
     }
-    // MODIFIED BY SAP
+    //SAP MODIFICATION
     //added private changeAnimation function
     Carousel.prototype.changeAnimation = function(sTransitionClass, fnCallback, oCallbackContext, aCallbackParams) {
     	if ( this.$inner ){
@@ -300,7 +300,7 @@ Mobify.UI.Carousel = (function($, Utils) {
 	    		sTransitionEvents = 'transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd';
 
 	    	var fnCleanUpTransition = function(){
-				$carouselInner.off(sTransitionEvents, fnCleanUpTransition);
+				$carouselInner.unbind(sTransitionEvents, fnCleanUpTransition);
 				$carouselInner.removeClass(sTransitionClass);
 				//Exexute callback function if there is one.
 				if(fnCallback) {
@@ -309,11 +309,11 @@ Mobify.UI.Carousel = (function($, Utils) {
 			}
 
 	    	$carouselInner.addClass(sTransitionClass);
-			$carouselInner.on(sTransitionEvents, fnCleanUpTransition);
+			$carouselInner.bind(sTransitionEvents, fnCleanUpTransition);
     	}
     }
 
-    // MODIFIED BY SAP
+    //SAP MODIFICATION
     //added resize function
     Carousel.prototype.resize = function() {
     	this.changeAnimation('sapMCrslHideNonActive');
@@ -330,11 +330,11 @@ Mobify.UI.Carousel = (function($, Utils) {
     }
 
     Carousel.prototype.touchmove = function(e) {
-        // BEGIN: MODIFIED BY SAP
+        // SAP MODIFICATION START
         if (jQuery(e.target).is("input, textarea, select, [contenteditable='true']")) {
             return;
         }
-        // END: MODIFIED BY SAP
+        // SAP MODIFICATION END
 
     	if(this._fnDrag) {
     		this._fnDrag.call(this, e);
@@ -370,13 +370,13 @@ Mobify.UI.Carousel = (function($, Utils) {
             , lockLeft = false
             , lockRight = false;
 
-        // MODIFIED BY SAP
+        //SAP MODIFICATION
         //make functions 'start', 'drag' and 'end' available to
         //containing carousel control.
         if(!self._fnStart) {
         	self._fnStart = function start(e) {
 
-	            // BEGIN: MODIFIED BY SAP
+	            // SAP MODIFICATION BEGIN
 	            if (e.isMarked("delayedMouseEvent")) {
 	                return;
 	            }
@@ -391,7 +391,7 @@ Mobify.UI.Carousel = (function($, Utils) {
 	    			canceled = true;
 	    			return;
 	    		}
-	        	// END: MODIFIED BY SAP
+	        	//SAP MODIFICATION END
 
 	            dragging = true;
 	            canceled = false;
@@ -410,13 +410,13 @@ Mobify.UI.Carousel = (function($, Utils) {
 
         	self._fnDrag = function drag(e) {
 
-	            // BEGIN: MODIFIED BY SAP
+	            // SAP MODIFICATION BEGIN
 	            if (!dragging || canceled || e.isMarked("delayedMouseEvent")) {
 	            	return;
 	            }
 	            // mark the event for components that needs to know if the event was handled by the carousel
 	            e.setMarked();
-	            // END: MODIFIED BY SAP
+	            // SAP MODIFICATION END
 
 	            var newXY = Utils.getCursorPosition(e);
 	            dx = xy.x - newXY.x;
@@ -440,11 +440,11 @@ Mobify.UI.Carousel = (function($, Utils) {
 
 	        self._fnEnd = function end(e) {
 
-	            // BEGIN: MODIFIED BY SAP
+	            // SAP MODIFICATION BEGIN
 	            if (!dragging || e.isMarked("delayedMouseEvent")) {
 	                return;
 	            }
-	            // END: MODIFIED BY SAP
+	            // SAP MODIFICATION END
 
 	            dragging = false;
 
@@ -477,23 +477,23 @@ Mobify.UI.Carousel = (function($, Utils) {
             }
         }
 
-        // BEGIN: MODIFIED BY SAP
+        // SAP MODIFICATION BEGIN
         $inner
             .on('click.carousel', click)
             .on('mouseout.carousel', self._fnEnd);
-        // END: MODIFIED BY SAP
+        // SAP MODIFICATION END
 
 
         $element.on('click', '[data-slide]', function(e){
 
-	        // BEGIN: MODIFIED BY SAP
+	        // SAP MODIFICATION BEGIN
 	        // The event might bubble up from another carousel inside of this one.
 	        // In this case we ignore the event.
 	        var oCarousel = jQuery(e.target).closest('.sapMCrsl');
 	        if (oCarousel[0] != $element[0]) {
 		        return;
 	        }
-	        // END: MODIFIED BY SAP
+	        // SAP MODIFICATION END
 
             e.preventDefault();
             var action = $(this).attr('data-slide')
@@ -502,7 +502,7 @@ Mobify.UI.Carousel = (function($, Utils) {
             if (isNaN(index)) {
                 self[action]();
             } else {
-            	// MODIFIED BY SAP deactivate move on
+            	//SAP MODIFICATION deactivate move on
             	//bullet press
                 //self.move(index);
             }
@@ -547,9 +547,9 @@ Mobify.UI.Carousel = (function($, Utils) {
         this.$inner.off();
     };
 
-    // BEGIN: MODIFIED BY SAP
+    // SAP MODIFICATION BEGIN
     Carousel.prototype.onTransitionComplete = function() {
-        this.$inner.off(this._sTransitionEvents, this.onTransitionComplete);
+        this.$inner.unbind(this._sTransitionEvents, this.onTransitionComplete);
 
 		var sActiveClass = this._getClass('active'),
 			i;
@@ -564,21 +564,12 @@ Mobify.UI.Carousel = (function($, Utils) {
 
 		// Trigger afterSlide event
 		this.$element.trigger('afterSlide', [this._prevIndex, this._index]);
-		this.setShouldFireEvent(false);
-	};
-
-	Carousel.prototype.getShouldFireEvent = function() {
-		return this._shouldFireEvent;
-	};
-
-	Carousel.prototype.setShouldFireEvent = function(bShouldFireEvent) {
-		this._shouldFireEvent = bShouldFireEvent;
 	};
 
 	Carousel.prototype.hasActiveTransition = function() {
 		return this._hasActiveTransition;
 	};
-    // END: MODIFIED BY SAP
+    // SAP MODIFICATION ENDS
 
 	Carousel.prototype.destroy = function() {
         this.unbind();
@@ -596,7 +587,7 @@ Mobify.UI.Carousel = (function($, Utils) {
 
     Carousel.prototype.move = function(newIndex, opts) {
     	//if list is empty or transition is in process , return
-    	// MODIFIED BY SAP
+    	//SAP MODIFICATION
     	if(this._length === 0 || this._hasActiveTransition == true) {
     		return;
     	}
@@ -611,17 +602,17 @@ Mobify.UI.Carousel = (function($, Utils) {
 
         opts = opts || {};
 
-		// BEGIN: MODIFIED BY SAP
+		// SAP MODIFICATION
 		// prevent loop when carousel shows more pages than 1
 		if (this.getLoop() && this.options.numberOfItemsToShow !== 1 &&
 				(newIndex < 1 || newIndex > this._length)) { // new index out of range - will cause loop
 			return;
 		}
-		// END: MODIFIED BY SAP
+		// SAP MODIFICATION END
 
         // Bound Values between [1, length];
         if (newIndex < 1) {
-        	// MODIFIED BY SAP
+        	//SAP MODIFICATION
             //if looping move to last index
         	if(this._bLoop) {
         		// this.changeAnimation('sapMCrslNoTransition');
@@ -630,7 +621,7 @@ Mobify.UI.Carousel = (function($, Utils) {
         		newIndex = 1;
         	}
         } else if (newIndex > this._length) {
-        	// MODIFIED BY SAP
+        	//SAP MODIFICATION
             //if looping move to first index
         	if(this._bLoop) {
         		// this.changeAnimation('sapMCrslNoTransition');
@@ -647,7 +638,7 @@ Mobify.UI.Carousel = (function($, Utils) {
         // Bail out early if no move is necessary.
         var bTriggerEvents = true;
         if (newIndex == this._index) {
-        	// MODIFIED BY SAP
+        	//SAP MODIFICATION
         	//only trigger events if index changes
         	bTriggerEvents = false;
         }
@@ -662,21 +653,19 @@ Mobify.UI.Carousel = (function($, Utils) {
         this._index = newIndex;
         this.update();
 
-        // MODIFIED BY SAP
+        //SAP MODIFICATION
         if(bTriggerEvents) {
-            // This indicates that transition has started
+            // This indicate that transition has started
             this._hasActiveTransition = true;
             $inner.bind(this._sTransitionEvents, jQuery.proxy(this.onTransitionComplete, this));
         }
     };
 
     Carousel.prototype.next = function() {
-        this.setShouldFireEvent(true);
         this.move(this._index + 1);
     };
 
     Carousel.prototype.prev = function() {
-        this.setShouldFireEvent(true);
         this.move(this._index - 1);
     };
 
@@ -708,14 +697,9 @@ Mobify.UI.Carousel = (function($, Utils) {
             var $this = $(this)
               , carousel = this._carousel;
 
+
             if (!carousel) {
                 carousel = new Mobify.UI.Carousel(this, initOptions);
-            } else {
-                carousel.setOptions(initOptions);
-                carousel.initElements(this);
-                carousel.initOffsets();
-                carousel.initAnimation();
-                carousel.bind();
             }
 
             if (action) {

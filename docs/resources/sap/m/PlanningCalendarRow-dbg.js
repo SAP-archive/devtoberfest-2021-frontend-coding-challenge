@@ -1,20 +1,11 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 //Provides control sap.ui.unified.PlanningCalendarRow.
-sap.ui.define(['sap/ui/core/Element',
-				'sap/m/CustomListItem',
-				'sap/ui/unified/DateTypeRange',
-				'sap/ui/unified/library'
-			], function (
-				Element,
-				CustomListItem,
-				DateTypeRange,
-				unifiedLibrary
-) {
+sap.ui.define(['sap/ui/core/Element', 'sap/m/CustomListItem'], function (Element, CustomListItem) {
 	"use strict";
 
 
@@ -32,7 +23,7 @@ sap.ui.define(['sap/ui/core/Element',
 	 * The <code>sap.m.PlanningCalendarRow</code> allows you to modify appointments at row level.
 	 *
 	 * @extends sap.ui.core.Element
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -367,25 +358,6 @@ sap.ui.define(['sap/ui/core/Element',
 
 		return this.oRowHeader;
 	};
-
-	PlanningCalendarRow.prototype._getSpecialDates = function(){
-		var specialDates = this.getSpecialDates();
-		for (var i = 0; i < specialDates.length; i++) {
-			var bNeedsSecondTypeAdding = specialDates[i].getSecondaryType() === unifiedLibrary.CalendarDayType.NonWorking
-					&& specialDates[i].getType() !== unifiedLibrary.CalendarDayType.NonWorking;
-			if (bNeedsSecondTypeAdding) {
-				var newSpecialDate = new DateTypeRange();
-				newSpecialDate.setType(unifiedLibrary.CalendarDayType.NonWorking);
-				newSpecialDate.setStartDate(specialDates[i].getStartDate());
-				if (specialDates[i].getEndDate()) {
-					newSpecialDate.setEndDate(specialDates[i].getEndDate());
-				}
-				specialDates.push(newSpecialDate);
-			}
-		}
-		return specialDates;
-	};
-
 
 	return PlanningCalendarRow;
 

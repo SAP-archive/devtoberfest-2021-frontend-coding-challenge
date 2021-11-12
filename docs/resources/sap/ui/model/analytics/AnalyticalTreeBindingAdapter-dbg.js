@@ -1,22 +1,34 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-/*eslint-disable max-len */
+
 // Provides class sap.ui.model.odata.ODataAnnotations
 sap.ui.define([
-	"./AnalyticalBinding",
+	'sap/ui/model/TreeBinding',
+	'./AnalyticalBinding',
+	'sap/ui/model/TreeAutoExpandMode',
+	'sap/ui/model/ChangeReason',
+	'sap/ui/model/odata/ODataTreeBindingAdapter',
+	'sap/ui/model/TreeBindingAdapter',
+	'sap/ui/model/TreeBindingUtils',
 	"sap/base/assert",
 	"sap/base/Log",
-	"sap/base/util/each",
-	"sap/ui/model/ChangeReason",
-	"sap/ui/model/TreeAutoExpandMode",
-	"sap/ui/model/TreeBinding",
-	"sap/ui/model/TreeBindingAdapter",
-	"sap/ui/model/odata/ODataTreeBindingAdapter"
-], function(AnalyticalBinding, assert, Log, each, ChangeReason, TreeAutoExpandMode, TreeBinding,
-		TreeBindingAdapter, ODataTreeBindingAdapter) {
+	"sap/ui/thirdparty/jquery"
+],
+	function(
+		TreeBinding,
+		AnalyticalBinding,
+		TreeAutoExpandMode,
+		ChangeReason,
+		ODataTreeBindingAdapter,
+		TreeBindingAdapter,
+		TreeBindingUtils,
+		assert,
+		Log,
+		jQuery
+	) {
 	"use strict";
 
 	/**
@@ -46,8 +58,7 @@ sap.ui.define([
 
 		//set the default auto expand mode
 		this.setAutoExpandMode(this.mParameters.autoExpandMode || TreeAutoExpandMode.Bundled);
-	},
-	sClassName = "sap.ui.model.analytics.AnalyticalTreeBindingAdapter";
+	};
 
 	/*
 	 * Returns the Root context of our tree, which is actually the context for the Grand Total
@@ -143,28 +154,13 @@ sap.ui.define([
 		return oNode.isLeaf && !oNode.isArtificial;
 	};
 
-	/**
-	 * Gets an array of either node objects or contexts for the requested part of the tree.
-	 *
-	 * @param {boolean} bReturnNodes
-	 *   Whether to return node objects or contexts
-	 * @param {number} iStartIndex
-	 *   The index of the first requested node or context
-	 * @param {number} [iLength]
-	 *   The maximum number of returned nodes or contexts; if not given the model's size limit is
-	 *   used; see {@link sap.ui.model.Model#setSizeLimit}
-	 * @param {number} [iThreshold=0]
-	 *   The maximum number of nodes or contexts to read additionally as buffer
-	 * @return {object[]|sap.ui.model.Context[]}
-	 *   The requested tree nodes or contexts
-	 *
-	 * @private
+	/*
+	 * Retrieves the requested part from the tree.
+	 * @param {int} iStartIndex the first index to be retrieved
+	 * @param {int} iLength the number of entries to be retrieved, starting at iStartIndex
+	 * @param {int} iThreshold the number of additional entries, which will be loaded after (iStartIndex + iLength) as a buffer
 	 */
-	AnalyticalTreeBindingAdapter.prototype._getContextsOrNodes = function (bReturnNodes,
-			iStartIndex, iLength, iThreshold) {
-		if (!this.isResolved()) {
-			return [];
-		}
+	AnalyticalTreeBindingAdapter.prototype.getContexts = function(iStartIndex, iLength, iThreshold, bReturnNodes) {
 		if (!iLength) {
 			iLength = this.oModel.iSizeLimit;
 		}
@@ -222,7 +218,7 @@ sap.ui.define([
 			var that = this;
 
 			//if we have a missing section inside a subtree, we need to reload this subtree
-			each(mMissingSections, function (sGroupID, oNode) {
+			jQuery.each(mMissingSections, function (sGroupID, oNode) {
 				// reset the root of the subtree
 				oNode.magnitude = 0;
 				oNode.numberOfTotals = 0;
@@ -659,7 +655,7 @@ sap.ui.define([
 			// Collapse all subsequent child nodes, this is determined by a common groupID prefix, e.g.: "/A100-50/" is the parent of "/A100-50/Finance/"
 			// All expanded nodes which start with 'sGroupIDforCollapsingNode', are basically children of it and also need to be collapsed
 			var that = this;
-			each(this._mTreeState.expanded, function (sGroupID, oNodeState) {
+			jQuery.each(this._mTreeState.expanded, function (sGroupID, oNodeState) {
 				if (typeof sGroupIDforCollapsingNode == "string" && sGroupIDforCollapsingNode.length > 0 && sGroupID.startsWith(sGroupIDforCollapsingNode)) {
 					that._updateTreeState({groupID: sGroupID, expanded: false});
 				}
@@ -667,7 +663,7 @@ sap.ui.define([
 
 			var aDeselectedNodeIds = [];
 			// also remove selections from child nodes of the collapsed node
-			each(this._mTreeState.selected, function (sGroupID, oNodeState) {
+			jQuery.each(this._mTreeState.selected, function (sGroupID, oNodeState) {
 				if (typeof sGroupIDforCollapsingNode == "string" && sGroupIDforCollapsingNode.length > 0 && sGroupID.startsWith(sGroupIDforCollapsingNode)) {
 					oNodeState.selectAllMode = false;
 					that.setNodeSelection(oNodeState, false);
@@ -774,7 +770,7 @@ sap.ui.define([
 	 */
 	AnalyticalTreeBindingAdapter.prototype.hasTotaledMeasures = function() {
 		var bHasMeasures = false;
-		each(this.getMeasureDetails() || [], function(iIndex, oMeasure) {
+		jQuery.each(this.getMeasureDetails() || [], function(iIndex, oMeasure) {
 			if (oMeasure.analyticalInfo.total) {
 				bHasMeasures = true;
 				return false;
@@ -814,20 +810,10 @@ sap.ui.define([
 	 */
 	// @see sap.ui.table.AnalyticalTable#_getGroupHeaderMenu
 	AnalyticalTreeBindingAdapter.prototype.setNumberOfExpandedLevels = function(iLevels, bSupressResetData) {
-		var iNumberOfAggregationLevels;
-
 		iLevels = iLevels || 0;
 		if (iLevels < 0) {
-			Log.warning("Number of expanded levels was set to 0. Negative values are prohibited",
-				this, sClassName);
+			Log.warning("AnalyticalTreeBindingAdapter: numberOfExpanded levels was set to 0. Negative values are prohibited.");
 			iLevels = 0;
-		}
-		iNumberOfAggregationLevels = this.aAggregationLevel.length;
-		if (iLevels > iNumberOfAggregationLevels) {
-			Log.warning("Number of expanded levels was reduced from " + iLevels + " to "
-					+ iNumberOfAggregationLevels + " which is the number of grouped dimensions",
-				this, sClassName);
-			iLevels = iNumberOfAggregationLevels;
 		}
 
 		if (!bSupressResetData) {

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -312,6 +312,11 @@ sap.ui.define([
 					});
 					aSupportedEnv.push({
 						system: Device.system.SYSTEMTYPE.DESKTOP,
+						browserName: Device.browser.BROWSER.INTERNET_EXPLORER,
+						browserVersion: 11
+					});
+					aSupportedEnv.push({
+						system: Device.system.SYSTEMTYPE.DESKTOP,
 						browserName: Device.browser.BROWSER.SAFARI,
 						browserVersion: 13
 					});
@@ -325,30 +330,12 @@ sap.ui.define([
 						browserName: Device.browser.BROWSER.SAFARI,
 						browserVersion: 13
 					});
-					aSupportedEnv.push({
-						system: Device.system.SYSTEMTYPE.TABLET,
-						os: Device.os.OS.ANDROID,
-						browserName: Device.browser.BROWSER.CHROME,
-						browserVersion:80
-					});
-					aSupportedEnv.push({
-						system: Device.system.SYSTEMTYPE.PHONE,
-						os: Device.os.OS.ANDROID,
-						browserName: Device.browser.BROWSER.CHROME,
-						browserVersion: 80
-					});
-
 					this._bSupportedEnvironment = aSupportedEnv.some(function (oSuppportedEnv) {
 						var bSupportedSystem = Device.system[oSuppportedEnv.system],
-							bSupportedOSName = oSuppportedEnv.os ? oSuppportedEnv.os === Device.os.name : true,
 							bSupportedBrowserName = oSuppportedEnv.browserName === Device.browser.name,
 							bSupportedBrowserVersion = Device.browser.version >= oSuppportedEnv.browserVersion;
 
-							try {
-								return bSupportedSystem && bSupportedOSName && bSupportedBrowserName && bSupportedBrowserVersion && window.indexedDB;
-							} catch (error) {
-								return false;
-							}
+						return bSupportedSystem && bSupportedBrowserName && bSupportedBrowserVersion && window.indexedDB;
 					});
 				}
 				return this._bSupportedEnvironment;

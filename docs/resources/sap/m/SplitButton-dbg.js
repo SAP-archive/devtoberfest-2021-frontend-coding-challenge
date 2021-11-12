@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -13,6 +13,7 @@ sap.ui.define([
 	'sap/ui/core/EnabledPropagator',
 	'sap/ui/core/IconPool',
 	'sap/ui/core/library',
+	'sap/ui/Device',
 	'sap/ui/core/InvisibleText',
 	'./SplitButtonRenderer',
 	"sap/ui/events/KeyCodes"
@@ -25,6 +26,7 @@ function(
 	EnabledPropagator,
 	IconPool,
 	coreLibrary,
+	Device,
 	InvisibleText,
 	SplitButtonRenderer,
 	KeyCodes
@@ -48,7 +50,7 @@ function(
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @private
@@ -196,6 +198,9 @@ function(
 					press: this._handleAction.bind(this, false)
 				}).addStyleClass('sapMSBText');
 
+				if (Device.browser.msie) {
+					oCtrl.addStyleClass('sapMSBTextIE');
+				}
 				this.setAggregation("_textButton", oCtrl);
 			}
 
@@ -208,9 +213,7 @@ function(
 			if (!oCtrl) {
 				oCtrl = new Button({
 					icon: "sap-icon://slim-arrow-down",
-					press: this._handleAction.bind(this, true),
-					tooltip: sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("SPLIT_BUTTON_ARROW_TOOLTIP"),
-					ariaHasPopup: coreLibrary.aria.HasPopup.Menu
+					press: this._handleAction.bind(this, true)
 				}).addStyleClass("sapMSBArrow");
 				this.setAggregation("_arrowButton", oCtrl);
 			}
@@ -256,11 +259,15 @@ function(
 				oEvent.preventDefault();
 			}
 
-			this._getTextButton().onkeydown(oEvent);
+			if (oEvent.which === KeyCodes.ENTER) {
+				this._getTextButton().firePress({/* no parameters */ });
+			}
 		};
 
 		SplitButton.prototype.onkeyup = function(oEvent) {
-			this._getTextButton().onkeyup(oEvent);
+			if (oEvent.which === KeyCodes.SPACE) {
+				this._getTextButton().firePress({/* no parameters */ });
+			}
 		};
 
 		SplitButton.prototype.onsapup = function(oEvent) {

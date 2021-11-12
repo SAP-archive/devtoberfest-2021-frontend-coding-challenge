@@ -9,8 +9,15 @@
 	outline: none;
 }
 
-.sapMStepInput .sapUiIcon:focus {
+html:not([data-sap-ui-browser^="ie"]):not([data-sap-ui-browser^="ed"]) .sapMStepInput .sapUiIcon:focus {
 	outline: none;
+}
+
+html[data-sap-ui-browser^='ie'],
+html[data-sap-ui-browser^='ed'] {
+	.sapMStepInput .sapUiIcon:focus::after {
+		display: none;
+	}
 }
 
 .sapMStepInput {
@@ -20,7 +27,7 @@
 	}
 
 	&:focus {
-		.sapMInputBaseContentWrapper:not(.sapMInputBaseReadonlyWrapper):not(.sapMStepInputReadOnly) {
+		.sapMInputBaseContentWrapper:not(.sapMInputBaseReadonlyWrapper):not(.sapMInputBaseContentWrapperState):not(.sapMStepInputReadOnly) {
 			&::before {
 				content: "";
 				position: absolute;
@@ -30,6 +37,17 @@
 				bottom: 1px;
 				border: 1px dotted @sapUiContentFocusColor;
 				pointer-events: none;
+			}
+		}
+	}
+}
+
+html[data-sap-ui-browser^='ie'],
+html[data-sap-ui-browser^='ed'] {
+	.sapMStepInput:focus {
+		.sapMInputBaseContentWrapper:not(.sapMInputBaseReadonlyWrapper):not(.sapMInputBaseContentWrapperState):not(.sapMStepInputReadOnly) {
+			&::before {
+				border-style: dashed;
 			}
 		}
 	}

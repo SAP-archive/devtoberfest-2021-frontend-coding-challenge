@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -39,9 +39,8 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/Renderer", "./ListItemBaseRen
 
 		// List item label
 		var sLabel = oLI.getLabel();
-		var sInnerLabel = oLI.getId() + "-label";
 		if (sLabel) {
-			rm.openStart("span", sInnerLabel);
+			rm.openStart("span", oLI.getId() + "-label");
 			rm.class("sapMILILabel");
 
 			var sLabelDir = oLI.getLabelTextDirection();
@@ -55,12 +54,7 @@ sap.ui.define(["sap/ui/core/library", "sap/ui/core/Renderer", "./ListItemBaseRen
 		}
 
 		rm.openStart("div").class("sapMILIDiv").class("sapMILI-CTX").openEnd();
-		oLI.getContent().forEach(function(oControl) {
-			if (oControl.addAriaLabelledBy && oControl.getAriaLabelledBy().indexOf(sInnerLabel) === -1) {
-				oControl.addAriaLabelledBy(sInnerLabel);
-			}
-			rm.renderControl(oControl);
-		});
+		oLI.getContent().forEach(rm.renderControl, rm);
 		rm.close("div");
 	};
 

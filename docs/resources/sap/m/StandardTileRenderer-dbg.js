@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -20,8 +20,6 @@ sap.ui.define(['./TileRenderer', 'sap/ui/core/ValueStateSupport', 'sap/ui/core/R
 	 */
 	var StandardTileRenderer = Renderer.extend(TileRenderer);
 
-	StandardTileRenderer.apiVersion = 2;
-
 	/**
 	 * Renders the HTML for the given control, using the provided {@link sap.ui.core.RenderManager}.
 	 *
@@ -31,83 +29,95 @@ sap.ui.define(['./TileRenderer', 'sap/ui/core/ValueStateSupport', 'sap/ui/core/R
 	StandardTileRenderer._renderContent = function(rm, oTile) {
 		var infoState = oTile.getInfoState();
 
-		rm.openStart("div"); // Start top row
-		rm.class("sapMStdTileTopRow");
-		rm.openEnd();
+		rm.write("<div"); // Start top row
+		rm.addClass("sapMStdTileTopRow");
+		rm.writeClasses();
+		rm.write(">");
 		if (oTile.getIcon()) {
-			rm.openStart("div");
-			rm.class("sapMStdTileIconDiv");
+			rm.write("<div");
+			rm.addClass("sapMStdTileIconDiv");
 
 			switch (oTile.getType()) {
 				case StandardTileType.Monitor:
-					rm.class("sapMStdIconMonitor");
+					rm.addClass("sapMStdIconMonitor");
 					break;
 				case StandardTileType.Create:
-					rm.class("sapMStdIconCreate");
+					rm.addClass("sapMStdIconCreate");
 					break;
 			}
-			rm.openEnd();
+			rm.writeClasses();
+			rm.write(">");
 			rm.renderControl(oTile._getImage());
-			rm.close("div");
+			rm.write("</div>");
 		}
 
 
 		if (oTile.getNumber()) {
 
-			rm.openStart("div");
-			rm.class("sapMStdTileNumDiv");
-			rm.openEnd();
+			rm.write("<div");
+			rm.addClass("sapMStdTileNumDiv");
+			rm.writeClasses();
+			rm.write(">");
 
-			rm.openStart("div", oTile.getId() + "-number");
+			rm.write("<div");
+			rm.writeAttribute("id", oTile.getId() + "-number");
 
 			var numberLength = oTile.getNumber().length;
 			if (numberLength < 5) {
-				rm.class("sapMStdTileNum");
+				rm.addClass("sapMStdTileNum");
 			} else if (numberLength < 8) {
-				rm.class("sapMStdTileNumM");
+				rm.addClass("sapMStdTileNumM");
 			} else {
-				rm.class("sapMStdTileNumS");
+				rm.addClass("sapMStdTileNumS");
 			}
 
-			rm.openEnd();
-			rm.text(oTile.getNumber());
-			rm.close("div");
+			rm.writeClasses();
+			rm.write(">");
+			rm.writeEscaped(oTile.getNumber());
+			rm.write("</div>");
 
 			if (oTile.getNumberUnit()) {
-				rm.openStart("div", oTile.getId() + "-numberUnit");
-				rm.class("sapMStdTileNumUnit");
-				rm.openEnd();
-				rm.text(oTile.getNumberUnit());
-				rm.close("div");
+				rm.write("<div");
+				rm.writeAttribute("id", oTile.getId() + "-numberUnit");
+				rm.addClass("sapMStdTileNumUnit");
+				rm.writeClasses();
+				rm.write(">");
+				rm.writeEscaped(oTile.getNumberUnit());
+				rm.write("</div>");
 			}
-			rm.close("div"); // End number div
+			rm.write("</div>"); // End number div
 		}
-		rm.close("div"); // End top row div
+		rm.write("</div>"); // End top row div
 
 
-		rm.openStart("div"); // Start monitoring tile styling
-		rm.class("sapMStdTileBottomRow");
+		rm.write("<div"); // Start monitoring tile styling
+		rm.addClass("sapMStdTileBottomRow");
 		if (oTile.getType() === StandardTileType.Monitor) {
-			rm.class("sapMStdTileMonitorType");
+			rm.addClass("sapMStdTileMonitorType");
 		}
-		rm.openEnd();
+		rm.writeClasses();
+		rm.write(">");
 
-		rm.openStart("div", oTile.getId() + "-title");  // Start title div
-		rm.class("sapMStdTileTitle");
-		rm.openEnd();
+		rm.write("<div");  // Start title div
+		rm.writeAttribute("id", oTile.getId() + "-title");
+		rm.addClass("sapMStdTileTitle");
+		rm.writeClasses();
+		rm.write(">");
 		if (oTile.getTitle()) {
-			rm.text(oTile.getTitle());
+			rm.writeEscaped(oTile.getTitle());
 		}
-		rm.close("div"); // End title div
+		rm.write("</div>"); // End title div
 
 		if (oTile.getInfo()) {
-			rm.openStart("div", oTile.getId() + "-info"); // Start info
-			rm.class("sapMStdTileInfo");
-			rm.class("sapMStdTileInfo" + infoState);
+			rm.write("<div"); // Start info
+			rm.writeAttribute("id", oTile.getId() + "-info");
+			rm.addClass("sapMStdTileInfo");
+			rm.addClass("sapMStdTileInfo" + infoState);
+			rm.writeClasses();
 
 			/* WAI ARIA for infoState */
 			if (infoState != ValueState.None) {
-				rm.accessibilityState(oTile, {
+				rm.writeAccessibilityState(oTile, {
 					ariaDescribedBy: {
 						value: oTile.getId() + "-sapSRH",
 						append: true
@@ -115,26 +125,28 @@ sap.ui.define(['./TileRenderer', 'sap/ui/core/ValueStateSupport', 'sap/ui/core/R
 				});
 			}
 
-			rm.openEnd();
+			rm.write(">");
 			if (oTile.getInfo()) {
-				rm.text(oTile.getInfo());
+				rm.writeEscaped(oTile.getInfo());
 			}
-			rm.close("div"); // End info
+			rm.write("</div>"); // End info
 		}
 
 		/* WAI ARIA adding hidden element for infoStatus */
 		if (infoState != ValueState.None) {
-			rm.openStart("span", oTile.getId() + "-sapSRH");
-			rm.class("sapUiInvisibleText");
-			rm.accessibilityState({
+			rm.write("<span");
+			rm.writeAttributeEscaped("id", oTile.getId() + "-sapSRH");
+			rm.addClass("sapUiInvisibleText");
+			rm.writeClasses();
+			rm.writeAccessibilityState({
 				hidden: false
 			});
-			rm.openEnd();
-			rm.text(ValueStateSupport.getAdditionalText(infoState));
-			rm.close("span");
+			rm.write(">");
+			rm.writeEscaped(ValueStateSupport.getAdditionalText(infoState));
+			rm.write("</span>");
 		}
 
-		rm.close("div"); // End bottom row type tile styling
+		rm.write("</div>"); // End bottom row type tile styling
 
 	};
 

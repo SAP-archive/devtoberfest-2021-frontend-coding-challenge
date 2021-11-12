@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -23,7 +23,7 @@ sap.ui.define(['./Object', "sap/base/assert"],
 	 * @extends sap.ui.base.Object
 	 * @implements sap.ui.base.Poolable
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @alias sap.ui.base.Event
 	 * @public
 	 */
@@ -51,7 +51,7 @@ sap.ui.define(['./Object', "sap/base/assert"],
 	 * @param {sap.ui.base.EventProvider} oSource Source of the event
 	 * @param {object} [oParameters] The event parameters
 	 *
-	 * @protected
+	 * @private
 	 *
 	 * @see sap.ui.base.Poolable.prototype#init
 	 */
@@ -70,7 +70,7 @@ sap.ui.define(['./Object', "sap/base/assert"],
 	 * Reset event data, needed for pooling.
 	 *
 	 * @see sap.ui.base.Poolable.prototype#reset
-	 * @protected
+	 * @private
 	 */
 	Event.prototype.reset = function() {
 		this.sId = "";

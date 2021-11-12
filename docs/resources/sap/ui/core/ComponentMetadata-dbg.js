@@ -1,20 +1,20 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides class sap.ui.core.ComponentMetadata
 sap.ui.define([
+	'sap/ui/thirdparty/jquery',
 	'sap/ui/base/ManagedObjectMetadata',
 	'sap/ui/core/Manifest',
+	'sap/ui/thirdparty/URI',
 	'sap/base/Log',
-	'sap/base/util/extend',
-	'sap/base/util/deepExtend',
 	'sap/base/util/isPlainObject',
 	'sap/base/util/LoaderExtensions'
 ],
-	function(ManagedObjectMetadata, Manifest, Log, extend, deepExtend, isPlainObject, LoaderExtensions) {
+	function(jQuery, ManagedObjectMetadata, Manifest, URI, Log, isPlainObject, LoaderExtensions) {
 	"use strict";
 
 	var oCfgData = window["sap-ui-config"] || {};
@@ -36,7 +36,7 @@ sap.ui.define([
 	 * @public
 	 * @class
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 * @since 1.9.2
 	 * @alias sap.ui.core.ComponentMetadata
 	 * @extends sap.ui.base.ManagedObjectMetadata
@@ -50,7 +50,6 @@ sap.ui.define([
 
 	//chain the prototypes
 	ComponentMetadata.prototype = Object.create(ManagedObjectMetadata.prototype);
-	ComponentMetadata.prototype.constructor = ComponentMetadata;
 
 	ComponentMetadata.preprocessClassInfo = function(oClassInfo) {
 		// if the component is a string we convert this into a "_src" metadata entry
@@ -86,7 +85,7 @@ sap.ui.define([
 				var oResponse = LoaderExtensions.loadResource(sResource, {
 					dataType: "json"
 				});
-				extend(oStaticInfo, oResponse);
+				jQuery.extend(oStaticInfo, oResponse);
 			} catch (err) {
 				Log.error("Failed to load component metadata from \"" + sResource + "\" (component " + sName + ")! Reason: " + err);
 			}
@@ -406,7 +405,7 @@ sap.ui.define([
 	 * inside the manifest. The path syntax always starts with a slash (/).
 	 *
 	 * @param {string} sKey Either the manifest section name (namespace) or a concrete path
-	 * @param {boolean} [bMerged=false] Indicates whether the custom configuration is merged with the parent custom configuration of the Component.
+	 * @param {boolean} [bMerged] Indicates whether the custom configuration is merged with the parent custom configuration of the Component.
 	 * @return {any|null} Value of the manifest section or the key (could be any kind of value)
 	 * @public
 	 * @since 1.27.1
@@ -430,7 +429,7 @@ sap.ui.define([
 		// only extend / clone if there is data
 		// otherwise "null" will be converted into an empty object
 		if (oParentData || oData) {
-				oData = deepExtend({}, oParentData, oData);
+				oData = jQuery.extend(true, {}, oParentData, oData);
 		}
 
 		return oData;
@@ -455,7 +454,7 @@ sap.ui.define([
 	 * The configuration above can be accessed via <code>sample.Component.getMetadata().getCustomEntry("my.custom.config")</code>.
 	 *
 	 * @param {string} sKey Key of the custom configuration (must be prefixed with a namespace)
-	 * @param {boolean} [bMerged=false] Indicates whether the custom configuration is merged with the parent custom configuration of the Component.
+	 * @param {boolean} bMerged Indicates whether the custom configuration is merged with the parent custom configuration of the Component.
 	 * @return {Object} custom Component configuration with the specified key.
 	 * @public
 	 * @deprecated Since 1.27.1. Please use the sap.ui.core.ComponentMetadata#getManifestEntry
@@ -475,9 +474,9 @@ sap.ui.define([
 		}
 
 		if (bMerged && (oParent = this.getParent()) instanceof ComponentMetadata) {
-			return deepExtend({}, oParent.getCustomEntry(sKey, bMerged), oData);
+			return jQuery.extend(true, {}, oParent.getCustomEntry(sKey, bMerged), oData);
 		}
-		return deepExtend({}, oData);
+		return jQuery.extend(true, {}, oData);
 	};
 
 
@@ -540,21 +539,10 @@ sap.ui.define([
 	 *
 	 * @return {string[]} Included files.
 	 * @public
-	 * @deprecated Since 1.27.1. For CSS, please use {@link sap.ui.core.Component#getManifestEntry}("/sap.ui5/resources/css").
+	 * @deprecated Since 1.27.1. Please use {@link sap.ui.core.Component#getManifestEntry}("/sap.ui5/resources")
 	 */
 	ComponentMetadata.prototype.getIncludes = function() {
-		Log.warning(
-			"Usage of sap.ui.core.ComponentMetadata.protoype.getIncludes() is deprecated. " +
-			"For CSS files, please use the '/sap.ui5/resources/css' section in your 'manifest.json'. ",
-			"Deprecation",
-			null,
-			function() {
-				return {
-					type: "sap.ui.core.ComponentMetadata",
-					name: this.getName()
-				};
-			}.bind(this));
-
+		// Log.warning("Usage of sap.ui.core.ComponentMetadata.protoype.getIncludes is deprecated!");
 		if (!this._aLegacyIncludes) {
 			var aIncludes = [],
 			    mResources = this.getManifestEntry("/sap.ui5/resources") || {},
@@ -657,7 +645,7 @@ sap.ui.define([
 	 * If no key is specified it returns the complete configuration property
 	 *
 	 * @param {string} [sKey] Key of the configuration property
-	 * @param {boolean} [bDoNotMerge=false] If set to <code>true</code>, only the local configuration is returned
+	 * @param {boolean} [bDoNotMerge] If set to <code>true</code>, only the local configuration is returned
 	 * @return {object} the value of the configuration property
 	 * @public
 	 * @since 1.15.1
@@ -733,10 +721,10 @@ sap.ui.define([
 
 		// deep copy of the legacy models object
 		var oParent,
-		    mModels = deepExtend({}, this._oLegacyModels);
+		    mModels = jQuery.extend(true, {}, this._oLegacyModels);
 		// merge the models object if defined via parameter
 		if (!bDoNotMerge && (oParent = this.getParent()) instanceof ComponentMetadata) {
-			mModels = deepExtend({}, oParent.getModels(), mModels);
+			mModels = jQuery.extend(true, {}, oParent.getModels(), mModels);
 		}
 
 		// return a clone of the models

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -17,9 +17,6 @@ sap.ui.define([
 ], function(UriParameters, utils) {
 	"use strict";
 
-	// shortcut for Object.prototype.hasOwnProperty.call(obj, prop)
-	var has = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
-
 	function makeArray(arg) {
 		return Array.isArray(arg) ? arg : [arg];
 	}
@@ -35,7 +32,7 @@ sap.ui.define([
 	function copyFiltered(target, source, filter) {
 		if ( source ) {
 			for ( var key in source ) {
-				if ( has(filter, key) ) {
+				if ( Object.prototype.hasOwnProperty.call(filter, key) ) {
 					target[key] = source[key];
 				}
 			}
@@ -97,45 +94,9 @@ sap.ui.define([
 		scrolltop: 1
 	};
 
-	/*
-	 * Retrieves information about the active version of an external component (e.g. qunit or sinon).
-	 *
-	 * The <code>config.version</code> property determines, which version of the component should be used.
-	 * It can have one of the following values
-	 * <ul>
-	 * <li>an object value is assumed to contain the component info and is returned "as is"</li>
-	 * <li>a falsy value (false, 0, null or "") disables the component and <code>null</code> is returned</li>
-	 * <li>any other value must be the name of an entry in the <code>config.versions</code> map</li>
-	 * </ul>
-	 *
-	 * If an entry in the <code>config.versions</code> map is not an object, it is assumed to be the name
-	 * of another entry (aliasing). E.g. version "edge" usually will point to a concrete version like "2".
-	 *
-	 * <b>Note:</b> Aliasing can create infinite loops. No measure are taken to prevent or detect this.
-	 *
-	 * @param {object} config Configuration for all versions of the component
-	 * @param {Object<string,object>} config.versions Map of configurations keyed by a version string
-	 * @param {string|boolean|number|object} config.version Config to be used or version to be used or an alias or a boolean (enabled flag)
-	 * @param {string} name Name of the external component (for error reporting only)
-	 * @returns object|null Configuration t use or null if component is disabled
-	 * @throws {TypeError}
-	 */
-	function getActiveVersion(componentConfig, componentName) {
-		var versionsMap = componentConfig.versions;
-		var version = componentConfig.version || null;
-
-		while ( typeof version !== "object" ) {
-			if ( !has(versionsMap, version) ) {
-				throw new TypeError("unsupported " + componentName + " version " + componentConfig.version);
-			}
-			version = versionsMap[version];
-		}
-		return version;
-	}
-
 	function initTestModule(oConfig) {
 		var pAfterLoader, pQUnit, pSinon, pSinonQUnitBridge, pSinonConfig, pCoverage, pTestEnv,
-			oQUnitConfig, aJUnitDoneCallbacks;
+			sQUnitModule, sQUnitCSS, aJUnitDoneCallbacks;
 
 		document.title = oConfig.title;
 
@@ -150,8 +111,21 @@ sap.ui.define([
 			pAfterLoader = Promise.resolve();
 		}
 
-		oQUnitConfig = getActiveVersion(oConfig.qunit, "qunit");
-		if ( oQUnitConfig != null ) {
+		if ( oConfig.qunit.version === "edge" || oConfig.qunit.version === true ) {
+			oConfig.qunit.version = 2;
+		}
+		if ( typeof oConfig.qunit.version === "number" ) {
+
+			if ( oConfig.qunit.version === 1 ) {
+				sQUnitModule = "sap/ui/thirdparty/qunit";
+				sQUnitCSS = "sap/ui/thirdparty/qunit.css";
+			} else if ( oConfig.qunit.version === 2 ) {
+				sQUnitModule = "sap/ui/thirdparty/qunit-2";
+				sQUnitCSS = "sap/ui/thirdparty/qunit-2.css";
+			} else {
+				throw new TypeError("unsupported qunit version " + oConfig.qunit.version);
+			}
+
 			// QUnit configuration can be set in advance, we always disable the autostart
 			window.QUnit = window.QUnit || {};
 			QUnit.config = QUnit.config || {};
@@ -160,12 +134,10 @@ sap.ui.define([
 			}
 			QUnit.config.autostart = false;
 
-			// now load qunitPause, QUnit, its CSS + the reporter bridge
-			pQUnit = pAfterLoader.then(function () {
-				return requireP("sap/ui/test/qunitPause");
-			}).then(function () {
-				utils.addStylesheet(oQUnitConfig.css);
-				return requireP(oQUnitConfig.module);
+			// now load QUnit, its CSS + the reporter bridge
+			pQUnit = pAfterLoader.then(function() {
+				utils.addStylesheet(sQUnitCSS);
+				return requireP(sQUnitModule);
 			}).then(function() {
 
 				// install a mock version of the qunit-reporter-junit API to collect jUnitDone callbacks
@@ -186,10 +158,23 @@ sap.ui.define([
 			});
 		}
 
-		var oSinonConfig = getActiveVersion(oConfig.sinon, "sinon");
-		if ( oSinonConfig != null ) {
+		if ( oConfig.sinon.version === "edge" || oConfig.sinon.version === true ) {
+			oConfig.sinon.version = 4;
+		}
+		if ( typeof oConfig.sinon.version === "number" ) {
+			var sinonModule, bridgeModule;
+			if ( oConfig.sinon.version === 1 ) {
+				sinonModule = "sap/ui/thirdparty/sinon";
+				bridgeModule = "sap/ui/thirdparty/sinon-qunit";
+			} else if ( oConfig.sinon.version === 4 ) {
+				sinonModule = "sap/ui/thirdparty/sinon-4";
+				bridgeModule = "sap/ui/qunit/sinon-qunit-bridge";
+			} else {
+				throw new TypeError("unsupported sinon version " + oConfig.sinon.version);
+			}
+
 			pSinon = pAfterLoader.then(function() {
-				return requireP(oSinonConfig.module);
+				return requireP(sinonModule);
 			});
 
 			if ( oConfig.sinon.qunitBridge && pQUnit ) {
@@ -197,7 +182,7 @@ sap.ui.define([
 					pQUnit,
 					pSinon
 				]).then(function() {
-					return requireP(oSinonConfig.bridge);
+					return requireP(bridgeModule);
 				});
 			}
 
@@ -214,16 +199,16 @@ sap.ui.define([
 				});
 			}
 
-		} else if ( oQUnitConfig != null ) {
+		} else if ( sQUnitModule ) {
 			// shim dependencies for the bridges, based on the selected QUnit version
 			// might be needed if tests load the bridge on their own
 			sap.ui.loader.config({
 				shim: {
 					"sap/ui/thirdparty/sinon-qunit": {
-						deps: [oQUnitConfig.module, "sap/ui/thirdparty/sinon"]
+						deps: [sQUnitModule, "sap/ui/thirdparty/sinon"]
 					},
 					"sap/ui/qunit/sinon-qunit-bridge": {
-						deps: [oQUnitConfig.module, "sap/ui/thirdparty/sinon-4"]
+						deps: [sQUnitModule, "sap/ui/thirdparty/sinon-4"]
 					}
 				}
 			});
@@ -255,7 +240,6 @@ sap.ui.define([
 				return requireP(["sap/ui/qunit/qunit-coverage"]);
 			}
 		}).then(function() {
-			// QUnit option CSP
 			if ( QUnit.urlParams["sap-ui-xx-csp-policy"] ) {
 				document.addEventListener("securitypolicyviolation", onCSPViolation);
 				QUnit.done(function() {
@@ -270,22 +254,6 @@ sap.ui.define([
 					"sap-target-level-2:report-only": "Level 2"
 				},
 				tooltip: "What Content-Security-Policy should the server send"
-			});
-			// QUnit option repeat-to-failure
-			if ( QUnit.urlParams["rtf"] || QUnit.urlParams["repeat-to-failure"]) {
-				QUnit.done(function(results) {
-					if (results.failed === 0) {
-						setTimeout(function() {
-							location.reload();
-						}, 100);
-					}
-				});
-			}
-			QUnit.config.urlConfig.push({
-				id: "repeat-to-failure",
-				label: "Repeat",
-				value: false,
-				tooltip: "Whether this test should auto-repeat until it fails"
 			});
 		});
 
@@ -377,8 +345,7 @@ sap.ui.define([
 			QUnit.start();
 		} else {
 			utils.whenDOMReady().then(function() {
-				document.body.style.color = "red";
-				document.body.innerHTML = "<pre>" + utils.encode(oErr.stack || oErr.message || String(oErr)) + "</pre>";
+				document.body.innerHTML = "<pre style='color:red;'>" + utils.encode(oErr.stack || oErr.message || String(oErr)) + "</pre>";
 			});
 		}
 	});

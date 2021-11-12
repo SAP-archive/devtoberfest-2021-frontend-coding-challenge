@@ -1,9 +1,9 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-sap.ui.define(["sap/base/Log", "sap/base/util/extend"], function(Log, extend) {
+sap.ui.define(["sap/base/Log", "sap/ui/thirdparty/jquery"], function(Log, jQuery) {
 	"use strict";
 
 	/**
@@ -11,7 +11,6 @@ sap.ui.define(["sap/base/Log", "sap/base/util/extend"], function(Log, extend) {
 	 * @private
 	 * @experimental
 	 * @since 1.33
-	 * @deprecated Since 1.90. Use a {@link sap.ui.core.routing.async.Route async.Route} instead
 	 */
 	return {
 
@@ -50,10 +49,10 @@ sap.ui.define(["sap/base/Log", "sap/base/util/extend"], function(Log, extend) {
 				this._oNestingParent._routeMatched(oArguments, false, this);
 			}
 
-			oConfig =  extend({}, oRouter._oConfig, this._oConfig);
+			oConfig =  jQuery.extend({}, oRouter._oConfig, this._oConfig);
 
 			// make a copy of arguments and forward route config to target
-			oTargetData = Object.assign({}, oArguments);
+			oTargetData = jQuery.extend({}, oArguments);
 			oTargetData.routeConfig = oConfig;
 
 			oEventData = {

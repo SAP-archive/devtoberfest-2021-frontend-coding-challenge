@@ -1,19 +1,17 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 	'sap/ui/Device',
-	'sap/ui/base/EventProvider',
 	'sap/ui/core/Control',
 	"sap/ui/thirdparty/jquery",
 	'./WheelSliderContainerRenderer'
 ],
 	function(
 		Device,
-		EventProvider,
 		Control,
 		jQuery,
 		WheelSliderContainerRenderer
@@ -31,7 +29,7 @@ sap.ui.define([
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
-		 * @version 1.96.0
+		 * @version 1.76.0
 		 *
 		 * @constructor
 		 * @public
@@ -87,7 +85,7 @@ sap.ui.define([
 		 */
 		WheelSliderContainer.prototype.exit = function() {
 			this.$().off('selectstart', fnFalse);
-			this.$().off(Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", this._onmousewheel);
+			this.$().off(!!Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", this._onmousewheel);
 			Device.resize.detachHandler(this._fnOrientationChanged);
 		};
 
@@ -97,8 +95,8 @@ sap.ui.define([
 		 * @private
 		 */
 		WheelSliderContainer.prototype.onAfterRendering = function() {
-			this.$().off(Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", this._onmousewheel);
-			this.$().on(Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", jQuery.proxy(this._onmousewheel, this));
+			this.$().off(!!Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", this._onmousewheel);
+			this.$().on(!!Device.browser.firefox ? "DOMMouseScroll" : "mousewheel", jQuery.proxy(this._onmousewheel, this));
 
 			this.$().off('selectstart', fnFalse);
 			this.$().on('selectstart', fnFalse);
@@ -265,7 +263,7 @@ sap.ui.define([
 		};
 
 		WheelSliderContainer.prototype.addSlider = function(oSlider) {
-			if (!Device.system.desktop && !EventProvider.hasListener(oSlider, "expanded", this._onSliderExpanded, this)) {
+			if (!Device.system.desktop && !sap.ui.base.EventProvider.hasListener(oSlider, "expanded", this._onSliderExpanded, this)) {
 				oSlider.attachExpanded(this._onSliderExpanded);
 			}
 

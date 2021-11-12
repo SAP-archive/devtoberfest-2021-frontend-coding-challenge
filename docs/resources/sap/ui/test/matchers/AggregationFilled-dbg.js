@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,7 +8,7 @@ sap.ui.define([
 	"sap/ui/test/matchers/Matcher",
 	"sap/base/strings/capitalize",
 	"sap/ui/thirdparty/jquery"
-], function (Matcher, capitalize, jQueryDOM) {
+], function(Matcher, capitalize, jQueryDOM) {
 	"use strict";
 
 	/**
@@ -32,14 +32,14 @@ sap.ui.define([
 	 */
 	return Matcher.extend("sap.ui.test.matchers.AggregationFilled", /** @lends sap.ui.test.matchers.AggregationFilled.prototype */ {
 
-		metadata: {
-			publicMethods: ["isMatching"],
-			properties: {
+		metadata : {
+			publicMethods : [ "isMatching" ],
+			properties : {
 				/**
 				 * The name of the aggregation that is used for matching.
 				 */
-				name: {
-					type: "string"
+				name : {
+					type : "string"
 				}
 			}
 		},
@@ -51,7 +51,7 @@ sap.ui.define([
 		 * @return {boolean} true if the Aggregation set in the property aggregationName is filled, false if it is not.
 		 * @public
 		 */
-		isMatching: function (oControl) {
+		isMatching : function (oControl) {
 			var sAggregationName = this.getName(),
 				fnAggregation = oControl["get" + capitalize(sAggregationName, 0)];
 
@@ -61,7 +61,7 @@ sap.ui.define([
 			}
 
 			var vAggregation = fnAggregation.call(oControl);
-			var aAggregation = Array.isArray(vAggregation) ? vAggregation : [vAggregation];
+			var aAggregation = jQueryDOM.isArray(vAggregation) ? vAggregation : [vAggregation];
 			var bFilled = !!aAggregation.length;
 			if (!bFilled) {
 				this._oLogger.debug("Control '" + oControl + "' aggregation '" + sAggregationName + "' is empty");

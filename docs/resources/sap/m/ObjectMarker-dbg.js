@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -62,7 +62,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.96.0
+	 * @version 1.76.0
 	 *
 	 * @constructor
 	 * @public
@@ -146,6 +146,13 @@ sap.ui.define([
 	});
 
 	/**
+	 * Library internationalization resource bundle.
+	 *
+	 * @type {jQuery.sap.util.ResourceBundle}
+	 */
+	var oRB = sap.ui.getCore().getLibraryResourceBundle("sap.m");
+
+	/**
 	 * Map of predefined <code>ObjectMarker</code> types.
 	 *
 	 * @static
@@ -160,7 +167,7 @@ sap.ui.define([
 				}
 			},
 			text: {
-				value: "OM_FLAG",
+				value: oRB.getText("OM_FLAG"),
 				visibility: {
 					small: false,
 					large: false
@@ -176,7 +183,7 @@ sap.ui.define([
 				}
 			},
 			text: {
-				value: "OM_FAVORITE",
+				value: oRB.getText("OM_FAVORITE"),
 				visibility: {
 					small: false,
 					large: false
@@ -192,7 +199,7 @@ sap.ui.define([
 				}
 			},
 			text: {
-				value: "OM_DRAFT",
+				value: oRB.getText("OM_DRAFT"),
 				visibility: {
 					small: true,
 					large: true
@@ -208,7 +215,7 @@ sap.ui.define([
 				}
 			},
 			text: {
-				value: "OM_LOCKED",
+				value: oRB.getText("OM_LOCKED"),
 				visibility: {
 					small: false,
 					large: true
@@ -224,7 +231,7 @@ sap.ui.define([
 				}
 			},
 			text: {
-				value: "OM_UNSAVED",
+				value: oRB.getText("OM_UNSAVED"),
 				visibility: {
 					small: false,
 					large: true
@@ -240,7 +247,7 @@ sap.ui.define([
 				}
 			},
 			text: {
-				value: "OM_LOCKED_BY",
+				value: oRB.getText("OM_LOCKED_BY"),
 				visibility: {
 					small: false,
 					large: true
@@ -256,7 +263,7 @@ sap.ui.define([
 				}
 			},
 			text: {
-				value: "OM_UNSAVED_BY",
+				value: oRB.getText("OM_UNSAVED_BY"),
 				visibility: {
 					small: false,
 					large: true
@@ -312,7 +319,7 @@ sap.ui.define([
 	 * If <code>press</code> event is attached and the control is rendered as text, than the control will be
 	 * re-rendered as link.
 	 *
-	 * @returns {this} <code>this</code> pointer for chaining
+	 * @returns {sap.m.ObjectMarker} <code>this</code> pointer for chaining
 	 */
 	ObjectMarker.prototype.attachPress = function () {
 		var oInnerControl = this._getInnerControl();
@@ -334,7 +341,7 @@ sap.ui.define([
 	 * If <code>press</code> event is detached and the control is rendered as a link, than the control will be
 	 * re-rendered as a text.
 	 *
-	 * @returns {this} <code>this</code> pointer for chaining
+	 * @returns {sap.m.ObjectMarker} <code>this</code> pointer for chaining
 	 */
 	ObjectMarker.prototype.detachPress = function() {
 		var oInnerControl = this._getInnerControl();
@@ -383,11 +390,7 @@ sap.ui.define([
 
 		var oType = ObjectMarker.M_PREDEFINED_TYPES[this.getType()],
 			oInnerControl = this._getInnerControl(),
-			oInnerIcon = oInnerControl && oInnerControl._getIconAggregation(),
 			sAdditionalInfo = this.getAdditionalInfo(),
-			bIsIconVisible = this._isIconVisible(),
-			bIsTextVisible = this._isTextVisible(),
-			bIsIconOnly = bIsIconVisible && !bIsTextVisible,
 			sType = this.getType(),
 			sText;
 
@@ -400,39 +403,25 @@ sap.ui.define([
 			sText = this._getMarkerText(oType, sType, sAdditionalInfo);
 		}
 
-		if (bIsIconVisible) {
+		if (this._isIconVisible()) {
 			oInnerControl.setIcon(oType.icon.src, bSuppressInvalidate);
-			oInnerIcon.setDecorative(!bIsIconOnly); // icon should be decorative if we have text
-			oInnerIcon.setAlt(sText);
-			oInnerIcon.setUseIconTooltip(false);
 			this.addStyleClass("sapMObjectMarkerIcon");
 		} else {
 			oInnerControl.setIcon(null, bSuppressInvalidate);
 			this.removeStyleClass("sapMObjectMarkerIcon");
 		}
 
-		if (bIsTextVisible) {
+		if (this._isTextVisible()) {
 			oInnerControl.setAggregation("tooltip", null, bSuppressInvalidate);
 			oInnerControl.setText(sText, bSuppressInvalidate);
 			this.addStyleClass("sapMObjectMarkerText");
 		} else {
-			if (oInnerIcon) {
+			if (oInnerControl.getIcon()) {
 				oInnerControl.setAggregation("tooltip", sText, bSuppressInvalidate);
 			}
 			oInnerControl.setText(null, bSuppressInvalidate);
 			this.removeStyleClass("sapMObjectMarkerText");
 		}
-
-		oInnerControl.removeAllAssociation("ariaLabelledBy", bSuppressInvalidate);
-		oInnerControl.removeAllAssociation("ariaDescribedBy", bSuppressInvalidate);
-
-		this.getAriaLabelledBy().forEach(function(ariaLabelledBy) {
-			oInnerControl.addAssociation("ariaLabelledBy", ariaLabelledBy, bSuppressInvalidate);
-		});
-
-		this.getAriaDescribedBy().forEach(function(ariaDescribedBy){
-			oInnerControl.addAssociation("ariaDescribedBy", ariaDescribedBy, bSuppressInvalidate);
-		});
 
 		return true;
 	};
@@ -447,7 +436,6 @@ sap.ui.define([
 	 * @private
 	 */
 	ObjectMarker.prototype._getMarkerText = function (oType, sType, sAdditionalInfo) {
-		var oRB = sap.ui.getCore().getLibraryResourceBundle("sap.m");
 
 		switch (sType) {
 			case "LockedBy":
@@ -455,10 +443,9 @@ sap.ui.define([
 			case "UnsavedBy":
 				return (sAdditionalInfo === "") ? oRB.getText('OM_UNSAVED_BY_ANOTHER_USER') : oRB.getText('OM_UNSAVED_BY', [sAdditionalInfo]);
 			default:
-				return (sAdditionalInfo === "") ? oRB.getText(oType.text.value) : oRB.getText(oType.text.value) + " " + sAdditionalInfo;
+				return (sAdditionalInfo === "") ? oType.text.value : oType.text.value + " " + sAdditionalInfo;
 		}
 	};
-
 
 	/**
 	 * Determines if the icon of the control should be visible or not.
@@ -571,7 +558,9 @@ sap.ui.define([
 		});
 	};
 
-	["getAccessibilityInfo"].map(function(sFn) {
+	["getAriaLabelledBy", "addAriaLabelledBy", "removeAriaLabelledBy", "removeAllAriaLabelledBy",
+		"getAriaDescribedBy", "addAriaDescribedBy", "removeAriaDescribedBy", "removeAllAriaDescribedBy",
+		"getAccessibilityInfo"].map(function(sFn) {
 		var bChainable = /^add/.test(sFn);
 		ObjectMarker.prototype[sFn] = function() {
 			var oInnerControl = this._getInnerControl(),

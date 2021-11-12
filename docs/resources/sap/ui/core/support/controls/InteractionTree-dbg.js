@@ -1,13 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 	'sap/ui/base/ManagedObject',
 	'sap/ui/core/IconPool',
-	'sap/ui/core/Core',
 	'sap/m/library',
 	'sap/m/Popover',
 	'sap/m/Text',
@@ -22,7 +21,6 @@ sap.ui.define([
     function(
 		ManagedObject,
 	   IconPool,
-	   Core,
 	   mobileLibrary,
 	   Popover,
 	   Text,
@@ -39,10 +37,7 @@ sap.ui.define([
        var PlacementType = mobileLibrary.PlacementType;
 
        var InteractionTree = ManagedObject.extend("sap.ui.core.support.controls.InteractionTree", {
-         metadata: {
-           library: "sap.ui.core"
-         },
-         constructor: function () {
+          constructor: function () {
              this.start = 0;
              this.end = 1;
           }
@@ -50,6 +45,7 @@ sap.ui.define([
 
        InteractionTree.expandIcon = 'sap-icon://navigation-right-arrow';
        InteractionTree.collapseIcon = 'sap-icon://navigation-down-arrow';
+       InteractionTree.headerIcon = '<img class="sapUiInteractionSvgImage" src="HeaderIcon.svg">';
 
        InteractionTree.prototype.setInteractions = function (interactions) {
 
@@ -101,9 +97,9 @@ sap.ui.define([
        InteractionTree.prototype.renderAt = function (parent) {
           this.parent = parent;
 
-          var rm = Core.createRenderManager();
+          var rm = sap.ui.getCore().createRenderManager();
           this.render(rm);
-          rm.flush(parent, true);
+          rm.flush(parent);
           rm.destroy();
 
           this.attachEvents();
@@ -112,19 +108,18 @@ sap.ui.define([
        };
 
        InteractionTree.prototype.render = function (rm) {
-          rm.openStart("div", this.getId())
-             .class("sapUiInteractionTreeContainer")
-             .class("sapUiSizeCompact")
-             .openEnd();
 
-          rm.openStart("div")
-             .class("sapUiInteractionGridLinesContainer")
-             .openEnd()
-             .close("div");
+          rm.write('<div id="' + this.getId() + '" class="sapUiInteractionTreeContainer sapUiSizeCompact">');
 
-          rm.openStart("ul")
-             .class("sapUiInteractionTree")
-             .openEnd();
+          rm.write('<div class="sapUiInteractionGridLinesContainer"></div>');
+
+          rm.write('<ul');
+
+          rm.addClass("sapUiInteractionTree");
+
+          rm.writeClasses();
+
+          rm.write(">");
 
           this.renderHeaders(rm);
 
@@ -141,8 +136,9 @@ sap.ui.define([
              this.renderInteraction(rm, interaction, i);
           }
 
-          rm.close("ul");
-          rm.close("div");
+          rm.write("</ul>");
+
+          rm.write("</div>");
        };
 
        InteractionTree.prototype.attachEvents = function () {
@@ -152,7 +148,7 @@ sap.ui.define([
           this.gridContainer = jQuery('.sapUiInteractionTreeContainer .sapUiInteractionGridLinesContainer');
           this.gridContainerWidth = 0;
 
-          interactionTree.on('click', function (event) {
+          interactionTree.bind('click', function (event) {
 
              var $target = jQuery(event.target);
 
@@ -161,11 +157,11 @@ sap.ui.define([
              }
           });
 
-          this.gridContainer.on("resize", function (event) {
+          this.gridContainer.resize(function (event) {
              that.updateGridLines();
           });
 
-          jQuery(window).on("resize", function (event) {
+          jQuery(window).resize(function (event) {
              that.updateGridLines();
           });
 
@@ -174,51 +170,32 @@ sap.ui.define([
 
        InteractionTree.prototype.updateGridLines = function () {
 
-           var gridContainer = this.gridContainer,
-               range = this.timeRange,
-               width = this.gridContainer.width(),
-               rm = Core.createRenderManager();
+          var gridContainer = this.gridContainer,
+              range = this.timeRange,
+              width = this.gridContainer.width();
 
-           if (this.gridContainerWidth === width) {
-               return;
-           }
+          if (this.gridContainerWidth == width) {
+             return;
+          }
 
+          gridContainer.empty();
 
-           rm.openStart("div")
-               .style("left", this.getPosition(width, range, 0) + 6 + "px")
-               .class("sapUiInteractionGridLineIntervalText")
-               .openEnd()
-               .text(this.formatGridLineDuration(0))
-               .close("div");
+          gridContainer.append('<div style="left:' + (this.getPosition(width, range, 0) + 6) + 'px" class="sapUiInteractionGridLineIntervalText">' + this.formatGridLineDuration(0) + '</div>');
 
-           var interval = this.calculateInterval(width, range);
+          var interval = this.calculateInterval(width, range);
 
-           for (var i = interval; i < range; i += interval) {
+          for (var i = interval; i < range; i += interval) {
 
-               var position = this.getPosition(width, range, i);
+             var position = this.getPosition(width, range, i);
 
-               if (i + interval < range) {
+             if (i + interval < range) {
+                gridContainer.append('<div style="left:' + (position + 6) + 'px" class="sapUiInteractionGridLineIntervalText">' + this.formatGridLineDuration(i) + '</div>');
+             }
 
-                   rm.openStart("div")
-                       .style("left", position + 6 + "px")
-                       .class("sapUiInteractionGridLineIntervalText")
-                       .openEnd()
-                       .text(this.formatGridLineDuration(i))
-                       .close("div");
-               }
+             gridContainer.append('<div style="left:' + position + 'px" class="sapUiInteractionGridLine"></div>');
+          }
 
-               rm.openStart("div")
-                   .style("left", position + "px")
-                   .class("sapUiInteractionGridLine")
-                   .openEnd()
-                   .close("div");
-           }
-
-           gridContainer.empty();
-           rm.flush(gridContainer[0], true);
-           rm.destroy();
-
-           this.gridContainerWidth = width;
+          this.gridContainerWidth = width;
        };
 
        InteractionTree.prototype.calculateInterval = function (width, range) {
@@ -263,11 +240,8 @@ sap.ui.define([
           var $parent = $icon.parent();
           $icon.remove();
 
-          var rm = Core.createRenderManager();
-          this.renderIcon(rm, !expanded);
-
-          rm.flush($parent[0], false, true);
-          rm.destroy();
+          var iconHTML = this.getIconHTML(!expanded);
+          $parent.children().eq(0).after(iconHTML);
 
           var $li = $parent.parent().parent();
           $li.toggleClass('sapUiInteractionItemExpanded');
@@ -285,49 +259,46 @@ sap.ui.define([
        };
 
        InteractionTree.prototype.renderHeaders = function (rm) {
-           rm.openStart("li")
-               .openEnd();
+          rm.write('<li>');
 
-           rm.openStart("div")
-               .class("sapUiInteractionTreeItem")
-               .class("sapUiInteractionItemDiv")
-               .class("sapUiInteractionHeader")
-               .openEnd();
+          rm.write('<div');
 
+          rm.addClass("sapUiInteractionTreeItem");
+          rm.addClass("sapUiInteractionItemDiv");
+          rm.addClass("sapUiInteractionHeader");
 
-           rm.openStart("div")
-               .class("sapUiInteractionTreeItemLeft")
-               .openEnd();
+          rm.writeClasses();
 
-           rm.openStart("div")
-               .openEnd();
+          rm.write(">");
 
-           rm.openStart("span")
-               .class("sapUiInteractionItemComponentText")
-               .openEnd()
-               .text("Component")
-               .close("span");
+          rm.write('<div class="sapUiInteractionTreeItemLeft">');
 
-           rm.voidStart("br")
-               .voidEnd();
+          rm.write("<div>");
 
-           rm.openStart("span")
-               .class("sapUiInteractionItemTriggerText")
-               .openEnd()
-               .text("Trigger")
-               .close("span");
+          rm.write('<span class="sapUiInteractionItemComponentText">');
+          rm.writeEscaped('Component');
+          rm.write('</span>');
 
 
-           rm.close("div");
-           rm.close("div"); // sapUiInteractionTreeItemLeft
+          rm.write("<br/>");
 
-           rm.openStart("div")
-               .class("sapUiInteractionTreeItemRight")
-               .openEnd()
-               .close("div");
 
-           rm.close("div");
-           rm.close("li");
+          rm.write('<span class="sapUiInteractionItemTriggerText">');
+          rm.writeEscaped('Trigger');
+          rm.write('</span>');
+
+          rm.write("</div>");
+
+          rm.write('</div>'); // sapUiInteractionTreeItemLeft
+
+
+          rm.write('<div class="sapUiInteractionTreeItemRight">');
+
+          rm.write('</div>');
+          rm.write("</div>");
+
+
+          rm.write("</li>");
        };
 
        InteractionTree.prototype.isInteractionVisible = function (interaction) {
@@ -374,27 +345,27 @@ sap.ui.define([
              return;
           }
 
-          rm.openStart("li")
-            .attr("data-interaction-index", index);
-
+          rm.write('<li data-interaction-index="' + index + '"');
 
           if (interaction.isExpanded) {
-             rm.class('sapUiInteractionItemExpanded');
+             rm.addClass('sapUiInteractionItemExpanded');
+             rm.writeClasses();
           }
 
-          rm.openEnd();
+          rm.write('>');
 
           this.renderInteractionDiv(rm, interaction);
 
-          rm.openStart("ul");
+          rm.write("<ul");
 
-          rm.class("sapUiInteractionItem");
+          rm.addClass("sapUiInteractionItem");
 
           if (!interaction.isExpanded) {
-             rm.class("sapUiHiddenUiInteractionItems");
+             rm.addClass("sapUiHiddenUiInteractionItems");
           }
 
-          rm.openEnd();
+          rm.writeClasses();
+          rm.write(">");
 
 
           for (var i = 0; i < requests.length; i++) {
@@ -402,168 +373,125 @@ sap.ui.define([
              this.renderRequest(rm, interaction, request, i);
           }
 
-          rm.close("ul");
-          rm.close("li");
+          rm.write("</ul>");
+          rm.write("</li>");
        };
 
        InteractionTree.prototype.renderInteractionDiv = function (rm, interaction) {
-           rm.openStart("div");
+          rm.write('<div');
 
-           rm.class("sapUiInteractionTreeItem");
-           rm.class("sapUiInteractionItemDiv");
+          rm.addClass("sapUiInteractionTreeItem");
+          rm.addClass("sapUiInteractionItemDiv");
 
-           rm.openEnd();
+          rm.writeClasses();
 
-           rm.openStart("div")
-               .class("sapUiInteractionLeft")
-               .class("sapUiInteractionTreeItemLeft")
-               .openEnd();
+          rm.write(">");
 
-           rm.openStart("div")
-               .openEnd();
+          rm.write('<div class="sapUiInteractionLeft sapUiInteractionTreeItemLeft">');
 
-           rm.openStart("span")
-               .class("sapUiInteractionItemComponentText")
-               .openEnd();
+          rm.write("<div>");
 
-           rm.text((interaction.component !== "undetermined") ? interaction.component : 'Initial Loading');
-           rm.close("span");
+          rm.write('<span class="sapUiInteractionItemComponentText">');
+          rm.writeEscaped((interaction.component !== "undetermined") ? interaction.component : 'Initial Loading');
+          rm.write('</span>');
 
 
-           rm.voidStart("br")
-               .voidEnd();
+          rm.write("<br/>");
 
 
-           rm.openStart("span")
-               .class("sapUiInteractionItemTriggerText")
-               .openEnd()
-               .text(interaction.trigger + " / " + interaction.event)
-               .close("span");
+          rm.write('<span class="sapUiInteractionItemTriggerText">');
+          rm.writeEscaped(interaction.trigger + " / " + interaction.event);
+          rm.write('</span>');
 
-           rm.close("div");
+          rm.write("</div>");
 
-           if (interaction.requests.length) {
-               this.renderIcon(rm, interaction.isExpanded);
-           }
+          if (interaction.requests.length) {
+             this.renderIcon(rm, interaction.isExpanded);
+          }
 
-           if (interaction.sapStatistics.length && interaction.requests.length) {
+          if (interaction.sapStatistics.length && interaction.requests.length) {
+             rm.write('<div class="sapUiInteractionHeaderIcon">' + InteractionTree.headerIcon + '</div>');
+          }
 
-               rm.openStart("div")
-                   .class("sapUiInteractionHeaderIcon")
-                   .openEnd();
+          rm.write('</div>'); // sapUiInteractionTreeItemLeft
 
-               rm.voidStart("img")
-                   .class("sapUiInteractionSvgImage")
-                   .attr("src", "HeaderIcon.svg")
-                   .voidEnd();
+          rm.write('<div class="sapUiInteractionTreeItemRight">');
 
-               rm.close("div");
-           }
+          var middle = Math.round(interaction.start + interaction.duration);
 
-           rm.close("div"); // sapUiInteractionTreeItemLeft
+          this.renderInteractionPart(rm, interaction.start, middle, 'sapUiInteractionBlue');
+          // this.renderInteractionPart(rm, middle, interaction.end, 'sapUiInteractionBlueLight');
 
-           rm.openStart("div")
-               .class("sapUiInteractionTreeItemRight")
-               .openEnd();
-
-
-           var middle = Math.round(interaction.start + interaction.duration);
-
-           this.renderInteractionPart(rm, interaction.start, middle, 'sapUiInteractionBlue');
-           // this.renderInteractionPart(rm, middle, interaction.end, 'sapUiInteractionBlueLight');
-
-           rm.close("div");
-           rm.close("div");
+          rm.write('</div>');
+          rm.write("</div>");
        };
 
        InteractionTree.prototype.renderInteractionPart = function (rm, start, end, colorClass) {
-           if (this.actualStartTime > end || this.actualEndTime < start) {
-               return;
-           }
+          if (this.actualStartTime > end || this.actualEndTime < start) {
+             return;
+          }
 
-           end = Math.min(end, this.actualEndTime);
-           start = Math.max(start, this.actualStartTime);
+          end = Math.min(end, this.actualEndTime);
+          start = Math.max(start, this.actualStartTime);
 
-           var left = 100 / this.timeRange * (start - this.actualStartTime);
-           var right = 100 / this.timeRange * (end - this.actualStartTime);
-           var width = right - left;
+          var left = 100 / this.timeRange * (start - this.actualStartTime);
+          var right = 100 / this.timeRange * (end - this.actualStartTime);
+          var width = right - left;
 
-           rm.openStart("span")
-               .style("margin-left", left + "%")
-               .style("width", width + "%")
-               .class("sapUiInteractionTimeframe")
-               .class("sapUiInteractionTimeInteractionFrame")
-               .class(colorClass)
-               .openEnd()
-               .close("span");
+          rm.write('<span style="margin-left: ' + left + '%; width: ' + width + '%" class="sapUiInteractionTimeframe sapUiInteractionTimeInteractionFrame ' + colorClass + '"></span>');
        };
 
        InteractionTree.prototype.renderRequest = function (rm, interaction, request, index) {
 
-           var fetchStartOffset = request.fetchStartOffset;
+          var fetchStartOffset = request.fetchStartOffset;
 
-           var start = fetchStartOffset + request.startTime;
-           var end = fetchStartOffset + request.startTime + this.getRequestDuration(request);
+          var start = fetchStartOffset + request.startTime;
+          var end = fetchStartOffset + request.startTime + this.getRequestDuration(request);
 
-           if (this.actualStartTime > end || this.actualEndTime < start) {
-               return;
-           }
+          if (this.actualStartTime > end || this.actualEndTime < start) {
+             return;
+          }
 
-           rm.openStart("li")
-               .attr("data-request-index", index)
-               .class("sapUiInteractionTreeItem")
-               .class("sapUiInteractionRequest")
-               .openEnd();
+          rm.write('<li data-request-index="' + index + '"');
 
-           rm.openStart("div")
-               .class("sapUiInteractionTreeItemLeft")
-               .class("sapUiInteractionRequestLeft")
-               .openEnd();
+          rm.addClass("sapUiInteractionTreeItem");
+          rm.addClass("sapUiInteractionRequest");
 
-           var requestType = request.initiatorType || request.entryType;
+          rm.writeClasses();
 
-           var colorClass = this.getRequestColorClass(requestType);
+          rm.write(">");
 
-           rm.openStart("span")
-               .class("sapUiInteractionRequestIcon")
-               .class(colorClass)
-               .openEnd()
-               .close("span");
+          rm.write('<div class="sapUiInteractionTreeItemLeft sapUiInteractionRequestLeft">');
 
-           rm.openStart("span")
-               .class("sapUiInteractionItemEntryTypeText")
-               .openEnd()
-               .text(requestType)
-               .close("span");
+          var requestType = request.initiatorType || request.entryType;
 
-           if (this.getRequestSapStatistics(interaction, request)) {
-               rm.openStart("div")
-                   .class("sapUiInteractionRequestHeaderIcon")
-                   .openEnd();
+          var colorClass = this.getRequestColorClass(requestType);
 
-               rm.voidStart("img")
-                   .class("sapUiInteractionSvgImage")
-                   .attr("src", "HeaderIcon.svg")
-                   .voidEnd();
+          rm.write('<span class="sapUiInteractionRequestIcon ' + colorClass + '"></span>');
 
-               rm.close("div");
-           }
+          rm.write('<span class="sapUiInteractionItemEntryTypeText">');
+          rm.writeEscaped(requestType);
+          rm.write('</span>');
 
-           rm.close("div");
+          if (this.getRequestSapStatistics(interaction, request)) {
+            rm.write('<div class="sapUiInteractionRequestHeaderIcon">' + InteractionTree.headerIcon + '</div>');
+          }
 
-           rm.openStart("div")
-               .class("sapUiInteractionTreeItemRight")
-               .openEnd();
+          rm.write('</div>');
 
-           var requestStart = this.getRequestRequestStart(request) + fetchStartOffset;
-           var responseStart = this.getRequestResponseStart(request) + fetchStartOffset;
+          rm.write('<div class="sapUiInteractionTreeItemRight"');
+          rm.write('>');
 
-           this.renderRequestPart(rm, start, requestStart, colorClass + '70');
-           this.renderRequestPart(rm, requestStart, responseStart, colorClass);
-           this.renderRequestPart(rm, responseStart, end, colorClass + '70');
+          var requestStart = this.getRequestRequestStart(request) + fetchStartOffset;
+          var responseStart = this.getRequestResponseStart(request) + fetchStartOffset;
 
-           rm.close("div");
-           rm.close("li");
+          this.renderRequestPart(rm, start, requestStart, colorClass + '70');
+          this.renderRequestPart(rm, requestStart, responseStart, colorClass);
+          this.renderRequestPart(rm, responseStart, end, colorClass + '70');
+
+          rm.write('</div>');
+
+          rm.write("</li>");
        };
 
        InteractionTree.prototype.getRequestSapStatistics = function (interaction, request) {
@@ -612,19 +540,18 @@ sap.ui.define([
 
           /* eslint-disable no-loop-func */
           if (requestDivElements.length) {
-              var oPopover = createEmptyPopOver();
+             var oPopover = createEmptyPopOver();
 
-              for (var i = 0; i < requestDivElements.length; i++) {
-                  requestDivElements[i].addEventListener('click', function (event) {
-                      initializePopOverRequestData.call(this);
-                      initializePopOverSapStatisticsData.call(this);
+             for (var i = 0; i < requestDivElements.length; i++) {
+                requestDivElements[i].addEventListener('click', function (event) {
+                   initializePopOverClientServerProgressBar.call(this);
+                   initializePopOverRequestData.call(this);
+                   initializePopOverSapStatisticsData.call(this);
 
-                      var requestBarElement = jQuery(this).children()[0];
-                      oPopover.openBy(requestBarElement);
-
-                      initializePopOverClientServerProgressBar.call(this);
-                  });
-              }
+                   var requestBarElement = jQuery(this).children()[0];
+                   oPopover.openBy(requestBarElement);
+                });
+             }
           }
           /* eslint-enable no-loop-func */
 
@@ -697,106 +624,54 @@ sap.ui.define([
 
           function initializePopOverClientServerProgressBar() {
 
-              var rm = Core.createRenderManager();
-              var request = that.getRequestFromElement(jQuery(this));
+             var request = that.getRequestFromElement(jQuery(this));
 
-              var fetchStartOffset = request.fetchStartOffset;
-              var duration = that.getRequestDuration(request);
+             var fetchStartOffset = request.fetchStartOffset;
+             var duration = that.getRequestDuration(request);
 
-              var start = fetchStartOffset + request.startTime;
-              var end = start + duration;
+             var start = fetchStartOffset + request.startTime;
+             var end = start + duration;
 
-              var requestStart = that.getRequestRequestStart(request) + fetchStartOffset;
-              var responseStart = that.getRequestResponseStart(request) + fetchStartOffset;
+             var requestStart = that.getRequestRequestStart(request) + fetchStartOffset;
+             var responseStart = that.getRequestResponseStart(request) + fetchStartOffset;
 
-              var preprocessingTime = requestStart - start;
-              var serverTotalTime = responseStart - requestStart;
+             var preprocessingTime = requestStart - start;
+             var serverTotalTime = responseStart - requestStart;
 
-              var clientTotalTime = end - responseStart;
+             var clientTotalTime = end - responseStart;
 
-              var serverTimePercent = Math.floor(100 * serverTotalTime / duration);
-              var clientTimePercent = Math.floor(100 * clientTotalTime / duration);
-              var preprocessingTimePercent = Math.floor(100 * preprocessingTime / duration);
+             var serverTimePercent = Math.floor(100 * serverTotalTime / duration);
+             var clientTimePercent = Math.floor(100 * clientTotalTime / duration);
+             var preprocessingTimePercent = Math.floor(100 *  preprocessingTime / duration);
 
-              rm.openStart("div")
-                  .class("sapUiInteractionTitle")
-                  .openEnd();
+             var titleTemplate = '<span class="sapUiInteractionTitleSection"><div class="sapUiInteractionTitleText">{Title}</div><div class="sapUiInteractionTitleSubText">{Subtitle}</div></span>';
 
+             var clientVsServerHTML = '<div class="sapUiInteractionTitle">';
 
-              [['PREPROCESSING', that.formatDuration(preprocessingTime)],
-                  ['SERVER', that.formatDuration(serverTotalTime)],
-                  ['CLIENT', that.formatDuration(clientTotalTime)]].forEach(function (item) {
+             clientVsServerHTML += titleTemplate.replace('{Title}', 'PREPROCESSING').replace('{Subtitle}', that.formatDuration(preprocessingTime));
+             clientVsServerHTML += titleTemplate.replace('{Title}', 'SERVER').replace('{Subtitle}', that.formatDuration(serverTotalTime));
+             clientVsServerHTML += titleTemplate.replace('{Title}', 'CLIENT').replace('{Subtitle}', that.formatDuration(clientTotalTime));
 
-                  rm.openStart("span")
-                      .class("sapUiInteractionTitleSection")
-                      .openEnd();
+             clientVsServerHTML += '</div>';
 
-                  rm.openStart("div")
-                      .class("sapUiInteractionTitleText")
-                      .openEnd()
-                      .text(item[0])
-                      .close("div");
+             clientVsServerTitle.setContent(clientVsServerHTML);
 
-                  rm.openStart("div")
-                      .class("sapUiInteractionTitleSubText")
-                      .openEnd()
-                      .text(item[1])
-                      .close("div");
+             var requestType = request.initiatorType || request.entryType;
 
-                  rm.close("span");
-              });
+             var colorClass = that.getRequestColorClass(requestType);
+             var colorClass70 = colorClass + '70';
 
-              rm.close("div");
+             var preprocessHTML = "<span class='sapUiSupportIntProgressBar " + colorClass70 + "'' style=\"width:calc(" + preprocessingTimePercent +
+                 "% - 1px)\"></span><span class='sapUiSupportIntProgressBarSeparator'></span>";
 
-              rm.flush(jQuery(".sapUiSupportPopoverTitle")[0], true);
-              rm.destroy();
+             var serverHTML = "<span class='sapUiSupportIntProgressBar " + colorClass + "' style=\"width:calc(" + serverTimePercent + "% - 1px)\"></span>" +
+                 "<span class='sapUiSupportIntProgressBarSeparator'></span>";
 
-              var requestType = request.initiatorType || request.entryType;
+             var clientHTML = "<span class='sapUiSupportIntProgressBar " + colorClass70 + "'' style=\"width:calc(" + clientTimePercent + "% - 1px)\"></span>";
 
-              var colorClass = that.getRequestColorClass(requestType);
-              var colorClass70 = colorClass + '70';
+             var progressBarHTML = "<div class='sapUiSupportIntProgressBarParent'>" + preprocessHTML + serverHTML + clientHTML + "</div>";
 
-              rm = Core.createRenderManager();
-
-              rm.openStart("div")
-                  .class("sapUiSupportIntProgressBarParent")
-                  .openEnd();
-
-              rm.openStart("span")
-                  .class("sapUiSupportIntProgressBar")
-                  .class(colorClass70)
-                  .style("width", "calc(" + preprocessingTimePercent + "% - 1px)")
-                  .openEnd()
-                  .close("span");
-
-              rm.openStart("span")
-                  .class("sapUiSupportIntProgressBarSeparator")
-                  .openEnd()
-                  .close("span");
-
-              rm.openStart("span")
-                  .class("sapUiSupportIntProgressBar")
-                  .class(colorClass)
-                  .style("width", "calc(" + serverTimePercent + "% - 1px)")
-                  .openEnd()
-                  .close("span");
-
-              rm.openStart("span")
-                  .class("sapUiSupportIntProgressBarSeparator")
-                  .openEnd()
-                  .close("span");
-
-              rm.openStart("span")
-                  .class("sapUiSupportIntProgressBar")
-                  .class(colorClass70)
-                  .style("width", "calc(" + clientTimePercent + "% - 1px)")
-                  .openEnd()
-                  .close("span");
-
-              rm.close("div");
-
-              rm.flush(jQuery(".sapUiSupportPopoverProgressBar")[0], true);
-              rm.destroy();
+             progressBar.setContent(progressBarHTML);
           }
 
           function createEmptyPopOver() {
@@ -813,21 +688,15 @@ sap.ui.define([
              }).addStyleClass('sapUiSupportPopover');
 
              oPopover.attachAfterOpen(function(oEvent){
-                oEvent.getSource().$().trigger("focus");
+                oEvent.getSource().$().focus();
              });
 
              return oPopover;
           }
 
           function createPopOverContent() {
-             clientVsServerTitle = new HTML({
-                 content: '<div class="sapUiSupportPopoverTitle"></div>',
-                 preferDOM: false
-             });
-             progressBar = new HTML({
-                 content: '<div class="sapUiSupportPopoverProgressBar"></div>',
-                 preferDOM: false
-             });
+             clientVsServerTitle = new HTML();
+             progressBar = new HTML();
              closeButton = new Button({
                 icon : IconPool.getIconURI("decline"),
                 type: "Transparent",
@@ -962,7 +831,7 @@ sap.ui.define([
              }).addStyleClass('sapUiSupportPopover');
 
              oPopover.attachAfterOpen(function(oEvent){
-                oEvent.getSource().$().trigger("focus");
+                oEvent.getSource().$().focus();
              });
              return oPopover;
           }
@@ -1017,25 +886,19 @@ sap.ui.define([
        };
 
        InteractionTree.prototype.renderRequestPart = function (rm, start, end, colorClass) {
-           if (this.actualStartTime > end || this.actualEndTime < start) {
-               return;
-           }
+          if (this.actualStartTime > end || this.actualEndTime < start) {
+             return;
+          }
 
-           end = Math.min(end, this.actualEndTime);
-           start = Math.max(start, this.actualStartTime);
+          end = Math.min(end, this.actualEndTime);
+          start = Math.max(start, this.actualStartTime);
 
-           var left = 100 / this.timeRange * (start - this.actualStartTime);
-           var right = 100 / this.timeRange * (end - this.actualStartTime);
-           var width = right - left;
+          var left = 100 / this.timeRange * (start - this.actualStartTime);
+          var right = 100 / this.timeRange * (end - this.actualStartTime);
+          var width = right - left;
 
-           rm.openStart("span")
-               .style("margin-left", left + "%")
-               .style("width", width + "%")
-               .class("sapUiInteractionTimeframe")
-               .class("sapUiInteractionTimeRequestFrame")
-               .class(colorClass)
-               .openEnd()
-               .close("span");
+          rm.write('<span style="margin-left: ' + left + '%; width: ' + width + '%" class="sapUiInteractionTimeframe sapUiInteractionTimeRequestFrame ' + colorClass + '"></span>');
+
        };
 
        InteractionTree.prototype.getRequestDuration = function(request) {
@@ -1095,28 +958,32 @@ sap.ui.define([
        };
 
        InteractionTree.prototype.renderIcon = function (rm, expanded) {
-           var icon = expanded ? InteractionTree.collapseIcon : InteractionTree.expandIcon;
+          var html = this.getIconHTML(expanded);
+          rm.write(html);
+       };
 
-           rm.openStart("span")
-               .attr("aria-hidden", "true")
-               .attr("expanded", expanded)
-               .class("sapUiIcon")
-               .class("sapUiInteractionTreeIcon");
+       InteractionTree.prototype.getIconHTML = function (expanded) {
 
+          var icon = expanded ? InteractionTree.collapseIcon : InteractionTree.expandIcon;
 
-           if (iconInfo && !iconInfo.suppressMirroring) {
-               rm.class("sapUiIconMirrorInRTL");
-           }
+          var classes = "sapUiIcon sapUiInteractionTreeIcon";
 
-           var iconInfo = IconPool.getIconInfo(icon);
+          if (iconInfo && !iconInfo.suppressMirroring) {
+             classes += " sapUiIconMirrorInRTL";
+          }
 
-           if (iconInfo) {
-               rm.attr("data-sap-ui-icon-content", iconInfo.content);
-               rm.style("font-family", "SAP-icons");
-           }
+          var html = '<span aria-hidden="true" expanded="' + expanded + '" class="' + classes + '" ';
 
-           rm.openEnd()
-               .close("span");
+          var iconInfo = IconPool.getIconInfo(icon);
+
+          if (iconInfo) {
+             html += 'data-sap-ui-icon-content="' + iconInfo.content + '"';
+             html += ' style="font-family:\'SAP-icons\'"';
+          }
+
+          html += "></span>";
+
+          return html;
        };
 
        return InteractionTree;

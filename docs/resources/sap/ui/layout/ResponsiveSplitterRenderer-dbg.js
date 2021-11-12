@@ -1,106 +1,94 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define([
-	"sap/ui/core/Core",
-	"sap/ui/core/IconPool"
-], function (Core, IconPool) {
+sap.ui.define(['sap/ui/core/IconPool'],
+	function (IconPool) {
 	"use strict";
-
-	var oResourceBundle = Core.getLibraryResourceBundle("sap.ui.layout");
 
 	/**
 	 * ResponsiveSplitter renderer.
 	 * @namespace
 	 */
-	var ResponsiveSplitterRenderer = {
-		apiVersion: 2
-	};
-
+	var ResponsiveSplitterRenderer = {};
 	IconPool.insertFontFaceStyle();
 
-	ResponsiveSplitterRenderer.render = function (oRm, oRespSplitter) {
-		oRm.openStart("div", oRespSplitter)
-			.class("sapUiResponsiveSplitter")
-			.style("width", oRespSplitter.getWidth())
-			.style("height", oRespSplitter.getHeight())
-			.openEnd();
+	ResponsiveSplitterRenderer.render = function (oRm, oControl) {
+		oRm.write("<div ");
+		oRm.addClass("sapUiResponsiveSplitter");
+		oRm.writeControlData(oControl);
+		oRm.addStyle("width", oControl.getWidth());
+		oRm.addStyle("height", oControl.getHeight());
+		oRm.writeStyles();
+		oRm.writeClasses();
+		oRm.write(">");
 
-		var aPages = oRespSplitter.getAggregation("_pages");
+		var aPages = oControl.getAggregation("_pages");
 
 		if (aPages) {
-			aPages.forEach(oRm.renderControl, oRm);
-			this.renderPaginator(oRm, oRespSplitter);
+			oControl.getAggregation("_pages").forEach(oRm.renderControl, oRm);
+			this.renderPaginator(oRm, oControl);
 		}
 
-		oRm.close("div");
+		oRm.write("</div>");
 	};
 
-	ResponsiveSplitterRenderer.renderPaginator = function (oRm, oRespSplitter) {
-		var iMaxPageCount = oRespSplitter._getMaxPageCount(),
-			aPages = oRespSplitter.getAggregation("_pages") || [];
+	ResponsiveSplitterRenderer.renderPaginator = function (oRm, oControl) {
+		var bpCount = oControl._getMaxPageCount(),
+			aPages = oControl.getAggregation("_pages") || [],
+			oBundle = sap.ui.getCore().getLibraryResourceBundle('sap.ui.layout');
 
-		// Render paginator when there are more than one pages.
-		if (iMaxPageCount <= 1) {
-			return;
-		}
+		oRm.write("<div ");
+		oRm.writeAttribute("role", "navigation");
+		oRm.addClass("sapUiResponsiveSplitterPaginator");
+		oRm.writeClasses();
+		oRm.write(">");
 
-		oRm.openStart("div")
-			.attr("role", "navigation")
-			.class("sapUiResponsiveSplitterPaginator")
-			.openEnd();
+		oRm.write("<div ");
+		oRm.addClass("sapUiResponsiveSplitterPaginatorNavButton");
+		oRm.addClass("sapUiResponsiveSplitterHiddenPaginatorButton");
+		oRm.addClass("sapUiResponsiveSplitterPaginatorButtonBack");
+		oRm.writeClasses();
+		oRm.write("></div>");
 
-		// Paginator Button Back
-		oRm.openStart("div")
-			.class("sapUiResponsiveSplitterPaginatorNavButton")
-			.class("sapUiResponsiveSplitterHiddenPaginatorButton")
-			.class("sapUiResponsiveSplitterPaginatorButtonBack")
-			.openEnd()
-			.close("div");
-
-		oRm.openStart("div")
-			.class("sapUiResponsiveSplitterPaginatorButtons")
-			.attr("role", "radiogroup")
-			.attr("aria-label", oResourceBundle.getText("RESPONSIVE_SPLITTER_ARIA_PAGINATOR_LABEL"));
-
+		oRm.write("<div ");
+		oRm.addClass("sapUiResponsiveSplitterPaginatorButtons");
+		oRm.writeClasses();
+		oRm.writeAttribute("role", "radiogroup");
+		oRm.writeAttributeEscaped("aria-label", oBundle.getText("RESPONSIVE_SPLITTER_ARIA_PAGINATOR_LABEL"));
 		if (aPages.length > 0) {
-			oRm.attr("aria-controls", aPages[0].getParent().getId());
+			oRm.writeAttribute("aria-controls", aPages[0].getParent().getId());
 		}
+		oRm.write(">");
 
-		oRm.openEnd();
-
-		for (var i = 0; i < iMaxPageCount; i++) {
-			oRm.openStart("div")
-				.attr("tabindex", 0)
-				.attr("page-index", i);
-
+		for (var i = 0; i < bpCount; i++) {
+			oRm.write("<div tabindex='0' ");
+			oRm.write("page-index='" + i + "'");
 			if (i === 0) {
-				oRm.class("sapUiResponsiveSplitterPaginatorSelectedButton");
+				oRm.addClass("sapUiResponsiveSplitterPaginatorSelectedButton");
 			}
-
-			oRm.class("sapUiResponsiveSplitterHiddenElement")
-				.class("sapUiResponsiveSplitterPaginatorButton")
-				.attr("role", "radio")
-				.attr("aria-checked", false)
-				.openEnd()
-				.close("div");
+			oRm.addClass("sapUiResponsiveSplitterHiddenElement");
+			oRm.addClass("sapUiResponsiveSplitterPaginatorButton");
+			oRm.writeClasses();
+			oRm.writeAttribute("role", "radio");
+			oRm.writeAttribute("aria-checked", false);
+			oRm.write("></div>");
 		}
 
-		oRm.close("div");
+		oRm.write("</div>");
 
-		// Paginator Button Forward
-		oRm.openStart("div")
-			.class("sapUiResponsiveSplitterPaginatorNavButton")
-			.class("sapUiResponsiveSplitterHiddenPaginatorButton")
-			.class("sapUiResponsiveSplitterPaginatorButtonForward")
-			.openEnd()
-			.close("div");
+		oRm.write("<div ");
+		oRm.addClass("sapUiResponsiveSplitterPaginatorNavButton");
+		oRm.addClass("sapUiResponsiveSplitterHiddenPaginatorButton");
+		oRm.addClass("sapUiResponsiveSplitterPaginatorButtonForward");
+		oRm.writeClasses();
+		oRm.write("></div>");
 
-		oRm.close("div");
+		oRm.write("</div>");
 	};
 
 	return ResponsiveSplitterRenderer;
+
 }, /* bExport= */ true);

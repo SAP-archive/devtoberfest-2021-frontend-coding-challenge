@@ -1,11 +1,11 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
-sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/library', './library', 'sap/ui/core/Core'],
-	function(Renderer, coreLibrary, library, Core) {
+sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/library'],
+	function(Renderer, coreLibrary) {
 	"use strict";
 
 
@@ -19,12 +19,6 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/library', './library', 'sap/
 	 * String to prefix CSS class for number status.
 	 */
 	var _sCSSPrefixObjNumberStatus = 'sapMObjectNumberStatus';
-
-	// shortcut for sap.m.EmptyIndicator
-	var EmptyIndicatorMode = library.EmptyIndicatorMode;
-
-	// shortcut for library resource bundle
-	var oRb = Core.getLibraryResourceBundle("sap.m");
 
 	/**
 	 * ObjectNumber renderer.
@@ -43,29 +37,15 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/library', './library', 'sap/
 	ObjectNumberRenderer.render = function(oRm, oON) {
 		var sTooltip = oON.getTooltip_AsString(),
 			sTextDir = oON.getTextDirection(),
-			sTextAlign = oON.getTextAlign(),
-			oAccAttributes = {
-				role: "group",
-				roledescription: sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("OBJECTNUMBER_NAME")
-			};
+			sTextAlign = oON.getTextAlign();
 
 		oRm.openStart("div", oON);
 		oRm.class("sapMObjectNumber");
-
-		if (oON._isActive()) {
-			oRm.class("sapMObjectNumberActive");
-			oRm.attr("tabindex", "0");
-			oAccAttributes.role = "button";
-		}
 
 		oRm.class(_sCSSPrefixObjNumberStatus + oON.getState());
 
 		if (oON.getEmphasized()) {
 			oRm.class("sapMObjectNumberEmph");
-		}
-
-		if (oON.getInverted()) {
-			oRm.class("sapMObjectNumberInverted");
 		}
 
 		if (sTooltip) {
@@ -82,45 +62,29 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/library', './library', 'sap/
 			oRm.style("text-align", sTextAlign);
 		}
 
-		if (oON._hasExternalLabelling()) {
-			oAccAttributes["labelledby"] = {
-				value: oON._generateSelfLabellingIds(),
-				append: true
-			};
+		// ARIA
+		// when the status is "None" there is nothing for reading
+		if (oON.getState() !== ValueState.None) {
+			oRm.accessibilityState({
+			describedby: oON.getId() + "-state"
+			});
 		}
-
-		oRm.accessibilityState(oON, oAccAttributes);
 
 		oRm.openEnd();
 
-		oRm.openStart("span", oON.getId() + "-inner");
-		oRm.class("sapMObjectNumberInner");
-		oRm.openEnd();
-
-		if (oON.getEmptyIndicatorMode() !== EmptyIndicatorMode.Off && !oON.getNumber()) {
-			this.renderEmptyIndicator(oRm, oON);
-		} else {
-			this.renderText(oRm, oON);
-			this.renderUnit(oRm, oON);
-		}
-
-		oRm.close("span");
-
-		this.renderEmphasizedInfoElement(oRm, oON);
+		this.renderText(oRm, oON);
+		oRm.text("  "); // space between the number text and unit
+		this.renderUnit(oRm, oON);
 		this.renderHiddenARIAElement(oRm, oON);
 
 		oRm.close("div");
 	};
 
 	ObjectNumberRenderer.renderText = function(oRm, oON) {
-		var sUnit = oON.getUnit() || oON.getNumberUnit();
-		oRm.openStart("span", oON.getId() + "-number");
+		oRm.openStart("span");
 		oRm.class("sapMObjectNumberText");
 		oRm.openEnd();
 		oRm.text(oON.getNumber());
-		if (sUnit !== "") {
-			oRm.text(" ");
-		}
 		oRm.close("span");
 	};
 
@@ -128,24 +92,12 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/library', './library', 'sap/
 		var sUnit = oON.getUnit() || oON.getNumberUnit();
 
 		if (sUnit !== "") {
-			oRm.openStart("span", oON.getId() + "-unit");
+			oRm.openStart("span");
 			oRm.class("sapMObjectNumberUnit");
 			oRm.openEnd();
 			oRm.text(sUnit);
 			oRm.close("span");
 		}
-	};
-
-	ObjectNumberRenderer.renderEmphasizedInfoElement = function(oRm, oON) {
-		if (!oON.getEmphasized()) {
-			return;
-		}
-
-		oRm.openStart("span", oON.getId() + "-emphasized");
-		oRm.class("sapUiPseudoInvisibleText");
-		oRm.openEnd();
-		oRm.text(sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("OBJECTNUMBER_EMPHASIZED"));
-		oRm.close("span");
 	};
 
 	ObjectNumberRenderer.renderHiddenARIAElement = function(oRm, oON) {
@@ -155,36 +107,10 @@ sap.ui.define(['sap/ui/core/Renderer', 'sap/ui/core/library', './library', 'sap/
 		}
 
 		oRm.openStart("span", oON.getId() + "-state");
-		oRm.class("sapUiPseudoInvisibleText");
+		oRm.class("sapUiInvisibleText");
+		oRm.attr("aria-hidden", false);
 		oRm.openEnd();
 		oRm.text(oON._getStateText());
-		oRm.close("span");
-	};
-
-	/**
-	 * Renders the empty text indicator.
-	 *
-	 * @param {sap.ui.core.RenderManager} oRm The RenderManager that can be used for writing to the render output buffer.
-	 * @param {sap.m.ObjectNumberRenderer} oON An object representation of the control that should be rendered.
-	 */
-	ObjectNumberRenderer.renderEmptyIndicator = function(oRm, oON) {
-		oRm.openStart("span");
-			oRm.class("sapMEmptyIndicator");
-			if (oON.getEmptyIndicatorMode() === EmptyIndicatorMode.Auto) {
-				oRm.class("sapMEmptyIndicatorAuto");
-			}
-			oRm.openEnd();
-			oRm.openStart("span");
-			oRm.attr("aria-hidden", true);
-			oRm.openEnd();
-				oRm.text(oRb.getText("EMPTY_INDICATOR"));
-			oRm.close("span");
-			//Empty space text to be announced by screen readers
-			oRm.openStart("span");
-			oRm.class("sapUiPseudoInvisibleText");
-			oRm.openEnd();
-				oRm.text(oRb.getText("EMPTY_INDICATOR_TEXT"));
-			oRm.close("span");
 		oRm.close("span");
 	};
 

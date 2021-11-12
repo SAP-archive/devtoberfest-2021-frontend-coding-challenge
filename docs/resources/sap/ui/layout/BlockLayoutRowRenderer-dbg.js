@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,9 +11,7 @@ sap.ui.define(['./library'],
 		// shortcut for sap.ui.layout.BlockBackgroundType
 		var BlockBackgroundType = library.BlockBackgroundType;
 
-		var BlockLayoutRowRenderer = {
-			apiVersion: 2
-		};
+		var BlockLayoutRowRenderer = {};
 
 		BlockLayoutRowRenderer.render = function (oRm, oBlockLayoutRow){
 			this.startRow(oRm, oBlockLayoutRow);
@@ -22,26 +20,30 @@ sap.ui.define(['./library'],
 		};
 
 		BlockLayoutRowRenderer.startRow = function (oRm, oBlockLayoutRow) {
-			oRm.openStart("div", oBlockLayoutRow)
-				.class("sapUiBlockLayoutRow");
+			oRm.write("<div");
+			oRm.writeControlData(oBlockLayoutRow);
+			oRm.addClass("sapUiBlockLayoutRow");
 			this.addRowRenderingClass(oRm, oBlockLayoutRow);
-			oRm.openEnd();
+			oRm.writeStyles();
+			oRm.writeClasses();
+			oRm.write(">");
 		};
 
 		BlockLayoutRowRenderer.addRowRenderingClass = function (oRm, oBlockLayoutRow) {
 			if (oBlockLayoutRow.getScrollable()) {
-				oRm.class("sapUiBlockScrollingRow");
+				oRm.addClass("sapUiBlockScrollingRow");
 				if (oBlockLayoutRow.getContent().length >= 6) {
-					oRm.class("sapUiBlockScrollingNarrowCells");
+					oRm.addClass("sapUiBlockScrollingNarrowCells");
 				}
 			} else {
-				oRm.class("sapUiBlockHorizontalCellsRow");
+				oRm.addClass("sapUiBlockHorizontalCellsRow");
 			}
 		};
 
 		BlockLayoutRowRenderer.renderContent = function (oRm, oBlockLayoutRow) {
 			var aContent = oBlockLayoutRow.getContent(),
 				bScrollable = oBlockLayoutRow.getScrollable(),
+				oBackgrounds = BlockBackgroundType,
 				sLayoutBackground = oBlockLayoutRow.getParent().getBackground(),
 				aAccentedCells = oBlockLayoutRow.getAccentCells(),
 				iContentCounter = 0,
@@ -57,16 +59,13 @@ sap.ui.define(['./library'],
 			});
 
 			switch (sLayoutBackground) {
-				case BlockBackgroundType.Mixed:
-					if (aAccentedCells.length > 0) {
-						oBlockLayoutRow._processMixedCellStyles(aAccentedCells[aAccentedCells.length - 1], aContent);
-					}
+				case oBackgrounds.Mixed:
+					oBlockLayoutRow._processMixedCellStyles(aAccentedCells[0], aContent);
 					break;
-				case BlockBackgroundType.Accent :
+				case oBackgrounds.Accent :
 					oBlockLayoutRow._processAccentCellStyles(aAccentedCells, aContent);
 					break;
 			}
-
 			var arrangement = oBlockLayoutRow._getCellArangementForCurrentSize();
 			if (bScrollable) {
 				/**
@@ -77,9 +76,10 @@ sap.ui.define(['./library'],
 			} else if (arrangement) {
 				for (var i = 0; i < arrangement.length; i++) {
 					var aSubRow = arrangement[i];
-					oRm.openStart("div");
-					oRm.style("display", "flex");
-					oRm.openEnd();
+					oRm.write("<div ");
+					oRm.addStyle("display", "flex");
+					oRm.writeStyles();
+					oRm.write(">");
 
 					for (var j = 0; j < aSubRow.length; j++) {
 						flexWidth = aSubRow[j];
@@ -87,13 +87,13 @@ sap.ui.define(['./library'],
 						oRm.renderControl(aContent[iContentCounter]);
 						iContentCounter++;
 					}
-					oRm.close("div");
+					oRm.write("</div>");
 				}
 			}
 		};
 
 		BlockLayoutRowRenderer.endRow = function (oRm) {
-			oRm.close("div");
+			oRm.write("</div>");
 		};
 
 		return BlockLayoutRowRenderer;
