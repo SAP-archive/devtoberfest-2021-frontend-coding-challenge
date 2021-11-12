@@ -8,7 +8,7 @@ resources:
             webapp: webapp
 framework:
     name: SAPUI5
-    version: 1.76.1
+    version: 1.96.0
     libraries:
         - name: sap.ui.core
         - name: sap.m
@@ -16,6 +16,16 @@ framework:
         - name: sap.tnt
         - name: sap.ui.layout
         - name: themelib_sap_fiori_3
+builder:
+  customTasks:
+  - name: ui5-task-librarian
+    beforeTask: replaceCopyright
+    configuration:
+        debug: false
+        strict: false
+  - name: ui5-task-cachebuster-indexing
+    afterTask: generateCachebusterInfo
+    
 server:
     customMiddleware:
         - name: ui5-middleware-livereload

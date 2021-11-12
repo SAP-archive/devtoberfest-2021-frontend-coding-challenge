@@ -33,18 +33,19 @@
         }
     },
     "sap.ui5": {
-        "flexEnabled": true,
+        "flexEnabled": false,
         "rootView": {
             "viewName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view.MainView",
             "type": "XML",
-            "id": "idAppControl"
+            "id": "idAppControl",
+            "async" : true
         },
         "dependencies": {
             "minUI5Version": "1.60.0",
             "libs": {
                 "sap.ui.core": {},
                 "sap.m": {},
-                "sap.ui.layout": {}
+                "sap.ui.layout": { "lazy": true }
             }
         },
         "contentDensities": {
@@ -76,7 +77,8 @@
                 "viewType": "XML",
                 "viewPath": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view",
                 "controlId": "idAppControl",
-                "controlAggregation": "pages"
+                "controlAggregation": "pages",
+                "async" : true
             },
             "routes": [
                 {

@@ -6,6 +6,8 @@
     "license": "Apache-2.0",
     "scripts": {
         "start": "ui5 serve --open index.html",
+        "start:dist": "serve dist",
+        "start:docs": "serve docs",
         "serve": "ui5 serve",
         "build": "ui5 build --clean-dest --dest docs self-contained --all ",
         "prettier": "prettier -w .",
@@ -15,19 +17,25 @@
         "karma-ci": "karma start karma-ci.conf.js"
     },
     "devDependencies": {
-        "@ui5/cli": "^2.11.2",
-        "karma": "^6.3.4",
+        "@ui5/cli": "^2.14.0",
+        "karma": "^6.3.8",
         "karma-chrome-launcher": "^3.1.0",
         "karma-coverage": "^2.0.3",
         "karma-ui5": "^2.3.4",
         "npm-run-all": "^4.1.5",
-        "prettier": "^2.3.2",
+        "prettier": "^2.4.1",
+        "serve": "^13.0.2",
         "shx": "^0.3.3",
-        "ui5-middleware-livereload": "^0.5.4"
+        "ui5-middleware-livereload": "^0.5.8",
+        "ui5-task-cachebuster-indexing": "^1.0.2",
+        "ui5-task-librarian": "^1.0.1",
+        "webp-converter": "^2.3.3"
     },
     "ui5": {
         "dependencies": [
-            "ui5-middleware-livereload"
+            "ui5-task-librarian",
+            "ui5-middleware-livereload",
+            "ui5-task-cachebuster-indexing"
         ]
     }
 }

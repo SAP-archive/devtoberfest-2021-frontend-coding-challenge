@@ -1,4 +1,4 @@
-sap.ui.define(["sap/ui/test/opaQunit", "./pages/Main"], function (opaTest) {
+sap.ui.define(["sap/ui/test/opaQunit"], function (opaTest) {
     "use strict";
 
     opaTest("Should see the product list", function (Given, When, Then) {

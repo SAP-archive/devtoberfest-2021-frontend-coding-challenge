@@ -8,6 +8,11 @@
 @_sap_m_ListItemBase_SelectionControlWidth: 3rem;
 @_sap_m_ListItemBase_SelectionControlHeight: 3rem;
 @_sap_m_ListItemBase_compact_SelectionControlHeight: 2rem;
+@_sap_m_ListItemBase_Highlight_InformationColor: @sapUiInformationBorder;
+@_sap_m_ListItemBase_Navigated: @sapUiListSelectionBorderColor;
+@_sap_m_ListItemBase_Detail_Delete_MarginLeft: 0.125rem;
+@_sap_m_ListItemBase_Focus_Outline: @sapUiContentFocusWidth @sapUiContentFocusStyle @sapUiContentFocusColor;
+@_sap_m_ListItemBase_Focus_OffsetWithGap: calc(-@sapUiContentFocusWidth ~"- 0.0625rem");
 
 .sapMLIB,
 .sapMLIBImgNav {
@@ -27,18 +32,19 @@
 
 .sapMLIBIconDet,
 .sapMLIBIconDel {
-	margin-left: 0.125rem;
+	margin-left: @_sap_m_ListItemBase_Detail_Delete_MarginLeft;
 }
 
 .sapMLIBContent {
 	-webkit-box-flex: 1;
 	flex: 1 1 auto;
 	max-width: 100%;
+	overflow: hidden;
 }
 
 .sapMLIBFocusable:focus {
-	outline: 1px dotted @sapUiContentFocusColor;
-	outline-offset: -2px;
+	outline: @_sap_m_ListItemBase_Focus_Outline;
+	outline-offset: @_sap_m_ListItemBase_Focus_OffsetWithGap;
 }
 
 /* makes the focus outline visible when hightlight is used */
@@ -49,27 +55,10 @@
 	top: 2px;
 }
 
+.sapMListTblRow:not(.sapMLIBFocusable):focus,
 .sapMLIB:not(.sapMLIBFocusable):focus,
 .sapMListTblSubRow:focus {
 	outline: none;
-}
-
-/* IE ignores outline-offset. Use an overlay: */
-.sapMLIBLegacyOutline:focus {
-	outline: none;
-	position: relative;
-}
-
-.sapMLIBLegacyOutline:focus::before {
-	content: "";
-	border: 0;
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	pointer-events: none;
-	border: 1px dotted @sapUiContentFocusColor;
 }
 
 .sapMLIBActionable,
@@ -98,6 +87,8 @@
 	bottom: 0;
 	left: 0;
 	top: 0;
+	border-right: 0.0625rem solid @sapUiListBackground;
+	box-sizing: border-box;
 }
 
 .sapMLIBHighlight + .sapMLIBContent,
@@ -126,7 +117,7 @@
 }
 
 .sapMLIBHighlightInformation {
-	background: @sapUiInformationBorder;
+	background: @_sap_m_ListItemBase_Highlight_InformationColor;
 }
 .sapMLIBHighlightSuccess {
 	background: @sapUiSuccessBorder;
@@ -161,11 +152,6 @@
 }
 .sapMLIBHighlightIndication08 {
 	background: @sapUiIndication8;
-}
-
-/* IE ignores outline-offset. Use an overlay: */
-.sapMLIBFocusable.sapMLIBLegacyOutline:focus {
-	outline: none;
 }
 
 :not(.sapMListModeDelete) > .sapMLIB.sapMLIBTypeNavigation {
@@ -292,7 +278,9 @@
 	color: @sapUiContentNonInteractiveIconColor;
 }
 
-.sapMLIBActive .sapMLIBImgNav {
+.sapMLIBActive .sapMLIBImgNav,
+.sapMLIBActive .sapMLIBIconDet .sapMBtnIcon,
+.sapMLIBActive .sapMLIBIconDel .sapMBtnIcon {
 	color: @sapUiListActiveTextColor;
 }
 
@@ -333,7 +321,7 @@
 	right: 0;
 	top: 0;
 	bottom: 0;
-	background-color: @sapUiSelected;
+	background-color: @_sap_m_ListItemBase_Navigated;
 }
 
 // to make the focus outline visible when navigated=true
