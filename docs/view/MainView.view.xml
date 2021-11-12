@@ -34,7 +34,7 @@
     </tnt:header>
     <tnt:mainContents>
       <ScrollContainer id="all-page" horizontal="false" vertical="true" height="100%">
-        <List id="all-list" items="{sample>/}" >
+        <List id="all-list" items="{sample>/}">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
               <Title id="all-bar-info" text="{i18n>btpservices}" level="H4" /> 
