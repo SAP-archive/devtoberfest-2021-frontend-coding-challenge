@@ -1,7 +1,7 @@
 {
     "_version": "1.21.0",
     "sap.app": {
-        "id": "com.devtoberfest.devtoberfests2021FrontendCodingChallenge",
+        "id": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
         "type": "application",
         "i18n": "i18n/i18n.properties",
         "applicationVersion": {
