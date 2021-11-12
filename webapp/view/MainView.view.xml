@@ -17,7 +17,7 @@
           </layoutData>
         </Text>
         <ToolbarSpacer />
-        <Image src="resources/img/github.png" height="50%" press="goToRepo" />
+        <Image src="resources/img/github-min.png" height="50%" press="goToRepo" />
         <Link text="{i18n>forkMe}" target="_blank"
           href="https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge"
           visible="{= ${device>/orientation/landscape} || !${device>/browser/mobile} }" class="sapUiMediumMarginEnd" />
