@@ -3,8 +3,10 @@ sap.ui.define(
         "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/controller/BaseController",
         "sap/ui/model/json/JSONModel",
         "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/model/formatter",
+        "sap/ui/model/Filter",
+        "sap/ui/model/FilterOperator",
     ],
-    function (Controller, JSONModel, formatter) {
+    function (Controller, JSONModel, formatter, Filter, FilterOperator) {
         "use strict";
 
         return Controller.extend(
@@ -31,23 +33,23 @@ sap.ui.define(
                     const value = oEvent.getParameter("newValue");
                     const list = this.getView().byId("all-list");
                     const listBinding = list.getBinding("items");
-                    const nameFilter = new sap.ui.model.Filter({
+                    const nameFilter = new Filter({
                         path: "name",
-                        operator: sap.ui.model.FilterOperator.Contains,
+                        operator: FilterOperator.Contains,
                         value1: value,
                     });
-                    const descFilter = new sap.ui.model.Filter({
+                    const descFilter = new Filter({
                         path: "description",
-                        operator: sap.ui.model.FilterOperator.Contains,
+                        operator: FilterOperator.Contains,
                         value1: value,
                     });
-                    const stateFilter = new sap.ui.model.Filter({
+                    const stateFilter = new Filter({
                         path: "category",
-                        operator: sap.ui.model.FilterOperator.Contains,
+                        operator: FilterOperator.Contains,
                         value1: value,
                     });
                     listBinding.filter(
-                        new sap.ui.model.Filter({
+                        new Filter({
                             filters: [nameFilter, descFilter, stateFilter],
                             and: false,
                         })

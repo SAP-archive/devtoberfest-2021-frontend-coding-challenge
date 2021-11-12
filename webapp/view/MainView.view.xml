@@ -26,7 +26,6 @@
 				<Image
 					src="resources/img/github.png"
 					height="50%"
-					press="goToRepo"
 				/>
 				<Link
 					text="{i18n>forkMe}"
@@ -71,6 +70,9 @@
 				<List
 					id="all-list"
 					items="{sample>/}"
+					growing="true"
+					growingScrollToLoad="true"
+					growingThreshold="12"
 				>
 					<headerToolbar>
 						<OverflowToolbar id="all-list-bar">
