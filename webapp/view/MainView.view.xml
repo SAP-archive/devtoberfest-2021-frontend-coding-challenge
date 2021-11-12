@@ -34,7 +34,6 @@
     </tnt:header>
     <tnt:mainContents>
       <ScrollContainer id="all-page" horizontal="false" vertical="true" height="100%">
-
         <List id="all-list" items="{sample>/}">
           <headerToolbar>
             <OverflowToolbar id="all-list-bar">
