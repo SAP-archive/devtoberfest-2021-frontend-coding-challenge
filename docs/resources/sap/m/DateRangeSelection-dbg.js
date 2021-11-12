@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -54,14 +54,16 @@ sap.ui.define([
 	 * <b>Note:</b>
 	 * The control is not UTC aware and the selected date range starts from 00:00:00:000 of the first date and ends in 23:59:59:999 on the second date.
 	 *
+	 * The application developer should add dependency to <code>sap.ui.unified</code> library
+	 * on application level to ensure that the library is loaded before the module dependencies will be required.
 	 * The {@link sap.ui.unified.Calendar} is used internally only if the
 	 * <code>DateRangeSelection</code> is opened (not used for the initial rendering).
 	 * If the <code>sap.ui.unified</code> library is not loaded before the
 	 * <code>DateRangeSelection</code> is opened, it will be loaded upon opening.
-	 * This could lead to a waiting time when the <code>DateRangeSelection</code> is
+	 * This could lead to CSP compliance issues and adds an additional waiting time when the <code>DateRangeSelection</code> is
 	 * opened for the first time. To prevent this, apps using the
 	 * <code>DateRangeSelection</code> should also load the <code>sap.ui.unified</code>
-	 * library.
+	 * library in advance.
 	 *
 	 * <h3>Usage</h3>
 	 *
@@ -81,7 +83,7 @@ sap.ui.define([
 	 *
 	 * The user can enter a date by:
 	 * <ul><li>Using the calendar that opens in a popup</li>
-	 * <li>Typing it in directly in the input field (not available for mobile devices)</li></ul>
+	 * <li>Typing it in directly in the input field</li></ul>
 	 *
 	 * On app level, there are two options to provide a date for the
 	 * <code>DateRangeSelection</code> - date range as a string to the
@@ -124,8 +126,8 @@ sap.ui.define([
 	 * compact mode and provides a touch-friendly size in cozy mode.
 	 *
 	 * @extends sap.m.DatePicker
-	 * @version 1.76.0
-	 * @version 1.76.0
+	 * @version 1.96.0
+	 * @version 1.96.0
 	 *
 	 * @constructor
 	 * @public
@@ -171,11 +173,6 @@ sap.ui.define([
 		ENDASH = String.fromCharCode(8211),
 		EMDASH = String.fromCharCode(8212);
 
-	/**
-	 * This file defines behavior for the control
-	 * @public
-	 */
-
 	/* eslint-disable no-lonely-if */
 
 	DateRangeSelection.prototype.init = function(){
@@ -202,6 +199,10 @@ sap.ui.define([
 		if (oCalendar instanceof CustomYearPicker) {
 			oCalendar._getYearPicker().setIntervalSelection(true);
 		}
+
+		this._getCalendar().attachWeekNumberSelect(this._handleWeekSelect, this);
+		this._getCalendar().getSelectedDates()[0].setStartDate(this._oDateRange.getStartDate());
+		this._getCalendar().getSelectedDates()[0].setEndDate(this._oDateRange.getEndDate());
 	};
 
 	DateRangeSelection.prototype.onkeypress = function(oEvent){
@@ -289,13 +290,13 @@ sap.ui.define([
 	 * If this property is used, the <code>dateValue</code> property should not be changed from the caller.
 	 *
 	 * @param {string} sValue The new value of the input.
-	 * @return {sap.m.DateRangeSelection} <code>this</code> to allow method chaining.
+	 * @return {this} <code>this</code> to allow method chaining.
 	 * @public
 	 */
 	DateRangeSelection.prototype.setValue = function(sValue) {
 
 		if (sValue !== this.getValue()) {
-			this._lastValue = sValue;
+			this.setLastValue(sValue);
 		} else {
 			return this;
 		}
@@ -369,7 +370,7 @@ sap.ui.define([
 	 * <b>Note:</b> Property <code>valueFormat</code> is not supported in the <code>sap.m.DateRangeSelection</code> control.
 	 *
 	 * @param {string} sValueFormat New value for property valueFormat
-	 * @return {sap.m.DateRangeSelection} <code>this</code> to allow method chaining
+	 * @return {this} <code>this</code> to allow method chaining
 	 * @public
 	 */
 	DateRangeSelection.prototype.setValueFormat = function(sValueFormat) {
@@ -388,7 +389,8 @@ sap.ui.define([
 
 		// if displayFormat changes the value must be formatted again
 
-		this.setProperty("displayFormat", sDisplayFormat, true); // no rerendering
+		DatePicker.prototype.setDisplayFormat.apply(this, arguments);
+
 		var sOutputValue = this._formatValue(this.getDateValue(), this.getSecondDateValue());
 
 		// as value also used displayFormat update value too
@@ -446,12 +448,12 @@ sap.ui.define([
 	 * <b>Note:</b> If this property is used, the <code>value</code> property should not be changed from the caller.
 	 *
 	 * @param {object} oDateValue New value for property <code>dateValue</code>
-	 * @return {sap.m.DateRangeSelection} <code>this</code> to allow method chaining.
+	 * @return {this} <code>this</code> to allow method chaining.
 	 * @public
 	 */
 	DateRangeSelection.prototype.setDateValue = function(oDateValue) {
 
-		if (this._isValidDate(oDateValue)) {
+		if (!this._isValidDate(oDateValue)) {
 			throw new Error("Date must be a JavaScript date object; " + this);
 		}
 
@@ -468,7 +470,7 @@ sap.ui.define([
 
 	DateRangeSelection.prototype.setSecondDateValue = function(oSecondDateValue) {
 
-		if (this._isValidDate(oSecondDateValue)) {
+		if (!this._isValidDate(oSecondDateValue)) {
 			throw new Error("Date must be a JavaScript date object; " + this);
 		}
 
@@ -716,12 +718,12 @@ sap.ui.define([
 			}
 		}
 
-		if (sValue !== this._lastValue) {
+		if (sValue !== this.getLastValue()) {
 			if (this.getDomRef() && (this._$input.val() !== sValue)) {
 				this._$input.val(sValue);
 				this._curpos = this._$input.cursorPos();
 			}
-			this._lastValue = sValue;
+			this.setLastValue(sValue);
 			this.setProperty("value", sValue, true);
 			if (this._bValid) {
 				this.setProperty("dateValue", _normalizeDateValue(aDates[0]), true);
@@ -765,6 +767,10 @@ sap.ui.define([
 	DateRangeSelection.prototype._getInputValue = function(sValue) {
 
 		sValue = (typeof sValue == "undefined") ? this._$input.val() : sValue.toString();
+
+		if (!sValue) {
+			return "";
+		}
 
 		var aDates = this._parseValue(sValue);
 		sValue = this._formatValue( aDates[0], aDates[1]);
@@ -846,7 +852,7 @@ sap.ui.define([
 						this._curpos = sValue.length;
 						this._$input.cursorPos(this._curpos);
 					}
-				}else if (!this._bValid){
+				} else if (!this._bValid){
 					// wrong input before open calendar
 					sValue = this._formatValue( oDate1, oDate2 );
 					if (sValue != this._$input.val()) {
@@ -857,6 +863,9 @@ sap.ui.define([
 						_fireChange.call(this, true);
 					}
 				}
+
+				this._oDateRange.setStartDate(this._getCalendar().getSelectedDates()[0].getStartDate());
+				this._oDateRange.setEndDate(this._getCalendar().getSelectedDates()[0].getEndDate());
 
 				// close popup and focus input after change event to allow application to reset value state or similar things
 				this._oPopup.close();
@@ -877,9 +886,27 @@ sap.ui.define([
 		this._selectDate();
 	};
 
+	DateRangeSelection.prototype._handleWeekSelect = function(oEvent){
+		var oSelectedDates = oEvent.getParameter("weekDays"),
+			oSelectedStartDate = oSelectedDates.getStartDate(),
+			oSelectedEndDate = oSelectedDates.getEndDate();
+
+		if (this.getShowFooter()) {
+			this._oPopup.getBeginButton().setEnabled(!!(oSelectedStartDate && oSelectedEndDate));
+			return;
+		}
+
+		this._getCalendar().getSelectedDates()[0].setStartDate(oSelectedStartDate);
+		this._getCalendar().getSelectedDates()[0].setEndDate(oSelectedEndDate);
+		this._oDateRange.setStartDate(oSelectedStartDate);
+		this._oDateRange.setEndDate(oSelectedEndDate);
+
+		this._selectDate();
+	};
+
 	/**
 	 * @see sap.ui.core.Control#getAccessibilityInfo
-	 * @returns {Object} Current accessibility state of the control
+	 * @returns {object} Current accessibility state of the control
 	 * @protected
 	 */
 	DateRangeSelection.prototype.getAccessibilityInfo = function() {
@@ -892,6 +919,7 @@ sap.ui.define([
 				sValue = this._formatValue(oDate, this.getSecondDateValue());
 			}
 		}
+		oInfo.type = sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("ACC_CTR_TYPE_DATERANGEINPUT");
 		oInfo.description = [sValue, oRenderer.getLabelledByAnnouncement(this), oRenderer.getDescribedByAnnouncement(this)].join(" ").trim();
 		return oInfo;
 	};
@@ -904,7 +932,7 @@ sap.ui.define([
 		var sValue = this._formatValue(oDateValue, oSecondDateValue);
 
 		if (sValue !== this.getValue()) {
-			this._lastValue = sValue;
+			this.setLastValue(sValue);
 		}
 		// Set the property in any case but check validity on output
 		this.setProperty("value", sValue);
@@ -956,7 +984,7 @@ sap.ui.define([
 		if ((oDate && ( iFirstTimestamp < this._oMinDate.getTime() || iFirstTimestamp > this._oMaxDate.getTime())) ||
 				(oSecondDate && ( iSecondTimestamp < this._oMinDate.getTime() || iSecondTimestamp > this._oMaxDate.getTime()))) {
 			return [undefined, undefined];
-		}else {
+		} else  {
 			return [oDate, oSecondDate];
 		}
 
@@ -1213,7 +1241,7 @@ sap.ui.define([
 	 * </ul>
 	 *
 	 * @param {object} [mArguments] The arguments to pass along with the event.
-	 * @return {sap.m.DateRangeSelection} <code>this</code> to allow method chaining
+	 * @return {this} <code>this</code> to allow method chaining
 	 * @protected
 	 * @name sap.m.DateRangeSelection#fireChange
 	 * @function

@@ -1,25 +1,26 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides object sap.ui.core.util.XMLPreprocessor
 sap.ui.define([
-	"sap/ui/thirdparty/jquery",
 	"sap/base/Log",
+	"sap/base/util/deepExtend",
 	"sap/base/util/JSTokenizer",
 	"sap/base/util/ObjectPath",
 	"sap/ui/base/BindingParser",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/base/SyncPromise",
+	"sap/ui/core/Component",
 	"sap/ui/core/XMLTemplateProcessor",
 	"sap/ui/model/BindingMode",
 	"sap/ui/model/CompositeBinding",
 	"sap/ui/model/Context",
 	"sap/ui/performance/Measurement"
-], function (jQuery, Log, JSTokenizer, ObjectPath, BindingParser, ManagedObject, SyncPromise,
-		XMLTemplateProcessor, BindingMode, CompositeBinding, Context, Measurement) {
+], function (Log, deepExtend, JSTokenizer, ObjectPath, BindingParser, ManagedObject, SyncPromise,
+		Component, XMLTemplateProcessor, BindingMode, CompositeBinding, Context, Measurement) {
 	"use strict";
 
 	var sNAMESPACE = "http://schemas.sap.com/sapui5/extension/sap.ui.core.template/1",
@@ -39,6 +40,7 @@ sap.ui.define([
 		 */
 		With = ManagedObject.extend("sap.ui.core.util._with", {
 			metadata : {
+				library: "sap.ui.core",
 				properties : {
 					any : "any"
 				},
@@ -57,6 +59,7 @@ sap.ui.define([
 		 */
 		Repeat = With.extend("sap.ui.core.util._repeat", {
 			metadata : {
+				library: "sap.ui.core",
 				aggregations : {
 					list : {multiple : true, type : "n/a", _doesNotRequireFactory : true}
 				}
@@ -570,7 +573,7 @@ sap.ui.define([
 		 *   ID of the owning component (since 1.31; needed for extension point support)
 		 * @param {string} oViewInfo.name
 		 *   the view name (since 1.31; needed for extension point support)
-		 * @param {boolean} [oViewInfo.sync=false]
+		 * @param {boolean} [oViewInfo.sync]
 		 *   whether the view is synchronous (since 1.57.0; needed for asynchronous XML templating)
 		 * @param {object} [mSettings={}]
 		 *   map/JSON-object with initial property values, etc.
@@ -578,8 +581,11 @@ sap.ui.define([
 		 *   binding contexts relevant for template pre-processing
 		 * @param {object} mSettings.models
 		 *   models relevant for template pre-processing
-		 * @returns {Element}
-		 *   <code>oRootElement</code>
+		 * @returns {Element|Promise}
+		 *   <code>oRootElement</code> or a promise which resolves with <code>oRootElement</code> as
+		 *   soon as processing is done, or is rejected with a corresponding error if processing
+		 *   fails; since 1.57.0, a promise is returned if and only if processing cannot complete
+		 *   synchronously
 		 *
 		 * @private
 		 */
@@ -740,7 +746,7 @@ sap.ui.define([
 					 * @since 1.41.0
 					 */
 					getViewInfo : function () {
-						return jQuery.extend(true, {}, oViewInfo);
+						return deepExtend({}, oViewInfo);
 					},
 
 					/**
@@ -886,7 +892,7 @@ sap.ui.define([
 					 *
 					 * @param {object} [mVariables={}]
 					 *   Map from variable name (string) to value ({@link sap.ui.model.Context})
-					 * @param {boolean} [bReplace=false]
+					 * @param {boolean} [bReplace]
 					 *   Whether only the given variables are known in the new callback interface
 					 *   instance, no inherited ones
 					 * @returns {sap.ui.core.util.XMLPreprocessor.ICallback}
@@ -1267,7 +1273,8 @@ sap.ui.define([
 			 *   any XML DOM element
 			 * @returns {sap.ui.base.SyncPromise}
 			 *   A sync promise which resolves with <code>undefined</code> as soon as all required
-			 *   modules have been loaded
+			 *   modules have been loaded, or is rejected with a corresponding error if module
+			 *   loading fails.
 			 * @throws {Error}
 			 *   If loading fails in sync mode
 			 */
@@ -1278,15 +1285,21 @@ sap.ui.define([
 					aURNs;
 
 				function asyncRequire() {
-					return new SyncPromise(function (resolve) {
-						// Note: currently there is no way to detect failure
-						sap.ui.require(aURNs, function (/*oModule,...*/) {
-							var aModules = arguments;
+					return new SyncPromise(function (resolve, reject) {
+						var aModules = aURNs.map(sap.ui.require);
 
-							Object.keys(mAlias2URN).forEach(function (sAlias, i) {
-								oScope[sAlias] = aModules[i];
-							});
-							resolve();
+						if (aModules.every(Boolean)) {
+							// if all modules have been loaded already, resolve sync
+							// Note: we do not care about edge cases where a module value is falsy
+							resolve(aModules);
+						} else {
+							sap.ui.require(aURNs, function (/*oModule,...*/) {
+								resolve(arguments); // Note: not exactly an Array, but good enough
+							}, reject);
+						}
+					}).then(function (aModules) {
+						Object.keys(mAlias2URN).forEach(function (sAlias, i) {
+							oScope[sAlias] = aModules[i];
 						});
 					});
 				}
@@ -1430,22 +1443,20 @@ sap.ui.define([
 					return oSyncPromiseResolvedTrue;
 				}
 				return oPromise.then(function (sName) {
-					var CustomizingConfiguration
-							= sap.ui.require("sap/ui/core/CustomizingConfiguration"),
-						oViewExtension;
+					var oViewExtension;
 
 					if (sName !== sValue) {
 						// debug trace for dynamic names only
 						debug(oElement, "name =", sName);
 					}
-					if (CustomizingConfiguration) {
-						oViewExtension = CustomizingConfiguration.getViewExtension(sCurrentName,
-							sName, oViewInfo.componentId);
-						if (oViewExtension && oViewExtension.className === "sap.ui.core.Fragment"
-								&& oViewExtension.type === "XML") {
-							return insertFragment(oViewExtension.fragmentName, oElement,
-								oWithControl);
-						}
+					oViewExtension = Component.getCustomizing(oViewInfo.componentId, {
+						extensionName : sName,
+						name : sCurrentName,
+						type : "sap.ui.viewExtensions"
+					});
+					if (oViewExtension && oViewExtension.className === "sap.ui.core.Fragment"
+							&& oViewExtension.type === "XML") {
+						return insertFragment(oViewExtension.fragmentName, oElement, oWithControl);
 					}
 
 					return true;
@@ -1571,7 +1582,8 @@ sap.ui.define([
 					error("Missing model '" + sModelName + "' in ", oElement);
 				}
 				oListBinding.enableExtendedChangeDetection();
-				aContexts = oListBinding.getContexts(oBindingInfo.startIndex, oBindingInfo.length);
+				aContexts = oListBinding.getContexts(oBindingInfo.startIndex,
+					oBindingInfo.length || /*no Model#iSizeLimit*/Infinity);
 				if (!oViewInfo.sync && aContexts.dataRequested) {
 					oPromise = new SyncPromise(function (resolve) {
 						oListBinding.attachEventOnce("change", resolve);
@@ -1915,8 +1927,8 @@ sap.ui.define([
 						context: oRootElement,
 						env: {
 							caller:"view",
-							viewinfo: jQuery.extend(true, {}, oViewInfo),
-							settings: jQuery.extend(true, {}, mSettings),
+							viewinfo: deepExtend({}, oViewInfo),
+							settings: deepExtend({}, mSettings),
 							clone: oRootElement.cloneNode(true),
 							type: "template"}
 					});
