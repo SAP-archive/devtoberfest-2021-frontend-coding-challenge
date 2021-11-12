@@ -5,6 +5,7 @@
   <tnt:ToolPage id="toolPage">
     <tnt:header>
       
+      
       <tnt:ToolHeader>
         <Image src="resources/img/favicon.ico" height="48px" width="48px">
           <layoutData>
