@@ -9,10 +9,6 @@
 	padding: 0 0 0 2.75rem;
 }
 
-.sapMIBar.sapMTB .sapMCb.sapMBarChild.sapMBarFirstVisibleChild.sapMBarLastVisibleChild {
-	padding-left: 2.75rem;
-}
-
 .sapMCbBg {
 	left: 0.6875rem;
 	top: 0.6875rem;
@@ -27,13 +23,11 @@
 	}
 }
 
-@_sap_m_CheckBox_SelectedWarningColor: darken(@sapUiFieldWarningColor, 100);
-
 .sapMCb.sapMCbWarn .sapMCbBg {
 	background-color: @sapUiFieldWarningBackground;
 	border: 0.125rem solid @sapUiFieldWarningColor;
 	&.sapMCbMarkChecked:before {
-		color: @_sap_m_CheckBox_SelectedWarningColor;
+		color: @sapUiFieldTextColor;
 	}
 }
 
@@ -110,17 +104,6 @@ html.sap-desktop {
 
 	.sapUiForm .sapMCb:not(.sapMCbBgDis).sapMCbHasLabel:focus:before {
 		left: 0px; /* Cb in SimpleForm: left border adjustment */
-	}
-}
-
-/* TODO remove after the end of support for Internet Explorer */
-html[data-sap-ui-browser^="ie"].sap-desktop,
-html[data-sap-ui-browser^="ed"].sap-desktop {
-	.sapMCb:not(.sapMCbBgDis):not(.sapMCbHasLabel):focus > .sapMCbBg {
-		outline-style: dashed;
-	}
-	.sapMCb:not(.sapMCbBgDis):not(.sapMCbDisplayOnly).sapMCbHasLabel:focus:before {
-		border: 1px dashed @sapUiContentFocusColor;
 	}
 }
 
