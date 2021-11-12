@@ -41,11 +41,10 @@
             "async": true
         },
         "dependencies": {
-            "minUI5Version": "1.60.0",
+            "minUI5Version": "1.90.0",
             "libs": {
                 "sap.ui.core": {},
-                "sap.m": {},
-                "sap.ui.layout": {}
+                "sap.m": {}
             }
         },
         "contentDensities": {
