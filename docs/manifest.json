@@ -3,7 +3,11 @@
     "sap.app": {
         "id": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
         "type": "application",
-        "i18n": "i18n/i18n.properties",
+        "i18n": {
+            "bundleUrl": "i18n/i18n.properties",
+            "supportedLocales": ["en"],
+            "fallbackLocale": "en"
+        },
         "applicationVersion": {
             "version": "1.0.0"
         },
@@ -37,14 +41,14 @@
         "rootView": {
             "viewName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view.MainView",
             "type": "XML",
-            "id": "idAppControl"
+            "id": "idAppControl",
+            "async": true
         },
         "dependencies": {
             "minUI5Version": "1.60.0",
             "libs": {
                 "sap.ui.core": {},
-                "sap.m": {},
-                "sap.ui.layout": {}
+                "sap.m": {}
             }
         },
         "contentDensities": {
@@ -55,12 +59,15 @@
             "i18n": {
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": {
-                    "bundleName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.i18n.i18n"
+                    "bundleName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.i18n.i18n",
+                    "supportedLocales": ["en"],
+                    "fallbackLocale": "en"
                 }
             },
             "sample": {
                 "type": "sap.ui.model.json.JSONModel",
-                "dataSource": "dataSource"
+                "dataSource": "dataSource",
+                "preload": true
             }
         },
         "resources": {
@@ -76,7 +83,8 @@
                 "viewType": "XML",
                 "viewPath": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.view",
                 "controlId": "idAppControl",
-                "controlAggregation": "pages"
+                "controlAggregation": "pages",
+                "async": true
             },
             "routes": [
                 {
