@@ -3,11 +3,7 @@
     "sap.app": {
         "id": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
         "type": "application",
-        "i18n": {
-            "bundleUrl": "i18n/i18n.properties",
-            "supportedLocales": ["en"],
-            "fallbackLocale": "en"
-        },
+        "i18n": "i18n/i18n.properties",
         "applicationVersion": {
             "version": "1.0.0"
         },
@@ -61,7 +57,7 @@
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": {
                     "bundleName": "com.devtoberfest.devtoberfest2021FrontendCodingChallenge.i18n.i18n",
-                    "supportedLocales": ["en"],
+                    "supportedLocales": ["en","es"],
                     "fallbackLocale": "en"
                 }
             },
