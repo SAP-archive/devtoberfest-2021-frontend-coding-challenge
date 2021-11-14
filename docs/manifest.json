@@ -45,6 +45,9 @@
             "libs": {
                 "sap.ui.core": {},
                 "sap.m": {},
+                "sap.ui.comp": {
+                    "lazy": true
+                  },
                 "sap.ui.layout": { "lazy": true }
             }
         },
@@ -61,6 +64,7 @@
             },
             "sample": {
                 "type": "sap.ui.model.json.JSONModel",
+                "preload": true,
                 "dataSource": "dataSource"
             }
         },

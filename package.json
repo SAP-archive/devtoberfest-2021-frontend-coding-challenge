@@ -6,7 +6,6 @@
     "license": "Apache-2.0",
     "scripts": {
         "start": "ui5 serve --open index.html",
-        "start:dist": "serve dist",
         "start:docs": "serve docs",
         "serve": "ui5 serve",
         "build": "ui5 build --clean-dest --dest docs self-contained --all ",
