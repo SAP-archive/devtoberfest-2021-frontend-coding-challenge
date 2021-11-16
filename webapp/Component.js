@@ -1,10 +1,10 @@
 sap.ui.define(
     [
         "sap/ui/core/UIComponent",
-        "sap/ui/Device",
+        "sap/ui/model/json/JSONModel",
         "com/devtoberfest/devtoberfest2021FrontendCodingChallenge/model/models",
     ],
-    function (UIComponent, Device, models) {
+    function (UIComponent, JSONModel, models) {
         "use strict";
 
         return UIComponent.extend(
@@ -28,7 +28,23 @@ sap.ui.define(
 
                     // set the device model
                     this.setModel(models.createDeviceModel(), "device");
+
+                    // set the settings model
+                    const useDarkTheme =
+                        window.matchMedia &&
+                        window.matchMedia("(prefers-color-scheme: dark)")
+                            .matches;
+
+                    const settingsModel = new JSONModel({
+                        search: "",
+                        lightTheme: !useDarkTheme,
+                    });
+                    this.setModel(settingsModel, "settings");
                 },
+
+                onBeforeRendering: function () {
+                    $("#busyIndicator").remove();
+                }
             }
         );
     }

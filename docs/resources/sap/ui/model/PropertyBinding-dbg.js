@@ -1,21 +1,20 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2020 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2021 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides an abstract property binding.
 sap.ui.define([
 	'./Binding',
-	'./SimpleType',
-	'./DataState',
 	"sap/ui/base/SyncPromise",
 	"sap/base/Log",
-	"sap/base/assert"
+	"sap/base/assert",
+	'./SimpleType', // convenience dependency for legacy code that uses global names
+	'./DataState' // convenience dependency for legacy code that uses global names
 ],
-	function(Binding, SimpleType, DataState, SyncPromise, Log, assert) {
+	function(Binding, SyncPromise, Log, assert) {
 	"use strict";
-
 
 	/**
 	 * Constructor for PropertyBinding
@@ -203,7 +202,7 @@ sap.ui.define([
 	 * setting the binding value and if so set the new value also in the model.
 	 *
 	 * @param {any} vValue the value to set for this binding
-	 * @return {undefined|Promise} a Promise in case asynchronous parsing/validation is done
+	 * @return {undefined|Promise} a promise in case of asynchronous type parsing or validation
 	 * @throws sap.ui.model.ParseException
 	 * @throws sap.ui.model.ValidateException
 	 *
@@ -355,54 +354,6 @@ sap.ui.define([
 	PropertyBinding.prototype.resume = function() {
 		this.bSuspended = false;
 		this.checkUpdate(true);
-	};
-
-	/**
-	 * Checks whether an update of the data state of this binding is required.
-	 *
-	 * @param {map} mPaths A Map of paths to check if update needed
-	 * @private
-	 */
-	PropertyBinding.prototype.checkDataState = function(mPaths) {
-		var sResolvedPath = this.oModel ? this.oModel.resolve(this.sPath, this.oContext) : null;
-
-		this._checkDataState(sResolvedPath, mPaths);
-	};
-
-	/**
-	 * Checks whether an update of the data state of this binding is required with the given path.
-	 *
-	 * @param {string} sResolvedPath With help of the connected model resolved path
-	 * @param {map} mPaths A Map of paths to check if update needed
-	 * @private
-	 */
-	PropertyBinding.prototype._checkDataState = function(sResolvedPath, mPaths) {
-		var that = this;
-		if (!mPaths || sResolvedPath && sResolvedPath in mPaths) {
-			var oDataState = this.getDataState();
-
-			var fireChange = function() {
-				that.fireEvent("AggregatedDataStateChange", { dataState: oDataState });
-				oDataState.changed(false);
-				that._sDataStateTimout = null;
-			};
-
-			if (sResolvedPath) {
-				oDataState.setModelMessages(this.oModel.getMessagesByPath(sResolvedPath));
-			}
-			if (oDataState && oDataState.changed()) {
-				if (this.mEventRegistry["DataStateChange"]) {
-					this.fireEvent("DataStateChange", { dataState: oDataState });
-				}
-				if (this.bIsBeingDestroyed) {
-					fireChange();
-				} else if (this.mEventRegistry["AggregatedDataStateChange"]) {
-					if (!this._sDataStateTimout) {
-						this._sDataStateTimout = setTimeout(fireChange, 0);
-					}
-				}
-			}
-		}
 	};
 
 	return PropertyBinding;

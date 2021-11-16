@@ -11,19 +11,13 @@ This is the [Devtoberfest 2021 Coding Challenge of week 6](https://github.com/SA
 
 ![Running app in light mode](./running.png)
 
-Unfortunately, this app doesn't have the best loading performance. The [Lighthouse performance score](https://web.dev/performance-scoring/) is way below the achievable 100 points. Luckily, this is not the fault of the framework used but happened due to a bad implementation and disregard of [common best practices](https://www.youtube.com/watch?v=CBF_8eOjuc8). It’s up to you to fix this web application and to push the performance score above 70.
+> This branch contains the sample solution of this challenge. Go [here](https://github.com/SAP-samples/devtoberfest-2021-frontend-coding-challenge/tree/main) to see the original, slower version of this application and optimize it yourself.
 
-Possible areas where you can achieve performance boosts are:
-- [Optimize Media Files](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=551s)
-- [Avoid or Minimize Blocking JS and CSS / On-demand Loading of Assets](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=675s)
-- [Reduce the Network Load](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=859s)
-- [Reduce the Perceived Loading Time](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=970s)
+This sample solution gets a result of (about) 94 when running locally.
+
+![Solution results](./sampleResult.png)
 
 
-For more details, watch [this video](https://www.youtube.com/watch?v=CBF_8eOjuc8):
-
-
-[![Video Preview](https://img.youtube.com/vi/CBF_8eOjuc8/0.jpg)](https://www.youtube.com/watch?v=CBF_8eOjuc8)
 
 ## Requirements
 
@@ -63,8 +57,6 @@ You can submit your solution as follows:
     ```
 
 1. Create a pull request and make sure your web app is exposed as with [GitHub Pages](https://pages.github.com/) and available under `https://${{ Your GitHub User }}.github.io/devtoberfest-2021-frontend-coding-challenge/`. Our CI/CD actions will take it from here and let you know if your app passed the test.
-
-    ![GitHub Pull Request](./PR.png)
 
 > In case you still have questions: [Check out this video](https://www.youtube.com/watch?v=CBF_8eOjuc8&t=1292s) where I create an example contribution.
 

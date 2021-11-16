@@ -1,45 +1,55 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link
-            href="resources/img/favicon.ico"
-            rel="shortcut icon"
-            type="image/x-icon"
-        />
 
-        <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/resources/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link id="animation" rel="stylesheet" type="text/css" href="css/splash.css"/>
 
-        <script
-            id="sap-ui-bootstrap"
-            src="resources/sap-ui-core.js"
-            data-sap-ui-theme="sap_fiori_3"
-            data-sap-ui-resourceroots='{
-        "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./"
-      }'
-            data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
-            data-sap-ui-compatVersion="edge"
-            data-sap-ui-frameOptions="trusted"
-        ></script>
+    <title>Devtoberfest 2021 - Frontend Coding Challenge</title>
 
-        <script>
-            sap.ui.getCore().attachInit(function () {
-                sap.ui.require(
-                    ["sap/ui/core/ComponentContainer"],
-                    function (ComponentContainer) {
-                        new ComponentContainer({
-                            name: "com.devtoberfest.devtoberfest2021FrontendCodingChallenge",
-                            manifest: true,
-                            height: "100%",
-                        }).placeAt("content");
-                    }
+    <script>
+        window["sap-ui-config"] = {};
+        // determine the proper theme for UI5 from current color scheme
+        window["sap-ui-config"]["theme"] = (function () {
+            try {
+                return window.matchMedia("(prefers-color-scheme: dark)")
+                    .matches
+                    ? "sap_fiori_3_dark"
+                    : "sap_fiori_3";
+            } catch (ex) {
+                console.warn(
+                    "window.matchMedia not supported - keep default theme"
                 );
-            });
-        </script>
-    </head>
+                return "sap_fiori_3";
+            }
+        })();
+    </script>
 
-    <body class="sapUiBody" role="application">
-        <div id="content"></div>
-    </body>
+    <script id="sap-ui-bootstrap" src="https://openui5.hana.ondemand.com/resources/sap-ui-core.js"
+        data-sap-ui-resourceroots='{
+                "com.devtoberfest.devtoberfest2021FrontendCodingChallenge": "./"
+            }' data-sap-ui-async="true" data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
+        data-sap-ui-compatVersion="edge" data-sap-ui-frameOptions="trusted"></script>
+</head>
+
+<body class="sapUiBody">
+
+    <div id="busyIndicator" style="text-align: center; font-family: Sans, Arial">
+
+        <img src="resources/img/ui5_logo.png" class="logo" />
+
+        <div class="lds-ellipsis">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <div data-sap-ui-component data-name="com.devtoberfest.devtoberfest2021FrontendCodingChallenge" data-id="container"
+        data-settings='{"id" : "devtoberfest2021FrontendCodingChallenge"}'></div>
+</body>
+
 </html>

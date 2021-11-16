@@ -3,7 +3,6 @@
 /* Base theme                      */
 /* =============================== */
 
-@_sap_m_Carousel_PagesMarginRight: 1.25rem;
 @_sap_m_Carousel_MinWidth: 20rem;
 @_sap_m_Carousel_ControlsNoArrowsHeight: 2rem;
 @_sap_m_Carousel_NumericIndicatorTextColor: @sapUiContentLabelColor;
@@ -29,11 +28,6 @@
 	overflow: hidden;
 	box-sizing: border-box;
 	border: 1px solid transparent;
-
-	/* IE Windows 8 */// TODO remove after the end of support for Internet Explorer
-	/* This element receives events when not panning in vertical direction */
-	touch-action: pan-y;
-	-ms-touch-action: pan-y;
 	min-width: @_sap_m_Carousel_MinWidth;
 }
 
@@ -89,19 +83,6 @@
 html[data-sap-ui-animation='off'] .sapMCrslInner {
 	transition-duration: 0.01s;
  }
-
-
-/* special handling for IE / Edge, as it does not support text-align: end */// TODO remove after the end of support for Internet Explorer
-html[data-sap-ui-browser^="ie"] .sapMCrslInner,// TODO remove after the end of support for Internet Explorer
-html[data-sap-ui-browser^="ed"] .sapMCrslInner {
- 	text-align: left;
-}
-
-html[dir=rtl][data-sap-ui-browser^="ie"] .sapMCrslInner,// TODO remove after the end of support for Internet Explorer
-html[dir=rtl][data-sap-ui-browser^="ed"] .sapMCrslInner {
-	text-align: right;
-
-}
 
 .sapMCrslItemTable {
 	height: 100%;
@@ -278,7 +259,7 @@ html[dir=rtl][data-sap-ui-browser^="ed"] .sapMCrslInner {
 	position: absolute;
 	top: 0;
 	width: 100%;
-	z-index: 10;
+	z-index: 1;
 	align-self: center;
 }
 
@@ -293,7 +274,7 @@ html[dir=rtl][data-sap-ui-browser^="ed"] .sapMCrslInner {
 	position: absolute;
 	top: 0;
 	width: 100%;
-	z-index: 10;
+	z-index: 1;
 	align-self: center;
 }
 
@@ -541,7 +522,7 @@ html[data-sap-ui-animation='off'] {
 
 /* Default Themes/Sytles for Slider */
 .sapMCrslFluid .sapMCrslItem {
-	margin-right: @_sap_m_Carousel_PagesMarginRight;
+	margin-right: 1.25rem;
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
